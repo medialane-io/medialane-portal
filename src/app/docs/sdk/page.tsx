@@ -163,59 +163,92 @@ console.log(newKey.data.key) // shown once — save it!
 // Get usage
 const usage = await client.api.getUsage()`}</DocCodeBlock>
 
-      <h3 className="text-lg font-semibold text-white mt-6 mb-3">Batch token fetch</h3>
-      <DocCodeBlock>{`// Fetch up to 50 tokens in one request
-const result = await client.api.getTokensBatch([
-  { contract: "0x05e7...", tokenId: "1" },
-  { contract: "0x05e7...", tokenId: "2" },
-])
-result.data.forEach((token) => console.log(token.tokenId, token.metadata?.name))`}</DocCodeBlock>
-
-      <h3 className="text-lg font-semibold text-white mt-6 mb-3">Batch checkout intent</h3>
-      <DocCodeBlock>{`import { toSignatureArray } from "@medialane/sdk"
-
-// Create fulfillment intents for up to 20 orders at once
-const intents = await client.api.createCheckoutIntent({
-  fulfiller: walletAddress,
-  orderHashes: ["0xabc...", "0xdef..."],
-})
-
-for (const item of intents.data) {
-  if (item.error) {
-    console.warn("Failed for order", item.orderHash, item.error)
-    continue
-  }
-  // Sign and submit each successful intent
-  const sig = await account.signMessage(item.typedData)
-  await client.api.submitIntentSignature(item.id!, toSignatureArray(sig))
-}`}</DocCodeBlock>
-
-      <h3 className="text-lg font-semibold text-white mt-6 mb-3" id="real-time-events">Real-time events (SSE)</h3>
-      <DocCodeBlock>{`// Get the SSE endpoint URL (includes your API key automatically)
-const url = client.api.getEventsUrl()
-const source = new EventSource(url)
-
-source.addEventListener("order.fulfilled", (e) => {
-  const order = JSON.parse(e.data)
-  console.log("Order fulfilled:", order.orderHash)
-})
-
-source.addEventListener("transfer", (e) => {
-  const transfer = JSON.parse(e.data)
-  console.log("Transfer:", transfer.contractAddress, transfer.tokenId)
-})
-
-source.addEventListener("order.created", (e) => {
-  const order = JSON.parse(e.data)
-  console.log("New listing:", order.orderHash, order.price)
-})
-
-// Resume from last event on reconnect
-source.addEventListener("error", () => {
-  source.close()
-  const resumeUrl = client.api.getEventsUrl(source.lastEventId || undefined)
-  // reconnect: new EventSource(resumeUrl)
+      <h3 className="text-lg font-semibold text-white mt-6 mb-3">On-chain comments</h3>
+      <DocCodeBlock>{`// Fetch permanent on-chain comments for a token
+const result = await client.api.getTokenComments("0x05e7...", "42", { limit: 20 })
+result.data.forEach((c) => {
+  console.log(c.author, c.content, c.postedAt)
 })`}</DocCodeBlock>
+
+      <h3 className="text-lg font-semibold text-white mt-6 mb-3">Counter-offers</h3>
+      <DocCodeBlock>{`// Seller creates a counter-offer in response to a buyer's bid
+const intent = await client.api.createCounterOfferIntent(
+  {
+    sellerAddress: "0x0591...",
+    originalOrderHash: "0x04f7a1...",
+    counterPrice: "750000",       // raw wei
+    durationSeconds: 86400,       // 1 day
+    message: "Best I can do!",
+  },
+  clerkToken
+)
+
+// Buyer fetches counter-offers for their bid
+const counters = await client.api.getCounterOffers({
+  originalOrderHash: "0x04f7a1...",
+})
+console.log(counters.data[0].price)
+
+// Buyer accepts by fulfilling the counter-offer (it is a standard listing)
+await client.api.createFulfillIntent({ fulfiller: buyerAddress, orderHash: counters.data[0].orderHash })`}</DocCodeBlock>
+
+      <h3 className="text-lg font-semibold text-white mt-6 mb-3">Remix licensing</h3>
+      <DocCodeBlock>{`import { OPEN_LICENSES } from "@medialane/sdk"
+
+// Check if a license is open (auto-approved remix)
+console.log(OPEN_LICENSES) // ["CC0", "CC BY", "CC BY-SA", "CC BY-NC"]
+
+// Request permission to remix a token (custom offer, Clerk JWT required)
+const offer = await client.api.submitRemixOffer(
+  {
+    originalContract: "0x05e7...",
+    originalTokenId: "42",
+    licenseType: "CC BY-NC",
+    commercial: false,
+    derivatives: true,
+    royaltyPct: 10,
+    message: "Would love to remix this for my EP cover",
+  },
+  clerkToken
+)
+
+// Open-license tokens are auto-approved
+const autoOffer = await client.api.submitAutoRemixOffer(
+  { originalContract: "0x05e7...", originalTokenId: "7", licenseType: "CC0" },
+  clerkToken
+)
+
+// Creator approves a pending offer
+await client.api.confirmRemixOffer(offer.data.id, {
+  approvedCollection: "0x06a3...",
+  remixContract: "0x06a3...",
+  remixTokenId: "1",
+}, clerkToken)
+
+// Creator rejects an offer
+await client.api.rejectRemixOffer(offer.data.id, clerkToken)
+
+// Owner records their own self-remix after minting
+await client.api.confirmSelfRemix(
+  {
+    originalContract: "0x05e7...",
+    originalTokenId: "42",
+    remixContract: "0x06a3...",
+    remixTokenId: "1",
+    licenseType: "CC BY",
+    commercial: true,
+    derivatives: true,
+  },
+  clerkToken
+)
+
+// List incoming / outgoing offers
+const incoming = await client.api.getRemixOffers({ role: "creator" }, clerkToken)
+const outgoing = await client.api.getRemixOffers({ role: "requester" }, clerkToken)
+
+// Get public remixes for a token (no auth needed)
+const remixes = await client.api.getTokenRemixes("0x05e7...", "42")
+remixes.data.forEach((r) => console.log(r.remixContract, r.remixTokenId, r.licenseType))`}</DocCodeBlock>
 
       <h3 className="text-lg font-semibold text-white mt-6 mb-3">CollectionSort — typed sort options</h3>
       <DocCodeBlock>{`import type { CollectionSort } from "@medialane/sdk"

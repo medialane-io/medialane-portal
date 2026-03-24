@@ -1162,6 +1162,283 @@ const resumeSource = new EventSource(url, {
 }`}
       />
 
+      {/* ── COMMENTS ── */}
+      <DocH2 id="comments" border>On-chain Comments</DocH2>
+      <p className="text-sm text-muted-foreground mb-6">
+        Permanent on-chain comments posted to the NFTComments contract on Starknet. Comments are indexed by the backend and surfaced here. The Cairo contract enforces a 60-second per-address rate limit and comments cannot be deleted on-chain, only hidden at the application layer after reports.
+      </p>
+
+      <Endpoint
+        method="GET"
+        path="/v1/tokens/:contract/:tokenId/comments"
+        description="List indexed on-chain comments for a token, newest first. Hidden comments (3+ reports) are excluded."
+        params={[
+          { name: "contract", type: "string", required: true, desc: "NFT contract address" },
+          { name: "tokenId", type: "string", required: true, desc: "Token ID" },
+          { name: "page", type: "number", desc: "Page number (default: 1)" },
+          { name: "limit", type: "number", desc: "Results per page (default: 20, max: 100)" },
+        ]}
+        curl={`curl "${BASE}/v1/tokens/0x05e7.../42/comments?limit=20" \\
+  -H "x-api-key: ${KEY}"`}
+        response={`{
+  "data": [
+    {
+      "id": "cmt_01j...",
+      "chain": "starknet",
+      "contractAddress": "0x05e7...",
+      "tokenId": "42",
+      "author": "0x03d0...",
+      "content": "This is a permanent mark on Starknet.",
+      "txHash": "0x07a2...",
+      "blockNumber": "789123",
+      "postedAt": "2026-03-22T14:00:00Z"
+    }
+  ],
+  "meta": { "page": 1, "limit": 20, "total": 5 }
+}`}
+      />
+
+      {/* ── COUNTER-OFFERS ── */}
+      <DocH2 id="counter-offers" border>Counter-offers</DocH2>
+      <p className="text-sm text-muted-foreground mb-6">
+        Sellers can respond to buyer bids with a counter-offer — a new on-chain listing linked to the original bid. The original bid is marked <code className="font-mono text-xs bg-white/10 px-1.5 py-0.5 rounded">COUNTER_OFFERED</code>. The buyer can then accept (fulfill the counter listing) or ignore it.
+      </p>
+
+      <Endpoint
+        method="GET"
+        path="/v1/orders/counter-offers"
+        description="List counter-offer listings. Pass originalOrderHash for the buyer's view (one counter per bid) or sellerAddress for the seller's view (all counters they have sent). At least one query param is required."
+        params={[
+          { name: "originalOrderHash", type: "string", desc: "Original bid order hash — returns the counter-offer for this specific bid" },
+          { name: "sellerAddress", type: "string", desc: "Seller address — returns all counter-offers sent by this seller" },
+          { name: "page", type: "number", desc: "Page number (default: 1)" },
+          { name: "limit", type: "number", desc: "Results per page (default: 20)" },
+        ]}
+        curl={`curl "${BASE}/v1/orders/counter-offers?originalOrderHash=0x04f7a1..." \\
+  -H "x-api-key: ${KEY}"`}
+        response={`{
+  "data": [
+    {
+      "id": "ord_01j...",
+      "orderHash": "0x0a1b...",
+      "offerer": "0x0591...",
+      "status": "ACTIVE",
+      "parentOrderHash": "0x04f7a1...",
+      "counterOfferMessage": "Best I can do!",
+      "price": { "raw": "750000", "formatted": "0.75", "currency": "USDC", "decimals": 6 },
+      "endTime": "2026-03-25T00:00:00Z",
+      "token": { "name": "Genesis #42", "image": "ipfs://...", "description": null }
+    }
+  ],
+  "meta": { "page": 1, "limit": 20, "total": 1 }
+}`}
+      />
+
+      <Endpoint
+        method="POST"
+        path="/v1/intents/counter-offer"
+        description="Create a counter-offer intent. The seller proposes a new price for the NFT in response to a buyer's active bid. Currency is derived server-side from the original bid token — do not pass a currency field. Requires a Clerk session JWT for authentication; the seller address must match the consideration.recipient of the original bid."
+        params={[
+          { name: "sellerAddress", type: "string", required: true, desc: "Seller's wallet address" },
+          { name: "originalOrderHash", type: "string", required: true, desc: "Order hash of the original buyer bid" },
+          { name: "counterPrice", type: "string", required: true, desc: "Counter price as raw wei integer string" },
+          { name: "durationSeconds", type: "number", required: true, desc: "Validity duration in seconds (3600–2592000)" },
+          { name: "message", type: "string", desc: "Optional seller message to buyer (max 500 chars)" },
+        ]}
+        curl={`curl -X POST "${BASE}/v1/intents/counter-offer" \\
+  -H "x-api-key: ${KEY}" \\
+  -H "Authorization: Bearer CLERK_SESSION_JWT" \\
+  -H "Content-Type: application/json" \\
+  -d '{
+    "sellerAddress": "0x0591...",
+    "originalOrderHash": "0x04f7a1...",
+    "counterPrice": "750000",
+    "durationSeconds": 86400,
+    "message": "Best I can do!"
+  }'`}
+        response={`{
+  "data": {
+    "id": "int_01j...",
+    "typedData": { ... },
+    "calls": [ ... ],
+    "expiresAt": "2026-03-25T00:00:00Z"
+  }
+}`}
+      />
+
+      {/* ── REMIX LICENSING ── */}
+      <DocH2 id="remix-licensing" border>Remix Licensing</DocH2>
+      <p className="text-sm text-muted-foreground mb-6">
+        Creators can allow others to remix their NFTs under specific license terms. Open licenses (CC0, CC BY, CC BY-SA, CC BY-NC) are auto-approved. Custom terms require creator approval before the requester can mint. All endpoints require a Clerk JWT except the public remixes list.
+      </p>
+
+      <Endpoint
+        method="GET"
+        path="/v1/tokens/:contract/:tokenId/remixes"
+        description="List public remixes of a token. Price and currency fields are omitted — this is a public endpoint. Returns minted remixes only."
+        params={[
+          { name: "contract", type: "string", required: true, desc: "Original NFT contract address" },
+          { name: "tokenId", type: "string", required: true, desc: "Original token ID" },
+          { name: "page", type: "number", desc: "Page number (default: 1)" },
+          { name: "limit", type: "number", desc: "Results per page (default: 20)" },
+        ]}
+        curl={`curl "${BASE}/v1/tokens/0x05e7.../42/remixes" \\
+  -H "x-api-key: ${KEY}"`}
+        response={`{
+  "data": [
+    {
+      "id": "rxo_01j...",
+      "remixContract": "0x06a3...",
+      "remixTokenId": "1",
+      "licenseType": "CC BY",
+      "commercial": true,
+      "derivatives": true,
+      "createdAt": "2026-03-23T10:00:00Z"
+    }
+  ],
+  "meta": { "page": 1, "limit": 20, "total": 3 }
+}`}
+      />
+
+      <Endpoint
+        method="POST"
+        path="/v1/remix-offers"
+        description="Submit a custom remix offer for a token. If the token's license is not open (CC0/CC BY/CC BY-SA/CC BY-NC), the creator must approve before the requester can mint. Requires Clerk JWT."
+        params={[
+          { name: "originalContract", type: "string", required: true, desc: "Original NFT contract address" },
+          { name: "originalTokenId", type: "string", required: true, desc: "Original token ID" },
+          { name: "licenseType", type: "string", required: true, desc: "Requested license (e.g. CC BY-NC)" },
+          { name: "commercial", type: "boolean", required: true, desc: "Commercial use requested" },
+          { name: "derivatives", type: "boolean", required: true, desc: "Derivatives allowed" },
+          { name: "royaltyPct", type: "number", desc: "Royalty percentage (0–100)" },
+          { name: "proposedPrice", type: "string", desc: "Proposed payment as raw wei integer string" },
+          { name: "proposedCurrency", type: "string", desc: "Token address of proposed payment currency" },
+          { name: "message", type: "string", desc: "Optional message to the creator" },
+        ]}
+        curl={`curl -X POST "${BASE}/v1/remix-offers" \\
+  -H "x-api-key: ${KEY}" \\
+  -H "Authorization: Bearer CLERK_SESSION_JWT" \\
+  -H "Content-Type: application/json" \\
+  -d '{
+    "originalContract": "0x05e7...",
+    "originalTokenId": "42",
+    "licenseType": "CC BY-NC",
+    "commercial": false,
+    "derivatives": true,
+    "royaltyPct": 10,
+    "message": "Would love to remix this for my EP cover"
+  }'`}
+        response={`{
+  "data": {
+    "id": "rxo_01j...",
+    "status": "PENDING",
+    "originalContract": "0x05e7...",
+    "originalTokenId": "42",
+    "creatorAddress": "0x0591...",
+    "requesterAddress": "0x03d0...",
+    "licenseType": "CC BY-NC",
+    "commercial": false,
+    "derivatives": true,
+    "royaltyPct": 10,
+    "approvedCollection": null,
+    "remixContract": null,
+    "remixTokenId": null,
+    "orderHash": null,
+    "expiresAt": "2026-04-23T10:00:00Z",
+    "createdAt": "2026-03-23T10:00:00Z"
+  }
+}`}
+      />
+
+      <Endpoint
+        method="POST"
+        path="/v1/remix-offers/auto"
+        description="Submit an auto remix offer for a token with an open license (CC0, CC BY, CC BY-SA, CC BY-NC). Auto-approved immediately — no creator action needed. Requires Clerk JWT."
+        params={[
+          { name: "originalContract", type: "string", required: true, desc: "Original NFT contract address" },
+          { name: "originalTokenId", type: "string", required: true, desc: "Original token ID" },
+          { name: "licenseType", type: "string", required: true, desc: "Open license type (must be CC0, CC BY, CC BY-SA, or CC BY-NC)" },
+        ]}
+        curl={`curl -X POST "${BASE}/v1/remix-offers/auto" \\
+  -H "x-api-key: ${KEY}" \\
+  -H "Authorization: Bearer CLERK_SESSION_JWT" \\
+  -H "Content-Type: application/json" \\
+  -d '{ "originalContract": "0x05e7...", "originalTokenId": "7", "licenseType": "CC0" }'`}
+        response={`{ "data": { "id": "rxo_01j...", "status": "AUTO_PENDING", ... } }`}
+      />
+
+      <Endpoint
+        method="POST"
+        path="/v1/remix-offers/self/confirm"
+        description="Record a self-remix — the token owner remixing their own asset. Call after the remix has been minted on-chain. Requires Clerk JWT."
+        params={[
+          { name: "originalContract", type: "string", required: true, desc: "Original NFT contract address" },
+          { name: "originalTokenId", type: "string", required: true, desc: "Original token ID" },
+          { name: "remixContract", type: "string", required: true, desc: "Remix NFT contract address" },
+          { name: "remixTokenId", type: "string", required: true, desc: "Remix token ID" },
+          { name: "licenseType", type: "string", required: true, desc: "License type applied to the remix" },
+          { name: "commercial", type: "boolean", required: true, desc: "Commercial use" },
+          { name: "derivatives", type: "boolean", required: true, desc: "Further derivatives allowed" },
+          { name: "royaltyPct", type: "number", desc: "Royalty percentage" },
+        ]}
+        curl={`curl -X POST "${BASE}/v1/remix-offers/self/confirm" \\
+  -H "x-api-key: ${KEY}" \\
+  -H "Authorization: Bearer CLERK_SESSION_JWT" \\
+  -H "Content-Type: application/json" \\
+  -d '{ "originalContract": "0x05e7...", "originalTokenId": "42", "remixContract": "0x06a3...", "remixTokenId": "1", "licenseType": "CC BY", "commercial": true, "derivatives": true }'`}
+        response={`{ "data": { "id": "rxo_01j...", "status": "SELF_MINTED", ... } }`}
+      />
+
+      <Endpoint
+        method="GET"
+        path="/v1/remix-offers"
+        description="List remix offers for the authenticated user. Pass role=creator to see incoming offers (you are the original creator), or role=requester to see offers you made. Requires Clerk JWT."
+        params={[
+          { name: "role", type: "string", required: true, desc: '"creator" or "requester"' },
+          { name: "page", type: "number", desc: "Page (default: 1)" },
+          { name: "limit", type: "number", desc: "Results per page (default: 20)" },
+        ]}
+        curl={`curl "${BASE}/v1/remix-offers?role=creator" \\
+  -H "x-api-key: ${KEY}" \\
+  -H "Authorization: Bearer CLERK_SESSION_JWT"`}
+        response={`{
+  "data": [ { "id": "rxo_01j...", "status": "PENDING", "requesterAddress": "0x03d0...", ... } ],
+  "meta": { "page": 1, "limit": 20, "total": 2 }
+}`}
+      />
+
+      <Endpoint
+        method="POST"
+        path="/v1/remix-offers/:id/confirm"
+        description="Creator approves a pending remix offer and records the minted remix on-chain coordinates. Requires Clerk JWT — caller must be the creator of the original token."
+        params={[
+          { name: "id", type: "string", required: true, desc: "Remix offer ID (URL param)" },
+          { name: "approvedCollection", type: "string", required: true, desc: "Collection contract where the remix will be minted" },
+          { name: "remixContract", type: "string", required: true, desc: "Remix NFT contract address (usually same as approvedCollection)" },
+          { name: "remixTokenId", type: "string", required: true, desc: "Minted remix token ID" },
+          { name: "orderHash", type: "string", desc: "Marketplace order hash if a payment was arranged" },
+        ]}
+        curl={`curl -X POST "${BASE}/v1/remix-offers/rxo_01j.../confirm" \\
+  -H "x-api-key: ${KEY}" \\
+  -H "Authorization: Bearer CLERK_SESSION_JWT" \\
+  -H "Content-Type: application/json" \\
+  -d '{ "approvedCollection": "0x06a3...", "remixContract": "0x06a3...", "remixTokenId": "1" }'`}
+        response={`{ "data": { "id": "rxo_01j...", "status": "APPROVED", "remixContract": "0x06a3...", "remixTokenId": "1", ... } }`}
+      />
+
+      <Endpoint
+        method="POST"
+        path="/v1/remix-offers/:id/reject"
+        description="Creator rejects a pending remix offer. Requires Clerk JWT — caller must be the creator of the original token."
+        params={[
+          { name: "id", type: "string", required: true, desc: "Remix offer ID (URL param)" },
+        ]}
+        curl={`curl -X POST "${BASE}/v1/remix-offers/rxo_01j.../reject" \\
+  -H "x-api-key: ${KEY}" \\
+  -H "Authorization: Bearer CLERK_SESSION_JWT"`}
+        response={`{ "data": { "id": "rxo_01j...", "status": "REJECTED", ... } }`}
+      />
+
       {/* ── TECHNICAL DETAILS ── */}
       <DocH2 id="technical" border>Technical Details</DocH2>
 
