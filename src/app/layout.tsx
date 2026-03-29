@@ -21,7 +21,7 @@ export const viewport = {
 }
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || "https://medialane.xyz"),
+  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || "https://portal.medialane.io"),
   alternates: {
     canonical: './',
   },

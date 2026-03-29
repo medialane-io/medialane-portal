@@ -85,7 +85,7 @@ export default function PricingPage() {
               </CardHeader>
               <CardContent className="p-8 space-y-6">
                 <Button asChild variant="outline" className="w-full border-primary/30 hover:bg-primary/10" size="lg">
-                  <a href="mailto:api@medialane.xyz">Request Access</a>
+                  <a href="mailto:api@medialane.io">Request Access</a>
                 </Button>
               </CardContent>
             </Card>

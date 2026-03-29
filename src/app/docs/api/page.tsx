@@ -633,7 +633,7 @@ export default function ApiReferencePage() {
         curl={`curl "${BASE}/v1/metadata/signed-url" \\
   -H "x-api-key: ${KEY}"`}
         response={`{
-  "url": "https://upload.medialane.xyz/...",
+  "url": "https://ipfs.io/ipfs/...",
   "fields": { ... },
   "expiresAt": "2026-03-01T10:30:00Z"
 }`}

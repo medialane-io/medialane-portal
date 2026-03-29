@@ -1,6 +1,6 @@
 import { MetadataRoute } from 'next'
 
-const BASE_URL = process.env.NEXT_PUBLIC_APP_URL || 'https://medialane.xyz'
+const BASE_URL = process.env.NEXT_PUBLIC_APP_URL || 'https://portal.medialane.io'
 
 export default function sitemap(): MetadataRoute.Sitemap {
     const routes = [

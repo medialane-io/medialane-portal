@@ -130,7 +130,7 @@ export function WebhooksTab({ plan }: Props) {
             and transfers.
           </p>
           <Button asChild variant="outline">
-            <a href="mailto:api@medialane.xyz?subject=Premium%20Access%20Request">
+            <a href="mailto:api@medialane.io?subject=Premium%20Access%20Request">
               Request Premium Access
             </a>
           </Button>
