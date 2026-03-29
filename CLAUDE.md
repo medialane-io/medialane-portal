@@ -19,13 +19,18 @@ Always verify `bun run build` passes (0 errors, 0 TS issues) after any significa
 
 ## Repository Role
 
-`medialane-xyz` is the **public-facing developer portal AND consumer creator app** for the Medialane platform.
-It is a Next.js 15 App Router site — mix of static marketing pages, a ChipiPay-powered wallet, and an API developer portal.
+`medialane-portal` is the **developer portal** for Medialane at `portal.medialane.io`.
+It is a Next.js 15 App Router site — API key management, usage dashboard, webhooks, and full REST + SDK documentation.
 
 **Do not confuse it with:**
-- `medialane-io` — separate consumer launchpad (older, being superseded by medialane-xyz features)
+- `medialane-io` — consumer launchpad at `www.medialane.io` (ChipiPay invisible wallet)
+- `medialane-dapp` — permissionless dApp at `dapp.medialane.io` (on-chain reads, Starknet wallets)
 - `medialane-backend` — the Hono REST API + indexer service
-- `medialane-sdk` — the TypeScript SDK (`@medialane/sdk` npm package, v0.4.1)
+- `medialane-sdk` — the TypeScript SDK (`@medialane/sdk` npm package, v0.5.3)
+
+**Only email in use across the entire platform**: `dao@medialane.org`
+
+**Build note**: `✓ Compiled successfully` is the success indicator. Static generation fails locally due to missing `NEXT_PUBLIC_CHIPI_API_KEY` — this is expected and pre-existing.
 
 ---
 
@@ -145,7 +150,7 @@ The contact route uses Zod for validation. Honeypot field `_hp` blocks bot submi
 | UI | React 19 + Tailwind v3 + Radix UI |
 | Animation | Framer Motion |
 | Auth | Clerk 6 (`@clerk/nextjs`) — auth + user metadata storage |
-| Wallet | ChipiPay — `@chipi-stack/nextjs` v13.8.0 + `@chipi-stack/chipi-passkey` v1.8.0 |
+| Wallet | ChipiPay — `@chipi-stack/nextjs` v14 + `@chipi-stack/chipi-passkey` |
 | Email | nodemailer v8 (SMTP, contact form only) |
 | Validation | Zod v3 (contact API route) |
 | Path alias | `@/*` → repo root, `@/src/*` → `src/` |
