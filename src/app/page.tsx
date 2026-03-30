@@ -47,7 +47,7 @@ export default function Home() {
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Button asChild size="lg" className="px-8 h-12 text-base font-semibold">
-              <Link href="/account">
+              <Link href="/connect">
                 <Key className="w-5 h-5 mr-2" />
                 Get Free API Key
               </Link>
@@ -116,7 +116,7 @@ export default function Home() {
                   ))}
                 </ul>
                 <Button asChild className="w-full">
-                  <Link href="/account">Get API Key</Link>
+                  <Link href="/connect">Get API Key</Link>
                 </Button>
               </CardContent>
             </Card>

@@ -5,7 +5,6 @@ import { Toaster } from "@/src/components/ui/toaster"
 import FloatingNav from "@/src/components/floating-nav"
 import Footer from "@/src/components/footer"
 import FramerMotionProvider from "@/src/lib/framer-motion-provider"
-import { ClerkProvider } from '@clerk/nextjs'
 import { Providers } from "./providers";
 
 const inter = Inter({ subsets: ["latin"], display: "swap" })
@@ -75,10 +74,6 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <ClerkProvider
-      publishableKey={process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY!}
-      afterSignOutUrl="/"
-    >
       <Providers>
         <html lang="en" className="dark">
           <body className={`${inter.className} bg-black`}>
@@ -94,6 +89,5 @@ export default function RootLayout({
           </body>
         </html>
       </Providers>
-    </ClerkProvider>
   )
 }

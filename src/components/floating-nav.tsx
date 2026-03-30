@@ -8,7 +8,6 @@ import { Button } from "@/src/components/ui/button"
 import { useMobile } from "@/src/hooks/use-mobile"
 import { cn } from "@/src/lib/utils"
 import { LogoMedialane } from "./logo-medialane"
-import { AccountButton } from "@/src/components/account-button"
 import Link from "next/link"
 
 const NAV_LINKS = [
@@ -92,7 +91,6 @@ const FloatingNav = () => {
                   {isMobileMenuOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
                 </Button>
               )}
-              <AccountButton />
             </div>
           </div>
 
@@ -123,11 +121,6 @@ const FloatingNav = () => {
                       </Button>
                     )
                   })}
-                  <div className="pt-2 border-t border-white/10">
-                    <Button asChild className="w-full justify-start bg-primary hover:bg-primary/90">
-                      <Link href="/account" onClick={closeMenu}>Get API Key</Link>
-                    </Button>
-                  </div>
                 </div>
               </motion.div>
             )}
