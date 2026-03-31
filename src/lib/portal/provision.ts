@@ -1,4 +1,10 @@
-import { clerkClient } from "@clerk/nextjs/server";
+import { pool } from "@/src/lib/db";
+
+interface ProvisionInput {
+  userId: string;
+  email: string;
+  name: string;
+}
 
 interface ProvisionResult {
   ok: boolean;
@@ -6,19 +12,17 @@ interface ProvisionResult {
   error?: string;
 }
 
-export async function provisionUser(userId: string): Promise<ProvisionResult> {
-  const clerk = await clerkClient();
-  const user = await clerk.users.getUser(userId);
+export async function provisionUser(
+  input: ProvisionInput
+): Promise<ProvisionResult> {
+  // Check if already provisioned
+  const existing = await pool.query<{ backendApiKey: string | null }>(
+    'SELECT "backendApiKey" FROM "user" WHERE id = $1',
+    [input.userId]
+  );
 
-  if (user.privateMetadata?.backendApiKey) {
+  if (existing.rows[0]?.backendApiKey) {
     return { ok: true, alreadyProvisioned: true };
-  }
-
-  const email = user.primaryEmailAddress?.emailAddress;
-  const name = user.fullName || user.firstName || email || userId;
-
-  if (!email) {
-    return { ok: false, error: "User has no email" };
   }
 
   const apiUrl = process.env.MEDIALANE_API_URL;
@@ -34,7 +38,7 @@ export async function provisionUser(userId: string): Promise<ProvisionResult> {
       "Content-Type": "application/json",
       "x-api-key": apiSecret,
     },
-    body: JSON.stringify({ name, email, plan: "FREE" }),
+    body: JSON.stringify({ name: input.name, email: input.email, plan: "FREE" }),
   });
 
   if (!res.ok) {
@@ -53,12 +57,10 @@ export async function provisionUser(userId: string): Promise<ProvisionResult> {
     return { ok: false, error: "Invalid backend response" };
   }
 
-  await clerk.users.updateUserMetadata(userId, {
-    privateMetadata: {
-      backendApiKey: plaintext,
-      backendTenantId: tenantId,
-    },
-  });
+  await pool.query(
+    'UPDATE "user" SET "backendApiKey" = $1, "backendTenantId" = $2 WHERE id = $3',
+    [plaintext, tenantId, input.userId]
+  );
 
   return { ok: true };
 }

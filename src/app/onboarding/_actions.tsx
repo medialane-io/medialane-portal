@@ -1,6 +1,7 @@
-'use server'
+"use server";
 
-import { auth, clerkClient } from '@clerk/nextjs/server'
+import { auth } from "@/src/lib/auth";
+import { headers } from "next/headers";
 
 interface WalletData {
   publicKey: string;
@@ -9,61 +10,51 @@ interface WalletData {
 
 export const completeOnboarding = async (walletData: WalletData) => {
   try {
-    const { userId } = await auth()
+    const session = await auth.api.getSession({ headers: await headers() });
 
-    if (!userId) {
-      return { error: 'No Logged In User' }
+    if (!session) {
+      return { error: "No Logged In User" };
     }
 
-    const client = await clerkClient()
+    await auth.api.updateUser({
+      headers: await headers(),
+      body: {
+        walletPublicKey: walletData.publicKey,
+        walletEncryptedPrivateKey: walletData.encryptedPrivateKey,
+      } as Record<string, unknown>,
+    });
 
-    const res = await client.users.updateUser(userId, {
-      publicMetadata: {
-        walletCreated: true,
-        publicKey: walletData.publicKey,
-        encryptedPrivateKey: walletData.encryptedPrivateKey,
-      },
-    })
-
-    return { success: true, metadata: res.publicMetadata }
+    return { success: true };
   } catch (err) {
-    console.error('Server: Error in complete Onboarding:', err)
-    return { error: err instanceof Error ? err.message : 'There was an error updating the user metadata.' }
+    console.error("Server: Error in completeOnboarding:", err);
+    return {
+      error: err instanceof Error ? err.message : "Error updating user.",
+    };
   }
-}
+};
 
 export const getWalletData = async (): Promise<{
   publicKey: string;
   encryptedPrivateKey: string;
 } | null> => {
   try {
-    const { userId } = await auth()
+    const session = await auth.api.getSession({ headers: await headers() });
 
-    if (!userId) {
-      console.error('No authenticated user found')
-      return null
-    }
+    if (!session) return null;
 
-    const client = await clerkClient()
-    const user = await client.users.getUser(userId)
+    const user = session.user as typeof session.user & {
+      walletPublicKey?: string | null;
+      walletEncryptedPrivateKey?: string | null;
+    };
 
-    const { publicKey, encryptedPrivateKey, walletCreated } = user.publicMetadata as {
-      publicKey?: string;
-      encryptedPrivateKey?: string;
-      walletCreated?: boolean;
-    }
-
-    if (!walletCreated || !publicKey || !encryptedPrivateKey) {
-      console.error('Wallet not found or not created')
-      return null
-    }
+    if (!user.walletPublicKey || !user.walletEncryptedPrivateKey) return null;
 
     return {
-      publicKey,
-      encryptedPrivateKey,
-    }
+      publicKey: user.walletPublicKey,
+      encryptedPrivateKey: user.walletEncryptedPrivateKey,
+    };
   } catch (err) {
-    console.error('Error fetching wallet data:', err)
-    return null
+    console.error("Error fetching wallet data:", err);
+    return null;
   }
-}
+};

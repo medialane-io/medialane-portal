@@ -1,21 +1,31 @@
-import { auth, clerkClient } from "@clerk/nextjs/server";
+import { auth } from "@/src/lib/auth";
+import { pool } from "@/src/lib/db";
+import { headers } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 
 async function handler(
   req: NextRequest,
   { params }: { params: Promise<{ path: string[] }> }
 ) {
-  const { userId } = await auth();
-  if (!userId) {
+  const session = await auth.api.getSession({ headers: await headers() });
+
+  if (!session) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const clerk = await clerkClient();
-  const user = await clerk.users.getUser(userId);
-  const apiKey = user.privateMetadata?.backendApiKey as string | undefined;
+  // backendApiKey is returned: false — must query DB directly
+  const row = await pool.query<{ backendApiKey: string | null }>(
+    'SELECT "backendApiKey" FROM "user" WHERE id = $1',
+    [session.user.id]
+  );
+
+  const apiKey = row.rows[0]?.backendApiKey;
 
   if (!apiKey) {
-    return NextResponse.json({ error: "No API key — provision first" }, { status: 403 });
+    return NextResponse.json(
+      { error: "No API key — provision first" },
+      { status: 403 }
+    );
   }
 
   const apiUrl = process.env.MEDIALANE_API_URL;
@@ -28,7 +38,7 @@ async function handler(
   const search = req.nextUrl.search;
   const upstreamUrl = `${apiUrl}/v1/portal/${subpath}${search}`;
 
-  const headers: Record<string, string> = {
+  const reqHeaders: Record<string, string> = {
     "x-api-key": apiKey,
     "Content-Type": "application/json",
   };
@@ -40,7 +50,7 @@ async function handler(
 
   const upstream = await fetch(upstreamUrl, {
     method: req.method,
-    headers,
+    headers: reqHeaders,
     body,
   });
 
