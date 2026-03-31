@@ -1,8 +1,7 @@
 "use client";
 
-import { useAuth } from "@clerk/nextjs";
+import { authClient } from "@/src/lib/auth-client";
 import { useGetWallet } from "@chipi-stack/nextjs";
-import Image from "next/image";
 import { WalletSummary } from "@/src/components/chipi/wallet-summary";
 import { Card, CardContent } from "@/src/components/ui/card";
 import { Badge } from "@/src/components/ui/badge";
@@ -34,11 +33,10 @@ export function AccountDashboard({
   userId,
   publicKey,
 }: Props) {
-  const { getToken } = useAuth();
   const router = useRouter();
 
   const { data: wallet } = useGetWallet({
-    getBearerToken: () => getToken({ template: "chipipay" }).then((t) => t || ""),
+    getBearerToken: () => authClient.token().then((t) => t?.token ?? ""),
     params: { externalUserId: userId },
     queryOptions: { enabled: !!userId && !publicKey },
   });

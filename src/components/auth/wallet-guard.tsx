@@ -1,51 +1,45 @@
 "use client";
 
-import { useAuth, useUser } from "@clerk/nextjs";
+import { authClient } from "@/src/lib/auth-client";
 import { useGetWallet } from "@chipi-stack/nextjs";
 import { useRouter, usePathname } from "next/navigation";
 import { useEffect } from "react";
 
 export function WalletGuard() {
-    const { userId, isLoaded, getToken } = useAuth();
-    const { user } = useUser();
+    const { data: session, isPending } = authClient.useSession();
     const router = useRouter();
     const pathname = usePathname();
 
     const { data: wallet, isLoading, error } = useGetWallet({
-        getBearerToken: () => getToken({ template: "chipipay" }).then(t => t || ""),
-        params: { externalUserId: userId || "" },
+        getBearerToken: () => authClient.token().then((t) => t?.token ?? ""),
+        params: { externalUserId: session?.user.id ?? "" },
         queryOptions: {
-            enabled: !!userId && isLoaded,
+            enabled: !!session?.user.id && !isPending,
             retry: false,
-        }
+        },
     });
 
     useEffect(() => {
-        // Only run check if auth is loaded and user is signed in
-        if (!isLoaded || !userId) return;
+        if (isPending || !session?.user) return;
 
         // Skip check if already on onboarding page to avoid loops
         if (pathname?.startsWith("/onboarding")) return;
 
-        // If wallet loading is finished
-        if (!isLoading && user) {
-            // If we have an error (likely 404) or no wallet data
+        if (!isLoading) {
             if (error || !wallet) {
-                // CRITICAL: Check if Clerk metadata thinks we ALREADY have a wallet.
-                // If so, do NOT redirect to onboarding, as that causes a loop with middleware.
-                // This likely means an API/SDK issue (404 on existing wallet).
-                const hasWalletInMetadata = user.publicMetadata?.walletCreated === true;
-
-                if (hasWalletInMetadata) {
-                    console.error("WalletGuard: Wallet missing in SDK but exists in Metadata. Preventing redirect loop.");
+                const user = session.user as typeof session.user & {
+                    walletPublicKey?: string | null;
+                };
+                // If session says wallet exists, don't redirect — SDK may be temporarily unavailable
+                if (user.walletPublicKey) {
+                    console.error("WalletGuard: Wallet missing in SDK but exists in session. Preventing redirect loop.");
                     return;
                 }
-
-                console.log("WalletGuard: No wallet found and no metadata, redirecting to onboarding.");
+                console.log("WalletGuard: No wallet found, redirecting to onboarding.");
                 router.push("/onboarding");
             }
         }
-    }, [isLoaded, userId, wallet, isLoading, error, pathname, router, user]);
+    }, [isPending, session, wallet, isLoading, error, pathname, router]);
 
     return null;
 }

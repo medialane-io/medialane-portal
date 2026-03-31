@@ -1,14 +1,28 @@
-import Link from "next/link"
-import { Button } from "@/src/components/ui/button"
+import { auth } from "@/src/lib/auth";
+import { headers } from "next/headers";
+import { redirect } from "next/navigation";
+import { AccountDashboard } from "./dashboard";
 
-export default function AccountPage() {
+export default async function AccountPage() {
+  const session = await auth.api.getSession({ headers: await headers() });
+
+  if (!session) {
+    redirect("/sign-in");
+  }
+
+  const user = session.user as typeof session.user & {
+    plan?: string;
+    walletPublicKey?: string | null;
+  };
+
   return (
-    <div className="container mx-auto px-4 pt-32 pb-16 max-w-lg text-center space-y-6">
-      <h1 className="text-3xl font-bold text-white">Account</h1>
-      <p className="text-muted-foreground">Account dashboard is temporarily unavailable. Contact us to get API access.</p>
-      <Button asChild>
-        <Link href="/connect">Contact Us</Link>
-      </Button>
-    </div>
-  )
+    <AccountDashboard
+      initialPlan={user.plan ?? "FREE"}
+      userImageUrl=""
+      userFullName={user.name ?? null}
+      userEmail={user.email}
+      userId={user.id}
+      publicKey={user.walletPublicKey ?? undefined}
+    />
+  );
 }
