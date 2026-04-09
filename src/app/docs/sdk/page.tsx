@@ -40,7 +40,8 @@ const client = new MedialaneClient({
   rpcUrl: "https://starknet-mainnet.g.alchemy.com/starknet/version/rpc/v0_7/YOUR_KEY",
   backendUrl: "https://medialane-backend-production.up.railway.app",
   apiKey: "ml_live_YOUR_KEY",
-  marketplaceContract: "0x04299b51289aa700de4ce19cc77bcea8430bfd1aef04193efab09d60a3a7ee0f",
+  // marketplaceContract — optional, defaults to mainnet contract
+  // collectionContract  — optional, defaults to mainnet collection registry
   // Optional: configure retry for transient failures
   retryOptions: {
     maxAttempts: 3,      // default
@@ -163,14 +164,14 @@ console.log(newKey.data.key) // shown once — save it!
 // Get usage
 const usage = await client.api.getUsage()`}</DocCodeBlock>
 
-      <h3 className="text-lg font-semibold text-white mt-6 mb-3">On-chain comments</h3>
+      <DocH2 id="comments" border>On-chain Comments</DocH2>
       <DocCodeBlock>{`// Fetch permanent on-chain comments for a token
 const result = await client.api.getTokenComments("0x05e7...", "42", { limit: 20 })
 result.data.forEach((c) => {
   console.log(c.author, c.content, c.postedAt)
 })`}</DocCodeBlock>
 
-      <h3 className="text-lg font-semibold text-white mt-6 mb-3">Counter-offers</h3>
+      <DocH2 id="counter-offers" border>Counter-offers</DocH2>
       <DocCodeBlock>{`// Seller creates a counter-offer in response to a buyer's bid
 const intent = await client.api.createCounterOfferIntent(
   {
@@ -192,7 +193,7 @@ console.log(counters.data[0].price)
 // Buyer accepts by fulfilling the counter-offer (it is a standard listing)
 await client.api.createFulfillIntent({ fulfiller: buyerAddress, orderHash: counters.data[0].orderHash })`}</DocCodeBlock>
 
-      <h3 className="text-lg font-semibold text-white mt-6 mb-3">Remix licensing</h3>
+      <DocH2 id="remix-licensing" border>Remix Licensing</DocH2>
       <DocCodeBlock>{`import { OPEN_LICENSES } from "@medialane/sdk"
 
 // Check if a license is open (auto-approved remix)
@@ -256,6 +257,138 @@ remixes.data.forEach((r) => console.log(r.remixContract, r.remixTokenId, r.licen
 // "recent" | "supply" | "floor" | "volume" | "name"
 const sort: CollectionSort = "floor"
 await client.api.getCollections(1, 20, true, sort)`}</DocCodeBlock>
+
+      {/* POP Protocol */}
+      <DocH2 id="pop-protocol" border>POP Protocol (Proof of Participation)</DocH2>
+      <p className="text-muted-foreground text-sm mb-3">
+        POP collections are event-based claim drops — conferences, workshops, hackathons, bootcamps. Each collection has one claimable token per eligible wallet. Use <code className="font-mono text-xs bg-white/10 px-1.5 py-0.5 rounded">client.services.pop</code> for on-chain interactions and <code className="font-mono text-xs bg-white/10 px-1.5 py-0.5 rounded">client.api</code> for eligibility checks.
+      </p>
+
+      <h3 className="text-lg font-semibold text-white mt-6 mb-3">Check eligibility and claim</h3>
+      <DocCodeBlock>{`// Check if a wallet is eligible to claim from a POP collection
+const status = await client.api.getPopEligibility(
+  "0x00b32c...",   // POP collection address
+  "0x0591...",     // wallet address
+)
+// status: { isEligible: boolean; hasClaimed: boolean; tokenId: string | null }
+
+if (status.isEligible && !status.hasClaimed) {
+  // Claim on-chain (requires starknet.js AccountInterface)
+  const { txHash } = await client.services.pop.claim(account, "0x00b32c...")
+  console.log("Claimed:", txHash)
+}`}</DocCodeBlock>
+
+      <h3 className="text-lg font-semibold text-white mt-6 mb-3">Batch eligibility check</h3>
+      <DocCodeBlock>{`// Check up to 100 wallets in one request
+const results = await client.api.getPopEligibilityBatch(
+  "0x00b32c...",          // POP collection address
+  ["0x0591...", "0x06a3..."],
+)
+// results: Array<{ wallet, isEligible, hasClaimed, tokenId }>
+results.forEach((r) => console.log(r.wallet, r.isEligible))`}</DocCodeBlock>
+
+      <h3 className="text-lg font-semibold text-white mt-6 mb-3">List POP collections</h3>
+      <DocCodeBlock>{`// Fetch all POP Protocol collections
+const pops = await client.api.getPopCollections({ page: 1, limit: 20, sort: "recent" })
+pops.data.forEach((col) => console.log(col.name, col.source)) // source: "POP_PROTOCOL"`}</DocCodeBlock>
+
+      <h3 className="text-lg font-semibold text-white mt-6 mb-3">Admin — mint and allowlist</h3>
+      <DocCodeBlock>{`// Gift a token to a specific wallet (bypass eligibility check)
+await client.services.pop.adminMint(account, {
+  collection: "0x00b32c...",
+  recipient: "0x0591...",
+  customUri: "ipfs://...",  // optional override
+})
+
+// Add a single wallet to the allowlist
+await client.services.pop.addToAllowlist(account, {
+  collection: "0x00b32c...",
+  address: "0x0591...",
+})
+
+// Add up to 200 wallets per tx
+await client.services.pop.batchAddToAllowlist(account, {
+  collection: "0x00b32c...",
+  addresses: ["0x0591...", "0x06a3...", /* ... */],
+})`}</DocCodeBlock>
+
+      <h3 className="text-lg font-semibold text-white mt-6 mb-3">Deploy a new POP collection</h3>
+      <DocCodeBlock>{`import type { CreatePopCollectionParams } from "@medialane/sdk"
+
+const params: CreatePopCollectionParams = {
+  name: "ETHDenver 2026",
+  symbol: "ETHDEN26",
+  baseUri: "ipfs://...",
+  claimEndTime: Math.floor(Date.now() / 1000) + 86400 * 7,  // 7 days
+  eventType: "Conference",  // "Conference" | "Bootcamp" | "Workshop" | "Hackathon" | "Meetup" | "Course" | "Other"
+}
+const { txHash } = await client.services.pop.createCollection(account, params)
+console.log("Deployed:", txHash)`}</DocCodeBlock>
+
+      {/* Collection Drop */}
+      <DocH2 id="collection-drop" border>Collection Drop</DocH2>
+      <p className="text-muted-foreground text-sm mb-3">
+        Collection Drops are public minting campaigns with configurable claim conditions — price, supply cap, time window, and per-wallet limits. Use <code className="font-mono text-xs bg-white/10 px-1.5 py-0.5 rounded">client.services.drop</code> for on-chain interactions and <code className="font-mono text-xs bg-white/10 px-1.5 py-0.5 rounded">client.api</code> for status queries.
+      </p>
+
+      <h3 className="text-lg font-semibold text-white mt-6 mb-3">Claim (public mint)</h3>
+      <DocCodeBlock>{`// Check mint status for a wallet before claiming
+const status = await client.api.getDropMintStatus(
+  "0x03587f...",   // Drop collection address
+  "0x0591...",     // wallet address
+)
+// status: { mintedByWallet: number; totalMinted: number }
+
+// Claim 1 token (default)
+const { txHash } = await client.services.drop.claim(account, "0x03587f...")
+
+// Claim multiple tokens
+await client.services.drop.claim(account, "0x03587f...", 3)`}</DocCodeBlock>
+
+      <h3 className="text-lg font-semibold text-white mt-6 mb-3">List Drop collections</h3>
+      <DocCodeBlock>{`const drops = await client.api.getDropCollections({ page: 1, limit: 20, sort: "recent" })
+drops.data.forEach((col) => console.log(col.name, col.source)) // source: "COLLECTION_DROP"`}</DocCodeBlock>
+
+      <h3 className="text-lg font-semibold text-white mt-6 mb-3">Deploy a new Drop</h3>
+      <DocCodeBlock>{`import type { CreateDropParams, ClaimConditions } from "@medialane/sdk"
+
+const conditions: ClaimConditions = {
+  startTime: Math.floor(Date.now() / 1000),          // open now
+  endTime: Math.floor(Date.now() / 1000) + 86400 * 30, // closes in 30 days
+  price: BigInt("1000000"),                           // 1 USDC (6 decimals). 0 = free mint
+  paymentToken: "0x033068f6...",                      // USDC contract
+  maxQuantityPerWallet: BigInt(5),                    // max 5 per wallet. 0 = unlimited
+}
+
+const params: CreateDropParams = {
+  name: "Genesis Drop",
+  symbol: "GEN",
+  baseUri: "ipfs://...",
+  maxSupply: BigInt(1000),
+  initialConditions: conditions,
+}
+const { txHash } = await client.services.drop.createDrop(account, params)
+console.log("Drop deployed:", txHash)`}</DocCodeBlock>
+
+      <h3 className="text-lg font-semibold text-white mt-6 mb-3">Manage an active Drop</h3>
+      <DocCodeBlock>{`// Update claim conditions (price, time window, wallet limits)
+await client.services.drop.setClaimConditions(account, {
+  collection: "0x03587f...",
+  conditions: { startTime: 0, endTime: 0, price: 0n, paymentToken: "0x0", maxQuantityPerWallet: 0n },
+})
+
+// Pause or unpause minting
+await client.services.drop.setPaused(account, { collection: "0x03587f...", paused: true })
+
+// Enable allowlist gate
+await client.services.drop.setAllowlistEnabled(account, { collection: "0x03587f...", enabled: true })
+await client.services.drop.batchAddToAllowlist(account, {
+  collection: "0x03587f...",
+  addresses: ["0x0591...", "0x06a3..."],
+})
+
+// Withdraw ERC-20 proceeds
+await client.services.drop.withdrawPayments(account, { collection: "0x03587f..." })`}</DocCodeBlock>
 
       {/* Error Handling */}
       <DocH2 id="errors" border>Error Handling</DocH2>

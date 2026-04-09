@@ -21,6 +21,8 @@ import {
   MessageSquare,
   GitFork,
   ArrowLeftRight,
+  Ticket,
+  ShoppingBag,
 } from "lucide-react"
 
 const API_CARDS = [
@@ -111,6 +113,22 @@ const API_CARDS = [
     color: "text-teal-400",
     bg: "bg-teal-500/10",
     border: "border-teal-500/20",
+  },
+  {
+    icon: Ticket,
+    title: "POP Protocol",
+    description: "Proof of Participation claim collections for events — conferences, workshops, hackathons, bootcamps. One claimable token per eligible wallet. Check eligibility, batch-query up to 100 wallets, and manage allowlists via the SDK.",
+    color: "text-indigo-400",
+    bg: "bg-indigo-500/10",
+    border: "border-indigo-500/20",
+  },
+  {
+    icon: ShoppingBag,
+    title: "Collection Drop",
+    description: "Public minting campaigns with configurable claim conditions: price, supply cap, time window, per-wallet limits, and optional allowlist gating. Deploy via the SDK and manage phases on-chain.",
+    color: "text-lime-400",
+    bg: "bg-lime-500/10",
+    border: "border-lime-500/20",
   },
 ]
 

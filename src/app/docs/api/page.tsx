@@ -1439,6 +1439,73 @@ const resumeSource = new EventSource(url, {
         response={`{ "data": { "id": "rxo_01j...", "status": "REJECTED", ... } }`}
       />
 
+      {/* ── POP PROTOCOL ── */}
+      <DocH2 id="pop-protocol" border>POP Protocol</DocH2>
+      <p className="text-sm text-muted-foreground mb-6">
+        Proof of Participation claim collections for events — conferences, workshops, hackathons, bootcamps. Each collection has one claimable token per eligible wallet. On-chain minting is handled via the SDK <code className="font-mono text-xs bg-white/10 px-1.5 py-0.5 rounded">client.services.pop</code>.
+      </p>
+
+      <Endpoint
+        method="GET"
+        path="/v1/pop/eligibility/:collection/:wallet"
+        description="Check whether a single wallet is eligible to claim from a POP collection and whether it has already claimed."
+        params={[
+          { name: "collection", type: "string", required: true, desc: "POP collection contract address" },
+          { name: "wallet", type: "string", required: true, desc: "Wallet address to check" },
+        ]}
+        curl={`curl "${BASE}/v1/pop/eligibility/0x00b32c.../0x0591..." \\
+  -H "x-api-key: ${KEY}"`}
+        response={`{
+  "data": {
+    "isEligible": true,
+    "hasClaimed": false,
+    "tokenId": null
+  }
+}`}
+      />
+
+      <Endpoint
+        method="GET"
+        path="/v1/pop/eligibility/:collection"
+        description="Batch eligibility check — pass up to 100 wallet addresses as a comma-separated wallets query param."
+        params={[
+          { name: "collection", type: "string", required: true, desc: "POP collection contract address (URL param)" },
+          { name: "wallets", type: "string", required: true, desc: "Comma-separated wallet addresses (max 100)" },
+        ]}
+        curl={`curl "${BASE}/v1/pop/eligibility/0x00b32c...?wallets=0x0591...,0x06a3..." \\
+  -H "x-api-key: ${KEY}"`}
+        response={`{
+  "data": [
+    { "wallet": "0x0591...", "isEligible": true,  "hasClaimed": false, "tokenId": null },
+    { "wallet": "0x06a3...", "isEligible": false, "hasClaimed": false, "tokenId": null }
+  ]
+}`}
+      />
+
+      {/* ── COLLECTION DROP ── */}
+      <DocH2 id="collection-drop" border>Collection Drop</DocH2>
+      <p className="text-sm text-muted-foreground mb-6">
+        Public minting campaigns with configurable claim conditions: price, supply cap, time window, and per-wallet limits. On-chain minting and configuration are handled via the SDK <code className="font-mono text-xs bg-white/10 px-1.5 py-0.5 rounded">client.services.drop</code>.
+      </p>
+
+      <Endpoint
+        method="GET"
+        path="/v1/drop/mint-status/:collection/:wallet"
+        description="Return how many tokens a wallet has minted from a Drop collection and the total minted across all wallets."
+        params={[
+          { name: "collection", type: "string", required: true, desc: "Drop collection contract address" },
+          { name: "wallet", type: "string", required: true, desc: "Wallet address to check" },
+        ]}
+        curl={`curl "${BASE}/v1/drop/mint-status/0x03587f.../0x0591..." \\
+  -H "x-api-key: ${KEY}"`}
+        response={`{
+  "data": {
+    "mintedByWallet": 2,
+    "totalMinted": 347
+  }
+}`}
+      />
+
       {/* ── TECHNICAL DETAILS ── */}
       <DocH2 id="technical" border>Technical Details</DocH2>
 

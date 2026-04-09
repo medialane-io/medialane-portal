@@ -10,6 +10,33 @@ interface ChangelogEntry {
 
 const ENTRIES: ChangelogEntry[] = [
   {
+    date: "2026-04-09",
+    title: "SDK v0.6.4 — Collection Drop + POP Protocol",
+    tag: "Release",
+    items: [
+      "POP Protocol (v0.6.0) — Proof of Participation claim collections for events (conferences, workshops, hackathons, bootcamps). One claimable token per eligible wallet per collection",
+      "SDK v0.6.x: PopService added to client.services.pop — claim(), adminMint(), addToAllowlist(), batchAddToAllowlist(), createCollection()",
+      "SDK v0.6.x: client.api.getPopCollections(), getPopEligibility(collection, wallet), getPopEligibilityBatch(collection, wallets) added",
+      "SDK v0.6.x: PopClaimStatus, PopBatchEligibilityItem, PopEventType, CreatePopCollectionParams types exported",
+      "SDK v0.6.x: POP_FACTORY_CONTRACT_MAINNET, POP_COLLECTION_CLASS_HASH_MAINNET, POPCollectionABI, POPFactoryABI exported",
+      "Collection Drop (v0.6.1) — public minting campaigns with configurable claim conditions: price, supply cap, time window, per-wallet limits, allowlist gate",
+      "SDK v0.6.x: DropService added to client.services.drop — claim(), adminMint(), setClaimConditions(), setAllowlistEnabled(), addToAllowlist(), batchAddToAllowlist(), setPaused(), withdrawPayments(), createDrop()",
+      "SDK v0.6.x: client.api.getDropCollections(), getDropMintStatus(collection, wallet) added",
+      "SDK v0.6.x: DropMintStatus, ClaimConditions, CreateDropParams types exported",
+      "SDK v0.6.x: DROP_FACTORY_CONTRACT_MAINNET, DROP_COLLECTION_CLASS_HASH_MAINNET, DropCollectionABI, DropFactoryABI exported",
+      "CollectionSource union extended with POP_PROTOCOL and COLLECTION_DROP — use getCollections() with source filter or the dedicated getPopCollections() / getDropCollections() helpers",
+    ],
+  },
+  {
+    date: "2026-04-02",
+    title: "SDK v0.5.7 — Gated Content Fields",
+    tag: "Feature",
+    items: [
+      "ApiCollectionProfile.hasGatedContent: boolean — indicates whether a collection has gated content configured",
+      "ApiCollectionProfile.gatedContentTitle: string | null — public title of gated content shown to all visitors; the actual URL is holder-only via GET /v1/collections/:contract/gated-content (requires Clerk JWT + NFT ownership verification)",
+    ],
+  },
+  {
     date: "2026-03-29",
     title: "SDK v0.5.3 — Counter-offers + Remix Licensing",
     tag: "Release",
