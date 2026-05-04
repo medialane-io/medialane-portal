@@ -9,25 +9,21 @@ async function migrate() {
     await client.query("BEGIN");
 
     await client.query(`
-      CREATE TABLE IF NOT EXISTS wallets (
-        address     TEXT PRIMARY KEY,
-        mdln_tier   INT NOT NULL DEFAULT 0,
-        created_at  TIMESTAMPTZ NOT NULL DEFAULT now()
-      )
-    `);
-
-    await client.query(`
-      CREATE TABLE IF NOT EXISTS credits (
-        address     TEXT PRIMARY KEY REFERENCES wallets(address),
-        balance     INT NOT NULL DEFAULT 0,
-        updated_at  TIMESTAMPTZ NOT NULL DEFAULT now()
+      CREATE TABLE IF NOT EXISTS accounts (
+        address           TEXT PRIMARY KEY,
+        mdln_tier         INT NOT NULL DEFAULT 0,
+        balance           INT NOT NULL DEFAULT 0,
+        backend_tenant_id TEXT,
+        backend_api_key   TEXT,
+        created_at        TIMESTAMPTZ NOT NULL DEFAULT now(),
+        updated_at        TIMESTAMPTZ NOT NULL DEFAULT now()
       )
     `);
 
     await client.query(`
       CREATE TABLE IF NOT EXISTS deposits (
         id           UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-        address      TEXT NOT NULL REFERENCES wallets(address),
+        address      TEXT NOT NULL REFERENCES accounts(address),
         usdc_amount  INT NOT NULL,
         tx_hash      TEXT UNIQUE NOT NULL,
         multiplier   NUMERIC(4,2) NOT NULL,
@@ -47,19 +43,10 @@ async function migrate() {
     await client.query(`
       CREATE TABLE IF NOT EXISTS sessions (
         id           UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-        address      TEXT NOT NULL REFERENCES wallets(address),
+        address      TEXT NOT NULL REFERENCES accounts(address),
         token_hash   TEXT NOT NULL,
         expires_at   TIMESTAMPTZ NOT NULL,
         created_at   TIMESTAMPTZ NOT NULL DEFAULT now()
-      )
-    `);
-
-    await client.query(`
-      CREATE TABLE IF NOT EXISTS wallet_provisioning (
-        address           TEXT PRIMARY KEY REFERENCES wallets(address),
-        backend_api_key   TEXT,
-        backend_tenant_id TEXT,
-        created_at        TIMESTAMPTZ NOT NULL DEFAULT now()
       )
     `);
 
@@ -72,6 +59,7 @@ async function migrate() {
 
     await client.query("CREATE INDEX IF NOT EXISTS idx_nonces_expires ON nonces(expires_at)");
     await client.query("CREATE INDEX IF NOT EXISTS idx_sessions_address ON sessions(address)");
+    await client.query("CREATE INDEX IF NOT EXISTS idx_deposits_address ON deposits(address)");
 
     await client.query("COMMIT");
     console.log("✓ Migration complete");
