@@ -1,9 +1,7 @@
 import { pool } from "@/src/lib/db";
 
 interface ProvisionInput {
-  userId: string;
-  email: string;
-  name: string;
+  address: string;
 }
 
 interface ProvisionResult {
@@ -12,16 +10,13 @@ interface ProvisionResult {
   error?: string;
 }
 
-export async function provisionUser(
-  input: ProvisionInput
-): Promise<ProvisionResult> {
-  // Check if already provisioned
-  const existing = await pool.query<{ backendApiKey: string | null }>(
-    'SELECT "backendApiKey" FROM "user" WHERE id = $1',
-    [input.userId]
+export async function provisionWallet(input: ProvisionInput): Promise<ProvisionResult> {
+  const existing = await pool.query<{ backend_api_key: string | null }>(
+    "SELECT backend_api_key FROM wallet_provisioning WHERE address = $1",
+    [input.address]
   );
 
-  if (existing.rows[0]?.backendApiKey) {
+  if (existing.rows[0]?.backend_api_key) {
     return { ok: true, alreadyProvisioned: true };
   }
 
@@ -38,7 +33,11 @@ export async function provisionUser(
       "Content-Type": "application/json",
       "x-api-key": apiSecret,
     },
-    body: JSON.stringify({ name: input.name, email: input.email, plan: "FREE" }),
+    body: JSON.stringify({
+      name: input.address,
+      email: `${input.address}@wallet.medialane.io`,
+      plan: "FREE",
+    }),
   });
 
   if (!res.ok) {
@@ -58,8 +57,10 @@ export async function provisionUser(
   }
 
   await pool.query(
-    'UPDATE "user" SET "backendApiKey" = $1, "backendTenantId" = $2 WHERE id = $3',
-    [plaintext, tenantId, input.userId]
+    `INSERT INTO wallet_provisioning (address, backend_api_key, backend_tenant_id)
+     VALUES ($1, $2, $3)
+     ON CONFLICT (address) DO UPDATE SET backend_api_key = $2, backend_tenant_id = $3`,
+    [input.address, plaintext, tenantId]
   );
 
   return { ok: true };

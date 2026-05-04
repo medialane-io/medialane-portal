@@ -1,25 +1,23 @@
-import { auth } from "@/src/lib/auth";
 import { pool } from "@/src/lib/db";
-import { headers } from "next/headers";
+import { getSession } from "@/src/lib/session";
 import { NextRequest, NextResponse } from "next/server";
 
 async function handler(
   req: NextRequest,
   { params }: { params: Promise<{ path: string[] }> }
 ) {
-  const session = await auth.api.getSession({ headers: await headers() });
+  const session = await getSession();
 
   if (!session) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  // backendApiKey is returned: false — must query DB directly
-  const row = await pool.query<{ backendApiKey: string | null }>(
-    'SELECT "backendApiKey" FROM "user" WHERE id = $1',
-    [session.user.id]
+  const row = await pool.query<{ backend_api_key: string | null }>(
+    "SELECT backend_api_key FROM wallet_provisioning WHERE address = $1",
+    [session.address]
   );
 
-  const apiKey = row.rows[0]?.backendApiKey;
+  const apiKey = row.rows[0]?.backend_api_key;
 
   if (!apiKey) {
     return NextResponse.json(
