@@ -7,7 +7,7 @@ const nextConfig: NextConfig = {
   eslint: {
     ignoreDuringBuilds: true,
   },
-  serverExternalPackages: ["pg", "pg-native"],
+  serverExternalPackages: ["pg", "pg-native", "@cartridge/connector", "@cartridge/controller", "@cartridge/controller-wasm"],
   images: {
     remotePatterns: [
       {
@@ -45,6 +45,10 @@ const nextConfig: NextConfig = {
         "pg-native": false,
       };
     }
+    config.experiments = {
+      ...config.experiments,
+      asyncWebAssembly: true,
+    };
     return config;
   },
 };

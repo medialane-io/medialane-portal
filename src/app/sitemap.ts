@@ -5,11 +5,15 @@ const BASE_URL = process.env.NEXT_PUBLIC_APP_URL || 'https://portal.medialane.io
 export default function sitemap(): MetadataRoute.Sitemap {
     const routes = [
         '',
-        '/about',
-        '/mint',
-        '/workshop',
+        '/features',
+        '/pricing',
+        '/docs',
+        '/docs/api',
+        '/docs/sdk',
+        '/docs/agents',
+        '/connect',
+        '/changelog',
         '/account',
-        '/create/mint-drop',
     ]
 
     return routes.map((route) => ({

@@ -13,12 +13,12 @@ export async function middleware(request: NextRequest) {
 
   const token = request.cookies.get("auth-token")?.value;
   if (!token) {
-    return NextResponse.redirect(new URL("/sign-in", request.url));
+    return NextResponse.redirect(new URL("/?connect=1", request.url));
   }
 
   const session = await verifyTokenEdge(token);
   if (!session) {
-    return NextResponse.redirect(new URL("/sign-in", request.url));
+    return NextResponse.redirect(new URL("/?connect=1", request.url));
   }
 
   return NextResponse.next();

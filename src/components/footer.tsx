@@ -13,7 +13,6 @@ const PLATFORM_LINKS = [
 const COMMUNITY_LINKS = [
   { name: "Connect", href: "/connect" },
   { name: "Changelog", href: "/changelog" },
-  { name: "Workshop", href: "/workshop" },
   { name: "DAO", href: "https://medialane.org", external: true },
 ]
 

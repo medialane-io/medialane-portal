@@ -9,6 +9,7 @@
     "start": "next start"
   },
   "dependencies": {
+    "@cartridge/connector": "^0.13.12",
     "@emotion/is-prop-valid": "latest",
     "@hookform/resolvers": "^3.10.0",
     "@radix-ui/react-accordion": "latest",
