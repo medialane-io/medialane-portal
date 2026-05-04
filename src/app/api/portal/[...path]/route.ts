@@ -13,7 +13,7 @@ async function handler(
   }
 
   const row = await pool.query<{ backend_api_key: string | null }>(
-    "SELECT backend_api_key FROM wallet_provisioning WHERE address = $1",
+    "SELECT backend_api_key FROM accounts WHERE address = $1",
     [session.address]
   );
 
