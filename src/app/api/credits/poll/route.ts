@@ -71,12 +71,12 @@ export async function GET(req: NextRequest) {
     const creditsToAdd = Math.floor((usdcCents / 100) * CREDITS_PER_USDC * multiplier);
 
     const walletRow = await pool.query(
-      "SELECT address FROM wallets WHERE address = $1",
+      "SELECT address FROM accounts WHERE address = $1",
       [fromAddress]
     );
     if ((walletRow.rowCount ?? 0) === 0) continue;
 
-    await pool.query("UPDATE wallets SET mdln_tier = $2 WHERE address = $1", [fromAddress, tier]);
+    await pool.query("UPDATE accounts SET mdln_tier = $2, updated_at = now() WHERE address = $1", [fromAddress, tier]);
     await addCredits(fromAddress, creditsToAdd);
     await pool.query(
       `INSERT INTO deposits (address, usdc_amount, tx_hash, multiplier, credited)
