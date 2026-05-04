@@ -12,7 +12,7 @@ interface ProvisionResult {
 
 export async function provisionWallet(input: ProvisionInput): Promise<ProvisionResult> {
   const existing = await pool.query<{ backend_api_key: string | null }>(
-    "SELECT backend_api_key FROM wallet_provisioning WHERE address = $1",
+    "SELECT backend_api_key FROM accounts WHERE address = $1",
     [input.address]
   );
 
@@ -57,7 +57,7 @@ export async function provisionWallet(input: ProvisionInput): Promise<ProvisionR
   }
 
   await pool.query(
-    `INSERT INTO wallet_provisioning (address, backend_api_key, backend_tenant_id)
+    `INSERT INTO accounts (address, backend_api_key, backend_tenant_id)
      VALUES ($1, $2, $3)
      ON CONFLICT (address) DO UPDATE SET backend_api_key = $2, backend_tenant_id = $3`,
     [input.address, plaintext, tenantId]
