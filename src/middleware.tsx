@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { verifyTokenEdge } from "@/src/lib/session";
+import { verifyTokenEdge } from "@/src/lib/session-edge";
 
 const PROTECTED = ["/account"];
 

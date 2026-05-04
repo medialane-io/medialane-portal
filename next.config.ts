@@ -7,6 +7,7 @@ const nextConfig: NextConfig = {
   eslint: {
     ignoreDuringBuilds: true,
   },
+  serverExternalPackages: ["pg", "pg-native"],
   images: {
     remotePatterns: [
       {
@@ -36,10 +37,12 @@ const nextConfig: NextConfig = {
       config.resolve.fallback = {
         ...config.resolve.fallback,
         ws: false,
+        "pg-native": false,
       };
       config.resolve.alias = {
         ...config.resolve.alias,
-        ws: false, // Ensure webpack ignores this module
+        ws: false,
+        "pg-native": false,
       };
     }
     return config;
