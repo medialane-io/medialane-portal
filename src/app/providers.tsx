@@ -1,3 +1,5 @@
+import StarknetProviderWrapper from "./starknet-provider-wrapper";
+
 export function Providers({ children }: { children: React.ReactNode }) {
-  return <>{children}</>
+  return <StarknetProviderWrapper>{children}</StarknetProviderWrapper>;
 }
