@@ -5,16 +5,12 @@ import { DocH2, DocH3, DocCodeBlock } from "@/src/components/docs/typography"
 const ERROR_CODES = [
   { code: "400", name: "Bad Request", desc: "Missing or invalid parameters" },
   { code: "401", name: "Unauthorized", desc: "Missing or invalid x-api-key" },
+  { code: "402", name: "Payment Required", desc: "Credit balance is zero — deposit USDC to continue" },
   { code: "403", name: "Forbidden", desc: "Key exists but lacks required permission" },
   { code: "404", name: "Not Found", desc: "Resource does not exist" },
   { code: "409", name: "Conflict", desc: "Duplicate resource or state conflict" },
-  { code: "429", name: "Too Many Requests", desc: "Rate limit or monthly quota exceeded" },
+  { code: "429", name: "Too Many Requests", desc: "Per-minute rate limit exceeded" },
   { code: "500", name: "Server Error", desc: "Internal error — try again or contact support" },
-]
-
-const RATE_LIMITS = [
-  { plan: "FREE", monthly: "50 requests", perMinute: "—", reset: "1st of each month" },
-  { plan: "PREMIUM", monthly: "Unlimited", perMinute: "3,000 req/min", reset: "—" },
 ]
 
 export default function DocsPage() {
@@ -40,7 +36,7 @@ export default function DocsPage() {
           <div>
             <p className="text-white font-medium mb-1">Get your API key</p>
             <p className="text-muted-foreground text-sm">
-              Sign in at <Link href="/account" className="text-primary hover:underline">/account</Link> and create a free API key from the portal dashboard. You can create up to 5 keys.
+              Connect your Starknet wallet at <Link href="/sign-in" className="text-primary hover:underline">/sign-in</Link> and create an API key from the portal dashboard. You can create up to 5 keys.
             </p>
           </div>
         </li>
@@ -149,30 +145,20 @@ export default function DocsPage() {
         ))}
       </div>
 
-      {/* Rate limits */}
-      <DocH2 id="rate-limits">Rate Limits</DocH2>
+      {/* Credits */}
+      <DocH2 id="credits">Credits &amp; Billing</DocH2>
       <p className="text-muted-foreground mb-3 text-sm">
-        Portal management calls (<code className="font-mono text-xs bg-white/10 px-1.5 py-0.5 rounded">/v1/portal/*</code>) never count toward the monthly quota.
+        Every account receives <strong className="text-white">50 free credits per month</strong> (reset on the 1st). Each API call consumes one credit.
+        When the free allowance runs out you receive a <code className="font-mono text-xs bg-white/10 px-1.5 py-0.5 rounded">402 Payment Required</code> response with an <code className="font-mono text-xs bg-white/10 px-1.5 py-0.5 rounded">X-Credits-Remaining: 0</code> header.
       </p>
-      <div className="rounded-xl border border-white/10 overflow-hidden">
-        <div className="grid grid-cols-4 px-5 py-3 bg-white/[0.03] border-b border-white/10 text-xs font-semibold text-muted-foreground uppercase tracking-wide">
-          <span>Plan</span>
-          <span>Monthly</span>
-          <span>Per Minute</span>
-          <span>Reset</span>
-        </div>
-        {RATE_LIMITS.map((row, i) => (
-          <div key={row.plan} className={`grid grid-cols-4 px-5 py-3 items-center text-sm ${i < RATE_LIMITS.length - 1 ? "border-b border-white/5" : ""}`}>
-            <span className="font-semibold text-white">{row.plan}</span>
-            <span className="text-muted-foreground">{row.monthly}</span>
-            <span className="text-muted-foreground">{row.perMinute}</span>
-            <span className="text-muted-foreground">{row.reset}</span>
-          </div>
-        ))}
-      </div>
-
-      <p className="text-muted-foreground text-sm mt-6">
-        When you exceed a limit, you receive a <code className="font-mono text-xs bg-white/10 px-1.5 py-0.5 rounded">429</code> response. PREMIUM users see no monthly cap — only the per-minute rate limit applies.
+      <p className="text-muted-foreground mb-3 text-sm">
+        To top up, deposit USDC on Starknet from your <Link href="/account" className="text-primary hover:underline">account dashboard</Link>.
+        Credits appear within ~2 minutes. Rate: <strong className="text-white">1 USDC = 100 credits</strong> ($0.01/request).
+        Hold MDLN tokens to receive a multiplier — up to 2× more credits per dollar. See the <Link href="/pricing" className="text-primary hover:underline">pricing page</Link> for tier details.
+      </p>
+      <p className="text-muted-foreground text-sm">
+        Portal management calls (<code className="font-mono text-xs bg-white/10 px-1.5 py-0.5 rounded">/v1/portal/*</code>) never count toward the credit balance.
+        Autonomous agents can detect the 402 and trigger a top-up automatically — see the <Link href="/docs/agents" className="text-primary hover:underline">Agent Quickstart</Link>.
       </p>
     </div>
   )

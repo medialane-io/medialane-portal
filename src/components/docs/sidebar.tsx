@@ -24,8 +24,17 @@ const NAV: NavSection[] = [
     items: [
       { label: "Quick Start", href: "/docs", hash: "#quick-start" },
       { label: "Authentication", href: "/docs", hash: "#authentication" },
-      { label: "Rate Limits", href: "/docs", hash: "#rate-limits" },
+      { label: "Credits & Billing", href: "/docs", hash: "#credits" },
       { label: "Error Codes", href: "/docs", hash: "#error-codes" },
+    ],
+  },
+  {
+    title: "Agents",
+    items: [
+      { label: "Agent Quickstart", href: "/docs/agents" },
+      { label: "SIWS Auth", href: "/docs/agents", hash: "#siws" },
+      { label: "Credit Billing (402)", href: "/docs/agents", hash: "#billing" },
+      { label: "Autonomous Topup", href: "/docs/agents", hash: "#topup" },
     ],
   },
   {
@@ -75,7 +84,7 @@ const NAV: NavSection[] = [
 
 function isItemActive(pathname: string, item: NavItem) {
   if (item.href === "/docs") return pathname === "/docs"
-  return pathname.startsWith(item.href)
+  return pathname === item.href
 }
 
 function SidebarSection({ section, pathname }: { section: NavSection; pathname: string }) {
