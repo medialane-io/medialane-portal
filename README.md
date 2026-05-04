@@ -1,10 +1,10 @@
-<img width="2972" height="2160" alt="Medialane.xyz — Developer Portal for Programmable IP on Starknet" src="https://github.com/user-attachments/assets/abd42bec-d6b9-4636-a9cf-21fe8ec3ba0d" />
+<img width="2972" height="2160" alt="Medialane — Developer Portal for Programmable IP on Starknet" src="https://github.com/user-attachments/assets/abd42bec-d6b9-4636-a9cf-21fe8ec3ba0d" />
 
-# Medialane.xyz
+# Medialane Developer Portal
 
-**Developer Portal + Creator App for Programmable IP on Starknet**
+**Developer Portal for Programmable IP on Starknet — [portal.medialane.io](https://portal.medialane.io)**
 
-[medialane.xyz](https://medialane.xyz) is the developer-facing gateway to the Medialane platform — API access, SDK documentation, API key management, webhooks, and usage analytics. It also serves as an onboarding hub for creators joining Medialane with an invisible Starknet wallet (passkey-first, PIN fallback).
+[portal.medialane.io](https://portal.medialane.io) is the developer-facing gateway to the Medialane platform — API access, SDK documentation, API key management, webhooks, and usage analytics.
 
 Everything you need to build Programmable IP on Starknet. One REST API. All the data. No indexer needed.
 
@@ -17,7 +17,7 @@ Medialane is infrastructure for the **creative economy on Starknet**. It enables
 The platform operates through two integrated products:
 
 - **[Medialane.io](https://medialane.io)** — Consumer marketplace and creator launchpad. Mint IP assets, trade NFTs, manage collections. No wallet required — gasless transactions via ChipiPay.
-- **[Medialane.xyz](https://medialane.xyz)** — Developer portal. API keys, REST endpoint docs, SDK quickstart, webhooks, usage analytics.
+- **[portal.medialane.io](https://portal.medialane.io)** — Developer portal. API keys, REST endpoint docs, SDK quickstart, webhooks, usage analytics.
 
 Both are powered by the Medialane backend (Starknet indexer + Hono REST API) and the `@medialane/sdk` TypeScript package.
 
@@ -32,14 +32,15 @@ Both are powered by the Medialane backend (Starknet indexer + Hono REST API) and
 - **Usage analytics** — 30-day request history by day
 - **SDK documentation** — `@medialane/sdk` quickstart, full method reference
 - **Full API reference** — Every endpoint, parameter, and response shape documented at `/docs/api`
+- **Agent quickstart** — SIWS auth flow, credit top-up, autonomous agent patterns at `/docs/agents`
 
 ### For Creators
-- **Invisible Starknet wallet** — Created on first use, protected by passkey (Face ID / Touch ID) or a 6-12 digit PIN
-- **Gasless transactions** — ChipiPay sponsors gas on Starknet Mainnet
+- **Starknet wallet auth** — Sign in with Starknet (SIWS) — no password, no Clerk, no custodial key
+- **Credit system** — Pay-as-you-go credits, MDLN token multipliers (up to 2×)
 - **Contact form** — Reach the team at `/connect`
 
 ### Platform
-- **Pricing** — FREE (50 req/month) and PREMIUM (3,000 req/min) tiers
+- **Pricing** — FREE tier + pay-as-you-go credits with MDLN multipliers
 - **Changelog** — Release timeline at `/changelog`
 - **Dark-theme UI** — Glass navigation, gradient backgrounds, Framer Motion animations
 
@@ -59,7 +60,7 @@ The Medialane REST API indexes Starknet in real time and exposes structured data
 | **Search** | Full-text search across tokens, collections, and creators. |
 | **Portal** | API keys, webhooks, usage — self-service from `/account`. |
 
-Get your API key at [medialane.xyz/account](https://medialane.xyz/account). Full reference at [medialane.xyz/docs/api](https://medialane.xyz/docs/api).
+Get your API key at [portal.medialane.io/account](https://portal.medialane.io/account). Full reference at [portal.medialane.io/docs/api](https://portal.medialane.io/docs/api).
 
 ---
 
@@ -72,8 +73,8 @@ Get your API key at [medialane.xyz/account](https://medialane.xyz/account). Full
 | Language | TypeScript |
 | UI | React 19 + [Tailwind CSS](https://tailwindcss.com/) + [Radix UI](https://www.radix-ui.com/) |
 | Animation | [Framer Motion](https://www.framer.com/motion/) |
-| Auth | [Clerk 6](https://clerk.com/) (email, social, passkey) |
-| Wallet | [ChipiPay](https://chipipay.com/) (`@chipi-stack/nextjs` + `@chipi-stack/chipi-passkey`) |
+| Auth | SIWS — Sign In With Starknet (stateless, JWT cookie) |
+| Database | PostgreSQL (Neon) — accounts, sessions, credits, deposits |
 | Email | nodemailer v8 (SMTP — contact form) |
 | Validation | [Zod](https://zod.dev/) + [React Hook Form](https://react-hook-form.com/) |
 | SDK | [@medialane/sdk](https://www.npmjs.com/package/@medialane/sdk) |
@@ -86,14 +87,15 @@ Get your API key at [medialane.xyz/account](https://medialane.xyz/account). Full
 |---|---|
 | `/` | Hero, feature overview, pricing teaser, ecosystem links |
 | `/features` | API surface, AI agent support, webhooks, real-time indexing |
-| `/pricing` | FREE vs PREMIUM comparison |
+| `/pricing` | FREE tier + pay-as-you-go + MDLN multiplier table |
 | `/connect` | Community links + contact form (SMTP) |
 | `/docs` | Getting started guide |
 | `/docs/api` | Full REST endpoint reference |
 | `/docs/sdk` | `@medialane/sdk` quickstart and method reference |
+| `/docs/agents` | AI agent quickstart — SIWS auth, 402 handling, autonomous top-up |
 | `/changelog` | Release timeline |
-| `/account` | API portal dashboard (API keys, webhooks, usage) — Clerk auth required |
-| `/onboarding` | Wallet setup — passkey-first, PIN fallback |
+| `/account` | API portal dashboard (API keys, webhooks, usage) — SIWS auth required |
+| `/sign-in` | Wallet connect + SIWS sign-in |
 | `/terms` | Terms of service |
 | `/privacy` | Privacy policy |
 
@@ -109,8 +111,8 @@ Get your API key at [medialane.xyz/account](https://medialane.xyz/account). Full
 
 ```bash
 # Clone
-git clone https://github.com/medialane-io/medialane-xyz.git
-cd medialane-xyz
+git clone https://github.com/medialane-io/medialane-portal.git
+cd medialane-portal
 
 # Install dependencies
 bun install
@@ -139,12 +141,11 @@ bun lint         # ESLint
 
 | Variable | Required | Purpose |
 |---|---|---|
-| `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` | Yes | Clerk publishable key |
-| `CLERK_SECRET_KEY` | Yes | Clerk secret key |
-| `NEXT_PUBLIC_CHIPI_API_KEY` | Yes | ChipiPay API key (wallet creation) |
-| `NEXT_PUBLIC_CLERK_TEMPLATE_NAME` | Yes | Clerk JWT template name (must match ChipiPay config) |
+| `DATABASE_URL` | Yes | PostgreSQL connection string |
+| `JWT_SECRET` | Yes | Secret for signing session JWT cookies |
 | `NEXT_PUBLIC_MEDIALANE_BACKEND_URL` | Yes | Medialane API base URL |
 | `NEXT_PUBLIC_MEDIALANE_API_KEY` | Yes | Medialane API key (portal calls) |
+| `BACKEND_ADMIN_KEY` | Yes | Admin key for backend provisioning |
 | `SMTP_HOST` | Contact form | SMTP hostname (e.g. `smtp.hostinger.com`) |
 | `SMTP_PORT` | Contact form | SMTP port (e.g. `465`) |
 | `SMTP_USER` | Contact form | SMTP username |
@@ -161,12 +162,20 @@ bun lint         # ESLint
 Next.js 15 App Router — server components by default. Client components (`"use client"`) only where hooks or browser APIs are needed.
 
 ```
-src/app/layout.tsx              ← Root: ClerkProvider + FloatingNav + Footer
+src/app/layout.tsx              ← Root: FloatingNav + Footer
   src/app/(pages)/              ← Marketing pages (server components)
   src/app/docs/layout.tsx       ← Docs: 2-col (DocsSidebar + content)
-  src/app/account/              ← Portal dashboard (Clerk auth required)
-  src/app/onboarding/           ← Wallet setup (ChipiPay)
+  src/app/account/              ← Portal dashboard (SIWS auth required)
+  src/app/sign-in/              ← Wallet connect + SIWS
 ```
+
+### Auth flow (SIWS)
+
+1. User connects Starknet wallet on `/sign-in`
+2. Portal issues a nonce challenge (`/api/auth/challenge`)
+3. User signs the typed-data message with their wallet
+4. Portal verifies the signature (`/api/auth/verify`), creates a JWT cookie session
+5. Subsequent requests use the JWT cookie — no Clerk, no custodial key
 
 ### Key components
 
@@ -176,27 +185,6 @@ src/app/layout.tsx              ← Root: ClerkProvider + FloatingNav + Footer
 | `Footer` | 3-column footer + social links |
 | `BackgroundGradients` | Fixed purple/cyan gradient blobs (full-page routes) |
 | `DocsSidebar` | Sticky left nav for `/docs/*` |
-| `WalletPinDialog` | Transaction auth — passkey-first, PIN fallback |
-| `WalletSummary` | Balance display + receive dialog |
-
-### Wallet flow
-
-1. User signs in with Clerk (email / social / passkey)
-2. `/onboarding` — ChipiPay creates an invisible Starknet wallet, encrypted with a passkey or PIN
-3. Wallet address stored in `publicMetadata` via Clerk server action
-4. Subsequent sessions use SNIP-9 session keys (6-hour validity) for gasless signing
-
----
-
-## Supported Starknet Tokens
-
-| Token | Address |
-|---|---|
-| USDC (native) | `0x033068f6539f8e6e6b131e6b2b814e6c34a5224bc66947c47dab9dfee93b35fb` |
-| USDC.e (bridged) | `0x053c91253bc9682c04929ca02ed00b3e423f6710d2ee7e0d5ebb06f3ecf368a8` |
-| USDT | `0x068f5c6a61780768455de69077e07e89787839bf8166decfbf92b645209c0fb8` |
-| ETH | `0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7` |
-| STRK | `0x04718f5a0fc34cc1af16a1cdee98ffb20c31f5cd61d6ab07201858f4287c938d` |
 
 ---
 
@@ -212,7 +200,7 @@ import { MedialaneClient } from "@medialane/sdk";
 const client = new MedialaneClient({
   network: "mainnet",
   backendUrl: "https://medialane-backend-production.up.railway.app",
-  apiKey: "ml_live_...", // from medialane.xyz/account
+  apiKey: "ml_live_...", // from portal.medialane.io/account
 });
 
 // Query active listings
@@ -228,7 +216,7 @@ console.log(token.data.metadata.commercialUse);  // "No"
 console.log(token.data.metadata.attributes);     // IpAttribute[]
 ```
 
-Full reference at [medialane.xyz/docs/sdk](https://medialane.xyz/docs/sdk) and on [npm](https://www.npmjs.com/package/@medialane/sdk).
+Full reference at [portal.medialane.io/docs/sdk](https://portal.medialane.io/docs/sdk) and on [npm](https://www.npmjs.com/package/@medialane/sdk).
 
 ---
 
@@ -258,4 +246,4 @@ Contributions are welcome. If you have a feature or improvement to suggest:
 
 [MIT](LICENSE)
 
-Powered by **Starknet** · **Mediolano Protocol** · **ChipiPay** · **@medialane/sdk**
+Powered by **Starknet** · **Mediolano Protocol** · **@medialane/sdk**
