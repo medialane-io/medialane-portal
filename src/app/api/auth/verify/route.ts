@@ -27,21 +27,17 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Invalid signature" }, { status: 401 });
   }
 
-  // Upsert wallet — creates account on first sign-in
+  // Upsert account — creates row on first sign-in
   await pool.query(
-    `INSERT INTO wallets (address) VALUES ($1) ON CONFLICT (address) DO NOTHING`,
-    [normalizedAddress]
-  );
-  await pool.query(
-    `INSERT INTO credits (address) VALUES ($1) ON CONFLICT (address) DO NOTHING`,
+    `INSERT INTO accounts (address) VALUES ($1) ON CONFLICT (address) DO NOTHING`,
     [normalizedAddress]
   );
 
-  const wallet = await pool.query<{ mdln_tier: number }>(
-    "SELECT mdln_tier FROM wallets WHERE address = $1",
+  const account = await pool.query<{ mdln_tier: number }>(
+    "SELECT mdln_tier FROM accounts WHERE address = $1",
     [normalizedAddress]
   );
-  const mdln_tier = wallet.rows[0]?.mdln_tier ?? 0;
+  const mdln_tier = account.rows[0]?.mdln_tier ?? 0;
 
   const { token, refreshToken } = await createSession({ address: normalizedAddress, mdln_tier });
 
