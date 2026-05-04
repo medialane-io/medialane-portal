@@ -1,8 +1,8 @@
-import { betterFetch } from "@better-fetch/fetch";
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
+import { verifyTokenEdge } from "@/src/lib/session";
 
-const PROTECTED = ["/account", "/onboarding"];
+const PROTECTED = ["/account"];
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
@@ -11,19 +11,19 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  const { data: session } = await betterFetch("/api/auth/get-session", {
-    baseURL: request.nextUrl.origin,
-    headers: { cookie: request.headers.get("cookie") ?? "" },
-  });
+  const token = request.cookies.get("auth-token")?.value;
+  if (!token) {
+    return NextResponse.redirect(new URL("/sign-in", request.url));
+  }
 
+  const session = await verifyTokenEdge(token);
   if (!session) {
-    const signInUrl = new URL("/sign-in", request.url);
-    return NextResponse.redirect(signInUrl);
+    return NextResponse.redirect(new URL("/sign-in", request.url));
   }
 
   return NextResponse.next();
 }
 
 export const config = {
-  matcher: ["/account/:path*", "/onboarding/:path*"],
+  matcher: ["/account/:path*"],
 };
