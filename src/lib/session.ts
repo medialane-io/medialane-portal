@@ -76,7 +76,7 @@ export async function refreshSession(
 
   const { address } = result.rows[0];
   const wallet = await pool.query<{ mdln_tier: number }>(
-    "SELECT mdln_tier FROM wallets WHERE address = $1",
+    "SELECT mdln_tier FROM accounts WHERE address = $1",
     [address]
   );
   const mdln_tier = wallet.rows[0]?.mdln_tier ?? 0;
