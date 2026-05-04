@@ -35,7 +35,7 @@ export default function PrivacyPage() {
             <H2>3. Third-Party Services</H2>
             <p>We rely on the following third parties:</p>
             <ul className="mt-2 ml-4 space-y-1 list-disc list-outside">
-              <li><strong className="text-white">Clerk</strong> — authentication and user session management. See <a href="https://clerk.com/privacy" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">clerk.com/privacy</a>.</li>
+              <li><strong className="text-white">Starknet</strong> — wallet-based authentication via Sign-In with Starknet (SIWS). No personal data is transmitted to a third party; identity is verified on-chain.</li>
               <li><strong className="text-white">Railway</strong> — infrastructure and database hosting. See <a href="https://railway.app/legal/privacy" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">railway.app/legal/privacy</a>.</li>
               <li><strong className="text-white">Hostinger</strong> — email delivery (SMTP). See <a href="https://www.hostinger.com/privacy-policy" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">hostinger.com/privacy-policy</a>.</li>
               <li><strong className="text-white">Pinata</strong> — IPFS pinning and metadata delivery.</li>
@@ -56,7 +56,7 @@ export default function PrivacyPage() {
 
             <H2>6. Cookies</H2>
             <p>
-              We use session cookies required for authentication (Clerk). We do not use advertising cookies. Analytics are collected via server-side logs rather than client-side trackers where possible.
+              We use session cookies required for authentication (<code className="font-mono text-xs bg-white/10 px-1.5 py-0.5 rounded">auth-token</code> and <code className="font-mono text-xs bg-white/10 px-1.5 py-0.5 rounded">auth-refresh</code>). We do not use advertising cookies. Analytics are collected via server-side logs rather than client-side trackers where possible.
             </p>
 
             <H2>7. Contact</H2>
