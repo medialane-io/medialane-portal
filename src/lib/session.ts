@@ -96,7 +96,7 @@ export function setSessionCookies(
   refreshToken: string
 ) {
   const secure = process.env.NODE_ENV === "production";
-  const base = `; Path=/; HttpOnly; SameSite=Lax${secure ? "; Secure" : ""}`;
+  const base = `; Path=/; HttpOnly; SameSite=Strict${secure ? "; Secure" : ""}`;
   response.headers.append("Set-Cookie", `${AUTH_TOKEN_COOKIE}=${token}; Max-Age=900${base}`);
   response.headers.append(
     "Set-Cookie",
@@ -105,20 +105,7 @@ export function setSessionCookies(
 }
 
 export function clearSessionCookies(response: Response) {
-  const base = "; Path=/; HttpOnly; SameSite=Lax; Max-Age=0";
+  const base = "; Path=/; HttpOnly; SameSite=Strict; Max-Age=0";
   response.headers.append("Set-Cookie", `${AUTH_TOKEN_COOKIE}=${base}`);
   response.headers.append("Set-Cookie", `${REFRESH_TOKEN_COOKIE}=${base}`);
-}
-
-// Edge-compatible verify — no cookies() or DB calls (for middleware)
-export async function verifyTokenEdge(token: string): Promise<SessionPayload | null> {
-  try {
-    const { payload } = await jwtVerify(token, getSecret());
-    return {
-      address: payload.sub as string,
-      mdln_tier: payload.mdln_tier as number,
-    };
-  } catch {
-    return null;
-  }
 }

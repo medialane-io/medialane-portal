@@ -14,10 +14,10 @@ function getSecret() {
 export async function verifyTokenEdge(token: string): Promise<SessionPayload | null> {
   try {
     const { payload } = await jwtVerify(token, getSecret());
-    return {
-      address: payload.sub as string,
-      mdln_tier: payload.mdln_tier as number,
-    };
+    const raw = payload.mdln_tier;
+    const mdln_tier =
+      typeof raw === "number" && raw >= 0 && raw <= 3 ? (raw as 0 | 1 | 2 | 3) : 0;
+    return { address: payload.sub as string, mdln_tier };
   } catch {
     return null;
   }
