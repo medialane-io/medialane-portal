@@ -2,8 +2,15 @@ import { NextRequest, NextResponse } from "next/server";
 import { consumeNonce, verifySignature } from "@/src/lib/siws";
 import { createSession, setSessionCookies } from "@/src/lib/session";
 import { pool } from "@/src/lib/db";
+import { checkRateLimit } from "@/src/lib/rate-limit";
 
 export async function POST(req: NextRequest) {
+  const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown";
+  const allowed = await checkRateLimit(`verify:${ip}`, 5, 60);
+  if (!allowed) {
+    return NextResponse.json({ error: "Too many requests" }, { status: 429 });
+  }
+
   const body = await req.json().catch(() => null);
   const { address, nonce, signature } = body ?? {};
 
