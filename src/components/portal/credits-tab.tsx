@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import useSWR from "swr";
 import { useAccount } from "@starknet-react/core";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/src/components/ui/card";
@@ -43,14 +43,6 @@ export function CreditsTab({ address, mdln_tier }: Props) {
   const { data: balanceData, mutate } = useSWR<BalanceData>("/api/credits/balance", portalFetcher);
   const { data: historyData, mutate: mutateHistory } = useSWR<HistoryData>("/api/credits/history", portalFetcher);
 
-  // Poll for new deposits on mount — no cron needed
-  useEffect(() => {
-    fetch("/api/credits/poll").then(() => {
-      mutate();
-      mutateHistory();
-    }).catch(() => {});
-  }, [mutate, mutateHistory]);
-
   const treasuryAddress = process.env.NEXT_PUBLIC_TREASURY_ADDRESS ?? "";
   const balance = balanceData?.balance ?? 0;
   const multiplier = MULTIPLIERS[mdln_tier] ?? 1.0;
@@ -80,10 +72,7 @@ export function CreditsTab({ address, mdln_tier }: Props) {
       ]);
       setTxHash(result.transaction_hash);
       setUsdcAmount("");
-      // Poll after a short delay to let the transaction index
-      setTimeout(() => {
-        fetch("/api/credits/poll").then(() => { mutate(); mutateHistory(); }).catch(() => {});
-      }, 8000);
+      setTimeout(() => { mutate(); mutateHistory(); }, 8000);
     } catch (err) {
       setDepositError(err instanceof Error ? err.message : "Transaction failed");
     } finally {
