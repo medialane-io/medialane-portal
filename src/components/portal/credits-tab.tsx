@@ -10,11 +10,11 @@ import { Input } from "@/src/components/ui/input";
 import { Label } from "@/src/components/ui/label";
 import { Coins, Zap, ExternalLink, Loader2 } from "lucide-react";
 import { portalFetcher } from "@/src/lib/portal/fetcher";
+import { CREDITS_PER_USDC } from "@/src/lib/constants";
 
 const USDC_CONTRACT = "0x053c91253bc9682c04929ca02ed00b3e423f6710d2ee7e0d5ebb06f3ecf368a8";
 const MDLN_TIER_LABELS = ["No MDLN bonus", "500+ MDLN · 1.2×", "2,000+ MDLN · 1.5×", "5,000+ MDLN · 2.0×"];
 const MULTIPLIERS = [1.0, 1.2, 1.5, 2.0];
-const CREDITS_PER_USDC = 100;
 
 interface Props {
   address: string;

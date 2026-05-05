@@ -3,6 +3,7 @@ import { RpcProvider } from "starknet";
 import { pool } from "@/src/lib/db";
 import { getMdlnBalance, getTier, getMultiplier } from "@/src/lib/mdln";
 import { addCredits } from "@/src/lib/credits";
+import { CREDITS_PER_USDC } from "@/src/lib/constants";
 
 const USDC_CONTRACT = "0x053c91253bc9682c04929ca02ed00b3e423f6710d2ee7e0d5ebb06f3ecf368a8";
 // keccak256("Transfer") selector on Starknet
@@ -95,5 +96,3 @@ export async function GET(req: NextRequest) {
 
   return NextResponse.json({ ok: true, credited, fromBlock, toBlock });
 }
-
-const CREDITS_PER_USDC = 100;
