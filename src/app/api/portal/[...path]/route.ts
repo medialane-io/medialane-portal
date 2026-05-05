@@ -32,6 +32,11 @@ async function handler(
   }
 
   const { path } = await params;
+
+  if (path.some((seg) => seg === ".." || seg === "." || seg.includes("/"))) {
+    return NextResponse.json({ error: "Invalid path" }, { status: 400 });
+  }
+
   const subpath = path.join("/");
   const search = req.nextUrl.search;
   const upstreamUrl = `${apiUrl}/v1/portal/${subpath}${search}`;

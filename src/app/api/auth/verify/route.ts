@@ -15,6 +15,16 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Invalid request body" }, { status: 400 });
   }
 
+  if (
+    signature.length < 1 ||
+    signature.length > 4 ||
+    !signature.every(
+      (s: unknown) => typeof s === "string" && /^0x[0-9a-fA-F]+$/.test(s)
+    )
+  ) {
+    return NextResponse.json({ error: "Invalid signature format" }, { status: 400 });
+  }
+
   const normalizedAddress = address.toLowerCase();
 
   const nonceValid = await consumeNonce(nonce, normalizedAddress);

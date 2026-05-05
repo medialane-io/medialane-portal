@@ -10,6 +10,15 @@ const transporter = nodemailer.createTransport({
   },
 })
 
+function escapeHtml(str: string): string {
+  return str
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#x27;")
+}
+
 interface ContactEmailParams {
   name: string
   email: string
@@ -24,14 +33,14 @@ export async function sendContactEmail({ name, email, subject, message }: Contac
   await transporter.sendMail({
     from: `"Medialane Contact" <${from}>`,
     to,
-    replyTo: `"${name}" <${email}>`,
+    replyTo: `"${escapeHtml(name)}" <${email}>`,
     subject: `[Contact] ${subject}`,
     text: `Name: ${name}\nEmail: ${email}\n\n${message}`,
     html: `
-      <p><strong>Name:</strong> ${name}</p>
-      <p><strong>Email:</strong> ${email}</p>
+      <p><strong>Name:</strong> ${escapeHtml(name)}</p>
+      <p><strong>Email:</strong> ${escapeHtml(email)}</p>
       <hr />
-      <p>${message.replace(/\n/g, "<br />")}</p>
+      <p>${escapeHtml(message).replace(/\n/g, "<br />")}</p>
     `,
   })
 }
