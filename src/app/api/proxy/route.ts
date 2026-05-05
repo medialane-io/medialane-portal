@@ -1,52 +1,66 @@
-import { NextRequest, NextResponse } from "next/server"
+import { NextRequest, NextResponse } from "next/server";
+import { getSession } from "@/src/lib/session";
+
+const ALLOWED_HOSTNAMES = new Set([
+  "gateway.pinata.cloud",
+  "ipfs.io",
+  "dweb.link",
+  "cloudflare-ipfs.com",
+  "nftstorage.link",
+]);
 
 export async function GET(req: NextRequest) {
-    const url = req.nextUrl.searchParams.get("url")
-    if (!url) {
-        return new NextResponse("Missing url", { status: 400 })
+  const session = await getSession();
+  if (!session) {
+    return new NextResponse("Unauthorized", { status: 401 });
+  }
+
+  const raw = req.nextUrl.searchParams.get("url");
+  if (!raw) {
+    return new NextResponse("Missing url", { status: 400 });
+  }
+
+  let parsed: URL;
+  try {
+    parsed = new URL(raw);
+  } catch {
+    return new NextResponse("Invalid URL", { status: 400 });
+  }
+
+  if (parsed.protocol !== "https:" && parsed.protocol !== "http:") {
+    return new NextResponse("Invalid URL", { status: 400 });
+  }
+
+  if (!ALLOWED_HOSTNAMES.has(parsed.hostname)) {
+    console.warn(`[proxy] blocked hostname: ${parsed.hostname}`);
+    return new NextResponse("Hostname not allowed", { status: 403 });
+  }
+
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 15_000);
+
+  try {
+    const response = await fetch(parsed.toString(), { signal: controller.signal });
+    clearTimeout(timeoutId);
+
+    if (!response.ok) {
+      return new NextResponse(`Upstream error: ${response.statusText}`, { status: response.status });
     }
 
-    try {
-        // Basic URL validation
-        if (!url.startsWith("http")) {
-            console.warn(`[Proxy] Blocked invalid URL: ${url}`)
-            return new NextResponse("Invalid URL", { status: 400 })
-        }
-
-        console.log(`[Proxy] Fetching: ${url}`)
-
-        const controller = new AbortController()
-        const timeoutId = setTimeout(() => controller.abort(), 15000) // 15s timeout
-
-        try {
-            const response = await fetch(url, { signal: controller.signal })
-            clearTimeout(timeoutId)
-
-            if (!response.ok) {
-                console.warn(`[Proxy] Failed to fetch ${url}: ${response.status} ${response.statusText}`)
-                return new NextResponse(`Failed to fetch from source: ${response.statusText}`, { status: response.status })
-            }
-
-            // Forward the image/json stream with appropriate headers
-            const contentType = response.headers.get("Content-Type") || "application/octet-stream"
-
-            return new NextResponse(response.body, {
-                status: response.status,
-                headers: {
-                    "Content-Type": contentType,
-                    "Cache-Control": "public, max-age=86400" // Cache for 24 hours
-                }
-            })
-        } catch (error: any) {
-            clearTimeout(timeoutId)
-            if (error.name === 'AbortError') {
-                console.warn(`[Proxy] Timeout fetching ${url}`)
-                return new NextResponse("Gateway Timeout", { status: 504 })
-            }
-            throw error
-        }
-    } catch (error: any) {
-        console.error(`[Proxy] Error fetching ${url}:`, error.message)
-        return new NextResponse(`Internal Server Error: ${error.message}`, { status: 500 })
+    const contentType = response.headers.get("Content-Type") ?? "application/octet-stream";
+    return new NextResponse(response.body, {
+      status: 200,
+      headers: {
+        "Content-Type": contentType,
+        "Cache-Control": "public, max-age=86400",
+      },
+    });
+  } catch (err: unknown) {
+    clearTimeout(timeoutId);
+    if (err instanceof Error && err.name === "AbortError") {
+      return new NextResponse("Gateway Timeout", { status: 504 });
     }
+    console.error("[proxy] fetch error:", err);
+    return new NextResponse("Internal Server Error", { status: 500 });
+  }
 }
