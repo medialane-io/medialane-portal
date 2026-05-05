@@ -36,7 +36,7 @@ export default function DocsPage() {
           <div>
             <p className="text-white font-medium mb-1">Get your API key</p>
             <p className="text-muted-foreground text-sm">
-              Connect your Starknet wallet at <Link href="/sign-in" className="text-primary hover:underline">/sign-in</Link> and create an API key from the portal dashboard. You can create up to 5 keys.
+              Connect your Starknet wallet at <Link href="/account" className="text-primary hover:underline">/account</Link> and create an API key from the portal dashboard. You need a minimum of 500 MDLN in your wallet to provision a key.
             </p>
           </div>
         </li>
@@ -148,18 +148,86 @@ export default function DocsPage() {
       {/* Credits */}
       <DocH2 id="credits">Credits &amp; Billing</DocH2>
       <p className="text-muted-foreground mb-3 text-sm">
-        Every account receives <strong className="text-white">50 free credits per month</strong> (reset on the 1st). Each API call consumes one credit.
-        When the free allowance runs out you receive a <code className="font-mono text-xs bg-white/10 px-1.5 py-0.5 rounded">402 Payment Required</code> response with an <code className="font-mono text-xs bg-white/10 px-1.5 py-0.5 rounded">X-Credits-Remaining: 0</code> header.
+        Credits are the billing unit. Top up by depositing USDC on Starknet from your{" "}
+        <Link href="/account" className="text-primary hover:underline">account dashboard</Link>.
+        Credits appear within ~2 minutes. Credits never expire.
       </p>
-      <p className="text-muted-foreground mb-3 text-sm">
-        To top up, deposit USDC on Starknet from your <Link href="/account" className="text-primary hover:underline">account dashboard</Link>.
-        Credits appear within ~2 minutes. Rate: <strong className="text-white">1 USDC = 100 credits</strong> ($0.01/request).
-        Hold MDLN tokens to receive a multiplier — up to 2× more credits per dollar. See the <Link href="/pricing" className="text-primary hover:underline">pricing page</Link> for tier details.
+      <p className="text-muted-foreground mb-4 text-sm">
+        Different endpoint categories consume different credits per call:
+      </p>
+      <div className="rounded-xl border border-white/10 overflow-hidden mb-4">
+        <div className="grid grid-cols-3 px-5 py-3 bg-white/[0.03] border-b border-white/10 text-xs font-semibold text-muted-foreground uppercase tracking-wide">
+          <span>Category</span>
+          <span className="text-center">Credits</span>
+          <span>Examples</span>
+        </div>
+        {[
+          { cat: "Read / query", cost: "1", ex: "Get asset, list collections, search, activity" },
+          { cat: "Trade intents", cost: "5", ex: "Create listing, fulfill order, counter-offer" },
+          { cat: "Minting", cost: "10", ex: "Mint token, batch mint" },
+          { cat: "Launchpad / deploy", cost: "100", ex: "Deploy contract, Collection Drop, POP Protocol" },
+        ].map((row, i, arr) => (
+          <div key={row.cat} className={`grid grid-cols-3 px-5 py-3 items-start text-sm ${i < arr.length - 1 ? "border-b border-white/5" : ""}`}>
+            <span className="text-white">{row.cat}</span>
+            <span className="text-center font-mono font-bold text-primary">{row.cost}</span>
+            <span className="text-muted-foreground text-xs">{row.ex}</span>
+          </div>
+        ))}
+      </div>
+      <p className="text-muted-foreground text-sm mb-3">
+        Hold MDLN tokens for a credit multiplier — up to 2× more credits per USDC deposit.
+        See the <Link href="/integrate" className="text-primary hover:underline">Integrate page</Link> for tier details.
       </p>
       <p className="text-muted-foreground text-sm">
-        Portal management calls (<code className="font-mono text-xs bg-white/10 px-1.5 py-0.5 rounded">/v1/portal/*</code>) never count toward the credit balance.
-        Autonomous agents can detect the 402 and trigger a top-up automatically — see the <Link href="/docs/agents" className="text-primary hover:underline">Agent Quickstart</Link>.
+        When credits run out you receive{" "}
+        <code className="font-mono text-xs bg-white/10 px-1.5 py-0.5 rounded">402 Payment Required</code>{" "}
+        with an{" "}
+        <code className="font-mono text-xs bg-white/10 px-1.5 py-0.5 rounded">X-Credits-Remaining: 0</code>{" "}
+        header. Portal management calls (<code className="font-mono text-xs bg-white/10 px-1.5 py-0.5 rounded">/v1/portal/*</code>)
+        never count toward the credit balance. Autonomous agents can detect the 402 and trigger a
+        top-up automatically — see the{" "}
+        <Link href="/docs/agents" className="text-primary hover:underline">Agent Quickstart</Link>.
       </p>
+
+      {/* Use cases */}
+      <DocH2 id="use-cases">Use Cases</DocH2>
+      <p className="text-muted-foreground mb-4 text-sm">
+        Both Medialane consumer apps are built on the same API you&apos;re integrating:
+      </p>
+      <div className="grid md:grid-cols-2 gap-4 mb-6">
+        {[
+          {
+            domain: "medialane.io",
+            role: "Creator Launchpad",
+            desc: "Uses Collections, Orders, Minting, Remix Licensing, and On-chain Comments APIs. Runs a ChipiPay invisible-wallet UX for end users.",
+          },
+          {
+            domain: "dapp.medialane.io",
+            role: "Permissionless dApp",
+            desc: "Uses Activities, Trade Intents, and Asset Metadata APIs with direct starknet.js reads — no backend dependency for browsing.",
+          },
+        ].map((s) => (
+          <div key={s.domain} className="rounded-xl border border-white/10 p-5 space-y-2 bg-white/[0.02]">
+            <p className="text-xs font-mono text-muted-foreground">{s.domain}</p>
+            <p className="text-sm font-semibold text-white">{s.role}</p>
+            <p className="text-xs text-muted-foreground leading-relaxed">{s.desc}</p>
+          </div>
+        ))}
+      </div>
+      <DocH3>Common patterns</DocH3>
+      <DocCodeBlock lang="ts">{`// Fetch a creator's portfolio
+const assets = await client.api.getTokensByOwner({ owner: "0x05f9..." });
+
+// List open-license assets available for remix
+import { OPEN_LICENSES } from "@medialane/sdk";
+const cc0 = await client.api.getTokens({ licenseType: OPEN_LICENSES });
+
+// Stream on-chain activity
+const events = await client.api.getActivities({ eventType: "TRANSFER" });
+
+// Submit a listing intent (agent or wallet)
+const intent = await client.api.createListingIntent({ tokenId, price, duration });
+const sig = await account.signMessage(intent.typedData);`}</DocCodeBlock>
     </div>
   )
 }

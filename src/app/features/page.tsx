@@ -28,56 +28,63 @@ import {
 const API_CARDS = [
   {
     icon: ListOrdered,
-    title: "Orders & Listings",
-    description: "Query open orders, bids, and fulfilled listings across the marketplace. Filter by NFT contract, token, or user.",
+    title: "Marketplace Orders",
+    description:
+      "Query active listings, bids, and completed sales. Filter by contract, token, or wallet. Powers the medialane.io marketplace.",
     color: "text-purple-400",
     bg: "bg-purple-500/10",
     border: "border-purple-500/20",
   },
   {
     icon: LayoutGrid,
-    title: "Collections",
-    description: "Fetch collection metadata, floor prices, volume, and token inventories for any Starknet IP collection.",
+    title: "Collections & Drops",
+    description:
+      "Fetch collection metadata, floor prices, volume, and token inventories. Includes POP and Collection Drop sources.",
     color: "text-blue-400",
     bg: "bg-blue-500/10",
     border: "border-blue-500/20",
   },
   {
     icon: Sparkles,
-    title: "Minting & Launchpad",
-    description: "Launch collection contracts and mint assets with ease. Get ready-to-execute calldata for on-chain deployment.",
+    title: "Launch & Mint",
+    description:
+      "Deploy collection contracts and mint assets programmatically. Get ready-to-sign calldata for on-chain deployment.",
     color: "text-orange-400",
     bg: "bg-orange-500/10",
     border: "border-orange-500/20",
   },
   {
     icon: FileImage,
-    title: "Tokens & Metadata",
-    description: "Resolve metadata for any token. Use JIT resolution for instant data on newly minted assets.",
+    title: "Asset Metadata",
+    description:
+      "Resolve full metadata for any token, including license terms, remix history, and provenance.",
     color: "text-green-400",
     bg: "bg-green-500/10",
     border: "border-green-500/20",
   },
   {
     icon: Activity,
-    title: "Activities",
-    description: "Stream on-chain events: mints, transfers, sales, offers, cancellations — indexed in real time.",
+    title: "On-chain Activity",
+    description:
+      "Stream every event: mints, transfers, sales, offers, cancellations — indexed in real time.",
     color: "text-cyan-400",
     bg: "bg-cyan-500/10",
     border: "border-cyan-500/20",
   },
   {
     icon: Signature,
-    title: "Intents (SNIP-12)",
-    description: "Create, sign, and submit structured trade intents using the SNIP-12 typed data standard on Starknet.",
+    title: "Trade Intents",
+    description:
+      "Create and sign structured trade intents using SNIP-12. Submit orders without exposing private keys.",
     color: "text-amber-400",
     bg: "bg-amber-500/10",
     border: "border-amber-500/20",
   },
   {
     icon: HeartPulse,
-    title: "Health & Monitoring",
-    description: "Real-time system health checks. Monitor indexer lag and database status for your enterprise integrations.",
+    title: "Platform Status",
+    description:
+      "Real-time indexer and database health. Build reliable integrations with observable system state.",
     color: "text-red-400",
     bg: "bg-red-500/10",
     border: "border-red-500/20",
@@ -85,7 +92,8 @@ const API_CARDS = [
   {
     icon: Search,
     title: "Search",
-    description: "Full-text search across tokens, collections, and creators. Integrate autocomplete in your dApp in minutes.",
+    description:
+      "Full-text search across tokens, collections, and creators. Integrate autocomplete in any app.",
     color: "text-pink-400",
     bg: "bg-pink-500/10",
     border: "border-pink-500/20",
@@ -93,7 +101,8 @@ const API_CARDS = [
   {
     icon: MessageSquare,
     title: "On-chain Comments",
-    description: "Permanent comments anchored to any NFT via the NFTComments Cairo contract. Indexed in real time, Voyager-verifiable, with on-chain 60s rate limiting and report-based auto-moderation.",
+    description:
+      "Permanent comments anchored to any NFT via the NFTComments Cairo contract. Indexed in real time, Voyager-verifiable, with on-chain rate limiting and report-based auto-moderation.",
     color: "text-violet-400",
     bg: "bg-violet-500/10",
     border: "border-violet-500/20",
@@ -101,7 +110,8 @@ const API_CARDS = [
   {
     icon: GitFork,
     title: "Remix Licensing",
-    description: "IP remix offer and self-remix system. Open licenses (CC0, CC BY, CC BY-SA, CC BY-NC) are auto-approved. Custom terms route through a creator approval flow before the requester can mint.",
+    description:
+      "Detect and enforce remix terms. Open licenses (CC0, CC BY, CC BY-SA, CC BY-NC) are auto-approved. Custom terms route through a creator approval flow before the requester can mint.",
     color: "text-rose-400",
     bg: "bg-rose-500/10",
     border: "border-rose-500/20",
@@ -109,7 +119,8 @@ const API_CARDS = [
   {
     icon: ArrowLeftRight,
     title: "Counter-offers",
-    description: "Buyers can counter any open listing with a custom price, duration, and message using SNIP-12 typed data. Sellers receive structured counter-offers they can accept or ignore.",
+    description:
+      "Buyers can counter any open listing with a custom price, duration, and message using SNIP-12 typed data. Sellers receive structured counter-offers they can accept or ignore.",
     color: "text-teal-400",
     bg: "bg-teal-500/10",
     border: "border-teal-500/20",
@@ -117,7 +128,8 @@ const API_CARDS = [
   {
     icon: Ticket,
     title: "POP Protocol",
-    description: "Proof of Participation claim collections for events — conferences, workshops, hackathons, bootcamps. One claimable token per eligible wallet. Check eligibility, batch-query up to 100 wallets, and manage allowlists via the SDK.",
+    description:
+      "Issue soulbound credentials tied to on-chain or off-chain events — conferences, workshops, hackathons. One claimable token per eligible wallet.",
     color: "text-indigo-400",
     bg: "bg-indigo-500/10",
     border: "border-indigo-500/20",
@@ -125,7 +137,8 @@ const API_CARDS = [
   {
     icon: ShoppingBag,
     title: "Collection Drop",
-    description: "Public minting campaigns with configurable claim conditions: price, supply cap, time window, per-wallet limits, and optional allowlist gating. Deploy via the SDK and manage phases on-chain.",
+    description:
+      "Launch fixed-supply public minting campaigns with configurable price, supply cap, time window, per-wallet limits, and optional allowlist gating.",
     color: "text-lime-400",
     bg: "bg-lime-500/10",
     border: "border-lime-500/20",
@@ -151,11 +164,52 @@ export default function FeaturesPage() {
             Platform Features
           </Badge>
           <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight text-white">
-            Everything you need to build on Starknet IP
+            Build on Creator Capital Markets
           </h1>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            One REST API. All the data. No indexer needed.
+            The Medialane API covers the full platform surface — marketplace orders, assets, minting,
+            licensing, drops, credentials, comments, and real-time events. One key, one SDK.
           </p>
+        </section>
+
+        {/* AI Agents section */}
+        <section className="container mx-auto px-4 pb-16 max-w-5xl">
+          <Card className="border-primary/20 bg-gradient-to-br from-primary/10 to-background/50">
+            <CardContent className="p-10 flex flex-col md:flex-row gap-8 items-start">
+              <div className="flex-shrink-0 p-4 bg-primary/10 rounded-2xl">
+                <Bot className="w-10 h-10 text-primary" />
+              </div>
+              <div className="space-y-4">
+                <h2 className="text-2xl font-bold text-white">Built for AI Agents</h2>
+                <p className="text-muted-foreground leading-relaxed">
+                  Medialane is designed to be machine-native. A Starknet wallet keypair is all the
+                  identity an agent needs — no KYC, no OAuth, no human in the loop. Agents can
+                  authenticate headlessly, query the full API surface, and manage billing autonomously.
+                </p>
+                <ul className="space-y-2 text-sm text-muted-foreground">
+                  {[
+                    "SIWS headless auth — generate keypair, sign challenge, receive JWT",
+                    "x-api-key header — trivial to integrate from any runtime",
+                    "Deterministic JSON responses — no UI, no scraping",
+                    "Detect open-license assets (CC0) and autonomously request remix offers",
+                    "402 Payment Required when credits run out — machine-readable, not a human error page",
+                    "Agents can trigger USDC top-up on-chain to continue autonomously",
+                  ].map((f) => (
+                    <li key={f} className="flex items-center gap-2">
+                      <Check className="w-4 h-4 text-primary flex-shrink-0" />
+                      {f}
+                    </li>
+                  ))}
+                </ul>
+                <Button asChild variant="outline" className="border-primary/30 hover:bg-primary/10 text-primary">
+                  <Link href="/docs/agents">
+                    Agent Quickstart
+                    <ArrowRight className="w-4 h-4 ml-2" />
+                  </Link>
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
         </section>
 
         {/* API Surface Grid */}
@@ -175,45 +229,12 @@ export default function FeaturesPage() {
           </div>
         </section>
 
-        {/* AI Agents section */}
-        <section className="container mx-auto px-4 pb-20 max-w-5xl">
-          <Card className="border-primary/20 bg-gradient-to-br from-primary/10 to-background/50">
-            <CardContent className="p-10 flex flex-col md:flex-row gap-8 items-start">
-              <div className="flex-shrink-0 p-4 bg-primary/10 rounded-2xl">
-                <Bot className="w-10 h-10 text-primary" />
-              </div>
-              <div className="space-y-4">
-                <h2 className="text-2xl font-bold text-white">Built for AI Agents</h2>
-                <p className="text-muted-foreground leading-relaxed">
-                  Medialane is designed to be machine-native. An API key is all the identity an agent needs — no KYC, no wallet connection, no human in the loop. Agents can query listings, submit trade intents, and read on-chain activity autonomously.
-                </p>
-                <ul className="space-y-2 text-sm text-muted-foreground">
-                  {[
-                    "Stateless REST — no sessions or cookies",
-                    "x-api-key header auth — trivial to integrate",
-                    "Deterministic JSON responses",
-                    "Unlimited monthly quota on PREMIUM — scale without friction",
-                    "Detect open-license assets (CC0) and autonomously request remix offers",
-                    "Query on-chain comments and IP metadata without a wallet",
-                  ].map((f) => (
-                    <li key={f} className="flex items-center gap-2">
-                      <Check className="w-4 h-4 text-primary flex-shrink-0" />
-                      {f}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </CardContent>
-          </Card>
-        </section>
-
-        {/* Webhooks — PREMIUM */}
+        {/* Webhooks */}
         <section className="container mx-auto px-4 pb-20 max-w-5xl">
           <div className="space-y-6">
             <div className="flex items-center gap-3">
               <Webhook className="w-6 h-6 text-amber-400" />
               <h2 className="text-2xl font-bold text-white">Webhooks</h2>
-              <Badge className="bg-amber-500/10 text-amber-300 border-amber-500/20 text-xs">PREMIUM</Badge>
             </div>
             <p className="text-muted-foreground">
               Subscribe to real-time on-chain events. Medialane pushes a signed POST payload to your endpoint the moment an event is indexed — no polling needed.

@@ -52,7 +52,7 @@ export function Navbar() {
 
   const navItems = [
     { name: "Home", href: "/", icon: Home },
-    { name: "Workshop", href: "/workshop", icon: Play },
+    { name: "Integrate", href: "/integrate", icon: Play },
     { name: "Mint Event", href: "/mint", icon: Sparkles },
     { name: "Account", href: "/account", icon: User },
   ]

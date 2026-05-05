@@ -1,7 +1,7 @@
 import React from "react"
 import { Badge } from "@/src/components/ui/badge"
 import Link from "next/link"
-import { DocH2, DocCodeBlock } from "@/src/components/docs/typography"
+import { DocH2, DocH3, DocCodeBlock } from "@/src/components/docs/typography"
 
 export default function SdkPage() {
   return (
@@ -462,6 +462,79 @@ try {
         <p className="text-sm text-muted-foreground">
           <span className="font-semibold text-white">Full API reference</span> — all REST endpoints, parameters, and response schemas are documented in the{" "}
           <Link href="/docs/api" className="text-primary hover:underline">API Reference</Link>.
+        </p>
+      </div>
+
+      {/* Use case examples */}
+      <DocH2 id="examples" border>Use Case Examples</DocH2>
+      <p className="text-muted-foreground text-sm mb-3">
+        Common patterns you can build with the SDK:
+      </p>
+
+      <DocH3>Fetch a creator&apos;s portfolio</DocH3>
+      <DocCodeBlock lang="ts">{`const portfolio = await client.api.getTokensByOwner({
+  owner: "0x05f9...",
+  limit: 20,
+});
+// portfolio.data → array of token objects with metadata, license terms, remixCount`}</DocCodeBlock>
+
+      <DocH3>List open-license assets for remix</DocH3>
+      <DocCodeBlock lang="ts">{`import { OPEN_LICENSES } from "@medialane/sdk";
+
+const openAssets = await client.api.getTokens({
+  licenseType: OPEN_LICENSES, // ["CC0", "CC BY", "CC BY-SA", "CC BY-NC"]
+});`}</DocCodeBlock>
+
+      <DocH3>Submit a trade intent (no private key exposure)</DocH3>
+      <DocCodeBlock lang="ts">{`const intent = await client.api.createListingIntent({
+  contractAddress: "0x04a...",
+  tokenId: "42",
+  price: "0.05",       // in ETH
+  currency: "ETH",
+  duration: 86400,     // seconds
+});
+
+// sign off-chain, submit on-chain
+const sig = await account.signMessage(intent.typedData);
+await client.api.submitOrder({ ...intent, signature: sig });`}</DocCodeBlock>
+
+      <DocH3>Stream on-chain activity</DocH3>
+      <DocCodeBlock lang="ts">{`const activity = await client.api.getActivities({
+  eventType: "TRANSFER",   // TRANSFER | ORDER_CREATED | ORDER_FULFILLED | ORDER_CANCELLED
+  contractAddress: "0x04a...",
+  limit: 50,
+});`}</DocCodeBlock>
+
+      <DocH2 id="consumer-apps" border>Built with the SDK</DocH2>
+      <p className="text-muted-foreground text-sm mb-4">
+        Both Medialane consumer apps use the same SDK you&apos;re integrating:
+      </p>
+      <div className="grid md:grid-cols-2 gap-4">
+        <div className="rounded-xl border border-primary/20 bg-primary/5 p-5 space-y-2">
+          <p className="text-xs font-mono text-muted-foreground">medialane.io</p>
+          <p className="text-sm font-semibold text-white">Creator Launchpad</p>
+          <p className="text-xs text-muted-foreground leading-relaxed">
+            Collections, Orders, Minting, Remix Licensing, POP, Collection Drop, On-chain Comments.
+            Invisible wallet UX via ChipiPay.
+          </p>
+        </div>
+        <div className="rounded-xl border border-cyan-500/20 bg-cyan-500/5 p-5 space-y-2">
+          <p className="text-xs font-mono text-muted-foreground">dapp.medialane.io</p>
+          <p className="text-sm font-semibold text-white">Permissionless dApp</p>
+          <p className="text-xs text-muted-foreground leading-relaxed">
+            Activities, Trade Intents, Asset Metadata. Direct starknet.js reads — no backend dependency for browsing.
+          </p>
+        </div>
+      </div>
+
+      <div className="mt-6 pt-6 border-t border-white/10 space-y-2">
+        <p className="text-sm font-semibold text-white">Full SDK documentation</p>
+        <p className="text-sm text-muted-foreground">
+          Complete method reference, type definitions, and advanced usage are on{" "}
+          <a href="https://docs.medialane.io/docs/sdk" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
+            docs.medialane.io/docs/sdk
+          </a>
+          .
         </p>
       </div>
     </div >

@@ -4,7 +4,7 @@ import { LogoMedialane } from "./logo-medialane"
 
 const PLATFORM_LINKS = [
   { name: "Features", href: "/features" },
-  { name: "Pricing", href: "/pricing" },
+  { name: "Integrate", href: "/integrate" },
   { name: "Docs", href: "/docs" },
   { name: "API Reference", href: "/docs/api" },
   { name: "SDK", href: "/docs/sdk" },
@@ -37,7 +37,7 @@ export default function Footer() {
           <div className="col-span-2 md:col-span-1 space-y-4">
             <LogoMedialane />
             <p className="text-sm text-muted-foreground leading-relaxed">
-              Permissionless IP infrastructure on Starknet. One REST API for orders, metadata, collections, and activities.
+              Creator capital markets. API and SDK access for assets, orders, licensing, drops, credentials, and real-time events.
             </p>
           </div>
 

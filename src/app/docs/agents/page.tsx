@@ -26,6 +26,7 @@ export default function AgentsPage() {
         <li><strong className="text-white">Identity</strong> — a Starknet wallet keypair. No email, no OAuth provider, no third-party dependency.</li>
         <li><strong className="text-white">Auth</strong> — Sign-In with Starknet (SIWS). Sign a typed-data challenge, receive a short-lived JWT.</li>
         <li><strong className="text-white">Billing</strong> — USDC on Starknet. Deposit on-chain, credits settle within ~2 minutes.</li>
+        <li><strong className="text-white">Access gate</strong> — 500 MDLN minimum in the agent wallet to provision an API key. Tokens stay in the wallet.</li>
         <li><strong className="text-white">Credit exhaustion</strong> — machine-readable <code className="font-mono text-xs bg-white/10 px-1.5 py-0.5 rounded">402</code> with <code className="font-mono text-xs bg-white/10 px-1.5 py-0.5 rounded">X-Credits-Remaining</code> header, not a human-facing error page.</li>
       </ul>
 
@@ -206,7 +207,7 @@ async function waitForCredits(retries = 20, delayMs = 7_000) {
       <ul className="space-y-2 text-sm text-muted-foreground list-disc list-inside">
         <li><Link href="/docs/api" className="text-primary hover:underline">API Reference</Link> — all available endpoints</li>
         <li><Link href="/docs/sdk" className="text-primary hover:underline">SDK Docs</Link> — typed TypeScript client (@medialane/sdk)</li>
-        <li><Link href="/pricing" className="text-primary hover:underline">Pricing</Link> — credit rates and MDLN tier details</li>
+        <li><Link href="/integrate" className="text-primary hover:underline">Integrate</Link> — credit costs and MDLN tier details</li>
       </ul>
     </div>
   )

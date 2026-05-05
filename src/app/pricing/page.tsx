@@ -72,7 +72,7 @@ export default function PricingPage() {
                   <li className="flex items-center gap-2"><Check className="w-4 h-4 text-green-400 shrink-0" /> Webhooks included</li>
                 </ul>
                 <Button asChild className="w-full" size="lg">
-                  <Link href="/sign-in">Connect Wallet</Link>
+                  <Link href="/account">Connect Wallet</Link>
                 </Button>
               </CardContent>
             </Card>
@@ -103,7 +103,7 @@ export default function PricingPage() {
                   <li className="flex items-center gap-2"><Check className="w-4 h-4 text-green-400 shrink-0" /> Agent-native 402 billing</li>
                 </ul>
                 <Button asChild className="w-full border-primary/30 hover:bg-primary/10" variant="outline" size="lg">
-                  <Link href="/sign-in">Get Started</Link>
+                  <Link href="/account">Get Started</Link>
                 </Button>
               </CardContent>
             </Card>

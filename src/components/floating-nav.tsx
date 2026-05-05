@@ -14,7 +14,7 @@ import { WalletConnectModal } from "./wallet-connect-modal"
 
 const NAV_LINKS = [
   { label: "Features", href: "/features" },
-  { label: "Pricing", href: "/pricing" },
+  { label: "Integrate", href: "/integrate" },
   { label: "Docs", href: "/docs" },
   { label: "Connect", href: "/connect" },
 ]

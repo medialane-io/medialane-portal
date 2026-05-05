@@ -1,20 +1,52 @@
 # Content & Messaging Refresh — Design Spec
 
-**Goal:** Rewrite the portal's content and structure to honestly reflect what Medialane is — a capital market for creative work — and what the portal gives developers: API and SDK access to that market.
+**Goal:** Rewrite the portal's content to honestly reflect what Medialane is — a capital market for creative work — and what the portal gives developers: API and SDK access to that market. Expand and improve all documentation. Reframe the access model around MDLN token gating and variable-cost credits.
 
-**Audience:** Developers and builders first. The copy speaks plainly about what can be built, not about the underlying chain or asset type.
+**Audience:** Developers, builders, and AI agents. The copy speaks plainly about what can be built.
 
 **Tone:** Direct and honest. No buzzwords. No "revolutionizing", "next-gen", "permissionless IP infrastructure". State what it is and what you get.
 
-**Source of truth:** `medialane-docs` about page, apps page, and learn sections. All messaging must be consistent with those documents.
+**Source of truth:** The platform itself — what it does, what the API exposes, what the SDK covers.
 
 ---
 
 ## What Medialane Is (internal anchor — every page derives from this)
 
-Medialane is a capital market for creative work. Creators, collectors, AI agents, and organizations mint, license, trade, and earn from programmable assets — IP, RWAs, NFTs — on-chain. The Medialane Portal is the developer layer: REST API, TypeScript SDK, webhooks, and pay-as-you-go credits to build on top of the platform.
+Medialane is a capital market for creative work. Creators, collectors, AI agents, and organizations mint, license, trade, and earn from programmable assets — IP, RWAs, NFTs — on-chain. The Medialane Portal is the developer layer: REST API, TypeScript SDK, webhooks, and a credit-based billing system to build on top of the platform.
 
-The platform is built on Mediolano — an independent, permissionless public goods protocol — and settles on Starknet. These are infrastructure facts, not the pitch.
+The platform settles on Starknet via Mediolano, an independent public goods protocol. These are infrastructure facts, not the pitch.
+
+**Consumer apps built on the SDK (use as showcase examples throughout):**
+- `medialane.io` — the creator launchpad (minting, drops, portfolio)
+- `dapp.medialane.io` — the permissionless on-chain dApp (marketplace, licensing, trading)
+
+---
+
+## Access Model
+
+### MDLN Token Gate
+Access to any API key requires a minimum wallet balance of **500 MDLN**. This is a spam/abuse gate, not a fee — the tokens remain in the user's wallet.
+
+| MDLN Balance | Credit Multiplier |
+|---|---|
+| 500 – 999 | 1.0× (base) |
+| 1,000 – 1,999 | 1.2× |
+| 2,000 – 4,999 | 1.5× |
+| 5,000+ | 2.0× |
+
+### Credit System
+Credits are topped up with USDC. No published credit-to-USDC rate — pricing is determined at deployment time and communicated in-app.
+
+**Variable credit costs by endpoint category:**
+| Category | Credits | Examples |
+|---|---|---|
+| Read / query | 1 | Get asset, list collections, search, activity |
+| Trade intents (SNIP-12) | 5 | Create listing, fulfill order, counter-offer |
+| Minting | 10 | Mint token, batch mint |
+| Launchpad / deploy | 100 | Deploy collection contract, Collection Drop, POP Protocol |
+
+### 402 Handling
+When credits run out the API returns `402 Payment Required` with `X-Credits-Remaining: 0`. Agents can detect this and programmatically trigger USDC top-up.
 
 ---
 
@@ -23,12 +55,13 @@ The platform is built on Mediolano — an independent, permissionless public goo
 ### 1. Homepage (`/`)
 
 **What changes:**
-- Hero headline: replace "Build on Starknet IP" with a plain statement of what Medialane is
-- Hero subhead: one sentence describing what the portal gives developers, without chain or asset-type jargon
-- Feature chips: replace API-surface labels with outcome-oriented descriptions
-- Cards row: remove the dead Workshop card; replace with a card pointing to the AI agents guide (`/docs/agents`)
-- Fix hero CTA: `/sign-in` button → opens wallet connect modal (already done in code; copy update needed)
-- Pricing teaser: keep structure, no copy changes needed
+- Hero headline: "Creator Capital Markets"
+- Hero badge: "The monetization platform for creators, collectors, and AI agents"
+- Hero subhead: plain statement of what the portal gives developers
+- Feature chips: outcome-oriented (not API-surface labels)
+- Cards row: replace Workshop card with Integrate card; keep AI agents card
+- Fix any remaining `/sign-in` copy references → wallet connect modal
+- Code preview: change example endpoint to something illustrative (collection listing or portfolio query)
 
 **New hero headline:**
 > Creator Capital Markets
@@ -39,7 +72,7 @@ The platform is built on Mediolano — an independent, permissionless public goo
 **New hero subhead:**
 > Medialane is where creative work becomes programmable capital. The portal gives developers API and SDK access to the full ecosystem — assets, orders, licensing, drops, credentials, and real-time events.
 
-**New feature chips (replacing old ones):**
+**New feature chips:**
 - Revenue Flows → royalties, licensing, primary sales
 - Programmable Licensing → remix, derivatives, open licenses
 - Collection Drops → fixed-supply public minting campaigns
@@ -49,19 +82,20 @@ The platform is built on Mediolano — an independent, permissionless public goo
 
 **Cards row:**
 - Keep: "Headless Auth for Agents" → `/docs/agents`
-- Replace Workshop card with: "Launchpad Services" → brief description of POP Protocol, Collection Drop, Remix — links to `/docs/sdk`
+- Replace Workshop card with: "Integrate the API" → description of access model and SDK, links to `/integrate`
 
-**Code preview:** keep the terminal block but change the endpoint shown to something that better illustrates the platform (e.g. a collection listing or a portfolio query, not raw token metadata).
+**Code preview:** endpoint showing a collection listing or portfolio query, not raw token metadata.
 
 ---
 
 ### 2. Features (`/features`)
 
 **What changes:**
-- Page headline: replace "Everything you need to build on Starknet IP" and "One REST API. All the data. No indexer needed."
-- Reframe each feature card title/description from "what the endpoint does" to "what you can build with it"
-- Move the AI Agents section to the top — it's the strongest differentiator
-- Webhooks section: stays as-is, minor copy tightening
+- Page headline: "Build on Creator Capital Markets"
+- Page subhead: one sentence covering the full API surface
+- Move AI Agents section to the top (strongest differentiator)
+- Reframe each feature card from "what the endpoint does" to "what you can build"
+- Add use case examples referencing medialane.io and dapp.medialane.io as consumer apps
 
 **New page headline:**
 > Build on Creator Capital Markets
@@ -69,11 +103,11 @@ The platform is built on Mediolano — an independent, permissionless public goo
 **New page subhead:**
 > The Medialane API covers the full platform surface. Marketplace orders, IP assets, minting, licensing, drops, credentials, comments, and real-time events — one key, one SDK.
 
-**Feature card rewrites (key ones):**
+**Feature card rewrites:**
 
 | Old title | New title | New description |
 |---|---|---|
-| Orders & Listings | Marketplace Orders | Query active listings, bids, and completed sales. Filter by contract, token, or wallet. |
+| Orders & Listings | Marketplace Orders | Query active listings, bids, and completed sales. Filter by contract, token, or wallet. medialane.io marketplace runs on this. |
 | Collections | Collections & Drops | Fetch collection metadata, floor prices, volume, and token inventories. Includes POP and Collection Drop sources. |
 | Minting & Launchpad | Launch & Mint | Deploy collection contracts and mint assets programmatically. Get ready-to-sign calldata for on-chain deployment. |
 | Tokens & Metadata | Asset Metadata | Resolve full metadata for any token, including license terms, remix history, and provenance. |
@@ -81,58 +115,96 @@ The platform is built on Mediolano — an independent, permissionless public goo
 | Intents (SNIP-12) | Trade Intents | Create and sign structured trade intents using SNIP-12. Submit orders without exposing private keys. |
 | Health & Monitoring | Platform Status | Real-time indexer and database health. Build reliable integrations with observable system state. |
 | Search | Search | Full-text search across tokens, collections, and creators. |
-| On-chain Comments | On-chain Comments | No change needed — description is already clear. |
-| Remix Licensing | Remix Licensing | No change needed. |
-| Counter-offers | Counter-offers | No change needed. |
-| POP Protocol | POP Protocol | No change needed. |
-| Collection Drop | Collection Drop | No change needed. |
+| Remix Licensing | Remix Licensing | Detect and enforce remix terms. Query open-license content suitable for autonomous reuse. |
+| POP Protocol | POP Protocol | Issue soulbound credentials tied to on-chain or off-chain events. |
+| Collection Drop | Collection Drop | Launch fixed-supply public minting campaigns with configurable windows and caps. |
 
-**AI Agents section — move to top, keep copy, add one line:**
-> Agents receive a `402 Payment Required` response when credits run out and can trigger autonomous top-up via the USDC deposit flow.
+**AI Agents section — move to top, update with 402 note:**
+> Agents authenticate headlessly via SIWS, receive a `402 Payment Required` response when credits run out, and can trigger autonomous top-up via the USDC deposit flow.
 
 ---
 
-### 3. Pricing (`/pricing`)
+### 3. `/pricing` → `/integrate`
 
-**What changes:** minimal — the pricing page is already the plainest on the site.
+**Route change:** rename from `/pricing` to `/integrate`. Add redirect from `/pricing` to `/integrate`.
 
-- Remove any reference to "PREMIUM" — there is no PREMIUM tier, only free + pay-as-you-go
-- Change hero subhead to match the new tone:
+**What changes — major reframe:**
+- Page is no longer a cost comparison table
+- Page tells the integration story: how to get access, how credits work, what the tiers unlock
+- No published credit-to-USDC rate (rate is dynamic)
+- Remove any "PREMIUM" tier label
 
-**Current:** "Pay only for what you use"
-**New:** "50 free credits every month. Top up with USDC. Hold MDLN for up to 2× more credits per dollar."
-
-(Move the current subhead text into the body — it's more description than headline.)
-
----
-
-### 4. Docs stub (`/docs`)
-
-**What changes:** significant restructure. The portal `/docs` page stops being a full getting-started guide and becomes a focused reference for portal-specific topics, with links out to medialane-docs for everything else.
+**New page headline:**
+> Start Building
 
 **New structure:**
 
-**Section 1 — Portal essentials (stays on this page):**
-- Authentication: how to get an API key, `x-api-key` header usage
+**Section 1 — Access (MDLN Gate)**
+- To get an API key you need 500 MDLN in your wallet
+- Tokens stay in your wallet — this is a balance check, not a fee
+- MDLN tiers and credit multipliers (table above)
+- MDLN on Starknet: where to get it (link to medialane.io)
+
+**Section 2 — Credits**
+- Credits are the billing unit
+- Top up with USDC at any time from your dashboard
+- Credits never expire
+- Variable costs per category (table above)
+- 402 response when credits hit zero
+
+**Section 3 — What you get**
+- REST API (one key)
+- TypeScript SDK (`@medialane/sdk`)
+- Webhooks
+- Dashboard: usage, history, key management
+- Links to `/docs` and `/docs/sdk`
+
+**Section 4 — Consumer app examples**
+- medialane.io — built entirely on the SDK; source of truth for what the API can do
+- dapp.medialane.io — on-chain trading and licensing, Starknet wallet native
+
+---
+
+### 4. Docs (`/docs`)
+
+**What changes:** Content stays and expands. This is the primary developer reference for portal-specific topics. No reduction, no outsourcing.
+
+**Improved structure:**
+
+**Section 1 — Authentication**
+- How to connect wallet and get an API key
+- MDLN balance requirement (500 minimum)
+- `x-api-key` header usage
 - Base URL and versioning
-- Credits and billing: free tier, USDC top-up, 402 handling, MDLN multipliers
+
+**Section 2 — Credits & Billing**
+- Free monthly credits (if applicable) vs. USDC top-up
+- Variable credit costs per endpoint category (full table)
+- 402 handling: what happens when credits run out
+- MDLN multiplier tiers
+
+**Section 3 — API Reference**
+- Full endpoint reference (keep existing, expand)
+- Request / response examples for each major category
 - Error codes table
 
-**Section 2 — Go deeper (links to medialane-docs.io):**
-- Full API reference → `docs.medialane.io/docs/api-docs`
-- SDK documentation → `docs.medialane.io/docs/sdk`
-- Protocol spec → `docs.medialane.io/docs/protocol`
-- Smart contracts → `docs.medialane.io/docs/contracts`
-- Developer guides → `docs.medialane.io/docs/developers`
-- Security → `docs.medialane.io/docs/security`
+**Section 4 — Use Cases & Examples**
+- Showcase: how medialane.io uses the API (marketplace, portfolio, minting)
+- Showcase: how dapp.medialane.io uses the API (on-chain reads, trade intents)
+- Code examples for common patterns: fetch a portfolio, submit a listing intent, stream activity events
 
-**Section 3 — New: AI agents quickstart (teaser, full content on `/docs/agents`):**
-- One paragraph, link to the full agents page
+**Section 5 — AI Agents (teaser)**
+- One paragraph on agent auth and 402 handling
+- Link to `/docs/agents`
 
-**Remove from `/docs`:**
-- The three-step quick start (replaced by the new clean structure)
-- The "Platform Surfaces" section (redundant with homepage)
-- The long SDK installation block (belongs on medialane-docs)
+**Section 6 — SDK Quick Start**
+- Install + initialize (4 lines)
+- Link to `/docs/sdk`
+
+**Section 7 — Go deeper (external links)**
+- Full SDK docs: `docs.medialane.io/docs/sdk`
+- Protocol spec: `docs.medialane.io/docs/protocol`
+- Smart contracts: `docs.medialane.io/docs/contracts`
 
 ---
 
@@ -143,57 +215,66 @@ A standalone guide for developers building AI agent integrations.
 **Sections:**
 
 **1 — What agents can do on Medialane**
-Plain list: authenticate headlessly, provision credits, query assets and orders, detect open-license content, submit trade intents, respond to 402 by topping up.
+- Authenticate headlessly (SIWS)
+- Provision and manage credits
+- Query assets, orders, collections
+- Detect open-license content for autonomous remix
+- Submit trade intents
+- Handle 402 autonomously
 
 **2 — Authentication**
-Headless SIWS flow: generate challenge → sign with agent keypair → POST to verify → receive JWT cookie. Code example in TypeScript using `starknet.js`.
+SIWS flow: generate challenge → sign with agent keypair → POST to verify → receive JWT cookie. TypeScript code example using `starknet.js`.
 
 **3 — Handling 402 Payment Required**
-When credits run out, the API returns 402 with `X-Credits-Remaining: 0`. Agents can detect this and programmatically trigger a USDC deposit via the Starknet transfer flow. Code example.
+When credits hit zero: `402` response + `X-Credits-Remaining: 0`. TypeScript code example showing detection + USDC deposit trigger.
 
 **4 — Querying open-license assets**
-How to detect CC0 and other open-license assets suitable for autonomous remix. Use `OPEN_LICENSES` from `@medialane/sdk`. Code example.
+How to detect CC0 and open-license assets. Use `OPEN_LICENSES` from `@medialane/sdk`. Code example.
 
 **5 — Submitting trade intents**
 How an agent signs a listing or fulfillment intent using its keypair. Code example using `client.api.createListingIntent` + `toSignatureArray`.
 
 **6 — SDK reference links**
-Links to relevant SDK methods, error codes, medialane-docs.
+Links to SDK methods, error codes, medialane-docs.
 
 ---
 
-### 6. `/docs/sdk` (portal page)
+### 6. `/docs/sdk`
 
-**What changes:** this page becomes a thin entry point, not a full SDK reference.
+**What changes:** Keep rich, add use cases. Not a thin stub — a real quick start.
 
-Replace current content with:
+**Content:**
 - Install command
-- Client initialization (3-4 lines)
-- 4 bullet points on what the SDK covers (Assets, Marketplace, Collections, Portfolio)
-- Link to full SDK docs on medialane-docs.io
-- Link to `/docs/agents` for AI agent usage
-
-The full SDK documentation lives on medialane-docs.io — the portal page just gets developers started and points them there.
+- Client initialization (4–6 lines)
+- What the SDK covers: Assets, Marketplace, Collections, Portfolio, Licensing, Drops, Credentials
+- Use case examples:
+  - Fetch a creator's portfolio
+  - List open-license assets
+  - Submit a trade intent
+  - Stream on-chain activity
+- Consumer app examples: medialane.io and dapp.medialane.io
+- Links to full SDK docs on medialane-docs.io
 
 ---
 
 ## What Does NOT Change
 
-- Site structure and routing (same pages, same URLs)
+- Site structure (same URLs except `/pricing` → `/integrate`)
 - Dark theme, visual design, component library
-- Pricing model numbers (50 free credits, $0.01/credit, MDLN tiers)
 - Auth flow (wallet connect modal, SIWS)
-- Footer links (already cleaned up)
+- Footer links
+- Any `/docs/api` endpoint reference content (keep and expand, don't remove)
 
 ---
 
-## Out of Scope for This Phase
+## Out of Scope
 
-- Full docs migration (deeper medialane-docs integration beyond linking)
 - Changelog page content
 - Connect page
 - Terms / Privacy
-- SDK API docs page (full rewrite — separate phase)
+- MDLN gate enforcement in backend (separate backend task)
+- Credit variable pricing enforcement in API (separate backend task)
+- Consumer app fees for medialane.io (future roadmap)
 
 ---
 
@@ -202,12 +283,18 @@ The full SDK documentation lives on medialane-docs.io — the portal page just g
 **Placeholder scan:** No TBD or TODO. All section copy is specified. ✓
 
 **Internal consistency:**
-- "Creator Capital Markets" is the headline on homepage. The phrase does not appear on other pages — it doesn't need to, each page has its own plain header. Consistent with medialane-docs about page. ✓
-- Mediolano is mentioned as infrastructure context, not product. Consistent with medialane-docs philosophy. ✓
-- `/sign-in` references removed from copy (page already deleted). ✓
-- "PREMIUM" tier removed from pricing — consistent with actual billing model. ✓
+- "Creator Capital Markets" is the homepage headline. No other page repeats it as a headline — each page has its own plain header. ✓
+- MDLN gate described consistently: 500 minimum, tokens stay in wallet, it's a balance check. ✓
+- No published credit-to-USDC rate anywhere in the spec. ✓
+- `/pricing` → `/integrate` rename applied everywhere in scope. ✓
+- Workshop card replaced on homepage. ✓
+- No `/sign-in` references in copy. ✓
+- Docs expanded not reduced. ✓
+- Use cases referencing medialane.io and dapp.medialane.io included in docs and features. ✓
 
-**Scope check:** This is a content/copy spec, not a full redesign. All changes are text and structure within existing components. Implementable in a single plan. ✓
+**Scope check:** Content and copy changes within existing components + new `/docs/agents` page + route rename. Single implementation plan. ✓
 
 **Ambiguity check:**
-- "Links to medialane-docs.io" — assumes docs.medialane.io is live and has the referenced pages. If not live, links should point to the GitHub repo pages instead. Implementable either way, implementer should verify the URL before wiring. ✓
+- `/docs/agents` is a new page — needs to be added to DocsLayout sidebar. ✓ (noted in plan)
+- `/pricing` redirect to `/integrate` — Next.js redirect in `next.config.ts`. ✓
+- MDLN balance check at API key provisioning time — portal already reads `mdln_tier` from accounts table; the gate threshold check is a portal-side guard on the provision endpoint. ✓
