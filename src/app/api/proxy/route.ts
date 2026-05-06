@@ -47,12 +47,21 @@ export async function GET(req: NextRequest) {
       return new NextResponse(`Upstream error: ${response.statusText}`, { status: response.status });
     }
 
-    const contentType = response.headers.get("Content-Type") ?? "application/octet-stream";
+    const upstreamContentType = response.headers.get("Content-Type") ?? "";
+    const SAFE_CONTENT_TYPES = [
+      "image/", "video/", "audio/", "application/json", "application/octet-stream",
+      "model/", "font/",
+    ];
+    const safeContentType = SAFE_CONTENT_TYPES.some((prefix) => upstreamContentType.startsWith(prefix))
+      ? upstreamContentType
+      : "application/octet-stream";
+
     return new NextResponse(response.body, {
       status: 200,
       headers: {
-        "Content-Type": contentType,
+        "Content-Type": safeContentType,
         "Cache-Control": "public, max-age=86400",
+        "X-Content-Type-Options": "nosniff",
       },
     });
   } catch (err: unknown) {
