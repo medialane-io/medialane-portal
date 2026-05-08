@@ -12,11 +12,8 @@ export default function TermsPage() {
       <div className="relative z-10">
         <section className="container mx-auto px-4 pt-28 pb-24 max-w-3xl">
           <div className="mb-8 space-y-3">
-            <Badge className="bg-amber-500/10 text-amber-300 border-amber-500/20 px-4 py-1.5 text-sm">
-              [PLACEHOLDER — replace with final legal copy before launch]
-            </Badge>
             <h1 className="text-4xl font-extrabold text-white">Terms of Service</h1>
-            <p className="text-sm text-muted-foreground">Last updated: March 1, 2026</p>
+            <p className="text-sm text-muted-foreground">Last updated: May 8, 2026</p>
           </div>
 
           <div className="prose-dark space-y-2 text-muted-foreground leading-relaxed">

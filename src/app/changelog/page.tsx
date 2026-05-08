@@ -33,7 +33,7 @@ const ENTRIES: ChangelogEntry[] = [
     tag: "Feature",
     items: [
       "ApiCollectionProfile.hasGatedContent: boolean — indicates whether a collection has gated content configured",
-      "ApiCollectionProfile.gatedContentTitle: string | null — public title of gated content shown to all visitors; the actual URL is holder-only via GET /v1/collections/:contract/gated-content (requires Clerk JWT + NFT ownership verification)",
+      "ApiCollectionProfile.gatedContentTitle: string | null — public title of gated content shown to all visitors; the actual URL is holder-only via GET /v1/collections/:contract/gated-content (requires SIWS session JWT + NFT ownership verification)",
     ],
   },
   {
@@ -43,7 +43,7 @@ const ENTRIES: ChangelogEntry[] = [
     items: [
       "Counter-offer flow — POST /v1/intents/counter-offer creates a SNIP-12 structured counter-offer with custom price, duration, and optional message. GET /v1/orders/counter-offers lists by originalOrderHash or sellerAddress",
       "SDK v0.5.x: OrderStatus extended with COUNTER_OFFERED; IntentType extended with COUNTER_OFFER",
-      "SDK v0.5.x: createCounterOfferIntent(params, clerkToken) and getCounterOffers(query) added to ApiClient",
+      "SDK v0.5.x: createCounterOfferIntent(params, siwsToken) and getCounterOffers(query) added to ApiClient",
       "Remix Licensing — full offer + self-remix system. Open licenses (CC0, CC BY, CC BY-SA, CC BY-NC) are auto-approved; custom terms require creator approval before the requester can mint",
       "SDK v0.5.x: submitRemixOffer(), submitAutoRemixOffer(), confirmSelfRemix(), getRemixOffers(), getRemixOffer(), confirmRemixOffer(), rejectRemixOffer() added to ApiClient",
       "SDK v0.5.x: RemixOfferStatus, ApiRemixOffer, ApiPublicRemix, OPEN_LICENSES, OpenLicense types exported",

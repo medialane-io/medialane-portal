@@ -263,7 +263,7 @@ export default function ApiReferencePage() {
     {
       "contract": "0x05e7...",
       "collectionId": "1",
-      "name": "Mediolano Genesis",
+      "name": "Medialane Collection",
       "owner": "0x0591...",
       "floorPrice": "100000",
       "floorCurrency": "USDC",
@@ -287,7 +287,7 @@ export default function ApiReferencePage() {
         response={`{
   "contract": "0x05e7...",
   "collectionId": "1",
-  "name": "Mediolano Genesis",
+  "name": "Medialane Collection",
   "owner": "0x0591...",
   "floorPrice": "100000",
   "totalVolume": "5000000",
@@ -705,7 +705,7 @@ export default function ApiReferencePage() {
   -H "x-api-key: ${KEY}"`}
         response={`{
   "data": [
-    { "type": "collection", "contract": "0x05e7...", "name": "Mediolano Genesis" },
+    { "type": "collection", "contract": "0x05e7...", "name": "Medialane Collection" },
     { "type": "token", "contract": "0x05e7...", "tokenId": "1", "name": "Genesis #1" }
   ]
 }`}
@@ -964,20 +964,20 @@ const resumeSource = new EventSource(url, {
       {/* ── COLLECTION CLAIMS ── */}
       <DocH2 id="claims" border>Collection Claims</DocH2>
       <p className="text-sm text-muted-foreground mb-6">
-        Claim ownership of an existing Starknet ERC-721 collection. Three verification paths available: automatic on-chain check (requires Clerk JWT), SNIP-12 signature challenge, or manual email review.
+        Claim ownership of an existing Starknet ERC-721 collection. Three verification paths available: automatic on-chain check (requires SIWS session JWT), SNIP-12 signature challenge, or manual email review.
       </p>
 
       <Endpoint
         method="POST"
         path="/v1/collections/claim"
-        description="Path 1: Auto-verify ownership on-chain. Requires both a tenant API key and a Clerk session JWT in the Authorization header. The API checks that the authenticated wallet is the on-chain owner of the contract."
+        description="Path 1: Auto-verify ownership on-chain. Requires both a tenant API key and a SIWS session JWT in the Authorization header. The API checks that the authenticated wallet is the on-chain owner of the contract."
         params={[
           { name: "contractAddress", type: "string", required: true, desc: "The ERC-721 contract address to claim" },
           { name: "walletAddress", type: "string", required: true, desc: "The Starknet wallet address claiming ownership" },
         ]}
         curl={`curl -X POST "${BASE}/v1/collections/claim" \\
   -H "x-api-key: ${KEY}" \\
-  -H "Authorization: Bearer CLERK_SESSION_JWT" \\
+  -H "Authorization: Bearer SIWS_SESSION_JWT" \\
   -H "Content-Type: application/json" \\
   -d '{ "contractAddress": "0x076c...", "walletAddress": "0x03d0..." }'`}
         response={`{
@@ -1054,7 +1054,7 @@ const resumeSource = new EventSource(url, {
       {/* ── PROFILES ── */}
       <DocH2 id="profiles" border>Profiles</DocH2>
       <p className="text-sm text-muted-foreground mb-6">
-        Enriched display metadata for collections and creators. Collection profiles can only be updated by the wallet that claimed the collection (requires Clerk JWT). Creator profiles can be updated by the profile owner.
+        Enriched display metadata for collections and creators. Collection profiles can only be updated by the wallet that claimed the collection (requires SIWS session JWT). Creator profiles can be updated by the profile owner.
       </p>
 
       <Endpoint
@@ -1084,7 +1084,7 @@ const resumeSource = new EventSource(url, {
       <Endpoint
         method="PATCH"
         path="/v1/collections/:contract/profile"
-        description="Update the display profile for a collection. Requires a Clerk session JWT — the authenticated wallet must be the claimedBy address for this collection."
+        description="Update the display profile for a collection. Requires a SIWS session JWT — the authenticated wallet must be the claimedBy address for this collection."
         params={[
           { name: "contract", type: "string", required: true, desc: "NFT contract address (URL param)" },
           { name: "displayName", type: "string", desc: "Display name (overrides on-chain name)" },
@@ -1098,7 +1098,7 @@ const resumeSource = new EventSource(url, {
         ]}
         curl={`curl -X PATCH "${BASE}/v1/collections/0x076c.../profile" \\
   -H "x-api-key: ${KEY}" \\
-  -H "Authorization: Bearer CLERK_SESSION_JWT" \\
+  -H "Authorization: Bearer SIWS_SESSION_JWT" \\
   -H "Content-Type: application/json" \\
   -d '{ "displayName": "Shiroi Collection", "description": "Music & Concept Art", "websiteUrl": "https://shiroi.io" }'`}
         response={`{
@@ -1137,7 +1137,7 @@ const resumeSource = new EventSource(url, {
       <Endpoint
         method="PATCH"
         path="/v1/creators/:wallet/profile"
-        description="Update a creator profile. Requires a Clerk session JWT — the authenticated wallet must match the wallet URL parameter."
+        description="Update a creator profile. Requires a SIWS session JWT — the authenticated wallet must match the wallet URL parameter."
         params={[
           { name: "wallet", type: "string", required: true, desc: "Starknet wallet address (URL param)" },
           { name: "displayName", type: "string", desc: "Display name or handle" },
@@ -1151,7 +1151,7 @@ const resumeSource = new EventSource(url, {
         ]}
         curl={`curl -X PATCH "${BASE}/v1/creators/0x03d0.../profile" \\
   -H "x-api-key: ${KEY}" \\
-  -H "Authorization: Bearer CLERK_SESSION_JWT" \\
+  -H "Authorization: Bearer SIWS_SESSION_JWT" \\
   -H "Content-Type: application/json" \\
   -d '{ "displayName": "Kalamaha", "bio": "Visual artist on Starknet" }'`}
         response={`{
@@ -1237,7 +1237,7 @@ const resumeSource = new EventSource(url, {
       <Endpoint
         method="POST"
         path="/v1/intents/counter-offer"
-        description="Create a counter-offer intent. The seller proposes a new price for the NFT in response to a buyer's active bid. Currency is derived server-side from the original bid token — do not pass a currency field. Requires a Clerk session JWT for authentication; the seller address must match the consideration.recipient of the original bid."
+        description="Create a counter-offer intent. The seller proposes a new price for the NFT in response to a buyer's active bid. Currency is derived server-side from the original bid token — do not pass a currency field. Requires a SIWS session JWT for authentication; the seller address must match the consideration.recipient of the original bid."
         params={[
           { name: "sellerAddress", type: "string", required: true, desc: "Seller's wallet address" },
           { name: "originalOrderHash", type: "string", required: true, desc: "Order hash of the original buyer bid" },
@@ -1247,7 +1247,7 @@ const resumeSource = new EventSource(url, {
         ]}
         curl={`curl -X POST "${BASE}/v1/intents/counter-offer" \\
   -H "x-api-key: ${KEY}" \\
-  -H "Authorization: Bearer CLERK_SESSION_JWT" \\
+  -H "Authorization: Bearer SIWS_SESSION_JWT" \\
   -H "Content-Type: application/json" \\
   -d '{
     "sellerAddress": "0x0591...",
@@ -1269,7 +1269,7 @@ const resumeSource = new EventSource(url, {
       {/* ── REMIX LICENSING ── */}
       <DocH2 id="remix-licensing" border>Remix Licensing</DocH2>
       <p className="text-sm text-muted-foreground mb-6">
-        Creators can allow others to remix their NFTs under specific license terms. Open licenses (CC0, CC BY, CC BY-SA, CC BY-NC) are auto-approved. Custom terms require creator approval before the requester can mint. All endpoints require a Clerk JWT except the public remixes list.
+        Creators can allow others to remix their NFTs under specific license terms. Open licenses (CC0, CC BY, CC BY-SA, CC BY-NC) are auto-approved. Custom terms require creator approval before the requester can mint. All endpoints require a SIWS session JWT except the public remixes list.
       </p>
 
       <Endpoint
@@ -1303,7 +1303,7 @@ const resumeSource = new EventSource(url, {
       <Endpoint
         method="POST"
         path="/v1/remix-offers"
-        description="Submit a custom remix offer for a token. If the token's license is not open (CC0/CC BY/CC BY-SA/CC BY-NC), the creator must approve before the requester can mint. Requires Clerk JWT."
+        description="Submit a custom remix offer for a token. If the token's license is not open (CC0/CC BY/CC BY-SA/CC BY-NC), the creator must approve before the requester can mint. Requires SIWS session JWT."
         params={[
           { name: "originalContract", type: "string", required: true, desc: "Original NFT contract address" },
           { name: "originalTokenId", type: "string", required: true, desc: "Original token ID" },
@@ -1317,7 +1317,7 @@ const resumeSource = new EventSource(url, {
         ]}
         curl={`curl -X POST "${BASE}/v1/remix-offers" \\
   -H "x-api-key: ${KEY}" \\
-  -H "Authorization: Bearer CLERK_SESSION_JWT" \\
+  -H "Authorization: Bearer SIWS_SESSION_JWT" \\
   -H "Content-Type: application/json" \\
   -d '{
     "originalContract": "0x05e7...",
@@ -1353,7 +1353,7 @@ const resumeSource = new EventSource(url, {
       <Endpoint
         method="POST"
         path="/v1/remix-offers/auto"
-        description="Submit an auto remix offer for a token with an open license (CC0, CC BY, CC BY-SA, CC BY-NC). Auto-approved immediately — no creator action needed. Requires Clerk JWT."
+        description="Submit an auto remix offer for a token with an open license (CC0, CC BY, CC BY-SA, CC BY-NC). Auto-approved immediately — no creator action needed. Requires SIWS session JWT."
         params={[
           { name: "originalContract", type: "string", required: true, desc: "Original NFT contract address" },
           { name: "originalTokenId", type: "string", required: true, desc: "Original token ID" },
@@ -1361,7 +1361,7 @@ const resumeSource = new EventSource(url, {
         ]}
         curl={`curl -X POST "${BASE}/v1/remix-offers/auto" \\
   -H "x-api-key: ${KEY}" \\
-  -H "Authorization: Bearer CLERK_SESSION_JWT" \\
+  -H "Authorization: Bearer SIWS_SESSION_JWT" \\
   -H "Content-Type: application/json" \\
   -d '{ "originalContract": "0x05e7...", "originalTokenId": "7", "licenseType": "CC0" }'`}
         response={`{ "data": { "id": "rxo_01j...", "status": "AUTO_PENDING", ... } }`}
@@ -1370,7 +1370,7 @@ const resumeSource = new EventSource(url, {
       <Endpoint
         method="POST"
         path="/v1/remix-offers/self/confirm"
-        description="Record a self-remix — the token owner remixing their own asset. Call after the remix has been minted on-chain. Requires Clerk JWT."
+        description="Record a self-remix — the token owner remixing their own asset. Call after the remix has been minted on-chain. Requires SIWS session JWT."
         params={[
           { name: "originalContract", type: "string", required: true, desc: "Original NFT contract address" },
           { name: "originalTokenId", type: "string", required: true, desc: "Original token ID" },
@@ -1383,7 +1383,7 @@ const resumeSource = new EventSource(url, {
         ]}
         curl={`curl -X POST "${BASE}/v1/remix-offers/self/confirm" \\
   -H "x-api-key: ${KEY}" \\
-  -H "Authorization: Bearer CLERK_SESSION_JWT" \\
+  -H "Authorization: Bearer SIWS_SESSION_JWT" \\
   -H "Content-Type: application/json" \\
   -d '{ "originalContract": "0x05e7...", "originalTokenId": "42", "remixContract": "0x06a3...", "remixTokenId": "1", "licenseType": "CC BY", "commercial": true, "derivatives": true }'`}
         response={`{ "data": { "id": "rxo_01j...", "status": "SELF_MINTED", ... } }`}
@@ -1392,7 +1392,7 @@ const resumeSource = new EventSource(url, {
       <Endpoint
         method="GET"
         path="/v1/remix-offers"
-        description="List remix offers for the authenticated user. Pass role=creator to see incoming offers (you are the original creator), or role=requester to see offers you made. Requires Clerk JWT."
+        description="List remix offers for the authenticated user. Pass role=creator to see incoming offers (you are the original creator), or role=requester to see offers you made. Requires SIWS session JWT."
         params={[
           { name: "role", type: "string", required: true, desc: '"creator" or "requester"' },
           { name: "page", type: "number", desc: "Page (default: 1)" },
@@ -1400,7 +1400,7 @@ const resumeSource = new EventSource(url, {
         ]}
         curl={`curl "${BASE}/v1/remix-offers?role=creator" \\
   -H "x-api-key: ${KEY}" \\
-  -H "Authorization: Bearer CLERK_SESSION_JWT"`}
+  -H "Authorization: Bearer SIWS_SESSION_JWT"`}
         response={`{
   "data": [ { "id": "rxo_01j...", "status": "PENDING", "requesterAddress": "0x03d0...", ... } ],
   "meta": { "page": 1, "limit": 20, "total": 2 }
@@ -1410,7 +1410,7 @@ const resumeSource = new EventSource(url, {
       <Endpoint
         method="POST"
         path="/v1/remix-offers/:id/confirm"
-        description="Creator approves a pending remix offer and records the minted remix on-chain coordinates. Requires Clerk JWT — caller must be the creator of the original token."
+        description="Creator approves a pending remix offer and records the minted remix on-chain coordinates. Requires SIWS session JWT — caller must be the creator of the original token."
         params={[
           { name: "id", type: "string", required: true, desc: "Remix offer ID (URL param)" },
           { name: "approvedCollection", type: "string", required: true, desc: "Collection contract where the remix will be minted" },
@@ -1420,7 +1420,7 @@ const resumeSource = new EventSource(url, {
         ]}
         curl={`curl -X POST "${BASE}/v1/remix-offers/rxo_01j.../confirm" \\
   -H "x-api-key: ${KEY}" \\
-  -H "Authorization: Bearer CLERK_SESSION_JWT" \\
+  -H "Authorization: Bearer SIWS_SESSION_JWT" \\
   -H "Content-Type: application/json" \\
   -d '{ "approvedCollection": "0x06a3...", "remixContract": "0x06a3...", "remixTokenId": "1" }'`}
         response={`{ "data": { "id": "rxo_01j...", "status": "APPROVED", "remixContract": "0x06a3...", "remixTokenId": "1", ... } }`}
@@ -1429,13 +1429,13 @@ const resumeSource = new EventSource(url, {
       <Endpoint
         method="POST"
         path="/v1/remix-offers/:id/reject"
-        description="Creator rejects a pending remix offer. Requires Clerk JWT — caller must be the creator of the original token."
+        description="Creator rejects a pending remix offer. Requires SIWS session JWT — caller must be the creator of the original token."
         params={[
           { name: "id", type: "string", required: true, desc: "Remix offer ID (URL param)" },
         ]}
         curl={`curl -X POST "${BASE}/v1/remix-offers/rxo_01j.../reject" \\
   -H "x-api-key: ${KEY}" \\
-  -H "Authorization: Bearer CLERK_SESSION_JWT"`}
+  -H "Authorization: Bearer SIWS_SESSION_JWT"`}
         response={`{ "data": { "id": "rxo_01j...", "status": "REJECTED", ... } }`}
       />
 

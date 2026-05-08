@@ -181,7 +181,7 @@ const intent = await client.api.createCounterOfferIntent(
     durationSeconds: 86400,       // 1 day
     message: "Best I can do!",
   },
-  clerkToken
+  siwsToken
 )
 
 // Buyer fetches counter-offers for their bid
@@ -199,7 +199,7 @@ await client.api.createFulfillIntent({ fulfiller: buyerAddress, orderHash: count
 // Check if a license is open (auto-approved remix)
 console.log(OPEN_LICENSES) // ["CC0", "CC BY", "CC BY-SA", "CC BY-NC"]
 
-// Request permission to remix a token (custom offer, Clerk JWT required)
+// Request permission to remix a token (custom offer, SIWS session JWT required)
 const offer = await client.api.submitRemixOffer(
   {
     originalContract: "0x05e7...",
@@ -210,13 +210,13 @@ const offer = await client.api.submitRemixOffer(
     royaltyPct: 10,
     message: "Would love to remix this for my EP cover",
   },
-  clerkToken
+  siwsToken
 )
 
 // Open-license tokens are auto-approved
 const autoOffer = await client.api.submitAutoRemixOffer(
   { originalContract: "0x05e7...", originalTokenId: "7", licenseType: "CC0" },
-  clerkToken
+  siwsToken
 )
 
 // Creator approves a pending offer
@@ -224,10 +224,10 @@ await client.api.confirmRemixOffer(offer.data.id, {
   approvedCollection: "0x06a3...",
   remixContract: "0x06a3...",
   remixTokenId: "1",
-}, clerkToken)
+}, siwsToken)
 
 // Creator rejects an offer
-await client.api.rejectRemixOffer(offer.data.id, clerkToken)
+await client.api.rejectRemixOffer(offer.data.id, siwsToken)
 
 // Owner records their own self-remix after minting
 await client.api.confirmSelfRemix(
@@ -240,12 +240,12 @@ await client.api.confirmSelfRemix(
     commercial: true,
     derivatives: true,
   },
-  clerkToken
+  siwsToken
 )
 
 // List incoming / outgoing offers
-const incoming = await client.api.getRemixOffers({ role: "creator" }, clerkToken)
-const outgoing = await client.api.getRemixOffers({ role: "requester" }, clerkToken)
+const incoming = await client.api.getRemixOffers({ role: "creator" }, siwsToken)
+const outgoing = await client.api.getRemixOffers({ role: "requester" }, siwsToken)
 
 // Get public remixes for a token (no auth needed)
 const remixes = await client.api.getTokenRemixes("0x05e7...", "42")

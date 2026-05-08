@@ -11,17 +11,14 @@ export default function PrivacyPage() {
       <div className="relative z-10">
         <section className="container mx-auto px-4 pt-28 pb-24 max-w-3xl">
           <div className="mb-8 space-y-3">
-            <Badge className="bg-amber-500/10 text-amber-300 border-amber-500/20 px-4 py-1.5 text-sm">
-              [PLACEHOLDER — replace with final legal copy before launch]
-            </Badge>
             <h1 className="text-4xl font-extrabold text-white">Privacy Policy</h1>
-            <p className="text-sm text-muted-foreground">Last updated: March 1, 2026</p>
+            <p className="text-sm text-muted-foreground">Last updated: May 8, 2026</p>
           </div>
 
           <div className="space-y-2 text-muted-foreground leading-relaxed">
             <H2>1. Information We Collect</H2>
             <p>
-              When you use Medialane, we may collect: (a) account information — email address and authentication identifiers provided via Clerk; (b) API usage data — request timestamps, endpoints called, HTTP status codes, and IP addresses; (c) contact form submissions — name, email, subject, and message when you contact us via /connect; (d) technical data — browser type, device identifiers, and referrer URLs for analytics purposes.
+              When you use Medialane, we may collect: (a) account information — wallet address and authentication identifiers provided via Sign In With Starknet (SIWS); (b) API usage data — request timestamps, endpoints called, HTTP status codes, and IP addresses; (c) contact form submissions — name, email, subject, and message when you contact us via /connect; (d) technical data — browser type, device identifiers, and referrer URLs for analytics purposes.
             </p>
             <p className="mt-2">
               We do not collect private keys, wallet seed phrases, or any on-chain signing material. All wallet interactions happen client-side.
