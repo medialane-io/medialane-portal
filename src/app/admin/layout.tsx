@@ -1,45 +1,30 @@
-import { getSession } from "@/src/lib/session";
-import { pool } from "@/src/lib/db";
-import { redirect } from "next/navigation";
+"use client";
 
-const API_URL = process.env.MEDIALANE_API_URL!;
-const ADMIN_KEY = process.env.ADMIN_API_KEY!;
+import { useAccount } from "@starknet-react/core";
 
-async function getPendingReportCount(): Promise<number> {
-  try {
-    const res = await fetch(
-      `${API_URL}/admin/reports?status=PENDING,UNDER_REVIEW&limit=1`,
-      { headers: { "x-api-key": ADMIN_KEY }, next: { revalidate: 30 } }
-    );
-    const data = await res.json();
-    return data.total ?? 0;
-  } catch {
-    return 0;
+const ADMIN_ADDRESS = process.env.NEXT_PUBLIC_ADMIN_ADDRESS?.toLowerCase();
+
+const navItems = [
+  { label: "Dashboard",   href: "/admin" },
+  { label: "Services",    href: "/admin/services" },
+  { label: "Claims",      href: "/admin/claims" },
+  { label: "Collections", href: "/admin/collections" },
+  { label: "Reports",     href: "/admin/reports" },
+  { label: "Tokens",      href: "/admin/tokens" },
+  { label: "Creators",    href: "/admin/creators" },
+  { label: "Maintenance", href: "/admin/maintenance" },
+];
+
+export default function AdminLayout({ children }: { children: React.ReactNode }) {
+  const { address, status } = useAccount();
+
+  if (status === "connecting") {
+    return <div className="container mx-auto px-4 py-6 pt-28 text-muted-foreground text-sm">Connecting…</div>;
   }
-}
 
-export default async function AdminLayout({ children }: { children: React.ReactNode }) {
-  const session = await getSession();
-  if (!session) redirect("/?connect=1");
-
-  const result = await pool.query<{ is_admin: boolean }>(
-    "SELECT is_admin FROM accounts WHERE address = $1",
-    [session.address]
-  );
-  if (!result.rows[0]?.is_admin) redirect("/");
-
-  const pendingReports = await getPendingReportCount();
-
-  const navItems = [
-    { label: "Dashboard",   href: "/admin" },
-    { label: "Services",    href: "/admin/services" },
-    { label: "Claims",      href: "/admin/claims" },
-    { label: "Collections", href: "/admin/collections" },
-    { label: "Reports",     href: "/admin/reports",     badge: pendingReports > 0 ? pendingReports : undefined },
-    { label: "Tokens",      href: "/admin/tokens" },
-    { label: "Creators",    href: "/admin/creators" },
-    { label: "Maintenance", href: "/admin/maintenance" },
-  ];
+  if (!address || address.toLowerCase() !== ADMIN_ADDRESS) {
+    return <div className="container mx-auto px-4 py-6 pt-28 text-muted-foreground text-sm">Not authorized.</div>;
+  }
 
   return (
     <div className="container mx-auto px-4 py-6 pt-28">
@@ -53,11 +38,6 @@ export default async function AdminLayout({ children }: { children: React.ReactN
               className="relative text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
             >
               {item.label}
-              {item.badge !== undefined && (
-                <span className="absolute -top-2 -right-3 flex h-4 w-4 items-center justify-center rounded-full bg-destructive text-[10px] font-bold text-destructive-foreground">
-                  {item.badge}
-                </span>
-              )}
             </a>
           ))}
         </nav>

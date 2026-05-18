@@ -2,23 +2,6 @@ import { randomBytes } from "crypto";
 import { RpcProvider, typedData as sdkTypedData } from "starknet";
 import { pool } from "./db";
 
-let noncesReady: Promise<void> | null = null;
-function ensureNoncesTable() {
-  if (!noncesReady) {
-    noncesReady = pool
-      .query(
-        `CREATE TABLE IF NOT EXISTS nonces (
-           nonce      TEXT        PRIMARY KEY,
-           address    TEXT        NOT NULL,
-           expires_at TIMESTAMPTZ NOT NULL
-         );
-         CREATE INDEX IF NOT EXISTS idx_nonces_expires ON nonces(expires_at)`
-      )
-      .then(() => {});
-  }
-  return noncesReady;
-}
-
 const DOMAIN = {
   name: "Medialane Portal",
   version: "1",
@@ -49,10 +32,9 @@ export function buildTypedData(nonce: string, address: string) {
 }
 
 export async function generateNonce(address: string): Promise<string> {
-  await ensureNoncesTable();
   await pool.query("DELETE FROM nonces WHERE expires_at < now()");
 
-  const nonce = randomBytes(16).toString("hex");
+  const nonce = randomBytes(15).toString("hex");
   const expiresAt = new Date(Date.now() + 5 * 60 * 1000);
 
   await pool.query(
@@ -71,7 +53,6 @@ export async function consumeNonce(nonce: string, address: string): Promise<bool
   return (result.rowCount ?? 0) > 0;
 }
 
-// Magic bytes returned by Argent X account contracts for a valid signature
 const FELT_VALID = "0x56414c4944";
 
 export async function verifySignature(
