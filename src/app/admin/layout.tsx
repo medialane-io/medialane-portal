@@ -32,6 +32,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
 
   const navItems = [
     { label: "Dashboard",   href: "/admin" },
+    { label: "Services",    href: "/admin/services" },
     { label: "Claims",      href: "/admin/claims" },
     { label: "Collections", href: "/admin/collections" },
     { label: "Reports",     href: "/admin/reports",     badge: pendingReports > 0 ? pendingReports : undefined },
