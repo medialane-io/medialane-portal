@@ -9,7 +9,7 @@ async function getPendingReportCount(): Promise<number> {
   try {
     const res = await fetch(
       `${API_URL}/admin/reports?status=PENDING,UNDER_REVIEW&limit=1`,
-      { headers: { "x-api-key": ADMIN_KEY }, cache: "no-store" }
+      { headers: { "x-api-key": ADMIN_KEY }, next: { revalidate: 30 } }
     );
     const data = await res.json();
     return data.total ?? 0;

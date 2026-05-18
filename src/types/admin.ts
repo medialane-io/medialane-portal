@@ -39,13 +39,6 @@ export interface AdminUsernameClaimRecord {
   createdAt: string;
 }
 
-export interface AdminCreatorRecord {
-  id: string;
-  username: string;
-  walletAddress: string;
-  status: "PENDING" | "APPROVED" | "REJECTED";
-}
-
 export interface AdminCollectionRecord {
   id: string;
   name?: string;

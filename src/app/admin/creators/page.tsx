@@ -1,14 +1,14 @@
 "use client";
 
 import { useState } from "react";
-import { useAdminCreators } from "@/src/hooks/use-admin";
+import { useAdminUsernameClaims } from "@/src/hooks/use-admin";
 import { Button } from "@/src/components/ui/button";
 import { Input } from "@/src/components/ui/input";
 import { Label } from "@/src/components/ui/label";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/src/components/ui/dialog";
 import { toast } from "sonner";
 import { ExternalLink, Wrench } from "lucide-react";
-import type { AdminCreatorRecord } from "@/src/types/admin";
+import type { AdminUsernameClaimRecord } from "@/src/types/admin";
 
 const STATUS_STYLE: Record<string, string> = {
   APPROVED: "bg-green-500/20 text-green-400",
@@ -19,14 +19,14 @@ const STATUS_STYLE: Record<string, string> = {
 export default function AdminCreatorsPage() {
   const [statusFilter, setStatusFilter] = useState("APPROVED");
   const [page, setPage] = useState(1);
-  const { creators, total, isLoading, mutate } = useAdminCreators(statusFilter || undefined, page);
+  const { claims: creators, total, isLoading, mutate } = useAdminUsernameClaims(statusFilter || undefined, page);
 
   const [fixOpen, setFixOpen]       = useState(false);
-  const [fixCreator, setFixCreator] = useState<AdminCreatorRecord | null>(null);
+  const [fixCreator, setFixCreator] = useState<AdminUsernameClaimRecord | null>(null);
   const [newWallet, setNewWallet]   = useState("");
   const [fixing, setFixing]         = useState(false);
 
-  function openFix(creator: AdminCreatorRecord) {
+  function openFix(creator: AdminUsernameClaimRecord) {
     setFixCreator(creator);
     setNewWallet("");
     setFixOpen(true);

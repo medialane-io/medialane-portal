@@ -2,7 +2,6 @@ import useSWR from "swr";
 import type {
   AdminCollectionClaimRecord,
   AdminUsernameClaimRecord,
-  AdminCreatorRecord,
   AdminCollectionRecord,
   AdminReport,
 } from "@/src/types/admin";
@@ -47,22 +46,6 @@ export function useAdminUsernameClaims(status?: string, page = 1) {
   };
 }
 
-export function useAdminCreators(status?: string, page = 1) {
-  const params = new URLSearchParams({ page: String(page), limit: "20" });
-  if (status) params.set("status", status);
-  const { data, error, isLoading, mutate } = useSWR(
-    `admin-creators-${status}-${page}`,
-    () => adminFetch(`/api/admin/username-claims?${params}`).then((r) => r.json()),
-    { revalidateOnFocus: false }
-  );
-  return {
-    creators: (data?.claims ?? []) as AdminCreatorRecord[],
-    total: data?.total ?? 0,
-    isLoading,
-    error,
-    mutate,
-  };
-}
 
 export function useAdminReports(status?: string, page = 1) {
   const params = new URLSearchParams({ page: String(page), limit: "20" });
