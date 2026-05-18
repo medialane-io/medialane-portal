@@ -1,5 +1,21 @@
 import { pool } from "./db";
 
+let rateLimitsReady: Promise<void> | null = null;
+function ensureRateLimitsTable() {
+  if (!rateLimitsReady) {
+    rateLimitsReady = pool
+      .query(
+        `CREATE TABLE IF NOT EXISTS rate_limits (
+           id           TEXT        PRIMARY KEY,
+           count        INTEGER     NOT NULL DEFAULT 1,
+           window_start TIMESTAMPTZ NOT NULL DEFAULT now()
+         )`
+      )
+      .then(() => {});
+  }
+  return rateLimitsReady;
+}
+
 /**
  * Returns true if the request is within limits, false if it should be blocked.
  * key       — unique identifier, e.g. "challenge:1.2.3.4"
@@ -11,6 +27,7 @@ export async function checkRateLimit(
   max: number,
   windowSec: number
 ): Promise<boolean> {
+  await ensureRateLimitsTable();
   const result = await pool.query<{ count: number }>(
     `INSERT INTO rate_limits (id, count, window_start)
      VALUES ($1, 1, now())
