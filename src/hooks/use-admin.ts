@@ -83,7 +83,7 @@ export function useAdminReports(status?: string, page = 1) {
 
 export function useAdminCollections(
   filters: {
-    source?: string;
+    service?: string;
     metadataStatus?: string;
     search?: string;
     page?: number;
@@ -92,7 +92,7 @@ export function useAdminCollections(
   } = {}
 ) {
   const params = new URLSearchParams({ page: String(filters.page ?? 1), limit: "20" });
-  if (filters.source) params.set("source", filters.source);
+  if (filters.service) params.set("service", filters.service);
   if (filters.metadataStatus) params.set("metadataStatus", filters.metadataStatus);
   if (filters.search) params.set("search", filters.search);
   if (filters.isFeatured != null) params.set("isFeatured", String(filters.isFeatured));

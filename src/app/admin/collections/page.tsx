@@ -22,20 +22,16 @@ import type { AdminCollectionRecord } from "@/src/types/admin";
 
 const PAGE_SIZE = 20;
 
-const SOURCE_STYLE: Record<string, string> = {
-  MEDIALANE_ERC721:   "bg-blue-500/20 text-blue-400 border-blue-500/30",
-  MEDIALANE_ERC1155:  "bg-teal-500/20 text-teal-400 border-teal-500/30",
-  EXTERNAL_ERC721:    "bg-gray-500/20 text-gray-400 border-gray-500/30",
-  EXTERNAL_ERC1155:   "bg-slate-500/20 text-slate-400 border-slate-500/30",
-  MEDIALANE_REGISTRY: "bg-blue-500/20 text-blue-400 border-blue-500/30",
-  EXTERNAL:           "bg-gray-500/20 text-gray-400 border-gray-500/30",
-  PARTNERSHIP:        "bg-purple-500/20 text-purple-400 border-purple-500/30",
-  GAME:               "bg-green-500/20 text-green-400 border-green-500/30",
-  IP_TICKET:          "bg-orange-500/20 text-orange-400 border-orange-500/30",
-  IP_CLUB:            "bg-pink-500/20 text-pink-400 border-pink-500/30",
-  POP_PROTOCOL:       "bg-cyan-500/20 text-cyan-400 border-cyan-500/30",
-  COLLECTION_DROP:    "bg-yellow-500/20 text-yellow-400 border-yellow-500/30",
+const SERVICE_STYLE: Record<string, string> = {
+  "mip-erc721":      "bg-blue-500/20 text-blue-400 border-blue-500/30",
+  "mip-erc1155":     "bg-teal-500/20 text-teal-400 border-teal-500/30",
+  "pop-protocol":    "bg-cyan-500/20 text-cyan-400 border-cyan-500/30",
+  "drop-collection": "bg-yellow-500/20 text-yellow-400 border-yellow-500/30",
 };
+const SERVICE_FALLBACK = "bg-gray-500/20 text-gray-400 border-gray-500/30";
+const serviceStyle = (s?: string | null) => SERVICE_STYLE[s ?? ""] ?? SERVICE_FALLBACK;
+const serviceLabel = (s?: string | null) => s ?? "external";
+
 const STATUS_STYLE: Record<string, string> = {
   FETCHED:  "bg-green-500/20 text-green-400 border-green-500/30",
   PENDING:  "bg-yellow-500/20 text-yellow-400 border-yellow-500/30",
@@ -47,13 +43,7 @@ const STANDARD_STYLE: Record<string, string> = {
   ERC1155: "bg-teal-500/20 text-teal-400 border-teal-500/30",
   UNKNOWN: "bg-muted/50 text-muted-foreground",
 };
-const SOURCES = [
-  "MEDIALANE_ERC721", "MEDIALANE_ERC1155",
-  "EXTERNAL_ERC721", "EXTERNAL_ERC1155",
-  "EXTERNAL", "PARTNERSHIP", "GAME",
-  "IP_TICKET", "IP_CLUB", "MEDIALANE_REGISTRY",
-  "POP_PROTOCOL", "COLLECTION_DROP",
-];
+const SERVICES = ["mip-erc721", "mip-erc1155", "pop-protocol", "drop-collection"];
 
 async function adminFetch(path: string, opts: RequestInit = {}) {
   const proxyPath = path.replace(/^\/admin\//, "/api/admin/");
@@ -65,14 +55,14 @@ async function adminFetch(path: string, opts: RequestInit = {}) {
 
 function CollectionThumb({ col }: { col: AdminCollectionRecord }) {
   const src = col.image ? ipfsToHttp(col.image) : null;
-  const srcStyle = SOURCE_STYLE[col.source] ?? SOURCE_STYLE.EXTERNAL;
+  const style = serviceStyle(col.service);
   return (
     <div className="relative h-12 w-12 rounded-lg overflow-hidden shrink-0 border border-border bg-muted">
       {src ? (
         <img src={src} alt={col.name ?? ""} className="h-full w-full object-cover" />
       ) : (
-        <div className={`h-full w-full flex items-center justify-center text-[10px] font-bold uppercase ${srcStyle}`}>
-          {(col.name ?? col.source).slice(0, 2)}
+        <div className={`h-full w-full flex items-center justify-center text-[10px] font-bold uppercase ${style}`}>
+          {(col.name ?? serviceLabel(col.service)).slice(0, 2)}
         </div>
       )}
     </div>
@@ -95,103 +85,26 @@ function CollectionSkeleton() {
   );
 }
 
-function CollectionRow({
-  col, onFeature, onHide, onBackfill, onRefresh, onStatsRefresh, onEdit, onDelete,
-}: {
-  col: AdminCollectionRecord;
-  onFeature: (addr: string, current: boolean) => void;
-  onHide: (addr: string, current: boolean) => void;
-  onBackfill: (addr: string) => void;
-  onRefresh: (addr: string) => void;
-  onStatsRefresh: (addr: string) => void;
-  onEdit: (col: AdminCollectionRecord) => void;
-  onDelete: (col: AdminCollectionRecord) => void;
-}) {
-  return (
-    <div className={`glass rounded-lg p-4 flex items-center gap-4 transition-opacity ${col.isHidden ? "opacity-50" : ""}`}>
-      <CollectionThumb col={col} />
-      <div className="flex-1 min-w-0 space-y-1.5">
-        <div className="flex items-center gap-2 flex-wrap">
-          <span className="font-semibold truncate max-w-[220px]">{col.name ?? "Unnamed"}</span>
-          {col.isFeatured && (
-            <Badge variant="outline" className="bg-yellow-500/20 text-yellow-400 border-yellow-500/30 gap-1">
-              <Star className="h-2.5 w-2.5" />Featured
-            </Badge>
-          )}
-          {col.isHidden && (
-            <Badge variant="outline" className="bg-destructive/20 text-destructive border-destructive/30">Hidden</Badge>
-          )}
-        </div>
-        <p className="text-xs text-muted-foreground font-mono truncate">{col.contractAddress}</p>
-        <div className="flex items-center gap-1.5 flex-wrap">
-          <Badge variant="outline" className={`text-[10px] px-1.5 py-0 h-4 ${SOURCE_STYLE[col.source] ?? SOURCE_STYLE.EXTERNAL}`}>
-            {col.source.replace(/_/g, " ")}
-          </Badge>
-          <Badge variant="outline" className={`text-[10px] px-1.5 py-0 h-4 ${STATUS_STYLE[col.metadataStatus]}`}>
-            {col.metadataStatus}
-          </Badge>
-          {col.standard && col.standard !== "UNKNOWN" && (
-            <Badge variant="outline" className={`text-[10px] px-1.5 py-0 h-4 ${STANDARD_STYLE[col.standard]}`}>
-              {col.standard}
-            </Badge>
-          )}
-          {col.totalSupply != null && (
-            <span className="flex items-center gap-0.5 text-[10px] text-muted-foreground">
-              <Layers className="h-3 w-3" />{col.totalSupply.toLocaleString()}
-            </span>
-          )}
-          {col.holderCount != null && (
-            <span className="flex items-center gap-0.5 text-[10px] text-muted-foreground">
-              <Users className="h-3 w-3" />{col.holderCount.toLocaleString()}
-            </span>
-          )}
-          {col.floorPrice && (
-            <span className="text-[10px] text-muted-foreground">Floor: {formatDisplayPrice(col.floorPrice)}</span>
-          )}
-          {col.claimedBy && (
-            <span className="text-[10px] text-muted-foreground">Claimed: {col.claimedBy.slice(0, 8)}…</span>
-          )}
-        </div>
-      </div>
-      <div className="flex items-center gap-1.5 shrink-0 flex-wrap justify-end">
-        <div className="flex items-center gap-1 mr-1">
-          <Switch checked={col.isFeatured} onCheckedChange={() => onFeature(col.contractAddress, col.isFeatured)} id={`feat-${col.id}`} className="scale-75" />
-          <Label htmlFor={`feat-${col.id}`} className="text-xs cursor-pointer text-muted-foreground">Featured</Label>
-        </div>
-        <Button size="icon" variant="ghost" className="h-8 w-8" onClick={() => onHide(col.contractAddress, col.isHidden)} title={col.isHidden ? "Show" : "Hide"}>
-          {col.isHidden ? <EyeOff className="h-3.5 w-3.5 text-destructive" /> : <Eye className="h-3.5 w-3.5" />}
-        </Button>
-        <Button size="icon" variant="ghost" className="h-8 w-8" onClick={() => onEdit(col)} title="Edit"><Pencil className="h-3.5 w-3.5" /></Button>
-        <Button size="icon" variant="ghost" className="h-8 w-8" onClick={() => onStatsRefresh(col.contractAddress)} title="Refresh stats"><BarChart3 className="h-3.5 w-3.5" /></Button>
-        <Button size="icon" variant="ghost" className="h-8 w-8" onClick={() => onBackfill(col.contractAddress)} title="Backfill transfers"><Download className="h-3.5 w-3.5" /></Button>
-        <Button size="icon" variant="ghost" className="h-8 w-8" onClick={() => onRefresh(col.contractAddress)} title="Refresh metadata"><RefreshCw className="h-3.5 w-3.5" /></Button>
-        <a href={`${EXPLORER_URL}/contract/${col.contractAddress}`} target="_blank" rel="noopener noreferrer">
-          <Button size="icon" variant="ghost" className="h-8 w-8" title="Voyager"><ExternalLink className="h-3.5 w-3.5" /></Button>
-        </a>
-        <Button size="icon" variant="ghost" className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10" onClick={() => onDelete(col)} title="Delete">
-          <Trash2 className="h-3.5 w-3.5" />
-        </Button>
-      </div>
-    </div>
-  );
-}
-
 export default function AdminCollectionsPage() {
-  const [search, setSearch] = useState("");
+  const [search, setSearch]               = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
-  const [sourceFilter, setSourceFilter] = useState("");
-  const [statusFilter, setStatusFilter] = useState("");
-  const [featuredOnly, setFeaturedOnly] = useState(false);
-  const [showHidden, setShowHidden] = useState(false);
-  const [page, setPage] = useState(1);
+  const [serviceFilter, setServiceFilter] = useState("");
+  const [statusFilter, setStatusFilter]   = useState("");
+  const [featuredOnly, setFeaturedOnly]   = useState(false);
+  const [showHidden, setShowHidden]       = useState(false);
+  const [page, setPage]                   = useState(1);
+
   const searchTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const { collections, total, isLoading, mutate } = useAdminCollections({
-    search: debouncedSearch, source: sourceFilter || undefined,
+    search: debouncedSearch,
+    service: serviceFilter || undefined,
     metadataStatus: statusFilter || undefined,
     isFeatured: featuredOnly ? true : undefined,
-    isHidden: showHidden ? true : undefined, page,
+    isHidden: showHidden ? true : undefined,
+    page,
   });
+
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
 
   const onSearch = useCallback((val: string) => {
@@ -201,37 +114,40 @@ export default function AdminCollectionsPage() {
   }, []);
 
   function resetFilters() {
-    setSearch(""); setDebouncedSearch(""); setSourceFilter("");
+    setSearch(""); setDebouncedSearch(""); setServiceFilter("");
     setStatusFilter(""); setFeaturedOnly(false); setShowHidden(false); setPage(1);
   }
 
-  const [registerOpen, setRegisterOpen] = useState(false);
-  const [registerContract, setRegisterContract] = useState("");
-  const [registerSource, setRegisterSource] = useState("EXTERNAL");
+  // ── Register dialog ──────────────────────────────────────────────────────────
+  const [registerOpen, setRegisterOpen]             = useState(false);
+  const [registerContract, setRegisterContract]     = useState("");
   const [registerStartBlock, setRegisterStartBlock] = useState("");
-  const [registering, setRegistering] = useState(false);
+  const [registering, setRegistering]               = useState(false);
 
   async function handleRegister() {
     if (!registerContract.trim()) return;
     setRegistering(true);
     try {
-      const body: Record<string, unknown> = { contractAddress: registerContract.trim(), source: registerSource };
+      const body: Record<string, unknown> = { contractAddress: registerContract.trim() };
       if (registerStartBlock.trim()) body.startBlock = parseInt(registerStartBlock.trim(), 10);
       const res = await adminFetch("/admin/collections", { method: "POST", body: JSON.stringify(body) });
       if (!res.ok) throw new Error();
       toast.success("Collection registered");
-      setRegisterOpen(false); setRegisterContract(""); setRegisterStartBlock(""); setRegisterSource("EXTERNAL");
+      setRegisterOpen(false); setRegisterContract(""); setRegisterStartBlock("");
       await mutate();
     } catch { toast.error("Registration failed"); }
     finally { setRegistering(false); }
   }
 
-  const [backfillOpen, setBackfillOpen] = useState(false);
-  const [backfillContract, setBackfillContract] = useState("");
+  // ── Backfill dialog ──────────────────────────────────────────────────────────
+  const [backfillOpen, setBackfillOpen]           = useState(false);
+  const [backfillContract, setBackfillContract]   = useState("");
   const [backfillFromBlock, setBackfillFromBlock] = useState("");
-  const [backfilling, setBackfilling] = useState(false);
+  const [backfilling, setBackfilling]             = useState(false);
 
-  function openBackfill(contractAddress: string) { setBackfillContract(contractAddress); setBackfillFromBlock(""); setBackfillOpen(true); }
+  function openBackfill(contractAddress: string) {
+    setBackfillContract(contractAddress); setBackfillFromBlock(""); setBackfillOpen(true);
+  }
 
   async function handleBackfillTransfers() {
     if (!backfillContract) return;
@@ -245,31 +161,40 @@ export default function AdminCollectionsPage() {
       const { inserted, skipped, metadataJobsEnqueued } = json.data ?? {};
       toast.success(`Backfill complete — ${inserted} inserted, ${skipped} skipped, ${metadataJobsEnqueued} metadata jobs queued`);
       setBackfillOpen(false); await mutate();
-    } catch (err: unknown) { toast.error(err instanceof Error ? err.message : "Backfill failed"); }
-    finally { setBackfilling(false); }
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? err.message : "Backfill failed");
+    } finally { setBackfilling(false); }
   }
 
-  const [editOpen, setEditOpen] = useState(false);
-  const [editCol, setEditCol] = useState<AdminCollectionRecord | null>(null);
-  const [editSource, setEditSource] = useState("");
-  const [saving, setSaving] = useState(false);
+  // ── Edit service dialog ──────────────────────────────────────────────────────
+  const [editOpen, setEditOpen]         = useState(false);
+  const [editCol, setEditCol]           = useState<AdminCollectionRecord | null>(null);
+  const [editService, setEditService]   = useState("");
+  const [saving, setSaving]             = useState(false);
 
-  function openEdit(col: AdminCollectionRecord) { setEditCol(col); setEditSource(col.source); setEditOpen(true); }
+  function openEdit(col: AdminCollectionRecord) {
+    setEditCol(col); setEditService(col.service ?? ""); setEditOpen(true);
+  }
 
   async function handleSaveEdit() {
     if (!editCol) return;
     setSaving(true);
     try {
-      const res = await adminFetch(`/admin/collections/${editCol.contractAddress}`, { method: "PATCH", body: JSON.stringify({ source: editSource }) });
+      const res = await adminFetch(`/admin/collections/${editCol.contractAddress}`, {
+        method: "PATCH",
+        body: JSON.stringify({ service: editService }),
+      });
       if (!res.ok) throw new Error();
-      toast.success("Collection updated"); setEditOpen(false); await mutate();
+      toast.success("Collection updated");
+      setEditOpen(false); await mutate();
     } catch { toast.error("Update failed"); }
     finally { setSaving(false); }
   }
 
+  // ── Delete dialog ────────────────────────────────────────────────────────────
   const [deleteOpen, setDeleteOpen] = useState(false);
-  const [deleteCol, setDeleteCol] = useState<AdminCollectionRecord | null>(null);
-  const [deleting, setDeleting] = useState(false);
+  const [deleteCol, setDeleteCol]   = useState<AdminCollectionRecord | null>(null);
+  const [deleting, setDeleting]     = useState(false);
 
   function openDelete(col: AdminCollectionRecord) { setDeleteCol(col); setDeleteOpen(true); }
 
@@ -283,31 +208,44 @@ export default function AdminCollectionsPage() {
       const { tokens, transfers } = json.data?.deleted ?? {};
       toast.success(`Deleted — ${tokens?.count ?? 0} tokens, ${transfers?.count ?? 0} transfers removed`);
       setDeleteOpen(false); await mutate();
-    } catch (err: unknown) { toast.error(err instanceof Error ? err.message : "Delete failed"); }
-    finally { setDeleting(false); }
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? err.message : "Delete failed");
+    } finally { setDeleting(false); }
   }
 
+  // ── Per-row actions ──────────────────────────────────────────────────────────
   async function handleRefresh(contractAddress: string) {
-    try { await adminFetch(`/admin/collections/${contractAddress}/refresh`, { method: "POST" }); toast.success("Metadata refresh queued"); }
-    catch { toast.error("Refresh failed"); }
+    try {
+      await adminFetch(`/admin/collections/${contractAddress}/refresh`, { method: "POST" });
+      toast.success("Metadata refresh queued");
+    } catch { toast.error("Refresh failed"); }
   }
 
   async function handleStatsRefresh(contractAddress: string) {
-    try { await adminFetch(`/admin/collections/${contractAddress}/stats-refresh`, { method: "POST" }); toast.success("Stats refresh queued"); setTimeout(() => mutate(), 3000); }
-    catch { toast.error("Stats refresh failed"); }
+    try {
+      await adminFetch(`/admin/collections/${contractAddress}/stats-refresh`, { method: "POST" });
+      toast.success("Stats refresh queued");
+      setTimeout(() => mutate(), 3000);
+    } catch { toast.error("Stats refresh failed"); }
   }
 
   async function handleIsFeatured(contractAddress: string, current: boolean) {
-    try { await adminFetch(`/admin/collections/${contractAddress}`, { method: "PATCH", body: JSON.stringify({ isFeatured: !current }) }); toast.success(current ? "Removed from featured" : "Added to featured"); await mutate(); }
-    catch { toast.error("Failed to update"); }
+    try {
+      await adminFetch(`/admin/collections/${contractAddress}`, { method: "PATCH", body: JSON.stringify({ isFeatured: !current }) });
+      toast.success(current ? "Removed from featured" : "Added to featured");
+      await mutate();
+    } catch { toast.error("Failed to update"); }
   }
 
   async function handleIsHidden(contractAddress: string, current: boolean) {
-    try { await adminFetch(`/admin/collections/${contractAddress}`, { method: "PATCH", body: JSON.stringify({ isHidden: !current }) }); toast.success(current ? "Collection visible" : "Collection hidden"); await mutate(); }
-    catch { toast.error("Failed to update"); }
+    try {
+      await adminFetch(`/admin/collections/${contractAddress}`, { method: "PATCH", body: JSON.stringify({ isHidden: !current }) });
+      toast.success(current ? "Collection visible on platform" : "Collection hidden from platform");
+      await mutate();
+    } catch { toast.error("Failed to update"); }
   }
 
-  const hasFilters = !!(debouncedSearch || sourceFilter || statusFilter || featuredOnly || showHidden);
+  const hasFilters = !!(debouncedSearch || serviceFilter || statusFilter || featuredOnly || showHidden);
 
   return (
     <div className="space-y-4">
@@ -326,11 +264,11 @@ export default function AdminCollectionsPage() {
           <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
           <Input className="pl-8" placeholder="Search by name or address…" value={search} onChange={(e) => onSearch(e.target.value)} />
         </div>
-        <Select value={sourceFilter} onValueChange={(v) => { setSourceFilter(v === "ALL" ? "" : v); setPage(1); }}>
-          <SelectTrigger className="w-44"><SelectValue placeholder="All sources" /></SelectTrigger>
+        <Select value={serviceFilter} onValueChange={(v) => { setServiceFilter(v === "ALL" ? "" : v); setPage(1); }}>
+          <SelectTrigger className="w-44"><SelectValue placeholder="All services" /></SelectTrigger>
           <SelectContent>
-            <SelectItem value="ALL">All sources</SelectItem>
-            {SOURCES.map(s => <SelectItem key={s} value={s}>{s.replace(/_/g, " ")}</SelectItem>)}
+            <SelectItem value="ALL">All services</SelectItem>
+            {SERVICES.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}
           </SelectContent>
         </Select>
         <Select value={statusFilter} onValueChange={(v) => { setStatusFilter(v === "ALL" ? "" : v); setPage(1); }}>
@@ -367,7 +305,11 @@ export default function AdminCollectionsPage() {
       ) : (
         <div className="space-y-2">
           {collections.map((col) => (
-            <CollectionRow key={col.id} col={col} onFeature={handleIsFeatured} onHide={handleIsHidden} onBackfill={openBackfill} onRefresh={handleRefresh} onStatsRefresh={handleStatsRefresh} onEdit={openEdit} onDelete={openDelete} />
+            <CollectionRow key={col.id} col={col}
+              onFeature={handleIsFeatured} onHide={handleIsHidden}
+              onBackfill={openBackfill} onRefresh={handleRefresh}
+              onStatsRefresh={handleStatsRefresh} onEdit={openEdit} onDelete={openDelete}
+            />
           ))}
         </div>
       )}
@@ -384,14 +326,14 @@ export default function AdminCollectionsPage() {
 
       <Dialog open={registerOpen} onOpenChange={setRegisterOpen}>
         <DialogContent>
-          <DialogHeader><DialogTitle>Register Collection</DialogTitle><DialogDescription>Add a contract to the platform index.</DialogDescription></DialogHeader>
+          <DialogHeader>
+            <DialogTitle>Register Collection</DialogTitle>
+            <DialogDescription>Add a contract to the platform index.</DialogDescription>
+          </DialogHeader>
           <div className="space-y-4 py-2">
-            <div className="space-y-2"><Label>Contract Address</Label><Input placeholder="0x…" value={registerContract} onChange={(e) => setRegisterContract(e.target.value)} /></div>
-            <div className="space-y-2"><Label>Source</Label>
-              <Select value={registerSource} onValueChange={setRegisterSource}>
-                <SelectTrigger><SelectValue /></SelectTrigger>
-                <SelectContent>{SOURCES.map(s => <SelectItem key={s} value={s}>{s.replace(/_/g, " ")}</SelectItem>)}</SelectContent>
-              </Select>
+            <div className="space-y-2">
+              <Label>Contract Address</Label>
+              <Input placeholder="0x…" value={registerContract} onChange={(e) => setRegisterContract(e.target.value)} />
             </div>
             <div className="space-y-2">
               <Label>Start Block <span className="text-muted-foreground font-normal">(optional)</span></Label>
@@ -401,14 +343,19 @@ export default function AdminCollectionsPage() {
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setRegisterOpen(false)}>Cancel</Button>
-            <Button disabled={registering || !registerContract.trim()} onClick={handleRegister}>{registering ? "Registering…" : "Register"}</Button>
+            <Button disabled={registering || !registerContract.trim()} onClick={handleRegister}>
+              {registering ? "Registering…" : "Register"}
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
 
       <Dialog open={backfillOpen} onOpenChange={setBackfillOpen}>
         <DialogContent>
-          <DialogHeader><DialogTitle>Backfill Transfers</DialogTitle><DialogDescription className="font-mono text-xs break-all">{backfillContract}</DialogDescription></DialogHeader>
+          <DialogHeader>
+            <DialogTitle>Backfill Transfers</DialogTitle>
+            <DialogDescription className="font-mono text-xs break-all">{backfillContract}</DialogDescription>
+          </DialogHeader>
           <div className="space-y-4 py-2">
             <p className="text-sm text-muted-foreground">Scans onchain Transfer events and creates Token records for any tokens missed by the indexer.</p>
             <div className="space-y-2">
@@ -426,12 +373,16 @@ export default function AdminCollectionsPage() {
 
       <Dialog open={editOpen} onOpenChange={setEditOpen}>
         <DialogContent className="sm:max-w-sm">
-          <DialogHeader><DialogTitle>Edit Collection</DialogTitle><DialogDescription className="font-mono text-xs break-all">{editCol?.contractAddress}</DialogDescription></DialogHeader>
+          <DialogHeader>
+            <DialogTitle>Edit Collection</DialogTitle>
+            <DialogDescription className="font-mono text-xs break-all">{editCol?.contractAddress}</DialogDescription>
+          </DialogHeader>
           <div className="space-y-4 py-2">
-            <div className="space-y-2"><Label>Source</Label>
-              <Select value={editSource} onValueChange={setEditSource}>
-                <SelectTrigger><SelectValue /></SelectTrigger>
-                <SelectContent>{SOURCES.map(s => <SelectItem key={s} value={s}>{s.replace(/_/g, " ")}</SelectItem>)}</SelectContent>
+            <div className="space-y-2">
+              <Label>Service</Label>
+              <Select value={editService} onValueChange={setEditService}>
+                <SelectTrigger><SelectValue placeholder="(external / none)" /></SelectTrigger>
+                <SelectContent>{SERVICES.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}</SelectContent>
               </Select>
             </div>
           </div>
@@ -446,7 +397,11 @@ export default function AdminCollectionsPage() {
         <DialogContent className="sm:max-w-sm">
           <DialogHeader>
             <DialogTitle>Delete collection?</DialogTitle>
-            <DialogDescription>This permanently deletes <span className="font-semibold text-foreground">{deleteCol?.name ?? "this collection"}</span> and all its tokens and transfers. This cannot be undone.</DialogDescription>
+            <DialogDescription>
+              This permanently deletes{" "}
+              <span className="font-semibold text-foreground">{deleteCol?.name ?? "this collection"}</span>
+              {" "}and all its tokens and transfers. This cannot be undone.
+            </DialogDescription>
           </DialogHeader>
           <div className="rounded-lg bg-muted/50 border border-border px-3 py-2 mt-1">
             <p className="text-xs font-mono text-muted-foreground break-all">{deleteCol?.contractAddress}</p>
@@ -459,6 +414,97 @@ export default function AdminCollectionsPage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+    </div>
+  );
+}
+
+function CollectionRow({
+  col, onFeature, onHide, onBackfill, onRefresh, onStatsRefresh, onEdit, onDelete,
+}: {
+  col: AdminCollectionRecord;
+  onFeature: (addr: string, current: boolean) => void;
+  onHide: (addr: string, current: boolean) => void;
+  onBackfill: (addr: string) => void;
+  onRefresh: (addr: string) => void;
+  onStatsRefresh: (addr: string) => void;
+  onEdit: (col: AdminCollectionRecord) => void;
+  onDelete: (col: AdminCollectionRecord) => void;
+}) {
+  return (
+    <div className={`glass rounded-lg p-4 flex items-center gap-4 transition-opacity ${col.isHidden ? "opacity-50" : ""}`}>
+      <CollectionThumb col={col} />
+      <div className="flex-1 min-w-0 space-y-1.5">
+        <div className="flex items-center gap-2 flex-wrap">
+          <span className="font-semibold truncate max-w-[220px]">{col.name ?? "Unnamed"}</span>
+          {col.isFeatured && (
+            <Badge variant="outline" className="bg-yellow-500/20 text-yellow-400 border-yellow-500/30 gap-1">
+              <Star className="h-2.5 w-2.5" />Featured
+            </Badge>
+          )}
+          {col.isHidden && (
+            <Badge variant="outline" className="bg-destructive/20 text-destructive border-destructive/30">Hidden</Badge>
+          )}
+        </div>
+        <p className="text-xs text-muted-foreground font-mono truncate">{col.contractAddress}</p>
+        <div className="flex items-center gap-1.5 flex-wrap">
+          <Badge variant="outline" className={`text-[10px] px-1.5 py-0 h-4 ${serviceStyle(col.service)}`}>
+            {serviceLabel(col.service)}
+          </Badge>
+          <Badge variant="outline" className={`text-[10px] px-1.5 py-0 h-4 ${STATUS_STYLE[col.metadataStatus]}`}>
+            {col.metadataStatus}
+          </Badge>
+          {col.standard && col.standard !== "UNKNOWN" && (
+            <Badge variant="outline" className={`text-[10px] px-1.5 py-0 h-4 ${STANDARD_STYLE[col.standard]}`}>
+              {col.standard}
+            </Badge>
+          )}
+          {col.totalSupply != null && (
+            <span className="flex items-center gap-0.5 text-[10px] text-muted-foreground">
+              <Layers className="h-3 w-3" />{col.totalSupply.toLocaleString()}
+            </span>
+          )}
+          {col.holderCount != null && (
+            <span className="flex items-center gap-0.5 text-[10px] text-muted-foreground">
+              <Users className="h-3 w-3" />{col.holderCount.toLocaleString()}
+            </span>
+          )}
+          {col.floorPrice && (
+            <span className="text-[10px] text-muted-foreground">Floor: {formatDisplayPrice(col.floorPrice)}</span>
+          )}
+          {col.claimedBy && (
+            <span className="text-[10px] text-muted-foreground">Claimed: {col.claimedBy.slice(0, 8)}…</span>
+          )}
+        </div>
+      </div>
+      <div className="flex items-center gap-1.5 shrink-0 flex-wrap justify-end">
+        <div className="flex items-center gap-1 mr-1">
+          <Switch checked={col.isFeatured} onCheckedChange={() => onFeature(col.contractAddress, col.isFeatured)} id={`feat-${col.id}`} className="scale-75" />
+          <Label htmlFor={`feat-${col.id}`} className="text-xs cursor-pointer text-muted-foreground">Featured</Label>
+        </div>
+        <Button size="icon" variant="ghost" className="h-8 w-8" onClick={() => onHide(col.contractAddress, col.isHidden)} title={col.isHidden ? "Show on platform" : "Hide from platform"}>
+          {col.isHidden ? <EyeOff className="h-3.5 w-3.5 text-destructive" /> : <Eye className="h-3.5 w-3.5" />}
+        </Button>
+        <Button size="icon" variant="ghost" className="h-8 w-8" onClick={() => onEdit(col)} title="Edit collection">
+          <Pencil className="h-3.5 w-3.5" />
+        </Button>
+        <Button size="icon" variant="ghost" className="h-8 w-8" onClick={() => onStatsRefresh(col.contractAddress)} title="Refresh stats">
+          <BarChart3 className="h-3.5 w-3.5" />
+        </Button>
+        <Button size="icon" variant="ghost" className="h-8 w-8" onClick={() => onBackfill(col.contractAddress)} title="Backfill transfers">
+          <Download className="h-3.5 w-3.5" />
+        </Button>
+        <Button size="icon" variant="ghost" className="h-8 w-8" onClick={() => onRefresh(col.contractAddress)} title="Refresh metadata">
+          <RefreshCw className="h-3.5 w-3.5" />
+        </Button>
+        <a href={`${EXPLORER_URL}/contract/${col.contractAddress}`} target="_blank" rel="noopener noreferrer">
+          <Button size="icon" variant="ghost" className="h-8 w-8" title="View on Voyager">
+            <ExternalLink className="h-3.5 w-3.5" />
+          </Button>
+        </a>
+        <Button size="icon" variant="ghost" className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10" onClick={() => onDelete(col)} title="Delete collection">
+          <Trash2 className="h-3.5 w-3.5" />
+        </Button>
+      </div>
     </div>
   );
 }
