@@ -20,7 +20,8 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json({ nonce, typedData });
   } catch (err) {
-    console.error("[auth/challenge]", err);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    const msg = err instanceof Error ? err.message : String(err);
+    console.error("[auth/challenge]", msg);
+    return NextResponse.json({ error: msg }, { status: 500 });
   }
 }

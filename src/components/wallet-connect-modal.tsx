@@ -34,7 +34,9 @@ export function WalletConnectModal({ open, onOpenChange, redirectTo = "/account"
 
     try {
       const challengeRes = await fetch(`/api/auth/challenge?address=${address}`);
-      const { nonce, typedData } = await challengeRes.json();
+      const challengeData = await challengeRes.json();
+      if (!challengeRes.ok) throw new Error(challengeData.error ?? "Failed to get challenge");
+      const { nonce, typedData } = challengeData;
 
       const signature = await account.signMessage(typedData);
       const sigArray = Array.isArray(signature)
