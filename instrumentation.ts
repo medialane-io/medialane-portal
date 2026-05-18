@@ -8,5 +8,15 @@ export async function register() {
         window_start TIMESTAMPTZ NOT NULL DEFAULT now()
       )
     `);
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS nonces (
+        nonce      TEXT        PRIMARY KEY,
+        address    TEXT        NOT NULL,
+        expires_at TIMESTAMPTZ NOT NULL
+      )
+    `);
+    await pool.query(
+      "CREATE INDEX IF NOT EXISTS idx_nonces_expires ON nonces(expires_at)"
+    );
   }
 }
