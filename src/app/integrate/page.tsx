@@ -128,9 +128,9 @@ export default function IntegratePage() {
                 <code className="font-mono bg-white/10 px-1.5 py-0.5 rounded">X-Credits-Remaining: 0</code>{" "}
                 header. AI agents can detect this response and trigger a USDC deposit autonomously.
                 See the{" "}
-                <Link href="/docs/agents" className="text-amber-300 hover:underline">
+                <a href="https://docs.medialane.io/docs/agents" target="_blank" rel="noopener noreferrer" className="text-amber-300 hover:underline">
                   Agent Quickstart
-                </Link>{" "}
+                </a>{" "}
                 for a code example.
               </p>
             </div>

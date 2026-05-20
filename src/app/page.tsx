@@ -54,10 +54,10 @@ export default function Home() {
               </Link>
             </Button>
             <Button asChild size="lg" variant="outline" className="px-8 h-12 text-base border-white/10 hover:bg-white/5">
-              <Link href="/docs">
+              <a href="https://docs.medialane.io/docs" target="_blank" rel="noopener noreferrer">
                 <Code2 className="w-5 h-5 mr-2" />
                 Read the Docs
-              </Link>
+              </a>
             </Button>
           </div>
 
@@ -165,10 +165,10 @@ export default function Home() {
                   zero human interaction required.
                 </p>
                 <Button asChild variant="outline" className="border-primary/30 hover:bg-primary/10 text-primary hover:text-primary">
-                  <Link href="/docs/agents">
+                  <a href="https://docs.medialane.io/docs/agents" target="_blank" rel="noopener noreferrer">
                     Read the guide
                     <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
-                  </Link>
+                  </a>
                 </Button>
               </CardContent>
             </Card>
@@ -188,10 +188,10 @@ export default function Home() {
                   via one SDK.
                 </p>
                 <Button asChild variant="outline" className="border-cyan-500/30 hover:bg-cyan-500/10 text-cyan-300 hover:text-cyan-200">
-                  <Link href="/docs/sdk">
+                  <a href="https://docs.medialane.io/docs/sdk" target="_blank" rel="noopener noreferrer">
                     Explore the SDK
                     <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
-                  </Link>
+                  </a>
                 </Button>
               </CardContent>
             </Card>

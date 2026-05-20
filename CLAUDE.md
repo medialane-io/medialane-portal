@@ -43,10 +43,7 @@ It is a Next.js 15 App Router site — API key management, usage dashboard, webh
 | `/integrate` | Access model, credit costs, consumer app examples | Yes |
 | `/pricing` | Permanent redirect → `/integrate` | Yes (redirect only) |
 | `/connect` | Community links + contact form | Yes |
-| `/docs` | Getting started, credits, use cases | Yes |
-| `/docs/api` | Full REST endpoint reference | Yes |
-| `/docs/sdk` | @medialane/sdk quickstart + examples | Yes |
-| `/docs/agents` | AI agent integration guide | Yes |
+| `/docs/*` | Permanent redirect → `docs.medialane.io/docs/*` (content migrated 2026-05-20) | Yes (redirect only) |
 | `/changelog` | Static release timeline | Yes |
 | `/terms` | Placeholder TOS | Yes |
 | `/privacy` | Placeholder privacy policy | Yes |
