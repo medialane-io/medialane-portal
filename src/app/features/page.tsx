@@ -202,10 +202,10 @@ export default function FeaturesPage() {
                   ))}
                 </ul>
                 <Button asChild variant="outline" className="border-primary/30 hover:bg-primary/10 text-primary">
-                  <Link href="/docs/agents">
+                  <a href="https://docs.medialane.io/docs/agents" target="_blank" rel="noopener noreferrer">
                     Agent Quickstart
                     <ArrowRight className="w-4 h-4 ml-2" />
-                  </Link>
+                  </a>
                 </Button>
               </div>
             </CardContent>
@@ -270,10 +270,10 @@ export default function FeaturesPage() {
                 </div>
               </div>
               <Button asChild variant="outline" className="flex-shrink-0 border-white/10 hover:bg-white/5">
-                <Link href="/docs/sdk">
+                <a href="https://docs.medialane.io/docs/sdk" target="_blank" rel="noopener noreferrer">
                   SDK Docs
                   <ArrowRight className="w-4 h-4 ml-2" />
-                </Link>
+                </a>
               </Button>
             </CardContent>
           </Card>

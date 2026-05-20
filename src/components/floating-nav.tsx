@@ -15,7 +15,7 @@ import { WalletConnectModal } from "./wallet-connect-modal"
 const NAV_LINKS = [
   { label: "Features", href: "/features" },
   { label: "Integrate", href: "/integrate" },
-  { label: "Docs", href: "/docs" },
+  { label: "Docs", href: "https://docs.medialane.io/docs" },
   { label: "Connect", href: "/connect" },
 ]
 

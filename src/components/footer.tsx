@@ -5,9 +5,9 @@ import { LogoMedialane } from "./logo-medialane"
 const PLATFORM_LINKS = [
   { name: "Features", href: "/features" },
   { name: "Integrate", href: "/integrate" },
-  { name: "Docs", href: "/docs" },
-  { name: "API Reference", href: "/docs/api" },
-  { name: "SDK", href: "/docs/sdk" },
+  { name: "Docs", href: "https://docs.medialane.io/docs" },
+  { name: "API Reference", href: "https://docs.medialane.io/docs/api" },
+  { name: "SDK", href: "https://docs.medialane.io/docs/sdk" },
 ]
 
 const COMMUNITY_LINKS = [
