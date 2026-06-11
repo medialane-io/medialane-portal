@@ -39,6 +39,84 @@ export interface AdminUsernameClaimRecord {
   createdAt: string;
 }
 
+export interface AdminTenant {
+  id: string;
+  name: string;
+  email: string;
+  plan: "FREE" | "PREMIUM";
+  status: "ACTIVE" | "SUSPENDED";
+  keyCount: number;
+  createdAt: string;
+}
+
+export interface AdminApiKey {
+  id: string;
+  prefix: string;
+  label: string;
+  appSource: string | null;
+  status: "ACTIVE" | "REVOKED";
+  lastUsedAt: string | null;
+  monthlyRequestCount: number;
+  createdAt: string;
+}
+
+export interface AdminComment {
+  id: string;
+  contractAddress: string;
+  tokenId: string;
+  author: string;
+  content: string;
+  txHash: string;
+  blockTimestamp: string;
+  isHidden: boolean;
+  createdAt: string;
+}
+
+export interface AdminSlugClaimRecord {
+  id: string;
+  contractAddress: string;
+  slug: string;
+  status: "PENDING" | "APPROVED" | "REJECTED";
+  notifyEmail?: string | null;
+  adminNotes?: string | null;
+  createdAt: string;
+}
+
+export interface RewardAction {
+  type: string;
+  label: string;
+  xp: number;
+  dailyCap: number | null;
+  minValueUsdc: number | null;
+  enabled: boolean;
+}
+
+export interface RewardMultiplier {
+  id: string;
+  name: string;
+  factor: number;
+  enabled: boolean;
+  description: string | null;
+}
+
+export interface RewardLevel {
+  level: number;
+  name: string;
+  xpRequired: number;
+  badgeColor: string;
+  description: string | null;
+}
+
+export interface RewardBadge {
+  key: string;
+  name: string;
+  description: string;
+  icon: string | null;
+  color: string | null;
+  category: string;
+  enabled: boolean;
+}
+
 export interface AdminCollectionRecord {
   id: string;
   name?: string;

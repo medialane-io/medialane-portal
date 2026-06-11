@@ -48,6 +48,7 @@ It is a Next.js 15 App Router site — API key management, usage dashboard, webh
 | `/terms` | Placeholder TOS | Yes |
 | `/privacy` | Placeholder privacy policy | Yes |
 | `/account` | API portal dashboard (SIWS auth + wallet) | Yes |
+| `/admin/*` | Admin panel (is_admin gate) — dashboard, services, tenants, claims, collections, reports, moderation, rewards, tokens, creators, maintenance | Yes |
 | `/mint` | NFT mint page | **DO NOT TOUCH** |
 | `/workshop` | Workshop event page | **DO NOT TOUCH** |
 

@@ -1,4 +1,5 @@
 import { AddContractForm } from "./add-contract-form";
+import { ContractActions } from "./contract-actions";
 
 const BACKEND_URL = process.env.MEDIALANE_API_URL!;
 const ADMIN_KEY = process.env.ADMIN_API_KEY!;
@@ -87,7 +88,8 @@ export default async function ServicesPage() {
                         <th className="text-left pb-2 pr-4">Start Block</th>
                         <th className="text-left pb-2 pr-4">Deployed</th>
                         <th className="text-left pb-2 pr-4">Status</th>
-                        <th className="text-left pb-2">Notes</th>
+                        <th className="text-left pb-2 pr-4">Notes</th>
+                        <th className="text-left pb-2">Actions</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-border">
@@ -104,7 +106,10 @@ export default async function ServicesPage() {
                               {contract.active ? "● Active" : "○ Inactive"}
                             </span>
                           </td>
-                          <td className="py-2 text-xs text-muted-foreground">{contract.notes ?? "—"}</td>
+                          <td className="py-2 pr-4 text-xs text-muted-foreground">{contract.notes ?? "—"}</td>
+                          <td className="py-2 text-xs">
+                            <ContractActions contractId={contract.id} active={contract.active} notes={contract.notes} />
+                          </td>
                         </tr>
                       ))}
                     </tbody>

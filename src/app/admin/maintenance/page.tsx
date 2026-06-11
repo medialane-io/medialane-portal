@@ -5,7 +5,8 @@ import { Button } from "@/src/components/ui/button";
 import { toast } from "sonner";
 import { Input } from "@/src/components/ui/input";
 import { Label } from "@/src/components/ui/label";
-import { RefreshCw, Activity, Database, Zap, GitMerge } from "lucide-react";
+import { RefreshCw, Activity, Database, Zap, GitMerge, ShoppingCart, ListChecks } from "lucide-react";
+import { Textarea } from "@/src/components/ui/textarea";
 import { cn } from "@/src/lib/utils";
 
 function adminPost(path: string, body?: unknown) {
@@ -267,6 +268,146 @@ export default function AdminMaintenancePage() {
           <Button size="sm" variant="outline" onClick={handleBackfillTransfers} disabled={transferRunning || !transferContract.trim() || !transferFromBlock.trim()}>
             {transferRunning ? <RefreshCw className="h-3.5 w-3.5 animate-spin mr-1.5" /> : null}
             {transferRunning ? "Running…" : "Run"}
+          </Button>
+        </div>
+      </div>
+
+      <MarketplaceOps />
+      <PopAllowlist />
+    </div>
+  );
+}
+
+function MarketplaceOps() {
+  const [orderHash, setOrderHash] = useState("");
+  const [txHash, setTxHash] = useState("");
+  const [busy, setBusy] = useState<string | null>(null);
+
+  async function run(key: string, path: string, confirmMsg?: string, body?: unknown) {
+    if (confirmMsg && !confirm(confirmMsg)) return;
+    setBusy(key);
+    try {
+      const res = await adminPost(path, body);
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error);
+      toast.success(`${key} complete`);
+    } catch (e) {
+      toast.error(e instanceof Error && e.message ? e.message : `${key} failed`);
+    } finally { setBusy(null); }
+  }
+
+  return (
+    <div className="space-y-3">
+      <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-2">
+        <ShoppingCart className="h-3.5 w-3.5" />Marketplace Ops
+      </h2>
+
+      <div className="glass rounded-xl p-5 space-y-3">
+        <div>
+          <p className="font-semibold text-sm">Order by hash</p>
+          <p className="text-xs text-muted-foreground mt-0.5">
+            Resync re-reads order details from chain (fixes a wrong price). Cancel marks an order the indexer
+            missed as CANCELLED in the index — it does not touch the chain.
+          </p>
+        </div>
+        <div className="flex flex-wrap items-end gap-2">
+          <div className="space-y-1 flex-1 min-w-[260px]">
+            <Label className="text-xs">Order hash</Label>
+            <Input placeholder="0x…" value={orderHash} onChange={e => setOrderHash(e.target.value)} className="h-8 text-xs font-mono" />
+          </div>
+          <Button size="sm" variant="outline" disabled={!orderHash.trim() || !!busy}
+            onClick={() => run("Resync", `/admin/orders/${orderHash.trim()}/resync`)}>
+            {busy === "Resync" ? "Running…" : "Resync"}
+          </Button>
+          <Button size="sm" variant="outline" className="text-destructive" disabled={!orderHash.trim() || !!busy}
+            onClick={() => run("Cancel", `/admin/orders/${orderHash.trim()}/cancel`, "Mark this order CANCELLED in the index? Only do this if it is already cancelled on-chain.")}>
+            {busy === "Cancel" ? "Running…" : "Force-cancel"}
+          </Button>
+        </div>
+      </div>
+
+      <div className="glass rounded-xl p-5 space-y-3">
+        <div>
+          <p className="font-semibold text-sm">Hydrate from transaction</p>
+          <p className="text-xs text-muted-foreground mt-0.5">
+            Re-index a transaction the indexer missed: pulls OrderCreated or NFT Transfer events from the
+            receipt and writes the rows.
+          </p>
+        </div>
+        <div className="flex flex-wrap items-end gap-2">
+          <div className="space-y-1 flex-1 min-w-[260px]">
+            <Label className="text-xs">Transaction hash</Label>
+            <Input placeholder="0x…" value={txHash} onChange={e => setTxHash(e.target.value)} className="h-8 text-xs font-mono" />
+          </div>
+          <Button size="sm" variant="outline" disabled={!txHash.trim() || !!busy}
+            onClick={() => run("Order hydrate", `/admin/marketplace/tx/${txHash.trim()}/hydrate`)}>
+            {busy === "Order hydrate" ? "Running…" : "Hydrate orders"}
+          </Button>
+          <Button size="sm" variant="outline" disabled={!txHash.trim() || !!busy}
+            onClick={() => run("Transfer hydrate", `/admin/transfers/tx/${txHash.trim()}/hydrate`)}>
+            {busy === "Transfer hydrate" ? "Running…" : "Hydrate transfers"}
+          </Button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function PopAllowlist() {
+  const [collection, setCollection] = useState("");
+  const [addresses, setAddresses] = useState("");
+  const [busy, setBusy] = useState<"add" | "remove" | null>(null);
+
+  function parseAddresses(): string[] {
+    return addresses.split(/[\s,;]+/).map(a => a.trim()).filter(Boolean);
+  }
+
+  async function submit(action: "add" | "remove") {
+    const list = parseAddresses();
+    if (!collection.trim()) { toast.error("Enter the collection address"); return; }
+    if (list.length === 0) { toast.error("Enter at least one wallet address"); return; }
+    if (!confirm(`${action === "add" ? "Add" : "Remove"} ${list.length} wallet(s) ${action === "add" ? "to" : "from"} the allowlist?`)) return;
+    setBusy(action);
+    try {
+      const res = await fetch("/api/admin/pop/allowlist", {
+        method: action === "add" ? "POST" : "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ collectionAddress: collection.trim(), addresses: list }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error);
+      toast.success(action === "add"
+        ? `Allowlist updated — ${data.data.inserted} new of ${data.data.total}`
+        : `Removed ${data.data.removed} entr${data.data.removed === 1 ? "y" : "ies"}`);
+      setAddresses("");
+    } catch (e) {
+      toast.error(e instanceof Error && e.message ? e.message : "Allowlist update failed");
+    } finally { setBusy(null); }
+  }
+
+  return (
+    <div className="space-y-3">
+      <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-2">
+        <ListChecks className="h-3.5 w-3.5" />POP / Drop Allowlist
+      </h2>
+      <div className="glass rounded-xl p-5 space-y-3">
+        <p className="text-xs text-muted-foreground">
+          Bulk add or remove wallets on a POP or Collection Drop allowlist. Paste addresses separated by
+          newlines, commas, or spaces (max 10,000 per batch).
+        </p>
+        <div className="space-y-1">
+          <Label className="text-xs">Collection address</Label>
+          <Input placeholder="0x…" value={collection} onChange={e => setCollection(e.target.value)} className="h-8 text-xs font-mono" />
+        </div>
+        <div className="space-y-1">
+          <Label className="text-xs">Wallet addresses</Label>
+          <Textarea placeholder={"0x…\n0x…"} value={addresses} onChange={e => setAddresses(e.target.value)} className="text-xs font-mono h-28 resize-y" />
+          <p className="text-[10px] text-muted-foreground">{parseAddresses().length} address(es) detected</p>
+        </div>
+        <div className="flex gap-2">
+          <Button size="sm" disabled={!!busy} onClick={() => submit("add")}>{busy === "add" ? "Adding…" : "Add to allowlist"}</Button>
+          <Button size="sm" variant="outline" className="text-destructive" disabled={!!busy} onClick={() => submit("remove")}>
+            {busy === "remove" ? "Removing…" : "Remove"}
           </Button>
         </div>
       </div>

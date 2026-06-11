@@ -3,9 +3,12 @@
 const navItems = [
   { label: "Dashboard",   href: "/admin" },
   { label: "Services",    href: "/admin/services" },
+  { label: "Tenants",     href: "/admin/tenants" },
   { label: "Claims",      href: "/admin/claims" },
   { label: "Collections", href: "/admin/collections" },
   { label: "Reports",     href: "/admin/reports" },
+  { label: "Moderation",  href: "/admin/moderation" },
+  { label: "Rewards",     href: "/admin/rewards" },
   { label: "Tokens",      href: "/admin/tokens" },
   { label: "Creators",    href: "/admin/creators" },
   { label: "Maintenance", href: "/admin/maintenance" },
