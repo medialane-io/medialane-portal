@@ -6,6 +6,7 @@ import { pool } from "./db";
 export type SessionPayload = {
   address: string;
   mdln_tier: number;
+  is_admin: boolean;
 };
 
 const AUTH_TOKEN_COOKIE = "auth-token";
@@ -30,6 +31,7 @@ export async function createSession(payload: SessionPayload): Promise<{
   const token = await new SignJWT({
     sub: payload.address,
     mdln_tier: payload.mdln_tier,
+    is_admin: payload.is_admin,
   })
     .setProtectedHeader({ alg: "HS256" })
     .setIssuedAt()
@@ -57,6 +59,7 @@ export async function getSession(): Promise<SessionPayload | null> {
     return {
       address: payload.sub as string,
       mdln_tier: payload.mdln_tier as number,
+      is_admin: payload.is_admin === true,
     };
   } catch {
     return null;
@@ -75,13 +78,14 @@ export async function refreshSession(
   if ((result.rowCount ?? 0) === 0) return null;
 
   const { address } = result.rows[0];
-  const wallet = await pool.query<{ mdln_tier: number }>(
-    "SELECT mdln_tier FROM accounts WHERE address = $1",
+  const wallet = await pool.query<{ mdln_tier: number; is_admin: boolean }>(
+    "SELECT mdln_tier, is_admin FROM accounts WHERE address = $1",
     [address]
   );
   const mdln_tier = wallet.rows[0]?.mdln_tier ?? 0;
+  const is_admin = wallet.rows[0]?.is_admin ?? false;
 
-  return createSession({ address, mdln_tier });
+  return createSession({ address, mdln_tier, is_admin });
 }
 
 export async function destroySession(refreshToken: string): Promise<void> {

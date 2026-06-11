@@ -21,6 +21,12 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL("/?connect=1", request.url));
   }
 
+  // Admin pages fetch backend data server-side, so the gate must run
+  // before any RSC renders — a client-side check is not enough.
+  if (pathname.startsWith("/admin") && !session.is_admin) {
+    return NextResponse.redirect(new URL("/", request.url));
+  }
+
   return NextResponse.next();
 }
 

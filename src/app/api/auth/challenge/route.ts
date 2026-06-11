@@ -1,10 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import { generateNonce, buildTypedData } from "@/src/lib/siws";
+import { normalizeStarknetAddress } from "@/src/lib/starknet-address";
 
 export async function GET(req: NextRequest) {
   try {
-    const address = req.nextUrl.searchParams.get("address");
-    if (!address || !address.startsWith("0x")) {
+    const raw = req.nextUrl.searchParams.get("address");
+    let address: string;
+    try {
+      address = normalizeStarknetAddress(raw ?? "");
+    } catch {
       return NextResponse.json({ error: "Missing or invalid address" }, { status: 400 });
     }
 

@@ -12,6 +12,7 @@ async function migrate() {
       CREATE TABLE IF NOT EXISTS accounts (
         address           TEXT PRIMARY KEY,
         mdln_tier         INT NOT NULL DEFAULT 0,
+        is_admin          BOOLEAN NOT NULL DEFAULT false,
         balance           INT NOT NULL DEFAULT 0,
         backend_tenant_id TEXT,
         backend_api_key   TEXT,
@@ -56,6 +57,10 @@ async function migrate() {
         value TEXT NOT NULL
       )
     `);
+
+    await client.query(
+      "ALTER TABLE accounts ADD COLUMN IF NOT EXISTS is_admin BOOLEAN NOT NULL DEFAULT false"
+    );
 
     await client.query("CREATE INDEX IF NOT EXISTS idx_nonces_expires ON nonces(expires_at)");
     await client.query("CREATE INDEX IF NOT EXISTS idx_sessions_address ON sessions(address)");

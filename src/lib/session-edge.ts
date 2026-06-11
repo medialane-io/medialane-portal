@@ -3,6 +3,7 @@ import { jwtVerify } from "jose";
 export type SessionPayload = {
   address: string;
   mdln_tier: number;
+  is_admin: boolean;
 };
 
 function getSecret() {
@@ -17,7 +18,11 @@ export async function verifyTokenEdge(token: string): Promise<SessionPayload | n
     const raw = payload.mdln_tier;
     const mdln_tier =
       typeof raw === "number" && raw >= 0 && raw <= 3 ? (raw as 0 | 1 | 2 | 3) : 0;
-    return { address: payload.sub as string, mdln_tier };
+    return {
+      address: payload.sub as string,
+      mdln_tier,
+      is_admin: payload.is_admin === true,
+    };
   } catch {
     return null;
   }

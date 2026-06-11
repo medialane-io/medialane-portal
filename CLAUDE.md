@@ -82,8 +82,17 @@ It is a Next.js 15 App Router site — API key management, usage dashboard, webh
 
 ### Session payload
 ```ts
-type SessionPayload = { address: string; mdln_tier: 0 | 1 | 2 | 3 }
+type SessionPayload = { address: string; mdln_tier: 0 | 1 | 2 | 3; is_admin: boolean }
 ```
+
+### Address normalization
+All Starknet addresses are canonicalized via `normalizeStarknetAddress` in `src/lib/starknet-address.ts` (lowercase, zero-padded to 64 hex chars) before any DB storage, lookup, or comparison. Wallets disagree on zero-padding, so raw `toLowerCase()` comparisons are a bug.
+
+### Admin access
+- `accounts.is_admin` (boolean) is the single source of truth. Grant it with `DATABASE_URL=... bun run scripts/set-admin.ts <address>` (add `--revoke` to remove). Re-sign-in after changing it — the flag is baked into the JWT.
+- `src/middleware.tsx` gates all `/admin/*` page loads on `session.is_admin` (edge, before any RSC renders).
+- `src/lib/with-admin.ts` re-checks `is_admin` against the DB on every admin API request.
+- There is **no** `NEXT_PUBLIC_ADMIN_ADDRESS` env var — the old client-side address check was removed.
 
 ### Wallet connect modal
 `WalletConnectModal` accepts `open`, `onOpenChange`, `redirectTo` props. It is embedded in `FloatingNav`. Pages that need to trigger wallet connect should link to `/?connect=1` — the `ConnectParamWatcher` in `FloatingNav` opens the modal automatically.
@@ -126,7 +135,7 @@ When credits reach zero the API returns `402 Payment Required` with `X-Credits-R
 PostgreSQL via `src/lib/db.ts` (pg pool). The `DATABASE_URL` env var is required.
 
 Tables used:
-- `accounts` — `address`, `backend_api_key`, `mdln_tier`, `credits`
+- `accounts` — `address`, `backend_api_key`, `mdln_tier`, `credits`, `is_admin`
 - `sessions` — `address`, `token_hash` (SHA-256 of refresh token), `expires_at`
 - `rate_limits` — `id` (key), `count`, `window_start` — auto-created on startup via `instrumentation.ts`
 - `nonces` — SIWS challenge nonces with TTL

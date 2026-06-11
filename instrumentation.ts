@@ -11,5 +11,8 @@ export async function register() {
     await pool.query(
       "CREATE INDEX IF NOT EXISTS idx_nonces_expires ON nonces(expires_at)"
     );
+    await pool.query(
+      "ALTER TABLE IF EXISTS accounts ADD COLUMN IF NOT EXISTS is_admin BOOLEAN NOT NULL DEFAULT false"
+    );
   }
 }

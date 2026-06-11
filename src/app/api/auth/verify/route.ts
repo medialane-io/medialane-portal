@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { consumeNonce, verifySignature } from "@/src/lib/siws";
 import { createSession, setSessionCookies } from "@/src/lib/session";
 import { pool } from "@/src/lib/db";
+import { normalizeStarknetAddress } from "@/src/lib/starknet-address";
 
 export async function POST(req: NextRequest) {
   const body = await req.json().catch(() => null);
@@ -25,7 +26,12 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Invalid signature format" }, { status: 400 });
   }
 
-  const normalizedAddress = address.toLowerCase();
+  let normalizedAddress: string;
+  try {
+    normalizedAddress = normalizeStarknetAddress(address);
+  } catch {
+    return NextResponse.json({ error: "Invalid address" }, { status: 400 });
+  }
 
   const nonceValid = await consumeNonce(nonce, normalizedAddress);
   if (!nonceValid) {
@@ -43,13 +49,18 @@ export async function POST(req: NextRequest) {
     [normalizedAddress]
   );
 
-  const account = await pool.query<{ mdln_tier: number }>(
-    "SELECT mdln_tier FROM accounts WHERE address = $1",
+  const account = await pool.query<{ mdln_tier: number; is_admin: boolean }>(
+    "SELECT mdln_tier, is_admin FROM accounts WHERE address = $1",
     [normalizedAddress]
   );
   const mdln_tier = account.rows[0]?.mdln_tier ?? 0;
+  const is_admin = account.rows[0]?.is_admin ?? false;
 
-  const { token, refreshToken } = await createSession({ address: normalizedAddress, mdln_tier });
+  const { token, refreshToken } = await createSession({
+    address: normalizedAddress,
+    mdln_tier,
+    is_admin,
+  });
 
   const response = NextResponse.json({ ok: true, address: normalizedAddress });
   setSessionCookies(response, token, refreshToken);

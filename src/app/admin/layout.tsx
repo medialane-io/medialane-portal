@@ -1,9 +1,5 @@
-"use client";
-
-import { useAccount } from "@starknet-react/core";
-
-const ADMIN_ADDRESS = process.env.NEXT_PUBLIC_ADMIN_ADDRESS?.toLowerCase();
-
+// Access control lives in src/middleware.tsx (session.is_admin) and
+// src/lib/with-admin.ts (per-request DB check on API routes).
 const navItems = [
   { label: "Dashboard",   href: "/admin" },
   { label: "Services",    href: "/admin/services" },
@@ -16,26 +12,16 @@ const navItems = [
 ];
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
-  const { address, status } = useAccount();
-
-  if (status === "connecting") {
-    return <div className="container mx-auto px-4 py-6 pt-28 text-muted-foreground text-sm">Connecting…</div>;
-  }
-
-  if (!address || address.toLowerCase() !== ADMIN_ADDRESS) {
-    return <div className="container mx-auto px-4 py-6 pt-28 text-muted-foreground text-sm">Not authorized.</div>;
-  }
-
   return (
     <div className="container mx-auto px-4 py-6 pt-28">
       <div className="mb-6">
         <p className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">Admin Panel</p>
-        <nav className="flex gap-4 mt-3 border-b border-border pb-3">
+        <nav className="flex gap-4 mt-3 border-b border-border pb-3 overflow-x-auto">
           {navItems.map((item) => (
             <a
               key={item.href}
               href={item.href}
-              className="relative text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+              className="relative text-sm font-medium text-muted-foreground hover:text-foreground transition-colors whitespace-nowrap"
             >
               {item.label}
             </a>
