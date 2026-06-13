@@ -171,10 +171,18 @@ export default function AdminCollectionsPage() {
   const [editOpen, setEditOpen]         = useState(false);
   const [editCol, setEditCol]           = useState<AdminCollectionRecord | null>(null);
   const [editService, setEditService]   = useState("");
+  const [editName, setEditName]         = useState("");
+  const [editImage, setEditImage]       = useState("");
+  const [editDescription, setEditDescription] = useState("");
   const [saving, setSaving]             = useState(false);
 
   function openEdit(col: AdminCollectionRecord) {
-    setEditCol(col); setEditService(col.service ?? ""); setEditOpen(true);
+    setEditCol(col);
+    setEditService(col.service ?? "");
+    setEditName(col.name ?? "");
+    setEditImage(col.image ?? "");
+    setEditDescription("");
+    setEditOpen(true);
   }
 
   async function handleSaveEdit() {
@@ -183,7 +191,12 @@ export default function AdminCollectionsPage() {
     try {
       const res = await adminFetch(`/admin/collections/${editCol.contractAddress}`, {
         method: "PATCH",
-        body: JSON.stringify({ service: editService }),
+        body: JSON.stringify({
+          service: editService,
+          ...(editName.trim() ? { name: editName.trim() } : {}),
+          ...(editImage.trim() ? { image: editImage.trim() } : {}),
+          ...(editDescription.trim() ? { description: editDescription.trim() } : {}),
+        }),
       });
       if (!res.ok) throw new Error();
       toast.success("Collection updated");
@@ -385,6 +398,26 @@ export default function AdminCollectionsPage() {
                 <SelectTrigger><SelectValue placeholder="(external / none)" /></SelectTrigger>
                 <SelectContent>{SERVICES.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}</SelectContent>
               </Select>
+            </div>
+            <div className="space-y-2">
+              <Label>Display name</Label>
+              <Input value={editName} onChange={(e) => setEditName(e.target.value)} placeholder="e.g. STARKNET BROTHER" />
+            </div>
+            <div className="space-y-2">
+              <Label>Image (URL or ipfs://…)</Label>
+              <Input value={editImage} onChange={(e) => setEditImage(e.target.value)} placeholder="ipfs://… or https://…" />
+              {editImage.trim() && (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={editImage.trim().startsWith("ipfs://") ? `https://ipfs.io/ipfs/${editImage.trim().slice(7)}` : editImage.trim()}
+                  alt=""
+                  className="mt-1 h-12 w-12 rounded-full border border-white/10 object-cover"
+                />
+              )}
+            </div>
+            <div className="space-y-2">
+              <Label>Description</Label>
+              <Input value={editDescription} onChange={(e) => setEditDescription(e.target.value)} placeholder="Short description (optional)" />
             </div>
           </div>
           <DialogFooter>
