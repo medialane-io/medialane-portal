@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 import { ipfsToHttp, formatDisplayPrice } from "@/src/lib/utils";
 import { EXPLORER_URL } from "@/src/lib/constants";
+import { SERVICE_IDS } from "@/src/lib/services";
 import type { AdminCollectionRecord } from "@/src/types/admin";
 
 const PAGE_SIZE = 20;
@@ -43,7 +44,7 @@ const STANDARD_STYLE: Record<string, string> = {
   ERC1155: "bg-teal-500/20 text-teal-400 border-teal-500/30",
   UNKNOWN: "bg-muted/50 text-muted-foreground",
 };
-const SERVICES = ["mip-erc721", "mip-erc1155", "pop-protocol", "drop-collection"];
+const SERVICES = SERVICE_IDS;
 
 async function adminFetch(path: string, opts: RequestInit = {}) {
   const proxyPath = path.replace(/^\/admin\//, "/api/admin/");

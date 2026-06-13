@@ -11,6 +11,7 @@ import { toast } from "sonner";
 import { formatDistanceToNow } from "date-fns";
 import { AtSign, FileCheck } from "lucide-react";
 import type { AdminCollectionClaimRecord, AdminUsernameClaimRecord } from "@/src/types/admin";
+import { SERVICE_IDS } from "@/src/lib/services";
 
 const STATUS_STYLE: Record<string, string> = {
   PENDING:       "bg-yellow-500/20 text-yellow-400 border-yellow-500/30",
@@ -23,7 +24,7 @@ const METHOD_STYLE: Record<string, string> = {
   SIGNATURE: "bg-purple-500/20 text-purple-400 border-purple-500/30",
   MANUAL:    "bg-orange-500/20 text-orange-400 border-orange-500/30",
 };
-const SERVICES = ["mip-erc721", "mip-erc1155", "pop-protocol", "drop-collection"];
+const SERVICES = SERVICE_IDS;
 const FILTERS = ["", "PENDING", "APPROVED", "REJECTED"];
 
 function CollectionClaimsTab() {
