@@ -53,7 +53,7 @@ export default function PrivacyPage() {
 
             <H2>6. Cookies</H2>
             <p>
-              We use session cookies required for authentication (<code className="font-mono text-xs bg-white/10 px-1.5 py-0.5 rounded">auth-token</code> and <code className="font-mono text-xs bg-white/10 px-1.5 py-0.5 rounded">auth-refresh</code>). We do not use advertising cookies. Analytics are collected via server-side logs rather than client-side trackers where possible.
+              We use a single session cookie required for authentication (<code className="font-mono text-xs bg-white/10 px-1.5 py-0.5 rounded">auth-token</code>). We do not use advertising cookies. Analytics are collected via server-side logs rather than client-side trackers where possible.
             </p>
 
             <H2>7. Contact</H2>

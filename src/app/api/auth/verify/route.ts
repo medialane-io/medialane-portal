@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { consumeNonce, verifySignature } from "@/src/lib/siws";
-import { createSession, setSessionCookies } from "@/src/lib/session";
+import { createSession, setSessionCookie } from "@/src/lib/session";
 import { pool } from "@/src/lib/db";
 import { normalizeStarknetAddress } from "@/src/lib/starknet-address";
 
@@ -67,13 +67,13 @@ export async function POST(req: NextRequest) {
   const mdln_tier = account.rows[0]?.mdln_tier ?? 0;
   const is_admin = account.rows[0]?.is_admin ?? false;
 
-  const { token, refreshToken } = await createSession({
+  const { token } = await createSession({
     address: normalizedAddress,
     mdln_tier,
     is_admin,
   });
 
   const response = NextResponse.json({ ok: true, address: normalizedAddress });
-  setSessionCookies(response, token, refreshToken);
+  setSessionCookie(response, token);
   return response;
 }

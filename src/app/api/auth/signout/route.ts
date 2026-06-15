@@ -1,12 +1,8 @@
-import { NextRequest, NextResponse } from "next/server";
-import { clearSessionCookies, destroySession } from "@/src/lib/session";
+import { NextResponse } from "next/server";
+import { clearSessionCookie } from "@/src/lib/session";
 
-export async function POST(req: NextRequest) {
-  const refreshToken = req.cookies.get("auth-refresh")?.value;
-  if (refreshToken) {
-    await destroySession(refreshToken);
-  }
+export async function POST() {
   const response = NextResponse.json({ ok: true });
-  clearSessionCookies(response);
+  clearSessionCookie(response);
   return response;
 }
