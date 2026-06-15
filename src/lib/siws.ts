@@ -60,8 +60,14 @@ export async function verifySignature(
   nonce: string,
   signature: string[]
 ): Promise<boolean> {
-  const rpcUrl = process.env.STARKNET_RPC_URL;
-  if (!rpcUrl) throw new Error("STARKNET_RPC_URL is not set");
+  // Server-side verification needs a mainnet RPC to call is_valid_signature.
+  // Fall back through the app's public RPC vars to a reliable public endpoint
+  // so a missing STARKNET_RPC_URL can't take sign-in down.
+  const rpcUrl =
+    process.env.STARKNET_RPC_URL ||
+    process.env.NEXT_PUBLIC_STARKNET_RPC_URL ||
+    process.env.NEXT_PUBLIC_RPC_URL ||
+    "https://free-rpc.nethermind.io/mainnet-juno";
 
   const provider = new RpcProvider({ nodeUrl: rpcUrl });
   const typedDataPayload = buildTypedData(nonce, address);

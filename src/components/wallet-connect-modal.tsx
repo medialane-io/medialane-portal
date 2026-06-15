@@ -6,6 +6,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { Button } from "@/src/components/ui/button";
 import { Wallet, Loader2, CheckCircle2, ChevronRight } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { stark } from "starknet";
 
 const WALLET_META: Record<string, { label: string; icon: string }> = {
   argentX:   { label: "Argent X",             icon: "🔷" },
@@ -39,9 +40,10 @@ export function WalletConnectModal({ open, onOpenChange, redirectTo = "/account"
       const { nonce, typedData } = challengeData;
 
       const signature = await account.signMessage(typedData);
-      const sigArray = Array.isArray(signature)
-        ? signature.map((s) => s.toString())
-        : [(signature as { r: bigint; s: bigint }).r.toString(), (signature as { r: bigint; s: bigint }).s.toString()];
+      // stark.formatSignature handles every wallet's shape (Braavos returns a
+      // variable-length array with a signer-type prefix, Argent returns [r, s],
+      // some return a {r, s} object) and normalizes to decimal felt strings.
+      const sigArray = stark.formatSignature(signature);
 
       const verifyRes = await fetch("/api/auth/verify", {
         method: "POST",

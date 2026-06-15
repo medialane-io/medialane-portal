@@ -16,11 +16,16 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Invalid request body" }, { status: 400 });
   }
 
+  // Signatures vary by wallet: Argent returns [r, s] (2 felts), Braavos returns
+  // a longer array with a signer-type prefix. Felts may be hex (0x…) or decimal.
+  // This is a cheap sanity guard only — the authoritative check is the on-chain
+  // is_valid_signature call in verifySignature() below.
   if (
     signature.length < 1 ||
-    signature.length > 4 ||
+    signature.length > 32 ||
     !signature.every(
-      (s: unknown) => typeof s === "string" && /^0x[0-9a-fA-F]+$/.test(s)
+      (s: unknown) =>
+        typeof s === "string" && /^(0x[0-9a-fA-F]+|[0-9]+)$/.test(s)
     )
   ) {
     return NextResponse.json({ error: "Invalid signature format" }, { status: 400 });
@@ -38,7 +43,13 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Invalid or expired nonce" }, { status: 401 });
   }
 
-  const sigValid = await verifySignature(normalizedAddress, nonce, signature);
+  let sigValid = false;
+  try {
+    sigValid = await verifySignature(normalizedAddress, nonce, signature);
+  } catch (err) {
+    console.error("[auth/verify] verifySignature threw:", err instanceof Error ? err.message : err);
+    return NextResponse.json({ error: "Signature verification unavailable, try again" }, { status: 503 });
+  }
   if (!sigValid) {
     return NextResponse.json({ error: "Invalid signature" }, { status: 401 });
   }
