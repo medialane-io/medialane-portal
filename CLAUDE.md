@@ -56,30 +56,45 @@ It is a Next.js 15 App Router site — API key management, usage dashboard, webh
 
 ## Auth System (SIWS — Sign In With Starknet)
 
-**Clerk has been removed.** Auth is now a custom SIWS flow with short-lived JWTs and DB-backed refresh tokens.
+**Clerk has been removed.** Auth mirrors the dapp's client wallet system —
+**connect-only + lazy sign-on-demand** — but the portal **verifies the wallet
+signature itself** (on-chain `is_valid_signature`) and issues its own session.
+The backend is **never** a trust anchor for identity, so an admin can't be
+forged by a backend compromise. Spec:
+`docs/superpowers/specs/2026-06-15-unify-wallet-auth-dapp-system-design.md`.
 
 ### Flow
-1. `GET /api/auth/challenge?address=0x...` — returns a `nonce` (stored in DB, 5-min TTL)
-2. Client signs typed-data challenge with Starknet wallet
-3. `POST /api/auth/verify` — validates signature → issues JWT (`auth-token`, 15 min) + refresh token cookie (`auth-refresh`, 7 days)
-4. `POST /api/auth/refresh` — exchanges valid refresh token for new JWT pair (rotation)
-5. `POST /api/auth/signout` — deletes refresh token from DB, clears cookies
+1. **Connect ≠ sign.** Connecting a wallet (`WalletConnectModal`, Ready/Braavos)
+   only connects — no signature. The user can browse freely.
+2. **Lazy sign.** When the user enters an authenticated area (clicks the
+   dashboard chip, lands on `/?connect=1` from a protected-page redirect, or
+   provisions a key), `useSiwsAuth().ensureSession()` runs:
+   - `GET /api/auth/challenge?address=0x...` — returns a `nonce` (DB, 5-min TTL).
+   - The wallet signs the typed-data challenge once.
+   - `POST /api/auth/verify` — verifies on-chain → issues a single JWT cookie
+     (`auth-token`, **12h**). No refresh token.
+3. `POST /api/auth/signout` — clears the cookie (no DB write).
+4. On expiry the user simply re-signs (off-chain, free) — **no refresh rotation,
+   no `sessions` table.**
 
 ### Key files
 | File | Purpose |
 |---|---|
-| `src/lib/session.ts` | `createSession`, `getSession`, `refreshSession`, `destroySession`, `setSessionCookies`, `clearSessionCookies` |
+| `src/lib/session.ts` | `createSession`, `getSession`, `setSessionCookie`, `clearSessionCookie` (single 12h `auth-token` JWT) |
 | `src/lib/session-edge.ts` | `verifyTokenEdge` — Edge-compatible JWT verify (no Node.js crypto) |
-| `src/lib/siws.ts` | Typed-data message construction for SIWS challenges |
+| `src/lib/siws.ts` | Server: challenge nonce + on-chain `is_valid_signature` verification |
+| `src/lib/siws-client.ts` | Client: `requestPortalSession(address, signer)` — challenge → sign → verify |
+| `src/hooks/use-wallet.ts` | `useWallet()` — thin injected-only shim over starknet-react (dapp-shape) |
+| `src/hooks/use-siws-auth.ts` | `useSiwsAuth()` — `session`, `ensureSession()`, `signIn()`, `signOut()` (lazy) |
 | `src/lib/with-auth.ts` | `withAuth(handler)` HOF — wraps API route handlers, returns 401 if session missing |
-| `src/middleware.tsx` | Edge middleware — reads `auth-token` cookie, redirects `/sign-in` → `/?connect=1` |
+| `src/middleware.tsx` | Edge middleware — reads `auth-token` cookie, gates `/account` + `/admin` |
 | `src/app/api/auth/challenge/route.ts` | Rate-limited (10 req/min/IP) challenge endpoint |
-| `src/app/api/auth/verify/route.ts` | Rate-limited (5 req/min/IP), validates signature elements |
-| `src/components/wallet-connect-modal.tsx` | Dialog: Argent X / Braavos / Cartridge Controller → full SIWS flow |
+| `src/app/api/auth/verify/route.ts` | Rate-limited (5 req/min/IP), on-chain verify → sets cookie |
+| `src/components/wallet-connect-modal.tsx` | **Connect-only** picker: Ready / Braavos. No signing here. |
 
 ### Cookies
-- `auth-token` — JWT, `HttpOnly; SameSite=Strict; Max-Age=900`
-- `auth-refresh` — UUID, `HttpOnly; SameSite=Strict; Max-Age=604800`
+- `auth-token` — JWT, `HttpOnly; SameSite=Strict; Max-Age=43200` (12h). The only
+  auth cookie. (`auth-refresh` and the `sessions` table were removed.)
 
 ### Session payload
 ```ts
@@ -96,7 +111,12 @@ All Starknet addresses are canonicalized via `normalizeStarknetAddress` in `src/
 - There is **no** `NEXT_PUBLIC_ADMIN_ADDRESS` env var — the old client-side address check was removed.
 
 ### Wallet connect modal
-`WalletConnectModal` accepts `open`, `onOpenChange`, `redirectTo` props. It is embedded in `FloatingNav`. Pages that need to trigger wallet connect should link to `/?connect=1` — the `ConnectParamWatcher` in `FloatingNav` opens the modal automatically.
+`WalletConnectModal` accepts `open`, `onOpenChange`. It is a **connect-only**
+picker (Ready/Braavos) embedded in `FloatingNav`; it closes itself once a wallet
+connects and never signs. Pages that need an authenticated user should link to
+`/?connect=1` — the `ConnectParamWatcher` in `FloatingNav` then opens the picker
+(if no wallet) or triggers lazy `ensureSession()` (if a wallet is already
+connected) and routes to `/account`.
 
 ### Starknet provider
 `src/app/starknet-provider-wrapper.tsx` loads `ControllerConnector` (Cartridge) **only on the client** via `require()` inside `useMemo` with a `typeof window !== 'undefined'` guard. This prevents WASM from loading during SSR. The package is also in `serverExternalPackages` in `next.config.ts`.
@@ -137,7 +157,6 @@ PostgreSQL via `src/lib/db.ts` (pg pool). The `DATABASE_URL` env var is required
 
 Tables used:
 - `accounts` — `address`, `backend_api_key`, `mdln_tier`, `credits`, `is_admin`
-- `sessions` — `address`, `token_hash` (SHA-256 of refresh token), `expires_at`
 - `rate_limits` — `id` (key), `count`, `window_start` — auto-created on startup via `instrumentation.ts`
 - `nonces` — SIWS challenge nonces with TTL
 
