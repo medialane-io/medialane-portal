@@ -1,71 +1,44 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect } from "react";
 import { useAccount, useConnect, useDisconnect } from "@starknet-react/core";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/src/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/src/components/ui/dialog";
 import { Button } from "@/src/components/ui/button";
-import { Wallet, Loader2, CheckCircle2, ChevronRight } from "lucide-react";
-import { useRouter } from "next/navigation";
-import { stark } from "starknet";
+import { Wallet, CheckCircle2, ChevronRight } from "lucide-react";
 
 const WALLET_META: Record<string, { label: string; icon: string }> = {
-  argentX:   { label: "Argent X",             icon: "🔷" },
-  braavos:   { label: "Braavos",              icon: "🔵" },
-  controller: { label: "Cartridge Controller", icon: "🕹️" },
+  argentX: { label: "Ready (Argent)", icon: "🔷" },
+  braavos: { label: "Braavos", icon: "🔵" },
 };
+
+// Portal wallet kinds are intentionally Ready / Braavos only.
+const ALLOWED_CONNECTORS = ["argentX", "braavos"];
 
 interface Props {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  redirectTo?: string;
 }
 
-export function WalletConnectModal({ open, onOpenChange, redirectTo = "/account" }: Props) {
-  const { address, account, status } = useAccount();
+export function WalletConnectModal({ open, onOpenChange }: Props) {
+  const { address, status } = useAccount();
   const { connect, connectors } = useConnect();
   const { disconnect } = useDisconnect();
-  const router = useRouter();
-  const [signing, setSigning] = useState(false);
-  const [error, setError] = useState<string | null>(null);
 
-  async function handleSignIn() {
-    if (!address || !account) return;
-    setSigning(true);
-    setError(null);
-
-    try {
-      const challengeRes = await fetch(`/api/auth/challenge?address=${address}`);
-      const challengeData = await challengeRes.json();
-      if (!challengeRes.ok) throw new Error(challengeData.error ?? "Failed to get challenge");
-      const { nonce, typedData } = challengeData;
-
-      const signature = await account.signMessage(typedData);
-      // stark.formatSignature handles every wallet's shape (Braavos returns a
-      // variable-length array with a signer-type prefix, Argent returns [r, s],
-      // some return a {r, s} object) and normalizes to decimal felt strings.
-      const sigArray = stark.formatSignature(signature);
-
-      const verifyRes = await fetch("/api/auth/verify", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ address, nonce, signature: sigArray }),
-      });
-
-      if (!verifyRes.ok) {
-        const err = await verifyRes.json();
-        throw new Error(err.error ?? "Verification failed");
-      }
-
-      await fetch("/api/portal/provision", { method: "POST" });
-
+  // Connect-only: as soon as a wallet is connected, close the picker. Signing
+  // happens later, lazily, when the user enters an authenticated area.
+  useEffect(() => {
+    if (open && status === "connected" && address) {
       onOpenChange(false);
-      router.push(redirectTo);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Sign-in failed");
-    } finally {
-      setSigning(false);
     }
-  }
+  }, [open, status, address, onOpenChange]);
+
+  const pickable = connectors.filter((c) => ALLOWED_CONNECTORS.includes(c.id));
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -80,10 +53,33 @@ export function WalletConnectModal({ open, onOpenChange, redirectTo = "/account"
           </DialogDescription>
         </DialogHeader>
 
-        {status === "disconnected" ? (
+        {status === "connected" && address ? (
+          <div className="space-y-4 pt-2">
+            <div className="rounded-lg border border-white/10 bg-white/5 px-4 py-3 flex items-center gap-3">
+              <CheckCircle2 className="w-4 h-4 text-green-400 flex-shrink-0" />
+              <div className="min-w-0">
+                <p className="text-xs text-muted-foreground">Connected</p>
+                <p className="text-sm font-mono text-white truncate">
+                  {address.slice(0, 10)}...{address.slice(-6)}
+                </p>
+              </div>
+            </div>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="w-full text-muted-foreground hover:text-white"
+              onClick={() => disconnect()}
+            >
+              Use a different wallet
+            </Button>
+          </div>
+        ) : (
           <div className="space-y-2 pt-2">
-            {connectors.map((connector) => {
-              const meta = WALLET_META[connector.id] ?? { label: connector.name, icon: "🔌" };
+            {pickable.map((connector) => {
+              const meta = WALLET_META[connector.id] ?? {
+                label: connector.name,
+                icon: "🔌",
+              };
               return (
                 <Button
                   key={connector.id}
@@ -107,40 +103,9 @@ export function WalletConnectModal({ open, onOpenChange, redirectTo = "/account"
                 rel="noopener noreferrer"
                 className="text-primary hover:underline"
               >
-                Get Argent X
+                Get a Starknet wallet
               </a>
             </p>
-          </div>
-        ) : (
-          <div className="space-y-4 pt-2">
-            <div className="rounded-lg border border-white/10 bg-white/5 px-4 py-3 flex items-center gap-3">
-              <CheckCircle2 className="w-4 h-4 text-green-400 flex-shrink-0" />
-              <div className="min-w-0">
-                <p className="text-xs text-muted-foreground">Connected</p>
-                <p className="text-sm font-mono text-white truncate">
-                  {address?.slice(0, 10)}...{address?.slice(-6)}
-                </p>
-              </div>
-            </div>
-
-            <Button className="w-full" onClick={handleSignIn} disabled={signing}>
-              {signing ? (
-                <><Loader2 className="w-4 h-4 mr-2 animate-spin" />Signing message…</>
-              ) : (
-                <><Wallet className="w-4 h-4 mr-2" />Sign in to Medialane</>
-              )}
-            </Button>
-
-            {error && <p className="text-sm text-destructive text-center">{error}</p>}
-
-            <Button
-              variant="ghost"
-              size="sm"
-              className="w-full text-muted-foreground hover:text-white"
-              onClick={() => disconnect()}
-            >
-              Use a different wallet
-            </Button>
           </div>
         )}
       </DialogContent>
