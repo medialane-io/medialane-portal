@@ -3,6 +3,7 @@ import type {
   AdminCollectionClaimRecord,
   AdminUsernameClaimRecord,
   AdminCollectionRecord,
+  AdminCoinRecord,
   AdminReport,
   AdminTenant,
   AdminApiKey,
@@ -188,6 +189,25 @@ export function useAdminBadges() {
   );
   return {
     badges: (data?.data ?? []) as RewardBadge[],
+    isLoading,
+    error,
+    mutate,
+  };
+}
+
+export function useAdminCoins(opts: { search?: string; service?: string; page?: number } = {}) {
+  const { search = "", service, page = 1 } = opts;
+  const params = new URLSearchParams({ page: String(page), limit: "20" });
+  if (search) params.set("search", search);
+  if (service) params.set("service", service);
+  const { data, error, isLoading, mutate } = useSWR(
+    `admin-coins-${search}-${service ?? ""}-${page}`,
+    () => adminFetch(`/api/admin/coins?${params}`).then((r) => r.json()),
+    { revalidateOnFocus: false }
+  );
+  return {
+    coins: (data?.coins ?? []) as AdminCoinRecord[],
+    total: data?.total ?? 0,
     isLoading,
     error,
     mutate,
