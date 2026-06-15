@@ -42,16 +42,6 @@ async function migrate() {
     `);
 
     await client.query(`
-      CREATE TABLE IF NOT EXISTS sessions (
-        id           UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-        address      TEXT NOT NULL REFERENCES accounts(address),
-        token_hash   TEXT NOT NULL,
-        expires_at   TIMESTAMPTZ NOT NULL,
-        created_at   TIMESTAMPTZ NOT NULL DEFAULT now()
-      )
-    `);
-
-    await client.query(`
       CREATE TABLE IF NOT EXISTS poll_meta (
         key   TEXT PRIMARY KEY,
         value TEXT NOT NULL
@@ -63,7 +53,6 @@ async function migrate() {
     );
 
     await client.query("CREATE INDEX IF NOT EXISTS idx_nonces_expires ON nonces(expires_at)");
-    await client.query("CREATE INDEX IF NOT EXISTS idx_sessions_address ON sessions(address)");
     await client.query("CREATE INDEX IF NOT EXISTS idx_deposits_address ON deposits(address)");
 
     await client.query("COMMIT");
