@@ -117,6 +117,23 @@ export interface RewardBadge {
   enabled: boolean;
 }
 
+export interface AdminCoinRecord {
+  id: string;
+  contractAddress: string;
+  chain: string;
+  standard: "ERC20";
+  service: string;
+  name?: string | null;
+  symbol?: string | null;
+  decimals: number;
+  totalSupply?: string | null;
+  description?: string | null;
+  image?: string | null;
+  creator?: string | null;
+  isHidden: boolean;
+  createdAt?: string;
+}
+
 export interface AdminCollectionRecord {
   id: string;
   name?: string;
