@@ -8,5 +8,10 @@ export async function GET(req: NextRequest) {
   const session = await verifyTokenEdge(token);
   if (!session) return NextResponse.json({ ok: false }, { status: 401 });
 
-  return NextResponse.json({ ok: true, address: session.address });
+  return NextResponse.json({
+    ok: true,
+    address: session.address,
+    is_admin: session.is_admin,
+    mdln_tier: session.mdln_tier,
+  });
 }
