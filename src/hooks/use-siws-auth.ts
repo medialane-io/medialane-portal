@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useAccount } from "@starknet-react/core";
-import { requestPortalSession } from "@/src/lib/siws-client";
 
 export interface PortalSession {
   address: string;
@@ -20,20 +19,19 @@ function sameAddress(a?: string | null, b?: string | null): boolean {
 }
 
 /**
- * Lazy sign-on-demand auth. Connecting a wallet does NOT sign. A session is
- * minted only when ensureSession()/signIn() is called (entering the dashboard
- * or admin, provisioning a key). The session lives in an HttpOnly cookie; this
- * hook reads its state via /api/auth/session.
+ * Connect-only portal session — like the dapp, no signature. Connecting a wallet
+ * IS the login: this hook establishes a short-lived session cookie from the
+ * connected address (POST /api/auth/session) and reads it back (GET). There is
+ * no challenge/sign/verify step. The session cookie lets the portal's dashboard
+ * and backend proxy resolve the connected address server-side.
  */
 export function useSiwsAuth() {
-  const { address, account } = useAccount();
+  const { address } = useAccount();
   const [session, setSession] = useState<PortalSession | null>(null);
   const [isSigningIn, setIsSigningIn] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  // Collapses concurrent sign-in attempts onto a single in-flight promise so a
-  // caller that fires repeatedly (e.g. a re-rendering effect) can never open
-  // more than one wallet signature prompt at a time.
-  const signingPromiseRef = useRef<Promise<PortalSession | null> | null>(null);
+  // Collapses concurrent establish attempts onto a single in-flight promise.
+  const establishPromiseRef = useRef<Promise<PortalSession | null> | null>(null);
 
   const refresh = useCallback(async (): Promise<PortalSession | null> => {
     try {
@@ -44,7 +42,7 @@ export function useSiwsAuth() {
       }
       const data = await res.json();
       // A cookie for a different wallet than the one now connected is not "our"
-      // session — treat it as signed-out so the UI prompts a fresh sign-in.
+      // session — treat it as signed-out so a fresh session is established.
       if (address && !sameAddress(data.address, address)) {
         setSession(null);
         return null;
@@ -62,13 +60,9 @@ export function useSiwsAuth() {
     }
   }, [address]);
 
-  useEffect(() => {
-    refresh();
-  }, [refresh]);
-
   const signIn = useCallback(async (): Promise<PortalSession | null> => {
-    if (signingPromiseRef.current) return signingPromiseRef.current;
-    if (!address || !account) {
+    if (establishPromiseRef.current) return establishPromiseRef.current;
+    if (!address) {
       const msg = "Connect your wallet first";
       setError(msg);
       throw new Error(msg);
@@ -77,7 +71,15 @@ export function useSiwsAuth() {
       setIsSigningIn(true);
       setError(null);
       try {
-        await requestPortalSession(address, account);
+        const res = await fetch("/api/auth/session", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ address }),
+        });
+        if (!res.ok) {
+          const err = await res.json().catch(() => ({}));
+          throw new Error(err.error ?? "Sign-in failed");
+        }
         return await refresh();
       } catch (err) {
         const msg = err instanceof Error ? err.message : "Sign-in failed";
@@ -85,18 +87,30 @@ export function useSiwsAuth() {
         throw err instanceof Error ? err : new Error(msg);
       } finally {
         setIsSigningIn(false);
-        signingPromiseRef.current = null;
+        establishPromiseRef.current = null;
       }
     })();
-    signingPromiseRef.current = run;
+    establishPromiseRef.current = run;
     return run;
-  }, [address, account, refresh]);
+  }, [address, refresh]);
 
   const ensureSession = useCallback(async (): Promise<PortalSession | null> => {
     const existing = await refresh();
     if (existing) return existing;
     return signIn();
   }, [refresh, signIn]);
+
+  // Connect = logged in: as soon as a wallet is connected and there is no
+  // matching session yet, establish one automatically (no prompt, no signature).
+  useEffect(() => {
+    if (!address) {
+      setSession(null);
+      return;
+    }
+    ensureSession().catch(() => {
+      // Surfaced via `error`; the user stays connected and can retry.
+    });
+  }, [address, ensureSession]);
 
   const signOut = useCallback(async (): Promise<void> => {
     await fetch("/api/auth/signout", { method: "POST" });
