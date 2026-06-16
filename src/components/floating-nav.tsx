@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, Suspense, useCallback } from "react"
+import { useState, useEffect, Suspense, useCallback, useRef } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { Menu, X, Wallet, LogOut, LayoutDashboard, Loader2 } from "lucide-react"
 import { usePathname, useSearchParams, useRouter } from "next/navigation"
@@ -105,12 +105,24 @@ function ConnectParamWatcher({
 }) {
   const searchParams = useSearchParams()
   const { isConnected } = useWallet()
+  const wantsConnect = searchParams.get("connect") === "1"
+  // Fire sign-in at most once per connect=1 visit. Without this guard the effect
+  // re-runs on every render (its callback deps change identity) and re-triggers
+  // sign-in before the first attempt settles — an endless wallet-prompt loop.
+  const signInFiredRef = useRef(false)
   useEffect(() => {
-    if (searchParams.get("connect") === "1") {
-      if (isConnected) onNeedSignIn()
-      else onNeedConnect()
+    if (!wantsConnect) return
+    if (isConnected) {
+      if (signInFiredRef.current) return
+      signInFiredRef.current = true
+      onNeedSignIn()
+    } else {
+      // Not connected yet: open the picker (idempotent) and stay armed so the
+      // sign step still fires once the wallet connects.
+      signInFiredRef.current = false
+      onNeedConnect()
     }
-  }, [searchParams, isConnected, onNeedConnect, onNeedSignIn])
+  }, [wantsConnect, isConnected, onNeedConnect, onNeedSignIn])
   return null
 }
 
@@ -128,7 +140,9 @@ const FloatingNav = () => {
       await ensureSession()
       router.push("/account")
     } catch {
-      /* declined — stay put */
+      // Declined or failed: drop the connect flag so the watcher can't
+      // immediately re-prompt. User stays connected-but-not-signed.
+      router.replace("/")
     }
   }, [ensureSession, router])
 

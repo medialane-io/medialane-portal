@@ -6,7 +6,7 @@ export default async function AccountPage() {
   const session = await getSession();
 
   if (!session) {
-    redirect("/sign-in");
+    redirect("/?connect=1");
   }
 
   return <AccountDashboard address={session.address} mdln_tier={session.mdln_tier} />;

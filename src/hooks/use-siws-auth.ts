@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { useAccount } from "@starknet-react/core";
 import { requestPortalSession } from "@/src/lib/siws-client";
 
@@ -30,6 +30,10 @@ export function useSiwsAuth() {
   const [session, setSession] = useState<PortalSession | null>(null);
   const [isSigningIn, setIsSigningIn] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  // Collapses concurrent sign-in attempts onto a single in-flight promise so a
+  // caller that fires repeatedly (e.g. a re-rendering effect) can never open
+  // more than one wallet signature prompt at a time.
+  const signingPromiseRef = useRef<Promise<PortalSession | null> | null>(null);
 
   const refresh = useCallback(async (): Promise<PortalSession | null> => {
     try {
@@ -63,23 +67,29 @@ export function useSiwsAuth() {
   }, [refresh]);
 
   const signIn = useCallback(async (): Promise<PortalSession | null> => {
+    if (signingPromiseRef.current) return signingPromiseRef.current;
     if (!address || !account) {
       const msg = "Connect your wallet first";
       setError(msg);
       throw new Error(msg);
     }
-    setIsSigningIn(true);
-    setError(null);
-    try {
-      await requestPortalSession(address, account);
-      return await refresh();
-    } catch (err) {
-      const msg = err instanceof Error ? err.message : "Sign-in failed";
-      setError(msg);
-      throw err instanceof Error ? err : new Error(msg);
-    } finally {
-      setIsSigningIn(false);
-    }
+    const run = (async () => {
+      setIsSigningIn(true);
+      setError(null);
+      try {
+        await requestPortalSession(address, account);
+        return await refresh();
+      } catch (err) {
+        const msg = err instanceof Error ? err.message : "Sign-in failed";
+        setError(msg);
+        throw err instanceof Error ? err : new Error(msg);
+      } finally {
+        setIsSigningIn(false);
+        signingPromiseRef.current = null;
+      }
+    })();
+    signingPromiseRef.current = run;
+    return run;
   }, [address, account, refresh]);
 
   const ensureSession = useCallback(async (): Promise<PortalSession | null> => {
