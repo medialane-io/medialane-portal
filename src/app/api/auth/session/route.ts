@@ -34,21 +34,27 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Invalid address" }, { status: 400 });
   }
 
-  // Upsert the account row on first connect, then read its flags.
-  await pool.query(
-    `INSERT INTO accounts (address) VALUES ($1) ON CONFLICT (address) DO NOTHING`,
-    [address]
-  );
-  const account = await pool.query<{ mdln_tier: number; is_admin: boolean }>(
-    "SELECT mdln_tier, is_admin FROM accounts WHERE address = $1",
-    [address]
-  );
-  const mdln_tier = account.rows[0]?.mdln_tier ?? 0;
-  const is_admin = account.rows[0]?.is_admin ?? false;
+  try {
+    // Upsert the account row on first connect, then read its flags.
+    await pool.query(
+      `INSERT INTO accounts (address) VALUES ($1) ON CONFLICT (address) DO NOTHING`,
+      [address]
+    );
+    const account = await pool.query<{ mdln_tier: number; is_admin: boolean }>(
+      "SELECT mdln_tier, is_admin FROM accounts WHERE address = $1",
+      [address]
+    );
+    const mdln_tier = account.rows[0]?.mdln_tier ?? 0;
+    const is_admin = account.rows[0]?.is_admin ?? false;
 
-  const { token } = await createSession({ address, mdln_tier, is_admin });
+    const { token } = await createSession({ address, mdln_tier, is_admin });
 
-  const response = NextResponse.json({ ok: true, address, is_admin, mdln_tier });
-  setSessionCookie(response, token);
-  return response;
+    const response = NextResponse.json({ ok: true, address, is_admin, mdln_tier });
+    setSessionCookie(response, token);
+    return response;
+  } catch (err) {
+    const detail = err instanceof Error ? err.message : String(err);
+    console.error("[auth/session POST] failed:", detail);
+    return NextResponse.json({ error: "Could not establish session", detail }, { status: 500 });
+  }
 }
