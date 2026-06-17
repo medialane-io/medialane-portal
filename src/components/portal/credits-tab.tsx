@@ -40,8 +40,8 @@ export function CreditsTab({ address, mdln_tier }: Props) {
   const [txHash, setTxHash] = useState<string | null>(null);
   const [depositError, setDepositError] = useState<string | null>(null);
 
-  const { data: balanceData, mutate } = useSWR<BalanceData>("/api/credits/balance", portalFetcher);
-  const { data: historyData, mutate: mutateHistory } = useSWR<HistoryData>("/api/credits/history", portalFetcher);
+  const { data: balanceData, mutate } = useSWR<BalanceData>(`/api/credits/balance?address=${address}`, portalFetcher);
+  const { data: historyData, mutate: mutateHistory } = useSWR<HistoryData>(`/api/credits/history?address=${address}`, portalFetcher);
 
   const treasuryAddress = process.env.NEXT_PUBLIC_TREASURY_ADDRESS ?? "";
   const balance = balanceData?.balance ?? 0;

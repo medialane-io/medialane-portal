@@ -12,7 +12,7 @@ export function AccountButton() {
 
   return (
     <Button asChild className="glass-card rounded-full hover:scale-105 transition-transform" variant="secondary">
-      <Link href={address ? "/account" : "/sign-in"}>{label}</Link>
+      <Link href={address ? "/account" : "/?connect=1"}>{label}</Link>
     </Button>
   )
 }

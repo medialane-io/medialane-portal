@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getSession } from "@/src/lib/session";
 
 const ALLOWED_HOSTNAMES = new Set([
   "gateway.pinata.cloud",
@@ -10,11 +9,6 @@ const ALLOWED_HOSTNAMES = new Set([
 ]);
 
 export async function GET(req: NextRequest) {
-  const session = await getSession();
-  if (!session) {
-    return new NextResponse("Unauthorized", { status: 401 });
-  }
-
   const raw = req.nextUrl.searchParams.get("url");
   if (!raw) {
     return new NextResponse("Missing url", { status: 400 });

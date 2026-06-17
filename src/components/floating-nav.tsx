@@ -2,7 +2,7 @@
 
 import { useState, useEffect, Suspense, useCallback, useRef } from "react"
 import { motion, AnimatePresence } from "framer-motion"
-import { Menu, X, Wallet, LogOut, LayoutDashboard, Loader2 } from "lucide-react"
+import { Menu, X, Wallet, LogOut, LayoutDashboard } from "lucide-react"
 import { usePathname, useSearchParams, useRouter } from "next/navigation"
 import { Button } from "@/src/components/ui/button"
 import { useMobile } from "@/src/hooks/use-mobile"
@@ -10,7 +10,6 @@ import { cn } from "@/src/lib/utils"
 import { LogoMedialane } from "./logo-medialane"
 import Link from "next/link"
 import { useWallet } from "@/src/hooks/use-wallet"
-import { useSiwsAuth } from "@/src/hooks/use-siws-auth"
 import { WalletConnectModal } from "./wallet-connect-modal"
 
 const NAV_LINKS = [
@@ -26,19 +25,8 @@ function isNavActive(pathname: string, href: string) {
 
 function WalletButton({ onOpenChange }: { onOpenChange: (v: boolean) => void }) {
   const { address, isConnected, disconnect } = useWallet()
-  const { isSignedIn, ensureSession, signOut, isSigningIn } = useSiwsAuth()
   const [open, setOpen] = useState(false)
   const router = useRouter()
-
-  const goToDashboard = useCallback(async () => {
-    try {
-      await ensureSession()
-      router.push("/account")
-    } catch {
-      // ensureSession surfaces the reason via the hook's error state; a
-      // declined signature simply leaves the user connected-but-not-signed.
-    }
-  }, [ensureSession, router])
 
   if (isConnected && address) {
     return (
@@ -47,24 +35,16 @@ function WalletButton({ onOpenChange }: { onOpenChange: (v: boolean) => void }) 
           size="sm"
           variant="ghost"
           className="rounded-full text-white hover:bg-white/20 gap-2 hidden md:flex"
-          onClick={goToDashboard}
-          disabled={isSigningIn}
+          onClick={() => router.push("/account")}
         >
-          {isSigningIn ? (
-            <Loader2 className="w-4 h-4 animate-spin" />
-          ) : (
-            <LayoutDashboard className="w-4 h-4" />
-          )}
+          <LayoutDashboard className="w-4 h-4" />
           <span className="font-mono text-xs">{address.slice(0, 6)}…{address.slice(-4)}</span>
         </Button>
         <Button
           size="sm"
           variant="ghost"
           className="rounded-full text-muted-foreground hover:text-white hover:bg-white/10 h-8 w-8 p-0"
-          onClick={() => {
-            disconnect()
-            if (isSignedIn) signOut()
-          }}
+          onClick={() => disconnect()}
           title="Disconnect"
         >
           <LogOut className="w-4 h-4" />
@@ -94,35 +74,32 @@ function WalletButton({ onOpenChange }: { onOpenChange: (v: boolean) => void }) 
 }
 
 // Isolated to avoid wrapping entire nav in Suspense. When redirected here from
-// a protected page (?connect=1): if a wallet is already connected, trigger the
-// lazy sign-in; otherwise open the wallet picker.
+// the account page (?connect=1): if a wallet is already connected, route to the
+// dashboard; otherwise open the wallet picker.
 function ConnectParamWatcher({
   onNeedConnect,
-  onNeedSignIn,
+  onConnected,
 }: {
   onNeedConnect: () => void
-  onNeedSignIn: () => void
+  onConnected: () => void
 }) {
   const searchParams = useSearchParams()
   const { isConnected } = useWallet()
   const wantsConnect = searchParams.get("connect") === "1"
-  // Fire sign-in at most once per connect=1 visit. Without this guard the effect
-  // re-runs on every render (its callback deps change identity) and re-triggers
-  // sign-in before the first attempt settles — an endless wallet-prompt loop.
-  const signInFiredRef = useRef(false)
+  const firedRef = useRef(false)
   useEffect(() => {
     if (!wantsConnect) return
     if (isConnected) {
-      if (signInFiredRef.current) return
-      signInFiredRef.current = true
-      onNeedSignIn()
+      if (firedRef.current) return
+      firedRef.current = true
+      onConnected()
     } else {
       // Not connected yet: open the picker (idempotent) and stay armed so the
-      // sign step still fires once the wallet connects.
-      signInFiredRef.current = false
+      // navigation still fires once the wallet connects.
+      firedRef.current = false
       onNeedConnect()
     }
-  }, [wantsConnect, isConnected, onNeedConnect, onNeedSignIn])
+  }, [wantsConnect, isConnected, onNeedConnect, onConnected])
   return null
 }
 
@@ -132,19 +109,11 @@ const FloatingNav = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
   const [connectOpen, setConnectOpen] = useState(false)
-  const { ensureSession } = useSiwsAuth()
   const router = useRouter()
 
-  const handleNeedSignIn = useCallback(async () => {
-    try {
-      await ensureSession()
-      router.push("/account")
-    } catch {
-      // Declined or failed: drop the connect flag so the watcher can't
-      // immediately re-prompt. User stays connected-but-not-signed.
-      router.replace("/")
-    }
-  }, [ensureSession, router])
+  const handleConnected = useCallback(() => {
+    router.push("/account")
+  }, [router])
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20)
@@ -159,7 +128,7 @@ const FloatingNav = () => {
       <Suspense fallback={null}>
         <ConnectParamWatcher
           onNeedConnect={() => setConnectOpen(true)}
-          onNeedSignIn={handleNeedSignIn}
+          onConnected={handleConnected}
         />
       </Suspense>
 

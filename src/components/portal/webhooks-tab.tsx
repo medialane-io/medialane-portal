@@ -31,15 +31,14 @@ interface WebhookEndpoint {
 }
 
 interface Props {
-  plan: string;
+  address: string;
+  isPremium: boolean;
 }
 
-export function WebhooksTab({ plan }: Props) {
-  const isPremium = plan === "PREMIUM";
-
+export function WebhooksTab({ address, isPremium }: Props) {
   // Backend returns { data: WebhookEndpoint[] } — only reachable if PREMIUM
   const { data, error, isLoading, mutate } = useSWR<{ data: WebhookEndpoint[] }>(
-    isPremium ? "/api/portal/webhooks" : null,
+    isPremium ? `/api/portal/webhooks?address=${address}` : null,
     portalFetcher
   );
 
@@ -64,7 +63,7 @@ export function WebhooksTab({ plan }: Props) {
     setDeleting(id);
     setActionError(null);
     try {
-      const res = await fetch(`/api/portal/webhooks/${id}`, { method: "DELETE" });
+      const res = await fetch(`/api/portal/webhooks/${id}?address=${address}`, { method: "DELETE" });
       if (!res.ok) {
         const json = await res.json().catch(() => ({})) as { error?: string };
         setActionError(json?.error ?? `Failed to delete endpoint (${res.status})`);
@@ -83,7 +82,7 @@ export function WebhooksTab({ plan }: Props) {
     setCreating(true);
     setActionError(null);
     try {
-      const res = await fetch("/api/portal/webhooks", {
+      const res = await fetch(`/api/portal/webhooks?address=${address}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ url: urlInput, events: Array.from(selectedEvents) }),

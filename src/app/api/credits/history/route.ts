@@ -1,8 +1,11 @@
 import { getDepositHistory } from "@/src/lib/credits";
-import { withAuth } from "@/src/lib/with-auth";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
-export const GET = withAuth(async (_req, session) => {
-  const deposits = await getDepositHistory(session.address);
+export async function GET(req: NextRequest) {
+  const address = req.nextUrl.searchParams.get("address");
+  if (!address) {
+    return NextResponse.json({ error: "Missing address" }, { status: 400 });
+  }
+  const deposits = await getDepositHistory(address);
   return NextResponse.json({ deposits });
-});
+}

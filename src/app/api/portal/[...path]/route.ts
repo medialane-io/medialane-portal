@@ -1,15 +1,18 @@
 import { pool } from "@/src/lib/db";
-import { withAuth } from "@/src/lib/with-auth";
 import { NextRequest, NextResponse } from "next/server";
 
 async function handler(
   req: NextRequest,
-  session: { address: string },
-  context?: { params: Promise<{ path: string[] }> }
+  context: { params: Promise<{ path: string[] }> }
 ) {
+  const address = req.nextUrl.searchParams.get("address");
+  if (!address) {
+    return NextResponse.json({ error: "Missing address" }, { status: 400 });
+  }
+
   const row = await pool.query<{ backend_api_key: string | null }>(
     "SELECT backend_api_key FROM accounts WHERE address = $1",
-    [session.address]
+    [address]
   );
 
   const apiKey = row.rows[0]?.backend_api_key;
@@ -22,7 +25,7 @@ async function handler(
     return NextResponse.json({ error: "Backend not configured" }, { status: 500 });
   }
 
-  const { path } = await context!.params;
+  const { path } = await context.params;
 
   if (path.some((seg) => seg === ".." || seg === "." || seg.includes("/"))) {
     return NextResponse.json({ error: "Invalid path" }, { status: 400 });
@@ -50,7 +53,7 @@ async function handler(
   return NextResponse.json(json ?? {}, { status: upstream.status });
 }
 
-export const GET = withAuth(handler);
-export const POST = withAuth(handler);
-export const DELETE = withAuth(handler);
-export const PATCH = withAuth(handler);
+export const GET = handler;
+export const POST = handler;
+export const DELETE = handler;
+export const PATCH = handler;

@@ -1,42 +1,47 @@
 'use client';
 
-import { StarknetConfig } from '@starknet-react/core';
+import { StarknetConfig, InjectedConnector, useInjectedConnectors } from '@starknet-react/core';
 import { mainnet } from '@starknet-react/chains';
 import { RpcProvider } from 'starknet';
 import { useMemo } from 'react';
 import type { ReactNode } from 'react';
-import { idResolvedReady, idResolvedBraavos } from '@/src/lib/starknet-connectors';
 import { createFailoverFetch, PUBLIC_RPC_FALLBACKS } from '@/src/lib/rpc-failover';
 
+/**
+ * Injected-only Starknet connection for the portal.
+ *
+ * Connect-only: this provider establishes which wallet is connected and its
+ * address. There is no signing/session layer on top — the connected address is
+ * the portal's only notion of identity, passed straight to the API routes.
+ *
+ * `useInjectedConnectors` discovers installed extensions via the wallet
+ * standard, so Ready (formerly Argent) is found regardless of whether it
+ * advertises itself as `argentX` or `ready`. Braavos likewise.
+ */
 export default function StarknetProviderWrapper({ children }: { children: ReactNode }) {
   const nodeUrl =
     process.env.NEXT_PUBLIC_RPC_URL ||
     process.env.NEXT_PUBLIC_STARKNET_RPC_URL ||
-    'https://starknet-mainnet.g.alchemy.com/starknet/version/rpc/v0_8/tOTwt1ug3YNOsaPjinDvS';
+    'https://starknet-mainnet.public.blastapi.io/rpc/v0_8';
 
-  // Ready (formerly Argent) advertises wallet.id "ready", not "argentX". The
-  // id-resolving connectors (ported from the working dapp) find the extension
-  // across that rebrand so connect doesn't hang. Mirrors the dapp's setup.
-  const connectors = useMemo(
-    () => [idResolvedReady(), idResolvedBraavos()],
-    [],
-  );
+  const { connectors } = useInjectedConnectors({
+    recommended: [
+      new InjectedConnector({ options: { id: 'argentX', name: 'Ready (formerly Argent)' } }),
+      new InjectedConnector({ options: { id: 'braavos', name: 'Braavos' } }),
+    ],
+    includeRecommended: 'onlyIfNoConnectors',
+    order: 'alphabetical',
+  });
 
-  // Fail over to public endpoints when the primary RPC (Alchemy) intermittently
-  // 503s / returns -32001 — otherwise the post-connect chain-match check hangs
-  // and the wallet prompt spins forever.
+  // Fail over to public endpoints when the primary RPC intermittently 503s /
+  // returns -32001, so the post-connect chain-match check doesn't hang.
   const provider = useMemo(() => {
     const failoverFetch = createFailoverFetch([nodeUrl, ...PUBLIC_RPC_FALLBACKS]);
     return () => new RpcProvider({ nodeUrl, baseFetch: failoverFetch });
   }, [nodeUrl]);
 
   return (
-    <StarknetConfig
-      chains={[mainnet]}
-      provider={provider}
-      connectors={connectors}
-      autoConnect
-    >
+    <StarknetConfig chains={[mainnet]} provider={provider} connectors={connectors} autoConnect>
       {children}
     </StarknetConfig>
   );

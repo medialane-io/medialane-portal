@@ -101,12 +101,12 @@ function relativeTime(iso: string): string {
 }
 
 interface UsageTabProps {
-  plan: string;
+  address: string;
 }
 
-export function UsageTab({ plan }: UsageTabProps) {
+export function UsageTab({ address }: UsageTabProps) {
   const { data, error, isLoading } = useSWR<{ data: UsageDayRaw[] }>(
-    "/api/portal/usage",
+    `/api/portal/usage?address=${address}`,
     portalFetcher
   );
 
@@ -114,7 +114,7 @@ export function UsageTab({ plan }: UsageTabProps) {
     data: recentData,
     error: recentError,
     isLoading: recentLoading,
-  } = useSWR<{ data: RecentRow[] }>("/api/portal/usage/recent", portalFetcher);
+  } = useSWR<{ data: RecentRow[] }>(`/api/portal/usage/recent?address=${address}`, portalFetcher);
 
   if (isLoading) {
     return (
@@ -143,7 +143,8 @@ export function UsageTab({ plan }: UsageTabProps) {
     .filter((r) => r.day.startsWith(monthPrefix))
     .reduce((sum, r) => sum + r.requests, 0);
 
-  const isFree = plan === "FREE";
+  // Free tier by default now that MDLN-tier gating is decoupled from auth.
+  const isFree = true;
   const quotaPct = Math.min((monthlyTotal / FREE_MONTHLY_LIMIT) * 100, 100);
   const quotaWarn = isFree && monthlyTotal / FREE_MONTHLY_LIMIT > 0.8;
 

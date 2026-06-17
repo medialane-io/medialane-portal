@@ -3,20 +3,19 @@
 import { useAccount, useConnect, useDisconnect } from "@starknet-react/core";
 
 /**
- * Thin wallet hook for the portal — mirrors the dapp's useWallet() surface but
- * over starknet-react directly. The portal is injected-only (Ready/Braavos), so
- * there is no multi-rail active-slot referee to maintain.
+ * The portal's single wallet hook. Connect-only: it exposes the connected
+ * address, connection state, the available injected connectors, and
+ * connect/disconnect. No signing, no session — the address is identity.
  */
 export function useWallet() {
-  const { address, status, account } = useAccount();
+  const { address, isConnected, status } = useAccount();
   const { connect, connectors } = useConnect();
   const { disconnect } = useDisconnect();
 
   return {
     address: address ?? null,
-    account,
-    isConnected: status === "connected" && Boolean(address),
-    isConnecting: status === "connecting",
+    isConnected: isConnected ?? false,
+    isConnecting: status === "connecting" || status === "reconnecting",
     connectors,
     connect,
     disconnect,

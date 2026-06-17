@@ -1,5 +1,6 @@
-// Access control lives in src/middleware.tsx (session.is_admin) and
-// src/lib/with-admin.ts (per-request DB check on API routes).
+// NOTE: Auth was removed in the wallet/connection rebuild. The admin pages and
+// their /api/admin/* routes are currently OPEN (no gate). Re-gating is a
+// follow-up once the new wallet-based access model is decided.
 const navItems = [
   { label: "Dashboard",   href: "/admin" },
   { label: "Services",    href: "/admin/services" },
