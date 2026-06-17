@@ -8,7 +8,7 @@ export default function CursorEffect() {
   const [isVisible, setIsVisible] = useState(false)
 
   useEffect(() => {
-    const handleMouseMove = (e) => {
+    const handleMouseMove = (e: MouseEvent) => {
       setMousePosition({ x: e.clientX, y: e.clientY })
       setIsVisible(true)
     }

@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { isAdminAddress } from "@/src/lib/admin-allowlist";
 
 const ADMIN_API_KEY = process.env.ADMIN_API_KEY!;
 const API_URL = process.env.MEDIALANE_API_URL!;
@@ -7,6 +8,10 @@ async function handler(
   req: NextRequest,
   context: { params: Promise<{ path: string[] }> }
 ) {
+  if (!isAdminAddress(req.headers.get("x-admin-address"))) {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  }
+
   const { path } = await context.params;
 
   if (path.some((seg) => seg === "" || seg === "." || seg === "..")) {

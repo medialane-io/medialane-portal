@@ -41,18 +41,19 @@ export default function IntegratePage() {
           </Button>
         </section>
 
-        {/* Section 1: MDLN Access Gate */}
+        {/* Section 1: MDLN Credit Bonus */}
         <section className="container mx-auto px-4 pb-16 max-w-4xl">
           <div className="space-y-6">
             <div className="space-y-2">
               <div className="flex items-center gap-3">
                 <Coins className="w-5 h-5 text-primary" />
-                <h2 className="text-2xl font-bold text-white">MDLN Access Gate</h2>
+                <h2 className="text-2xl font-bold text-white">MDLN Credit Bonus</h2>
               </div>
               <p className="text-muted-foreground text-sm max-w-2xl">
-                To provision an API key you need a minimum of <strong className="text-white">500 MDLN</strong> in
-                your wallet. Your tokens stay in your wallet — this is a balance check, not a fee or a lock-up.
-                Holding more MDLN increases the credits you receive per USDC deposit.
+                Provisioning an API key is open to any connected wallet — no minimum balance, no gate.
+                Holding <strong className="text-white">MDLN</strong> is optional and only boosts the credits you
+                receive per USDC deposit. Your tokens stay in your wallet — it&apos;s a balance check, never a fee
+                or a lock-up.
               </p>
             </div>
 
