@@ -2,6 +2,10 @@
 
 Guidance for Claude Code when working in this repository.
 
+> **⚠️ ARCHITECTURE UPDATE (2026-06-18) — read before trusting the sections below.**
+> The Clerk/ChipiPay/**SIWS auth system was fully removed**. The portal is now **connect-only**: an injected Starknet wallet (Ready/Braavos) via `@starknet-react` — no signing, no session, no JWT, no `/api/auth`. `/admin` is gated by an **env address allowlist** (`NEXT_PUBLIC_ADMIN_ADDRESSES`, server-checked via the `x-admin-address` header; spoofable without a signature — hardening TODO). **Credits + x402 are now backend-owned** (`medialane-backend`): the local `src/lib/credits.ts`, `/api/credits/*`, and the USDC-deposit cron were retired; `CreditsTab` reads balance/history from `/api/portal/me` + `/api/portal/credits/*` and tops up via the backend fund endpoint (`NEXT_PUBLIC_STARKNET_X402_TREASURY` = Creator's Fund). The **MDLN access gate is gone** (MDLN is a credit *bonus* only). Metered API routes take the wallet address via `?address=`.
+> ⇒ The **"Auth System (SIWS)"**, **"Credit & Access Model"** (MDLN gate), and the `# Auth (SIWS)` env block below are **SUPERSEDED** — kept only as history. `db.ts` stays (the `/api/portal` proxy + provisioning read `accounts.backend_api_key`).
+
 ## Commands
 
 ```bash
