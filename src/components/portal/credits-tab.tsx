@@ -51,8 +51,9 @@ export function CreditsTab({ address }: Props) {
     portalFetcher,
   );
 
-  // The Creator's Fund treasury (x402 settles here).
-  const treasuryAddress = process.env.NEXT_PUBLIC_TREASURY_ADDRESS ?? "";
+  // The Creator's Fund treasury on Starknet (x402 settles here). Chain-prefixed
+  // for multichain readiness (NEXT_PUBLIC_BASE_X402_TREASURY etc. later).
+  const treasuryAddress = process.env.NEXT_PUBLIC_STARKNET_X402_TREASURY ?? "";
   const balance = meData?.data?.creditBalance ?? 0;
   const payments = historyData?.data ?? [];
   const parsedUsdc = parseFloat(usdcAmount);
