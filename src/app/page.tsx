@@ -103,11 +103,11 @@ export default function Home() {
             <Card className="border-white/10 bg-white/5 backdrop-blur-sm">
               <CardContent className="p-6 space-y-4">
                 <div className="flex items-center justify-between">
-                  <h3 className="text-lg font-bold text-white">MDLN Access</h3>
-                  <span className="text-sm font-semibold text-muted-foreground">500 MDLN min</span>
+                  <h3 className="text-lg font-bold text-white">Open Access</h3>
+                  <span className="text-sm font-semibold text-muted-foreground">No token required</span>
                 </div>
                 <p className="text-sm text-muted-foreground">
-                  Hold 500 MDLN in your wallet to get an API key. Tokens stay in your wallet — it&apos;s a balance check, not a fee.
+                  Connect any Starknet wallet to get an API key — no minimum balance, no gate. Pay only for what you use; hold MDLN for bonus credits.
                 </p>
                 <ul className="space-y-2 text-sm text-muted-foreground">
                   {["All API endpoints", "Up to 5 API keys", "Portal dashboard", "Webhooks included"].map((f) => (
@@ -133,7 +133,7 @@ export default function Home() {
                   Top up credits with USDC. Hold more MDLN to get bonus credits automatically at deposit time.
                 </p>
                 <ul className="space-y-2 text-sm text-muted-foreground">
-                  {["500 MDLN → 1.0× base", "1,000 MDLN → 1.2×", "2,000 MDLN → 1.5×", "5,000 MDLN → 2.0×"].map((f) => (
+                  {["No MDLN → 1.0× base", "500+ MDLN → 1.2×", "2,000+ MDLN → 1.5×", "5,000+ MDLN → 2.0×"].map((f) => (
                     <li key={f} className="flex items-center gap-2">
                       <Check className="w-4 h-4 text-primary flex-shrink-0" />
                       {f}

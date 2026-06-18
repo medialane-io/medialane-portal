@@ -1,16 +1,18 @@
 import { NextRequest, NextResponse } from "next/server";
-import { withAdmin } from "@/src/lib/with-admin";
-import { SessionPayload } from "@/src/lib/session";
+import { isAdminAddress } from "@/src/lib/admin-allowlist";
 
 const ADMIN_API_KEY = process.env.ADMIN_API_KEY!;
 const API_URL = process.env.MEDIALANE_API_URL!;
 
 async function handler(
   req: NextRequest,
-  _session: SessionPayload,
-  context?: { params: Promise<{ path: string[] }> }
+  context: { params: Promise<{ path: string[] }> }
 ) {
-  const { path } = await context!.params;
+  if (!isAdminAddress(req.headers.get("x-admin-address"))) {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  }
+
+  const { path } = await context.params;
 
   if (path.some((seg) => seg === "" || seg === "." || seg === "..")) {
     return NextResponse.json({ error: "Invalid path" }, { status: 400 });
@@ -46,7 +48,7 @@ async function handler(
   });
 }
 
-export const GET = withAdmin(handler);
-export const POST = withAdmin(handler);
-export const PATCH = withAdmin(handler);
-export const DELETE = withAdmin(handler);
+export const GET = handler;
+export const POST = handler;
+export const PATCH = handler;
+export const DELETE = handler;

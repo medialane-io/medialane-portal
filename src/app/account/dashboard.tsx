@@ -7,6 +7,7 @@ import { WebhooksTab } from "@/src/components/portal/webhooks-tab";
 import { CreditsTab } from "@/src/components/portal/credits-tab";
 import { Key, BarChart2, Webhook, Coins } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { useWallet } from "@/src/hooks/use-wallet";
 import { Button } from "@/src/components/ui/button";
 import { Badge } from "@/src/components/ui/badge";
 
@@ -20,10 +21,11 @@ interface Props {
 
 export function AccountDashboard({ address, mdln_tier }: Props) {
   const router = useRouter();
+  const { disconnect } = useWallet();
 
-  async function handleSignOut() {
-    await fetch("/api/auth/signout", { method: "POST" });
-    router.push("/sign-in");
+  function handleSignOut() {
+    disconnect();
+    router.push("/");
   }
 
   return (
@@ -90,10 +92,10 @@ export function AccountDashboard({ address, mdln_tier }: Props) {
             </TabsTrigger>
           </TabsList>
 
-          <TabsContent value="keys"><ApiKeysTab /></TabsContent>
+          <TabsContent value="keys"><ApiKeysTab address={address} /></TabsContent>
           <TabsContent value="credits"><CreditsTab address={address} mdln_tier={mdln_tier} /></TabsContent>
-          <TabsContent value="usage"><UsageTab /></TabsContent>
-          <TabsContent value="webhooks"><WebhooksTab /></TabsContent>
+          <TabsContent value="usage"><UsageTab address={address} /></TabsContent>
+          <TabsContent value="webhooks"><WebhooksTab address={address} isPremium={mdln_tier > 0} /></TabsContent>
         </Tabs>
       </div>
     </div>

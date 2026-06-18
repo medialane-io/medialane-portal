@@ -34,7 +34,7 @@ export default function ProgrammableIPDemo() {
     setTimeout(() => setCopied(false), 2000)
   }
 
-  const handleSettingChange = (key, value) => {
+  const handleSettingChange = (key: string, value: number | boolean) => {
     setSettings((prev) => ({
       ...prev,
       [key]: value,

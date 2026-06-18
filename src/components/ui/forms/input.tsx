@@ -5,7 +5,7 @@ import { useState } from "react";
 import { Input, InputProps } from "../input";
 import { Label } from "../label";
 import { Badge } from "../badge";
-import { InputAreaProps, Textarea } from "../textarea";
+import { TextareaProps as InputAreaProps, Textarea } from "../textarea";
 import { cn } from "@/src/lib/utils";
 
 export const TextInput = ({
@@ -15,7 +15,7 @@ export const TextInput = ({
   labelClass,
   showBadge = true,
   ...props
-}: InputProps & { label: string; labelClass?: string }) => {
+}: InputProps & { label: string; labelClass?: string; labelIcon?: React.ReactNode; showBadge?: boolean }) => {
   const [show, setShow] = useState(false);
   const [field, meta] = useField({
     name: props.name || "",
@@ -78,7 +78,7 @@ export const TextAreaInput = ({
   className,
   labelIcon,
   ...props
-}: InputAreaProps & { label: string }) => {
+}: InputAreaProps & { label: string; labelIcon?: React.ReactNode }) => {
   const [field, meta] = useField({
     name: props.name || "",
     onChange: props.onChange,

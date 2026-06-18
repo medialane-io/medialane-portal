@@ -14,11 +14,17 @@ import type {
   RewardLevel,
   RewardBadge,
 } from "@/src/types/admin";
+import { getAdminAddress } from "@/src/lib/admin-address";
 
 const adminFetch = (url: string, options?: RequestInit) =>
   fetch(url, {
     ...options,
-    headers: { "Content-Type": "application/json", ...(options?.headers as Record<string, string>) },
+    headers: {
+      "Content-Type": "application/json",
+      // Connected admin wallet — the server checks this against the allowlist.
+      "x-admin-address": getAdminAddress() ?? "",
+      ...(options?.headers as Record<string, string>),
+    },
   });
 
 export function useAdminClaims(status?: string, page = 1) {

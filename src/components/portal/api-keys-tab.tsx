@@ -109,9 +109,9 @@ function QuickstartCard() {
   );
 }
 
-export function ApiKeysTab() {
+export function ApiKeysTab({ address }: { address: string }) {
   const { data, error, isLoading, mutate } = useSWR<{ data: ApiKey[] }>(
-    "/api/portal/keys",
+    `/api/portal/keys?address=${address}`,
     portalFetcher
   );
   const [revoking, setRevoking] = useState<string | null>(null);
@@ -127,7 +127,7 @@ export function ApiKeysTab() {
     setRevoking(id);
     setActionError(null);
     try {
-      const res = await fetch(`/api/portal/keys/${id}`, { method: "DELETE" });
+      const res = await fetch(`/api/portal/keys/${id}?address=${address}`, { method: "DELETE" });
       if (!res.ok) {
         const json = await res.json().catch(() => ({})) as { error?: string };
         setActionError(json?.error ?? `Failed to revoke key (${res.status})`);
@@ -145,7 +145,7 @@ export function ApiKeysTab() {
     setCreating(true);
     setActionError(null);
     try {
-      const res = await fetch("/api/portal/keys", {
+      const res = await fetch(`/api/portal/keys?address=${address}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ label: labelInput.trim() || undefined }),
