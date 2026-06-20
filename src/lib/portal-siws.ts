@@ -1,7 +1,8 @@
 import { randomBytes } from "crypto";
-import { RpcProvider, typedData as sdkTypedData, type TypedData } from "starknet";
+import { RpcProvider, type TypedData } from "starknet";
 import { pool } from "./db";
 import { normalizeStarknetAddress } from "./starknet-address";
+import { createFailoverFetch, PUBLIC_RPC_FALLBACKS } from "./rpc-failover";
 
 /**
  * Sign-in challenge + Starknet signature verification. The portal verifies the
@@ -52,31 +53,43 @@ export async function consumeNonce(nonce: string, address: string): Promise<bool
   return (result.rowCount ?? 0) > 0;
 }
 
-const FELT_VALID = "0x56414c4944";
+export type VerifyResult = { ok: true } | { ok: false; reason: "invalid" | "not_deployed" | "rpc_error" };
 
+/**
+ * Verify a Starknet wallet signature over the sign-in challenge. Uses starknet.js's
+ * `verifyMessageInStarknet` (the proven high-level path — handles Argent AND Braavos
+ * signature shapes correctly, unlike a hand-rolled `is_valid_signature` call) with
+ * RPC failover. Never swallows errors silently — the reason is logged + returned.
+ */
 export async function verifyStarknetSignature(
   address: string,
   nonce: string,
   signature: string[],
-): Promise<boolean> {
-  // Public RPC fallback so a missing STARKNET_RPC_URL can't take sign-in down.
-  const rpcUrl =
+): Promise<VerifyResult> {
+  const nodeUrl =
     process.env.STARKNET_RPC_URL ||
     process.env.NEXT_PUBLIC_STARKNET_RPC_URL ||
-    process.env.NEXT_PUBLIC_RPC_URL ||
-    "https://free-rpc.nethermind.io/mainnet-juno";
+    "https://starknet-mainnet.public.blastapi.io/rpc/v0_8";
+  const provider = new RpcProvider({
+    nodeUrl,
+    baseFetch: createFailoverFetch([nodeUrl, ...PUBLIC_RPC_FALLBACKS]),
+  });
 
-  const provider = new RpcProvider({ nodeUrl: rpcUrl });
-  const msgHash = sdkTypedData.getMessageHash(buildTypedData(nonce, address), address);
+  const td = buildTypedData(nonce, address);
+  // Normalize to decimal felt strings — tolerates hex / mixed wallet output.
+  const sig = signature.map((v) => BigInt(v).toString());
 
   try {
-    const result = await provider.callContract({
-      contractAddress: address,
-      entrypoint: "is_valid_signature",
-      calldata: [msgHash, signature.length.toString(), ...signature],
-    });
-    return result[0] === FELT_VALID || result[0] === "0x1";
-  } catch {
-    return false;
+    const ok = await provider.verifyMessageInStarknet(td as TypedData, sig, address);
+    return ok ? { ok: true } : { ok: false, reason: "invalid" };
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err);
+    // Counterfactual smart wallet — no deployed contract to call is_valid_signature on.
+    if (msg.includes("Contract not found") || msg.includes("not deployed")) {
+      console.error("[portal-siws] wallet not deployed:", msg);
+      return { ok: false, reason: "not_deployed" };
+    }
+    console.error("[portal-siws] signature verification error:", msg);
+    return { ok: false, reason: "rpc_error" };
   }
 }

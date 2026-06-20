@@ -35,7 +35,20 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Invalid or expired challenge" }, { status: 401 });
   }
 
-  if (!(await verifyStarknetSignature(address, parsed.data.nonce, parsed.data.signature))) {
+  const verified = await verifyStarknetSignature(address, parsed.data.nonce, parsed.data.signature);
+  if (!verified.ok) {
+    if (verified.reason === "not_deployed") {
+      return NextResponse.json(
+        { error: "Your wallet isn't deployed on Starknet yet — make one transaction first, then sign in." },
+        { status: 400 },
+      );
+    }
+    if (verified.reason === "rpc_error") {
+      return NextResponse.json(
+        { error: "Couldn't reach Starknet to verify your signature. Please try again in a moment." },
+        { status: 503 },
+      );
+    }
     return NextResponse.json({ error: "Signature verification failed" }, { status: 401 });
   }
 
