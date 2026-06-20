@@ -1,9 +1,24 @@
 "use client";
 
-import { stark, type TypedData, type Signature } from "starknet";
+import { type TypedData } from "starknet";
 
 export interface WalletSigner {
   signMessage: (typedData: TypedData) => Promise<unknown>;
+}
+
+/**
+ * Normalize a wallet signature to a felt-string array — the dapp's proven shape.
+ * Pass arrays through raw (`.map(String)`): Braavos returns a longer, signer-
+ * prefixed array that `stark.formatSignature` mangles, which breaks on-chain
+ * `is_valid_signature`. Handle `{r,s}` objects too.
+ */
+function normalizeSignature(signature: unknown): string[] {
+  if (Array.isArray(signature)) return signature.map(String);
+  if (signature && typeof signature === "object") {
+    const { r, s } = signature as { r?: unknown; s?: unknown };
+    if (r !== undefined && s !== undefined) return [String(r), String(s)];
+  }
+  return [String(signature)];
 }
 
 /**
@@ -17,10 +32,7 @@ export async function requestPortalSession(address: string, signer: WalletSigner
   if (!challengeRes.ok) throw new Error(challengeData.error ?? "Failed to get challenge");
   const { nonce, typedData } = challengeData;
 
-  const signature = await signer.signMessage(typedData);
-  // Normalize every wallet's signature shape (Braavos's signer-prefixed array,
-  // Argent's [r, s], object {r, s}) → decimal felt strings.
-  const sigArray = stark.formatSignature(signature as Signature);
+  const sigArray = normalizeSignature(await signer.signMessage(typedData));
 
   const verifyRes = await fetch("/api/auth/verify", {
     method: "POST",

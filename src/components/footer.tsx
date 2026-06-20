@@ -11,14 +11,14 @@ const PLATFORM_LINKS = [
 ]
 
 const COMMUNITY_LINKS = [
-  { name: "Connect", href: "/connect" },
-  { name: "Changelog", href: "/changelog" },
+  { name: "Connect", href: "https://docs.medialane.io/contact", external: true },
+  { name: "Changelog", href: "https://docs.medialane.io/dev/changelog", external: true },
   { name: "DAO", href: "https://medialane.org", external: true },
 ]
 
 const LEGAL_LINKS = [
-  { name: "Terms", href: "/terms" },
-  { name: "Privacy", href: "/privacy" },
+  { name: "Terms", href: "https://docs.medialane.io/terms", external: true },
+  { name: "Privacy", href: "https://docs.medialane.io/privacy", external: true },
 ]
 
 const SOCIALS = [

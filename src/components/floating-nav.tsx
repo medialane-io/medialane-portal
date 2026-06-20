@@ -16,7 +16,7 @@ const NAV_LINKS = [
   { label: "Features", href: "/features" },
   { label: "Integrate", href: "/integrate" },
   { label: "Docs", href: "https://docs.medialane.io/docs" },
-  { label: "Connect", href: "/connect" },
+  { label: "Connect", href: "https://docs.medialane.io/contact" },
 ]
 
 function isNavActive(pathname: string, href: string) {
