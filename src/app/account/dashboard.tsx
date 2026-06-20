@@ -8,6 +8,7 @@ import { CreditsTab } from "@/src/components/portal/credits-tab";
 import { Key, BarChart2, Webhook, Coins } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useWallet } from "@/src/hooks/use-wallet";
+import { usePortalAuth } from "@/src/hooks/use-portal-auth";
 import { Button } from "@/src/components/ui/button";
 import { Badge } from "@/src/components/ui/badge";
 
@@ -22,8 +23,10 @@ interface Props {
 export function AccountDashboard({ address, mdln_tier }: Props) {
   const router = useRouter();
   const { disconnect } = useWallet();
+  const { signOut } = usePortalAuth();
 
-  function handleSignOut() {
+  async function handleSignOut() {
+    await signOut();
     disconnect();
     router.push("/");
   }

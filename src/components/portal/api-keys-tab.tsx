@@ -192,7 +192,7 @@ export function ApiKeysTab({ address }: { address: string }) {
     return (
       <div className="flex items-center gap-2 text-destructive p-4 rounded-xl border border-destructive/20 bg-destructive/5">
         <AlertCircle className="w-4 h-4 shrink-0" />
-        <span className="text-sm">Failed to load API keys. Make sure the backend is running.</span>
+        <span className="text-sm">Couldn&apos;t load your API keys. Please try again in a moment.</span>
       </div>
     );
   }
