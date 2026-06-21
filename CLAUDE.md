@@ -30,7 +30,7 @@ It is a Next.js 15 App Router site — API key management, usage dashboard, webh
 
 **Do not confuse it with:**
 - `medialane-io` — consumer launchpad at `www.medialane.io` (ChipiPay invisible wallet)
-- `medialane-dapp` — permissionless dApp at `dapp.medialane.io` (on-chain reads, Starknet wallets)
+- `medialane-starknet` — permissionless dApp at `starknet.medialane.io` (on-chain reads, Starknet wallets)
 - `medialane-backend` — the Hono REST API + indexer service
 - `medialane-sdk` — the TypeScript SDK (`@medialane/sdk` npm package, v0.6.4)
 

@@ -219,7 +219,7 @@ export default function IntegratePage() {
               </Card>
               <Card className="border-cyan-500/20 bg-cyan-500/5">
                 <CardContent className="p-6 space-y-3">
-                  <p className="text-xs font-mono text-muted-foreground">dapp.medialane.io</p>
+                  <p className="text-xs font-mono text-muted-foreground">starknet.medialane.io</p>
                   <h3 className="text-lg font-bold text-white">Permissionless dApp</h3>
                   <p className="text-sm text-muted-foreground leading-relaxed">
                     Fully on-chain reads via starknet.js. No backend dependency for browsing —
