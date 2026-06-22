@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useCallback } from "react";
+import Link from "next/link";
 import { useAdminCoins } from "@/src/hooks/use-admin";
 import { adminFetch } from "@/src/lib/admin-fetch";
 import { Button } from "@/src/components/ui/button";
@@ -69,47 +70,6 @@ export default function AdminCoinsPage() {
     finally { setAdding(false); }
   }
 
-  // ── Edit dialog ──────────────────────────────────────────────────────────
-  const [editOpen, setEditOpen] = useState(false);
-  const [editCoin, setEditCoin] = useState<AdminCoinRecord | null>(null);
-  const [editName, setEditName] = useState("");
-  const [editSymbol, setEditSymbol] = useState("");
-  const [editImage, setEditImage] = useState("");
-  const [editDescription, setEditDescription] = useState("");
-  const [editService, setEditService] = useState("");
-  const [editCreator, setEditCreator] = useState("");
-  const [saving, setSaving] = useState(false);
-
-  function openEdit(coin: AdminCoinRecord) {
-    setEditCoin(coin);
-    setEditName(coin.name ?? ""); setEditSymbol(coin.symbol ?? "");
-    setEditImage(coin.image ?? ""); setEditDescription(coin.description ?? "");
-    setEditService(coin.service ?? ""); setEditCreator(coin.creator ?? "");
-    setEditOpen(true);
-  }
-
-  async function handleSaveEdit() {
-    if (!editCoin) return;
-    setSaving(true);
-    try {
-      const res = await adminFetch(`/admin/coins/${editCoin.contractAddress}`, {
-        method: "PATCH",
-        body: JSON.stringify({
-          ...(editName.trim() ? { name: editName.trim() } : {}),
-          ...(editSymbol.trim() ? { symbol: editSymbol.trim() } : {}),
-          ...(editImage.trim() ? { image: editImage.trim() } : {}),
-          ...(editDescription.trim() ? { description: editDescription.trim() } : {}),
-          ...(editService.trim() ? { service: editService.trim() } : {}),
-          ...(editCreator.trim() ? { creator: editCreator.trim() } : {}),
-        }),
-      });
-      if (!res.ok) throw new Error();
-      toast.success("Coin updated");
-      setEditOpen(false); await mutate();
-    } catch { toast.error("Update failed"); }
-    finally { setSaving(false); }
-  }
-
   async function handleHide(coin: AdminCoinRecord) {
     try {
       await adminFetch(`/admin/coins/${coin.contractAddress}`, { method: "PATCH", body: JSON.stringify({ isHidden: !coin.isHidden }) });
@@ -168,8 +128,8 @@ export default function AdminCoinsPage() {
                 <Button size="icon" variant="ghost" className="h-8 w-8" onClick={() => handleHide(coin)} title={coin.isHidden ? "Show on platform" : "Hide from platform"}>
                   {coin.isHidden ? <EyeOff className="h-3.5 w-3.5 text-destructive" /> : <Eye className="h-3.5 w-3.5" />}
                 </Button>
-                <Button size="icon" variant="ghost" className="h-8 w-8" onClick={() => openEdit(coin)} title="Edit coin">
-                  <Pencil className="h-3.5 w-3.5" />
+                <Button asChild size="icon" variant="ghost" className="h-8 w-8" title="Coin settings">
+                  <Link href={`/admin/coins/${coin.contractAddress}`}><Pencil className="h-3.5 w-3.5" /></Link>
                 </Button>
                 <Button size="icon" variant="ghost" className="h-8 w-8" onClick={() => handleRefresh(coin)} title="Refresh metadata">
                   <RefreshCw className="h-3.5 w-3.5" />
@@ -208,34 +168,6 @@ export default function AdminCoinsPage() {
           <DialogFooter>
             <Button variant="outline" onClick={() => setAddOpen(false)}>Cancel</Button>
             <Button disabled={adding || !addContract.trim()} onClick={handleAdd}>{adding ? "Adding…" : "Add coin"}</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      <Dialog open={editOpen} onOpenChange={setEditOpen}>
-        <DialogContent className="sm:max-w-sm">
-          <DialogHeader>
-            <DialogTitle>Edit Coin</DialogTitle>
-            <DialogDescription className="font-mono text-xs break-all">{editCoin?.contractAddress}</DialogDescription>
-          </DialogHeader>
-          <div className="space-y-4 py-2">
-            <div className="space-y-2"><Label>Name</Label><Input value={editName} onChange={(e) => setEditName(e.target.value)} /></div>
-            <div className="space-y-2"><Label>Symbol</Label><Input value={editSymbol} onChange={(e) => setEditSymbol(e.target.value)} /></div>
-            <div className="space-y-2"><Label>Image (URL or ipfs://…)</Label>
-              <Input value={editImage} onChange={(e) => setEditImage(e.target.value)} placeholder="ipfs://… or https://…" />
-              {editImage.trim() && (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img src={editImage.trim().startsWith("ipfs://") ? `https://ipfs.io/ipfs/${editImage.trim().slice(7)}` : editImage.trim()}
-                  alt="" className="mt-1 h-12 w-12 rounded-full border border-white/10 object-cover" />
-              )}
-            </div>
-            <div className="space-y-2"><Label>Description</Label><Input value={editDescription} onChange={(e) => setEditDescription(e.target.value)} /></div>
-            <div className="space-y-2"><Label>Service</Label><Input value={editService} onChange={(e) => setEditService(e.target.value)} placeholder="creator-coin | external-erc20" /></div>
-            <div className="space-y-2"><Label>Creator</Label><Input value={editCreator} onChange={(e) => setEditCreator(e.target.value)} placeholder="0x…" /></div>
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setEditOpen(false)}>Cancel</Button>
-            <Button disabled={saving} onClick={handleSaveEdit}>{saving ? "Saving…" : "Save"}</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
