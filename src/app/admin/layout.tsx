@@ -118,13 +118,13 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         </div>
         <nav className="flex gap-4 mt-3 border-b border-border pb-3 overflow-x-auto">
           {navItems.map((item) => (
-            <a
+            <Link
               key={item.href}
               href={item.href}
               className="relative text-sm font-medium text-muted-foreground hover:text-foreground transition-colors whitespace-nowrap"
             >
               {item.label}
-            </a>
+            </Link>
           ))}
         </nav>
       </div>
