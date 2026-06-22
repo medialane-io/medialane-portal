@@ -1,54 +1,18 @@
-import { NextRequest, NextResponse } from "next/server";
-import { isAdminAddress } from "@/src/lib/admin-allowlist";
+import { NextResponse } from "next/server";
 
-const ADMIN_API_KEY = process.env.ADMIN_API_KEY!;
-const API_URL = process.env.MEDIALANE_API_URL!;
-
-async function handler(
-  req: NextRequest,
-  context: { params: Promise<{ path: string[] }> }
-) {
-  if (!isAdminAddress(req.headers.get("x-admin-address"))) {
-    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
-  }
-
-  const { path } = await context.params;
-
-  if (path.some((seg) => seg === "" || seg === "." || seg === "..")) {
-    return NextResponse.json({ error: "Invalid path" }, { status: 400 });
-  }
-
-  const url = req.nextUrl;
-  const safeParams = new URLSearchParams();
-  url.searchParams.forEach((value, key) => {
-    if (/^\$/.test(key) || /[{}]/.test(key)) return;
-    safeParams.append(key, value);
-  });
-  const search = safeParams.toString() ? `?${safeParams.toString()}` : "";
-  const targetUrl = `${API_URL}/admin/${path.join("/")}${search}`;
-
-  let body: string | undefined;
-  if (req.method !== "GET" && req.method !== "HEAD") {
-    body = await req.text();
-  }
-
-  const upstream = await fetch(targetUrl, {
-    method: req.method,
-    headers: {
-      "x-api-key": ADMIN_API_KEY,
-      "Content-Type": "application/json",
-    },
-    body,
-  });
-
-  const text = await upstream.text();
-  return new NextResponse(text, {
-    status: upstream.status,
-    headers: { "Content-Type": "application/json" },
-  });
+// The admin web proxy is DISABLED. It previously authorized on a spoofable,
+// client-supplied `x-admin-address` header while attaching the backend master
+// key — a full admin bypass (see spec 2026-06-22-portal-admin-signed-request-auth).
+// It is being rebuilt on signed-request auth. Until then: closed. Operators use
+// the backend API_SECRET_KEY via CLI.
+function disabled() {
+  return NextResponse.json(
+    { error: "Admin console is temporarily disabled while its auth is rebuilt." },
+    { status: 403 },
+  );
 }
 
-export const GET = handler;
-export const POST = handler;
-export const PATCH = handler;
-export const DELETE = handler;
+export const GET = disabled;
+export const POST = disabled;
+export const PATCH = disabled;
+export const DELETE = disabled;
