@@ -19,9 +19,6 @@ interface Props {
   mdln_tier: number;
 }
 
-interface MeData {
-  data?: { creditBalance?: number };
-}
 interface Payment {
   id: string;
   amountAtomic: string;
@@ -31,8 +28,9 @@ interface Payment {
   status: string;
   createdAt: string;
 }
-interface HistoryData {
-  data?: Payment[];
+// The account-admin surface returns balance + ledger from a single endpoint.
+interface CreditsData {
+  data?: { balance?: number; history?: Payment[] };
 }
 
 export function CreditsTab({ address }: Props) {
@@ -43,19 +41,18 @@ export function CreditsTab({ address }: Props) {
   const [credited, setCredited] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  // Balance + history now come from the backend (the x402 credit owner), proxied
-  // through /api/portal/* which attaches the tenant key.
-  const { data: meData, mutate: mutateMe } = useSWR<MeData>(`/api/portal/me?address=${address}`, portalFetcher);
-  const { data: historyData, mutate: mutateHistory } = useSWR<HistoryData>(
-    `/api/portal/credits/history?address=${address}`,
+  // Balance + history come from the backend (the x402 credit owner) via the
+  // account-admin surface, which returns both from one /credits endpoint.
+  const { data: creditsData, mutate: mutateCredits } = useSWR<CreditsData>(
+    `/api/portal/credits?address=${address}`,
     portalFetcher,
   );
 
   // The Creator's Fund treasury on Starknet (x402 settles here). Chain-prefixed
   // for multichain readiness (NEXT_PUBLIC_BASE_X402_TREASURY etc. later).
   const treasuryAddress = process.env.NEXT_PUBLIC_STARKNET_X402_TREASURY ?? "";
-  const balance = meData?.data?.creditBalance ?? 0;
-  const payments = historyData?.data ?? [];
+  const balance = creditsData?.data?.balance ?? 0;
+  const payments = creditsData?.data?.history ?? [];
   const parsedUsdc = parseFloat(usdcAmount);
   const previewCredits =
     !isNaN(parsedUsdc) && parsedUsdc > 0 ? Math.floor(parsedUsdc * CREDITS_PER_USDC) : null;
@@ -77,8 +74,7 @@ export function CreditsTab({ address }: Props) {
     }
     setCredited(json.data?.credited ?? 0);
     setPendingTx(null);
-    mutateMe();
-    mutateHistory();
+    mutateCredits();
   }
 
   async function handleDeposit() {
