@@ -2,6 +2,7 @@
 
 import { useState, useRef, useCallback } from "react";
 import { useAdminCoins } from "@/src/hooks/use-admin";
+import { adminFetch } from "@/src/lib/admin-fetch";
 import { Button } from "@/src/components/ui/button";
 import { Badge } from "@/src/components/ui/badge";
 import { Input } from "@/src/components/ui/input";
@@ -15,14 +16,6 @@ import { EXPLORER_URL } from "@/src/lib/constants";
 import type { AdminCoinRecord } from "@/src/types/admin";
 
 const PAGE_SIZE = 20;
-
-async function adminFetch(path: string, opts: RequestInit = {}) {
-  const proxyPath = path.replace(/^\/admin\//, "/api/admin/");
-  return fetch(proxyPath, {
-    ...opts,
-    headers: { "Content-Type": "application/json", ...(opts.headers as Record<string, string>) },
-  });
-}
 
 function CoinThumb({ coin }: { coin: AdminCoinRecord }) {
   const src = coin.image ? ipfsToHttp(coin.image) : null;

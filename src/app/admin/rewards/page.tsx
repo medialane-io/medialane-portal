@@ -11,9 +11,10 @@ import { Switch } from "@/src/components/ui/switch";
 import { toast } from "sonner";
 import { Trophy, Play, Award, Layers, Percent } from "lucide-react";
 import type { RewardAction, RewardMultiplier } from "@/src/types/admin";
+import { adminFetch } from "@/src/lib/admin-fetch";
 
 async function patchJson(url: string, body: unknown) {
-  const res = await fetch(url, {
+  const res = await adminFetch(url, {
     method: "PATCH",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(body),
@@ -182,7 +183,7 @@ function BadgesCard() {
     if (!address.trim() || !badgeKey) { toast.error("Address and badge are required"); return; }
     setAwarding(true);
     try {
-      const res = await fetch(`/api/admin/rewards/badges/${address.trim()}`, {
+      const res = await adminFetch(`/api/admin/rewards/badges/${address.trim()}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ badgeKey }),
@@ -241,7 +242,7 @@ function ComputeCard() {
     if (!dryRun && !confirm("Recompute all scores, point events, and badges from scratch? This truncates and rebuilds the reward tables.")) return;
     setRunning(true); setOutput(null);
     try {
-      const res = await fetch(`/api/admin/rewards/compute${dryRun ? "?dry_run=true" : ""}`, { method: "POST" });
+      const res = await adminFetch(`/api/admin/rewards/compute${dryRun ? "?dry_run=true" : ""}`, { method: "POST" });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error);
       setOutput(data.output ?? "");

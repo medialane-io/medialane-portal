@@ -2,6 +2,7 @@
 
 import { useState, useRef, useCallback } from "react";
 import { useAdminCollections } from "@/src/hooks/use-admin";
+import { adminFetch } from "@/src/lib/admin-fetch";
 import { Button } from "@/src/components/ui/button";
 import { Badge } from "@/src/components/ui/badge";
 import { Input } from "@/src/components/ui/input";
@@ -45,14 +46,6 @@ const STANDARD_STYLE: Record<string, string> = {
   UNKNOWN: "bg-muted/50 text-muted-foreground",
 };
 const SERVICES = SERVICE_IDS;
-
-async function adminFetch(path: string, opts: RequestInit = {}) {
-  const proxyPath = path.replace(/^\/admin\//, "/api/admin/");
-  return fetch(proxyPath, {
-    ...opts,
-    headers: { "Content-Type": "application/json", ...(opts.headers as Record<string, string>) },
-  });
-}
 
 function CollectionThumb({ col }: { col: AdminCollectionRecord }) {
   const src = col.image ? ipfsToHttp(col.image) : null;

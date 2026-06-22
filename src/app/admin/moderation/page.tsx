@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useAdminComments, useAdminSlugClaims } from "@/src/hooks/use-admin";
+import { adminFetch } from "@/src/lib/admin-fetch";
 import { Button } from "@/src/components/ui/button";
 import { Input } from "@/src/components/ui/input";
 import { Label } from "@/src/components/ui/label";
@@ -40,7 +41,7 @@ function CommentsTab() {
   async function toggle(id: string, hide: boolean) {
     setBusy(id);
     try {
-      const res = await fetch(`/api/admin/comments/${id}/${hide ? "hide" : "show"}`, { method: "PATCH" });
+      const res = await adminFetch(`/api/admin/comments/${id}/${hide ? "hide" : "show"}`, { method: "PATCH" });
       if (!res.ok) throw new Error();
       toast.success(hide ? "Comment hidden" : "Comment restored");
       await mutate();
@@ -103,7 +104,7 @@ function SlugClaimsTab() {
   async function review(id: string, newStatus: "APPROVED" | "REJECTED") {
     setBusy(id);
     try {
-      const res = await fetch(`/api/admin/collection-slug-claims/${id}`, {
+      const res = await adminFetch(`/api/admin/collection-slug-claims/${id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ status: newStatus }),
@@ -176,7 +177,7 @@ function LicensingFixTab() {
     if (!offerId.trim() || !creatorAddress.trim()) { toast.error("Both fields are required"); return; }
     setBusy(true);
     try {
-      const res = await fetch(`/api/admin/remix-offers/${offerId.trim()}`, {
+      const res = await adminFetch(`/api/admin/remix-offers/${offerId.trim()}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ creatorAddress: creatorAddress.trim() }),

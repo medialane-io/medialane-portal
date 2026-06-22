@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useAdminClaims, useAdminUsernameClaims } from "@/src/hooks/use-admin";
+import { adminFetch } from "@/src/lib/admin-fetch";
 import { Button } from "@/src/components/ui/button";
 import { Badge } from "@/src/components/ui/badge";
 import { Textarea } from "@/src/components/ui/textarea";
@@ -39,7 +40,7 @@ function CollectionClaimsTab() {
     if (!selected) return;
     setProcessing(true);
     try {
-      const res = await fetch(`/api/admin/claims/${selected.id}`, {
+      const res = await adminFetch(`/api/admin/claims/${selected.id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ status, adminNotes, ...(status === "APPROVED" && service ? { service } : {}) }),
@@ -126,7 +127,7 @@ function UsernameClaimsTab() {
     if (!selected) return;
     setProcessing(true);
     try {
-      const res = await fetch(`/api/admin/username-claims/${selected.id}`, {
+      const res = await adminFetch(`/api/admin/username-claims/${selected.id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ status, adminNotes }),

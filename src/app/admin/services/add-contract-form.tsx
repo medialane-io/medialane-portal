@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { adminFetch } from "@/src/lib/admin-fetch";
 
 const CHAINS = ["starknet-mainnet", "starknet-sepolia"] as const;
 
@@ -27,7 +28,7 @@ export function AddContractForm({ serviceId }: Props) {
     setError(null);
 
     try {
-      const res = await fetch("/api/admin/services", {
+      const res = await adminFetch("/api/admin/services", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ serviceId, ...form }),

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { adminFetch } from "@/src/lib/admin-fetch";
 import { Button } from "@/src/components/ui/button";
 import { Input } from "@/src/components/ui/input";
 import { Label } from "@/src/components/ui/label";
@@ -64,7 +65,7 @@ export default function AdminTokensPage() {
     if (overrideTokenId)  setTokenId(t);
     setLoading(true); setToken(null);
     try {
-      const res = await fetch(`/api/admin/tokens/${c}/${t}`, { headers: { "Content-Type": "application/json" } });
+      const res = await adminFetch(`/api/admin/tokens/${c}/${t}`, { headers: { "Content-Type": "application/json" } });
       if (!res.ok) { toast.error(res.status === 404 ? "Token not found" : "Lookup failed"); return; }
       const data = await res.json();
       const tokenData: TokenData = data.data ?? data;
@@ -80,7 +81,7 @@ export default function AdminTokensPage() {
     if (!c || !t) return;
     setRefreshing(true);
     try {
-      const res = await fetch(`/api/admin/tokens/${c}/${t}/refresh`, { method: "POST", headers: { "Content-Type": "application/json" } });
+      const res = await adminFetch(`/api/admin/tokens/${c}/${t}/refresh`, { method: "POST", headers: { "Content-Type": "application/json" } });
       if (!res.ok) throw new Error();
       const data = await res.json();
       toast.success(`Refresh queued — status: ${data.metadataStatus ?? "updated"}`);

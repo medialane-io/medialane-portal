@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useAdminUsernameClaims } from "@/src/hooks/use-admin";
+import { adminFetch } from "@/src/lib/admin-fetch";
 import { Button } from "@/src/components/ui/button";
 import { Input } from "@/src/components/ui/input";
 import { Label } from "@/src/components/ui/label";
@@ -36,7 +37,7 @@ export default function AdminCreatorsPage() {
     if (!newWallet.trim() || !fixCreator) return;
     setFixing(true);
     try {
-      const res = await fetch(
+      const res = await adminFetch(
         `/api/admin/creators/${fixCreator.walletAddress}/fix-wallet`,
         {
           method: "PATCH",

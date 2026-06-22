@@ -14,29 +14,7 @@ import type {
   RewardLevel,
   RewardBadge,
 } from "@/src/types/admin";
-import { encodeAdminHeaders } from "@medialane/sdk";
-import { getAdminSession } from "@/src/lib/admin-session";
-
-/** Thrown when there's no valid admin session — the UI prompts a re-sign. */
-export class NoAdminSessionError extends Error {
-  constructor() { super("No admin session"); this.name = "NoAdminSessionError"; }
-}
-
-const adminFetch = (url: string, options?: RequestInit) => {
-  const session = getAdminSession();
-  if (!session) throw new NoAdminSessionError();
-  // `url` is the same-origin forwarder path (/api/admin/<sub>); sign the BACKEND
-  // path (/admin/<sub> incl. query) the backend will actually see + verify.
-  const u = new URL(url, "http://x");
-  const backendPath = u.pathname.replace(/^\/api\/admin/, "/admin") + u.search;
-  const method = (options?.method ?? "GET").toUpperCase();
-  const body = typeof options?.body === "string" ? options.body : "";
-  const signed = encodeAdminHeaders(session, { method, path: backendPath, body });
-  return fetch(url, {
-    ...options,
-    headers: { "Content-Type": "application/json", ...signed, ...(options?.headers as Record<string, string>) },
-  });
-};
+import { adminFetch } from "@/src/lib/admin-fetch";
 
 export function useAdminClaims(status?: string, page = 1) {
   const params = new URLSearchParams({ page: String(page), limit: "20" });

@@ -8,18 +8,17 @@ import { Label } from "@/src/components/ui/label";
 import { RefreshCw, Activity, Database, Zap, GitMerge, ShoppingCart, ListChecks } from "lucide-react";
 import { Textarea } from "@/src/components/ui/textarea";
 import { cn } from "@/src/lib/utils";
+import { adminFetch } from "@/src/lib/admin-fetch";
 
 function adminPost(path: string, body?: unknown) {
-  const proxyPath = path.replace(/^\/admin\//, "/api/admin/");
-  return fetch(proxyPath, {
+  return adminFetch(path, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
     ...(body !== undefined ? { body: JSON.stringify(body) } : {}),
   });
 }
 
 function adminGet(path: string) {
-  return fetch(path.replace(/^\/admin\//, "/api/admin/"), { cache: "no-store" });
+  return adminFetch(path, { cache: "no-store" });
 }
 
 interface ServiceCoverage {
@@ -48,7 +47,7 @@ export default function AdminMaintenancePage() {
 
   const fetchHealth = useCallback(async () => {
     try {
-      const res = await fetch("/api/admin/health", { cache: "no-store" });
+      const res = await adminFetch("/api/admin/health", { cache: "no-store" });
       setHealth(await res.json());
     } catch {
       setHealth(null);
@@ -369,7 +368,7 @@ function PopAllowlist() {
     if (!confirm(`${action === "add" ? "Add" : "Remove"} ${list.length} wallet(s) ${action === "add" ? "to" : "from"} the allowlist?`)) return;
     setBusy(action);
     try {
-      const res = await fetch("/api/admin/pop/allowlist", {
+      const res = await adminFetch("/api/admin/pop/allowlist", {
         method: action === "add" ? "POST" : "DELETE",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ collectionAddress: collection.trim(), addresses: list }),

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useAdminReports } from "@/src/hooks/use-admin";
+import { adminFetch } from "@/src/lib/admin-fetch";
 import {
   ExternalLink, Flag, ChevronLeft, ChevronRight,
   ShieldAlert, Eye, EyeOff, XCircle, RotateCcw, Clock,
@@ -87,7 +88,7 @@ export default function ReportsPage() {
     }
     setActing(true);
     try {
-      const res = await fetch(`/api/admin/reports/${selected.id}`, {
+      const res = await adminFetch(`/api/admin/reports/${selected.id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ status: newStatus, adminNotes: adminNotes.trim() || undefined }),

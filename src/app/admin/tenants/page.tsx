@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useAdminTenants, useAdminTenantKeys } from "@/src/hooks/use-admin";
+import { adminFetch } from "@/src/lib/admin-fetch";
 import { Button } from "@/src/components/ui/button";
 import { Input } from "@/src/components/ui/input";
 import { Label } from "@/src/components/ui/label";
@@ -65,7 +66,7 @@ function TenantKeys({ tenant, onPlaintext }: { tenant: AdminTenant; onPlaintext:
   async function createKey() {
     setBusy(true);
     try {
-      const res = await fetch(`/api/admin/tenants/${tenant.id}/keys`, {
+      const res = await adminFetch(`/api/admin/tenants/${tenant.id}/keys`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ label: label.trim() || undefined }),
@@ -83,7 +84,7 @@ function TenantKeys({ tenant, onPlaintext }: { tenant: AdminTenant; onPlaintext:
   async function revokeKey(keyId: string, prefix: string) {
     if (!confirm(`Revoke key ${prefix}…? Apps using it will lose access immediately.`)) return;
     try {
-      const res = await fetch(`/api/admin/keys/${keyId}`, { method: "DELETE" });
+      const res = await adminFetch(`/api/admin/keys/${keyId}`, { method: "DELETE" });
       if (!res.ok) throw new Error();
       toast.success("Key revoked");
       await mutate();
@@ -168,7 +169,7 @@ export default function AdminTenantsPage() {
     if (!form.name.trim() || !form.email.trim()) { toast.error("Name and email are required"); return; }
     setBusy(true);
     try {
-      const res = await fetch("/api/admin/tenants", {
+      const res = await adminFetch("/api/admin/tenants", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name: form.name.trim(), email: form.email.trim(), plan: form.plan }),
@@ -186,7 +187,7 @@ export default function AdminTenantsPage() {
 
   async function patchTenant(t: AdminTenant, patch: { plan?: string; status?: string }) {
     try {
-      const res = await fetch(`/api/admin/tenants/${t.id}`, {
+      const res = await adminFetch(`/api/admin/tenants/${t.id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(patch),

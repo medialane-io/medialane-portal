@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import { adminFetch } from "@/src/lib/admin-fetch";
 
 interface Props {
   contractId: string;
@@ -19,7 +20,7 @@ export function ContractActions({ contractId, active, notes }: Props) {
   async function patch(body: { active?: boolean; notes?: string | null }) {
     setBusy(true);
     try {
-      const res = await fetch(`/api/admin/services/${contractId}`, {
+      const res = await adminFetch(`/api/admin/services/${contractId}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
