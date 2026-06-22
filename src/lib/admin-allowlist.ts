@@ -1,25 +1,20 @@
 import { normalizeStarknetAddress } from "./starknet-address";
 
 /**
- * Admin access = an env allowlist of wallet addresses. No DB, no signing.
+ * Client-side UI hint ONLY — decides whether to show the admin nav + sign-in
+ * affordance. NOT a security boundary: the real authority is the backend's
+ * `STARKNET_ADMIN_ADDRESSES` (checked after a verified SNIP-12 signature in
+ * `adminSignatureAuth`). A wallet that passes this client check still gets a
+ * 403 from the backend unless it's in the backend allowlist.
  *
- * NOTE: the allowlist checks a CLIENT-SUPPLIED address (the connected wallet,
- * sent as the `x-admin-address` header). Without a signature this is spoofable
- * by anyone who knows an admin's public address — it's a deliberate
- * simplicity-over-strength choice. Harden later with a one-time signature if
- * the threat model needs it.
- *
- * Set one (or more, comma-separated) addresses via env. Checked in order:
- *   NEXT_PUBLIC_ADMIN_ADDRESSES, NEXT_PUBLIC_ADMIN_ADDRESS,
- *   ADMIN_ADDRESSES, ADMIN_ADDRESS
- * (NEXT_PUBLIC_* are needed so the client UI gate can read them too.)
+ * Set comma-separated addresses via `NEXT_PUBLIC_STARKNET_ADMIN_ADDRESSES`
+ * (NEXT_PUBLIC_ so the client bundle can read it). `NEXT_PUBLIC_ADMIN_ADDRESSES`
+ * is a transitional fallback — drop it once Vercel env is migrated.
  */
 function rawAllowlist(): string {
   return (
+    process.env.NEXT_PUBLIC_STARKNET_ADMIN_ADDRESSES ||
     process.env.NEXT_PUBLIC_ADMIN_ADDRESSES ||
-    process.env.NEXT_PUBLIC_ADMIN_ADDRESS ||
-    process.env.ADMIN_ADDRESSES ||
-    process.env.ADMIN_ADDRESS ||
     ""
   );
 }
