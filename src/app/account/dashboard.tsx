@@ -3,24 +3,18 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/src/components/ui/tabs";
 import { ApiKeysTab } from "@/src/components/portal/api-keys-tab";
 import { UsageTab } from "@/src/components/portal/usage-tab";
-import { WebhooksTab } from "@/src/components/portal/webhooks-tab";
 import { CreditsTab } from "@/src/components/portal/credits-tab";
-import { Key, BarChart2, Webhook, Coins } from "lucide-react";
+import { Key, BarChart2, Coins } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useWallet } from "@/src/hooks/use-wallet";
 import { usePortalAuth } from "@/src/hooks/use-portal-auth";
 import { Button } from "@/src/components/ui/button";
-import { Badge } from "@/src/components/ui/badge";
-
-const MDLN_TIER_LABELS = ["", "500+ MDLN", "2K+ MDLN", "5K+ MDLN"];
-const MDLN_TIER_MULTIPLIERS = ["", "1.2×", "1.5×", "2.0×"];
 
 interface Props {
   address: string;
-  mdln_tier: number;
 }
 
-export function AccountDashboard({ address, mdln_tier }: Props) {
+export function AccountDashboard({ address }: Props) {
   const router = useRouter();
   const { disconnect } = useWallet();
   const { signOut } = usePortalAuth();
@@ -41,11 +35,6 @@ export function AccountDashboard({ address, mdln_tier }: Props) {
                 <h1 className="text-lg font-mono font-bold truncate text-white">
                   {address.slice(0, 8)}&hellip;{address.slice(-6)}
                 </h1>
-                {mdln_tier > 0 && (
-                  <Badge className="bg-primary/20 text-primary border-primary/30 text-xs">
-                    {MDLN_TIER_LABELS[mdln_tier]} &middot; {MDLN_TIER_MULTIPLIERS[mdln_tier]} credits
-                  </Badge>
-                )}
               </div>
               <p className="text-xs text-muted-foreground">Starknet Wallet</p>
             </div>
@@ -64,7 +53,7 @@ export function AccountDashboard({ address, mdln_tier }: Props) {
 
       <div className="container mx-auto px-4 max-w-5xl py-8">
         <Tabs defaultValue="keys" className="space-y-6">
-          <TabsList className="w-full h-auto p-1 gap-1 bg-black/40 border border-white/10 rounded-xl grid grid-cols-4">
+          <TabsList className="w-full h-auto p-1 gap-1 bg-black/40 border border-white/10 rounded-xl grid grid-cols-3">
             <TabsTrigger
               value="keys"
               className="flex items-center gap-1.5 py-2.5 text-xs sm:text-sm rounded-lg data-[state=active]:bg-primary/20 data-[state=active]:text-primary data-[state=active]:shadow-none"
@@ -86,19 +75,11 @@ export function AccountDashboard({ address, mdln_tier }: Props) {
               <BarChart2 className="w-3.5 h-3.5 shrink-0" />
               <span className="hidden sm:inline">Usage</span>
             </TabsTrigger>
-            <TabsTrigger
-              value="webhooks"
-              className="flex items-center gap-1.5 py-2.5 text-xs sm:text-sm rounded-lg data-[state=active]:bg-primary/20 data-[state=active]:text-primary data-[state=active]:shadow-none"
-            >
-              <Webhook className="w-3.5 h-3.5 shrink-0" />
-              <span className="hidden sm:inline">Webhooks</span>
-            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="keys"><ApiKeysTab address={address} /></TabsContent>
-          <TabsContent value="credits"><CreditsTab address={address} mdln_tier={mdln_tier} /></TabsContent>
+          <TabsContent value="credits"><CreditsTab address={address} /></TabsContent>
           <TabsContent value="usage"><UsageTab address={address} /></TabsContent>
-          <TabsContent value="webhooks"><WebhooksTab address={address} isPremium={mdln_tier > 0} /></TabsContent>
         </Tabs>
       </div>
     </div>

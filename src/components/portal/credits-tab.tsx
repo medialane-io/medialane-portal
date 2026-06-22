@@ -16,7 +16,6 @@ const USDC_CONTRACT = "0x033068f6539f8e6e6b131e6b2b814e6c34a5224bc66947c47dab9df
 
 interface Props {
   address: string;
-  mdln_tier: number;
 }
 
 interface Payment {

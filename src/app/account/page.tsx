@@ -13,7 +13,7 @@ export default function AccountPage() {
 
   // Signed in → the console (scoped to the resolved Account).
   if (session) {
-    return <AccountDashboard address={session.address} mdln_tier={0} />;
+    return <AccountDashboard address={session.address} />;
   }
 
   // Wallet connected but not signed in → prompt a one-time signature.
