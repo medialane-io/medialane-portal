@@ -4,15 +4,20 @@ import { Toaster as Sonner } from 'sonner'
 
 type ToasterProps = React.ComponentProps<typeof Sonner>
 
-const Toaster = ({ ...props }: ToasterProps) => {
+// Sonner toaster for admin/action feedback. richColors gives success/error their
+// own semantic colors; closeButton + a generous duration make messages readable
+// and dismissible (no one-second flash). Errors are kept longer per-call.
+const SonnerToaster = ({ ...props }: ToasterProps) => {
   return (
     <Sonner
       theme="dark"
+      position="top-center"
+      richColors
+      closeButton
+      duration={5000}
       className="toaster group"
       toastOptions={{
         classNames: {
-          toast:
-            'group toast group-[.toaster]:bg-background group-[.toaster]:text-foreground group-[.toaster]:border-border group-[.toaster]:shadow-lg',
           description: 'group-[.toast]:text-muted-foreground',
           actionButton:
             'group-[.toast]:bg-primary group-[.toast]:text-primary-foreground',
@@ -25,4 +30,4 @@ const Toaster = ({ ...props }: ToasterProps) => {
   )
 }
 
-export { Toaster }
+export { SonnerToaster }

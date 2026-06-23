@@ -2,6 +2,7 @@ import type React from "react"
 import "@/src/app/globals.css"
 import { Inter } from "next/font/google"
 import { Toaster } from "@/src/components/ui/toaster"
+import { SonnerToaster } from "@/src/components/ui/sonner"
 import FloatingNav from "@/src/components/floating-nav"
 import Footer from "@/src/components/footer"
 import FramerMotionProvider from "@/src/lib/framer-motion-provider"
@@ -84,6 +85,7 @@ export default function RootLayout({
                 <main className="flex-1">{children}</main>
                 <Footer />
                 <Toaster />
+                <SonnerToaster />
               </div>
             </FramerMotionProvider>
           </body>
