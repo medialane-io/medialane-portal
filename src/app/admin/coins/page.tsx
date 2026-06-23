@@ -3,14 +3,13 @@
 import { useState, useRef, useCallback } from "react";
 import Link from "next/link";
 import { useAdminCoins } from "@/src/hooks/use-admin";
-import { adminFetch } from "@/src/lib/admin-fetch";
+import { runAdminAction } from "@/src/lib/admin-fetch";
 import { Button } from "@/src/components/ui/button";
 import { Badge } from "@/src/components/ui/badge";
 import { Input } from "@/src/components/ui/input";
 import { Label } from "@/src/components/ui/label";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/src/components/ui/dialog";
 import { Skeleton } from "@/src/components/ui/skeleton";
-import { toast } from "sonner";
 import { ExternalLink, RefreshCw, Plus, EyeOff, Eye, Pencil, Search } from "lucide-react";
 import { ipfsToHttp } from "@/src/lib/utils";
 import { EXPLORER_URL } from "@/src/lib/constants";
@@ -58,32 +57,26 @@ export default function AdminCoinsPage() {
   async function handleAdd() {
     if (!addContract.trim()) return;
     setAdding(true);
-    try {
-      const body: Record<string, unknown> = { contractAddress: addContract.trim() };
-      if (addOwner.trim()) body.owner = addOwner.trim();
-      const res = await adminFetch("/admin/coins/add-external", { method: "POST", body: JSON.stringify(body) });
-      const json = await res.json().catch(() => ({})) as { error?: string };
-      if (!res.ok) throw new Error(json.error ?? "Failed");
-      toast.success("External coin added");
-      setAddOpen(false); setAddContract(""); setAddOwner(""); await mutate();
-    } catch (err) { toast.error(err instanceof Error ? err.message : "Add failed"); }
-    finally { setAdding(false); }
+    const body: Record<string, unknown> = { contractAddress: addContract.trim() };
+    if (addOwner.trim()) body.owner = addOwner.trim();
+    const r = await runAdminAction("/admin/coins/add-external", {
+      method: "POST", body: JSON.stringify(body), success: "External coin added", errorPrefix: "Add failed",
+    });
+    if (r) { setAddOpen(false); setAddContract(""); setAddOwner(""); await mutate(); }
+    setAdding(false);
   }
 
   async function handleHide(coin: AdminCoinRecord) {
-    try {
-      await adminFetch(`/admin/coins/${coin.contractAddress}`, { method: "PATCH", body: JSON.stringify({ isHidden: !coin.isHidden }) });
-      toast.success(coin.isHidden ? "Coin visible on platform" : "Coin hidden from platform");
-      await mutate();
-    } catch { toast.error("Failed to update"); }
+    const r = await runAdminAction(`/admin/coins/${coin.contractAddress}`, {
+      method: "PATCH", body: JSON.stringify({ isHidden: !coin.isHidden }),
+      success: coin.isHidden ? "Coin visible on platform" : "Coin hidden from platform",
+    });
+    if (r) await mutate();
   }
 
   async function handleRefresh(coin: AdminCoinRecord) {
-    try {
-      await adminFetch(`/admin/coins/${coin.contractAddress}/refresh`, { method: "POST" });
-      toast.success("Metadata refreshed");
-      setTimeout(() => mutate(), 1500);
-    } catch { toast.error("Refresh failed"); }
+    const r = await runAdminAction(`/admin/coins/${coin.contractAddress}/refresh`, { method: "POST", success: "Metadata refreshed" });
+    if (r) setTimeout(() => mutate(), 1500);
   }
 
   return (
