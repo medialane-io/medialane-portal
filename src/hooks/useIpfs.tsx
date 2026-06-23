@@ -12,9 +12,9 @@ export interface IpfsMetadata {
 
 const getSignedUrl = async (): Promise<string> => {
   const res = await fetch("/api/pinata");
-  if (!res.ok) throw new Error("Failed to fetch signed URL");
-  const { url } = await res.json();
-  return url;
+  const json = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(json?.error || `Image upload service error (${res.status})`);
+  return json.url as string;
 };
 
 export function useIpfsUpload() {

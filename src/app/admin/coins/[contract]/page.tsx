@@ -13,8 +13,7 @@ import { Textarea } from "@/src/components/ui/textarea";
 import { Switch } from "@/src/components/ui/switch";
 import { Badge } from "@/src/components/ui/badge";
 import { Skeleton } from "@/src/components/ui/skeleton";
-import { ArrowLeft, ExternalLink } from "lucide-react";
-import { toast } from "sonner";
+import { ArrowLeft, ExternalLink, CheckCircle2, AlertCircle } from "lucide-react";
 import { ipfsToHttp } from "@/src/lib/utils";
 import { EXPLORER_URL } from "@/src/lib/constants";
 
@@ -38,6 +37,7 @@ export default function CoinSettingsPage() {
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [saving, setSaving] = useState(false);
   const [seeded, setSeeded] = useState(false);
+  const [status, setStatus] = useState<{ type: "error" | "success"; message: string } | null>(null);
 
   // Seed the form once the coin record arrives.
   useEffect(() => {
@@ -56,21 +56,31 @@ export default function CoinSettingsPage() {
   async function handleSave() {
     if (!coin) return;
     setSaving(true);
-    try {
-      // Resolve the image: uploaded file wins; else a real (non-preview), changed URL; else leave as-is.
-      let image: string | undefined;
-      if (imageFile) {
+    setStatus(null);
+
+    // 1) Resolve the image — upload the chosen file (or use a pasted URL).
+    //    A failed upload aborts the save with a specific reason; nothing is persisted.
+    let image: string | undefined;
+    if (imageFile) {
+      try {
         const { fileUrl } = await uploadToIpfs(imageFile, { name: name || coin.contractAddress, description: description || "" });
         image = fileUrl;
-      } else if (
-        imageUrl &&
-        imageUrl !== (coin.image ?? "") &&
-        !imageUrl.startsWith("data:") &&
-        !imageUrl.startsWith("blob:")
-      ) {
-        image = imageUrl;
+      } catch (err) {
+        setSaving(false);
+        setStatus({ type: "error", message: `Image upload failed: ${err instanceof Error ? err.message : "unknown error"}. No changes were saved.` });
+        return;
       }
+    } else if (
+      imageUrl &&
+      imageUrl !== (coin.image ?? "") &&
+      !imageUrl.startsWith("data:") &&
+      !imageUrl.startsWith("blob:")
+    ) {
+      image = imageUrl;
+    }
 
+    // 2) Persist the coin fields.
+    try {
       const patch: Record<string, unknown> = { isHidden: hidden };
       if (name.trim()) patch.name = name.trim();
       if (symbol.trim()) patch.symbol = symbol.trim();
@@ -83,12 +93,15 @@ export default function CoinSettingsPage() {
         method: "PATCH",
         body: JSON.stringify(patch),
       });
-      if (!res.ok) throw new Error();
-      toast.success("Coin updated");
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        throw new Error(body?.error || `Server responded ${res.status}`);
+      }
       await mutate();
-      router.push("/admin/coins");
-    } catch {
-      toast.error("Update failed");
+      setImageFile(null);
+      setStatus({ type: "success", message: "Changes saved." });
+    } catch (err) {
+      setStatus({ type: "error", message: `Save failed: ${err instanceof Error ? err.message : "unknown error"}` });
     } finally {
       setSaving(false);
     }
@@ -173,12 +186,28 @@ export default function CoinSettingsPage() {
         </div>
       </div>
 
+      {status && (
+        <div
+          className={`flex items-start gap-2 rounded-lg border p-3 text-sm ${
+            status.type === "error"
+              ? "border-destructive/30 bg-destructive/10 text-destructive"
+              : "border-green-500/30 bg-green-500/10 text-green-500"
+          }`}
+          role="status"
+        >
+          {status.type === "error"
+            ? <AlertCircle className="h-4 w-4 shrink-0 mt-0.5" />
+            : <CheckCircle2 className="h-4 w-4 shrink-0 mt-0.5" />}
+          <span className="break-words">{status.message}</span>
+        </div>
+      )}
+
       {saving && progress > 0 && progress < 100 && (
         <p className="text-xs text-muted-foreground">Uploading image… {Math.round(progress)}%</p>
       )}
 
       <div className="flex justify-end gap-2">
-        <Button variant="outline" onClick={() => router.push("/admin/coins")} disabled={saving}>Cancel</Button>
+        <Button variant="outline" onClick={() => router.push("/admin/coins")} disabled={saving}>Back to coins</Button>
         <Button onClick={handleSave} disabled={saving}>{saving ? "Saving…" : "Save changes"}</Button>
       </div>
     </div>
