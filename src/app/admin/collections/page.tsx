@@ -2,7 +2,7 @@
 
 import { useState, useRef, useCallback } from "react";
 import { useAdminCollections } from "@/src/hooks/use-admin";
-import { adminFetch } from "@/src/lib/admin-fetch";
+import { runAdminAction } from "@/src/lib/admin-fetch";
 import { Button } from "@/src/components/ui/button";
 import { Badge } from "@/src/components/ui/badge";
 import { Input } from "@/src/components/ui/input";
@@ -121,16 +121,13 @@ export default function AdminCollectionsPage() {
   async function handleRegister() {
     if (!registerContract.trim()) return;
     setRegistering(true);
-    try {
-      const body: Record<string, unknown> = { contractAddress: registerContract.trim() };
-      if (registerStartBlock.trim()) body.startBlock = parseInt(registerStartBlock.trim(), 10);
-      const res = await adminFetch("/admin/collections", { method: "POST", body: JSON.stringify(body) });
-      if (!res.ok) throw new Error();
-      toast.success("Collection registered");
-      setRegisterOpen(false); setRegisterContract(""); setRegisterStartBlock("");
-      await mutate();
-    } catch { toast.error("Registration failed"); }
-    finally { setRegistering(false); }
+    const body: Record<string, unknown> = { contractAddress: registerContract.trim() };
+    if (registerStartBlock.trim()) body.startBlock = parseInt(registerStartBlock.trim(), 10);
+    const r = await runAdminAction("/admin/collections", {
+      method: "POST", body: JSON.stringify(body), success: "Collection registered", errorPrefix: "Registration failed",
+    });
+    if (r) { setRegisterOpen(false); setRegisterContract(""); setRegisterStartBlock(""); await mutate(); }
+    setRegistering(false);
   }
 
   // ── Backfill dialog ──────────────────────────────────────────────────────────
@@ -146,18 +143,18 @@ export default function AdminCollectionsPage() {
   async function handleBackfillTransfers() {
     if (!backfillContract) return;
     setBackfilling(true);
-    try {
-      const body: Record<string, unknown> = {};
-      if (backfillFromBlock.trim()) body.fromBlock = parseInt(backfillFromBlock.trim(), 10);
-      const res = await adminFetch(`/admin/collections/${backfillContract}/backfill-transfers`, { method: "POST", body: JSON.stringify(body) });
-      const json = await res.json().catch(() => ({})) as { data?: { inserted?: number; skipped?: number; metadataJobsEnqueued?: number }; error?: string };
-      if (!res.ok) throw new Error(json.error ?? "Failed");
-      const { inserted, skipped, metadataJobsEnqueued } = json.data ?? {};
+    const body: Record<string, unknown> = {};
+    if (backfillFromBlock.trim()) body.fromBlock = parseInt(backfillFromBlock.trim(), 10);
+    const r = await runAdminAction<{ data?: { inserted?: number; skipped?: number; metadataJobsEnqueued?: number } }>(
+      `/admin/collections/${backfillContract}/backfill-transfers`,
+      { method: "POST", body: JSON.stringify(body), errorPrefix: "Backfill failed" },
+    );
+    if (r) {
+      const { inserted, skipped, metadataJobsEnqueued } = r.data ?? {};
       toast.success(`Backfill complete — ${inserted} inserted, ${skipped} skipped, ${metadataJobsEnqueued} metadata jobs queued`);
       setBackfillOpen(false); await mutate();
-    } catch (err: unknown) {
-      toast.error(err instanceof Error ? err.message : "Backfill failed");
-    } finally { setBackfilling(false); }
+    }
+    setBackfilling(false);
   }
 
   // ── Edit service dialog ──────────────────────────────────────────────────────
@@ -181,21 +178,18 @@ export default function AdminCollectionsPage() {
   async function handleSaveEdit() {
     if (!editCol) return;
     setSaving(true);
-    try {
-      const res = await adminFetch(`/admin/collections/${editCol.contractAddress}`, {
-        method: "PATCH",
-        body: JSON.stringify({
-          service: editService,
-          ...(editName.trim() ? { name: editName.trim() } : {}),
-          ...(editImage.trim() ? { image: editImage.trim() } : {}),
-          ...(editDescription.trim() ? { description: editDescription.trim() } : {}),
-        }),
-      });
-      if (!res.ok) throw new Error();
-      toast.success("Collection updated");
-      setEditOpen(false); await mutate();
-    } catch { toast.error("Update failed"); }
-    finally { setSaving(false); }
+    const r = await runAdminAction(`/admin/collections/${editCol.contractAddress}`, {
+      method: "PATCH",
+      body: JSON.stringify({
+        service: editService,
+        ...(editName.trim() ? { name: editName.trim() } : {}),
+        ...(editImage.trim() ? { image: editImage.trim() } : {}),
+        ...(editDescription.trim() ? { description: editDescription.trim() } : {}),
+      }),
+      success: "Collection updated", errorPrefix: "Update failed",
+    });
+    if (r) { setEditOpen(false); await mutate(); }
+    setSaving(false);
   }
 
   // ── Delete dialog ────────────────────────────────────────────────────────────
@@ -208,48 +202,42 @@ export default function AdminCollectionsPage() {
   async function handleConfirmDelete() {
     if (!deleteCol) return;
     setDeleting(true);
-    try {
-      const res = await adminFetch(`/admin/collections/${deleteCol.contractAddress}`, { method: "DELETE" });
-      const json = await res.json().catch(() => ({})) as { data?: { deleted?: { tokens?: { count: number }; transfers?: { count: number } } }; error?: string };
-      if (!res.ok) throw new Error(json.error ?? "Failed");
-      const { tokens, transfers } = json.data?.deleted ?? {};
+    const r = await runAdminAction<{ data?: { deleted?: { tokens?: { count: number }; transfers?: { count: number } } } }>(
+      `/admin/collections/${deleteCol.contractAddress}`,
+      { method: "DELETE", errorPrefix: "Delete failed" },
+    );
+    if (r) {
+      const { tokens, transfers } = r.data?.deleted ?? {};
       toast.success(`Deleted — ${tokens?.count ?? 0} tokens, ${transfers?.count ?? 0} transfers removed`);
       setDeleteOpen(false); await mutate();
-    } catch (err: unknown) {
-      toast.error(err instanceof Error ? err.message : "Delete failed");
-    } finally { setDeleting(false); }
+    }
+    setDeleting(false);
   }
 
   // ── Per-row actions ──────────────────────────────────────────────────────────
   async function handleRefresh(contractAddress: string) {
-    try {
-      await adminFetch(`/admin/collections/${contractAddress}/refresh`, { method: "POST" });
-      toast.success("Metadata refresh queued");
-    } catch { toast.error("Refresh failed"); }
+    await runAdminAction(`/admin/collections/${contractAddress}/refresh`, { method: "POST", success: "Metadata refresh queued" });
   }
 
   async function handleStatsRefresh(contractAddress: string) {
-    try {
-      await adminFetch(`/admin/collections/${contractAddress}/stats-refresh`, { method: "POST" });
-      toast.success("Stats refresh queued");
-      setTimeout(() => mutate(), 3000);
-    } catch { toast.error("Stats refresh failed"); }
+    const r = await runAdminAction(`/admin/collections/${contractAddress}/stats-refresh`, { method: "POST", success: "Stats refresh queued" });
+    if (r) setTimeout(() => mutate(), 3000);
   }
 
   async function handleIsFeatured(contractAddress: string, current: boolean) {
-    try {
-      await adminFetch(`/admin/collections/${contractAddress}`, { method: "PATCH", body: JSON.stringify({ isFeatured: !current }) });
-      toast.success(current ? "Removed from featured" : "Added to featured");
-      await mutate();
-    } catch { toast.error("Failed to update"); }
+    const r = await runAdminAction(`/admin/collections/${contractAddress}`, {
+      method: "PATCH", body: JSON.stringify({ isFeatured: !current }),
+      success: current ? "Removed from featured" : "Added to featured",
+    });
+    if (r) await mutate();
   }
 
   async function handleIsHidden(contractAddress: string, current: boolean) {
-    try {
-      await adminFetch(`/admin/collections/${contractAddress}`, { method: "PATCH", body: JSON.stringify({ isHidden: !current }) });
-      toast.success(current ? "Collection visible on platform" : "Collection hidden from platform");
-      await mutate();
-    } catch { toast.error("Failed to update"); }
+    const r = await runAdminAction(`/admin/collections/${contractAddress}`, {
+      method: "PATCH", body: JSON.stringify({ isHidden: !current }),
+      success: current ? "Collection visible on platform" : "Collection hidden from platform",
+    });
+    if (r) await mutate();
   }
 
   const hasFilters = !!(debouncedSearch || serviceFilter || statusFilter || featuredOnly || showHidden);
