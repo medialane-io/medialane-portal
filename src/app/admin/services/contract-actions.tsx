@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { adminFetch } from "@/src/lib/admin-fetch";
+import { runAdminAction } from "@/src/lib/admin-fetch";
 
 interface Props {
   contractId: string;
@@ -19,22 +19,12 @@ export function ContractActions({ contractId, active, notes }: Props) {
 
   async function patch(body: { active?: boolean; notes?: string | null }) {
     setBusy(true);
-    try {
-      const res = await adminFetch(`/api/admin/services/${contractId}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(body),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error);
-      router.refresh();
-      return true;
-    } catch {
-      toast.error("Update failed");
-      return false;
-    } finally {
-      setBusy(false);
-    }
+    const r = await runAdminAction(`/api/admin/services/${contractId}`, {
+      method: "PATCH", body: JSON.stringify(body), errorPrefix: "Update failed",
+    });
+    setBusy(false);
+    if (r) { router.refresh(); return true; }
+    return false;
   }
 
   async function toggleActive() {

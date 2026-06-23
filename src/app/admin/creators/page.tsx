@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useAdminUsernameClaims } from "@/src/hooks/use-admin";
-import { adminFetch } from "@/src/lib/admin-fetch";
+import { runAdminAction } from "@/src/lib/admin-fetch";
 import { Button } from "@/src/components/ui/button";
 import { Input } from "@/src/components/ui/input";
 import { Label } from "@/src/components/ui/label";
@@ -36,21 +36,12 @@ export default function AdminCreatorsPage() {
   async function handleFixWallet() {
     if (!newWallet.trim() || !fixCreator) return;
     setFixing(true);
-    try {
-      const res = await adminFetch(
-        `/api/admin/creators/${fixCreator.walletAddress}/fix-wallet`,
-        {
-          method: "PATCH",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ newAddress: newWallet.trim() }),
-        }
-      );
-      if (!res.ok) throw new Error();
-      toast.success(`Wallet corrected for @${fixCreator.username}`);
-      setFixOpen(false);
-      await mutate();
-    } catch { toast.error("Failed to fix wallet"); }
-    finally { setFixing(false); }
+    const r = await runAdminAction(`/api/admin/creators/${fixCreator.walletAddress}/fix-wallet`, {
+      method: "PATCH", body: JSON.stringify({ newAddress: newWallet.trim() }),
+      success: `Wallet corrected for @${fixCreator.username}`, errorPrefix: "Failed to fix wallet",
+    });
+    if (r) { setFixOpen(false); await mutate(); }
+    setFixing(false);
   }
 
   const totalPages = Math.ceil(total / 20);

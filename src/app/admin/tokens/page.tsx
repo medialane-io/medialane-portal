@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { adminFetch } from "@/src/lib/admin-fetch";
+import { adminFetch, runAdminAction } from "@/src/lib/admin-fetch";
 import { Button } from "@/src/components/ui/button";
 import { Input } from "@/src/components/ui/input";
 import { Label } from "@/src/components/ui/label";
@@ -80,14 +80,9 @@ export default function AdminTokensPage() {
     const c = contract.trim(); const t = tokenId.trim();
     if (!c || !t) return;
     setRefreshing(true);
-    try {
-      const res = await adminFetch(`/api/admin/tokens/${c}/${t}/refresh`, { method: "POST", headers: { "Content-Type": "application/json" } });
-      if (!res.ok) throw new Error();
-      const data = await res.json();
-      toast.success(`Refresh queued — status: ${data.metadataStatus ?? "updated"}`);
-      await handleLookup();
-    } catch { toast.error("Refresh failed"); }
-    finally { setRefreshing(false); }
+    const r = await runAdminAction<{ metadataStatus?: string }>(`/api/admin/tokens/${c}/${t}/refresh`, { method: "POST", errorPrefix: "Refresh failed" });
+    if (r) { toast.success(`Refresh queued — status: ${r.metadataStatus ?? "updated"}`); await handleLookup(); }
+    setRefreshing(false);
   }
 
   const imgUrl = token?.metadata?.image ? ipfsToHttp(token.metadata.image) : null;

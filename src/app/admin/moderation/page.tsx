@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useAdminComments, useAdminSlugClaims } from "@/src/hooks/use-admin";
-import { adminFetch } from "@/src/lib/admin-fetch";
+import { runAdminAction } from "@/src/lib/admin-fetch";
 import { Button } from "@/src/components/ui/button";
 import { Input } from "@/src/components/ui/input";
 import { Label } from "@/src/components/ui/label";
@@ -40,13 +40,11 @@ function CommentsTab() {
 
   async function toggle(id: string, hide: boolean) {
     setBusy(id);
-    try {
-      const res = await adminFetch(`/api/admin/comments/${id}/${hide ? "hide" : "show"}`, { method: "PATCH" });
-      if (!res.ok) throw new Error();
-      toast.success(hide ? "Comment hidden" : "Comment restored");
-      await mutate();
-    } catch { toast.error("Action failed"); }
-    finally { setBusy(null); }
+    const r = await runAdminAction(`/api/admin/comments/${id}/${hide ? "hide" : "show"}`, {
+      method: "PATCH", success: hide ? "Comment hidden" : "Comment restored", errorPrefix: "Action failed",
+    });
+    if (r) await mutate();
+    setBusy(null);
   }
 
   return (
@@ -103,17 +101,12 @@ function SlugClaimsTab() {
 
   async function review(id: string, newStatus: "APPROVED" | "REJECTED") {
     setBusy(id);
-    try {
-      const res = await adminFetch(`/api/admin/collection-slug-claims/${id}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ status: newStatus }),
-      });
-      if (!res.ok) throw new Error();
-      toast.success(`Claim ${newStatus.toLowerCase()}`);
-      await mutate();
-    } catch { toast.error("Action failed"); }
-    finally { setBusy(null); }
+    const r = await runAdminAction(`/api/admin/collection-slug-claims/${id}`, {
+      method: "PATCH", body: JSON.stringify({ status: newStatus }),
+      success: `Claim ${newStatus.toLowerCase()}`, errorPrefix: "Action failed",
+    });
+    if (r) await mutate();
+    setBusy(null);
   }
 
   const STATUS_STYLE: Record<string, string> = {
@@ -176,18 +169,12 @@ function LicensingFixTab() {
   async function submit() {
     if (!offerId.trim() || !creatorAddress.trim()) { toast.error("Both fields are required"); return; }
     setBusy(true);
-    try {
-      const res = await adminFetch(`/api/admin/remix-offers/${offerId.trim()}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ creatorAddress: creatorAddress.trim() }),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error);
-      toast.success(`Creator address updated on offer ${data.data.id}`);
-      setOfferId(""); setCreatorAddress("");
-    } catch { toast.error("Update failed — check the offer ID"); }
-    finally { setBusy(false); }
+    const r = await runAdminAction<{ data?: { id?: string } }>(`/api/admin/remix-offers/${offerId.trim()}`, {
+      method: "PATCH", body: JSON.stringify({ creatorAddress: creatorAddress.trim() }),
+      errorPrefix: "Update failed — check the offer ID",
+    });
+    if (r) { toast.success(`Creator address updated on offer ${r.data?.id}`); setOfferId(""); setCreatorAddress(""); }
+    setBusy(false);
   }
 
   return (

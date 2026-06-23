@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useAdminClaims, useAdminUsernameClaims } from "@/src/hooks/use-admin";
-import { adminFetch } from "@/src/lib/admin-fetch";
+import { runAdminAction } from "@/src/lib/admin-fetch";
 import { Button } from "@/src/components/ui/button";
 import { Badge } from "@/src/components/ui/badge";
 import { Textarea } from "@/src/components/ui/textarea";
@@ -39,18 +39,13 @@ function CollectionClaimsTab() {
   async function handleAction(status: "APPROVED" | "REJECTED") {
     if (!selected) return;
     setProcessing(true);
-    try {
-      const res = await adminFetch(`/api/admin/claims/${selected.id}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ status, adminNotes, ...(status === "APPROVED" && service ? { service } : {}) }),
-      });
-      if (!res.ok) throw new Error();
-      toast.success(status === "APPROVED" ? "Claim approved" : "Claim rejected");
-      setSelected(null);
-      await mutate();
-    } catch { toast.error("Action failed"); }
-    finally { setProcessing(false); }
+    const r = await runAdminAction(`/api/admin/claims/${selected.id}`, {
+      method: "PATCH",
+      body: JSON.stringify({ status, adminNotes, ...(status === "APPROVED" && service ? { service } : {}) }),
+      success: status === "APPROVED" ? "Claim approved" : "Claim rejected", errorPrefix: "Action failed",
+    });
+    if (r) { setSelected(null); await mutate(); }
+    setProcessing(false);
   }
 
   return (
@@ -126,18 +121,12 @@ function UsernameClaimsTab() {
   async function handleAction(status: "APPROVED" | "REJECTED") {
     if (!selected) return;
     setProcessing(true);
-    try {
-      const res = await adminFetch(`/api/admin/username-claims/${selected.id}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ status, adminNotes }),
-      });
-      if (!res.ok) throw new Error();
-      toast.success(status === "APPROVED" ? `@${selected.username} approved` : "Claim rejected");
-      setSelected(null);
-      await mutate();
-    } catch { toast.error("Action failed"); }
-    finally { setProcessing(false); }
+    const r = await runAdminAction(`/api/admin/username-claims/${selected.id}`, {
+      method: "PATCH", body: JSON.stringify({ status, adminNotes }),
+      success: status === "APPROVED" ? `@${selected.username} approved` : "Claim rejected", errorPrefix: "Action failed",
+    });
+    if (r) { setSelected(null); await mutate(); }
+    setProcessing(false);
   }
 
   return (

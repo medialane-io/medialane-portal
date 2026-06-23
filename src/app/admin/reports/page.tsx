@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useAdminReports } from "@/src/hooks/use-admin";
-import { adminFetch } from "@/src/lib/admin-fetch";
+import { runAdminAction } from "@/src/lib/admin-fetch";
 import {
   ExternalLink, Flag, ChevronLeft, ChevronRight,
   ShieldAlert, Eye, EyeOff, XCircle, RotateCcw, Clock,
@@ -87,17 +87,13 @@ export default function ReportsPage() {
       toast.error("Admin notes are required for Hide / Dismiss"); return;
     }
     setActing(true);
-    try {
-      const res = await adminFetch(`/api/admin/reports/${selected.id}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ status: newStatus, adminNotes: adminNotes.trim() || undefined }),
-      });
-      if (!res.ok) throw new Error();
-      toast.success(`Report ${newStatus.toLowerCase().replace(/_/g, " ")}`);
-      closeDialog(); await mutate();
-    } catch { toast.error("Action failed. Please try again."); }
-    finally { setActing(false); }
+    const r = await runAdminAction(`/api/admin/reports/${selected.id}`, {
+      method: "PATCH",
+      body: JSON.stringify({ status: newStatus, adminNotes: adminNotes.trim() || undefined }),
+      success: `Report ${newStatus.toLowerCase().replace(/_/g, " ")}`, errorPrefix: "Action failed",
+    });
+    if (r) { closeDialog(); await mutate(); }
+    setActing(false);
   };
 
   return (

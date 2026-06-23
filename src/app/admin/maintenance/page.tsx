@@ -67,11 +67,11 @@ export default function AdminMaintenancePage() {
     setRegistryRunning(true); setRegistryResult(null);
     try {
       const res = await adminPost("/admin/collections/backfill-registry");
-      if (!res.ok) throw new Error();
-      const data = await res.json();
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.error ?? "Backfill registry failed");
       setRegistryResult(data.data);
       toast.success(`Registry backfill complete — ${data.data.inserted} inserted, ${data.data.skipped} skipped`);
-    } catch { toast.error("Backfill registry failed"); }
+    } catch (e) { toast.error(e instanceof Error ? e.message : "Backfill registry failed"); }
     finally { setRegistryRunning(false); }
   }
 
@@ -80,11 +80,11 @@ export default function AdminMaintenancePage() {
     setMetaRunning(true); setMetaResult(null);
     try {
       const res = await adminPost("/admin/collections/backfill-metadata");
-      if (!res.ok) throw new Error();
-      const data = await res.json();
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.error ?? "Backfill metadata failed");
       setMetaResult(data.data);
       toast.success(`Metadata backfill complete — ${data.data.enqueued} jobs enqueued`);
-    } catch { toast.error("Backfill metadata failed"); }
+    } catch (e) { toast.error(e instanceof Error ? e.message : "Backfill metadata failed"); }
     finally { setMetaRunning(false); }
   }
 
@@ -97,11 +97,11 @@ export default function AdminMaintenancePage() {
     setTransferRunning(true); setTransferResult(null);
     try {
       const res = await adminPost(`/admin/collections/${transferContract.trim()}/backfill-transfers`, { fromBlock });
-      if (!res.ok) throw new Error();
-      const data = await res.json();
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.error ?? "Transfer backfill failed");
       setTransferResult(data.data);
       toast.success(`Transfer backfill complete — ${data.data.inserted} tokens inserted, ${data.data.metadataJobsEnqueued} metadata jobs queued`);
-    } catch { toast.error("Transfer backfill failed"); }
+    } catch (e) { toast.error(e instanceof Error ? e.message : "Transfer backfill failed"); }
     finally { setTransferRunning(false); }
   }
 
@@ -109,12 +109,12 @@ export default function AdminMaintenancePage() {
     setCoverageLoading(true);
     try {
       const res = await adminGet("/admin/collections/service-coverage");
-      if (!res.ok) throw new Error();
-      const data = await res.json();
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.error ?? "Coverage check failed");
       setCoverage(data.data as ServiceCoverage);
       if (data.data.safeToDropSourceColumn) toast.success("Safe to drop source column — missingService = 0");
       else toast.error(`${data.data.missingService} collection(s) still missing a service`);
-    } catch { toast.error("Coverage check failed"); }
+    } catch (e) { toast.error(e instanceof Error ? e.message : "Coverage check failed"); }
     finally { setCoverageLoading(false); }
   }
 

@@ -47,14 +47,14 @@ function ActionsCard() {
       toast.success(`${a.label} updated`);
       setEditing(null);
       await mutate();
-    } catch { toast.error("Update failed"); }
+    } catch (e) { toast.error(e instanceof Error ? e.message : "Update failed"); }
   }
 
   async function toggleEnabled(a: RewardAction) {
     try {
       await patchJson(`/api/admin/rewards/actions/${a.type}`, { enabled: !a.enabled });
       await mutate();
-    } catch { toast.error("Update failed"); }
+    } catch (e) { toast.error(e instanceof Error ? e.message : "Update failed"); }
   }
 
   return (
@@ -124,14 +124,14 @@ function MultipliersCard() {
       toast.success(`${m.name} updated`);
       setEditing(null);
       await mutate();
-    } catch { toast.error("Update failed"); }
+    } catch (e) { toast.error(e instanceof Error ? e.message : "Update failed"); }
   }
 
   async function toggleEnabled(m: RewardMultiplier) {
     try {
       await patchJson(`/api/admin/rewards/multipliers/${m.id}`, { enabled: !m.enabled });
       await mutate();
-    } catch { toast.error("Update failed"); }
+    } catch (e) { toast.error(e instanceof Error ? e.message : "Update failed"); }
   }
 
   return (
@@ -176,7 +176,7 @@ function BadgesCard() {
     try {
       await patchJson(`/api/admin/rewards/badges/${key}`, { enabled: !enabled });
       await mutate();
-    } catch { toast.error("Update failed"); }
+    } catch (e) { toast.error(e instanceof Error ? e.message : "Update failed"); }
   }
 
   async function award() {
@@ -188,10 +188,11 @@ function BadgesCard() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ badgeKey }),
       });
-      if (!res.ok) throw new Error();
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.error ?? "Award failed");
       toast.success("Badge awarded");
       setAddress("");
-    } catch { toast.error("Award failed"); }
+    } catch (e) { toast.error(e instanceof Error ? e.message : "Award failed"); }
     finally { setAwarding(false); }
   }
 
@@ -247,7 +248,7 @@ function ComputeCard() {
       if (!res.ok) throw new Error(data.error);
       setOutput(data.output ?? "");
       toast.success(`Computation complete in ${(data.elapsedMs / 1000).toFixed(1)}s${dryRun ? " (dry run)" : ""}`);
-    } catch { toast.error("Computation failed"); }
+    } catch (e) { toast.error(e instanceof Error ? e.message : "Computation failed"); }
     finally { setRunning(false); }
   }
 

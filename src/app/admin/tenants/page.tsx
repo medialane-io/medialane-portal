@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useAdminTenants, useAdminTenantKeys } from "@/src/hooks/use-admin";
-import { adminFetch } from "@/src/lib/admin-fetch";
+import { runAdminAction } from "@/src/lib/admin-fetch";
 import { Button } from "@/src/components/ui/button";
 import { Input } from "@/src/components/ui/input";
 import { Label } from "@/src/components/ui/label";
@@ -65,30 +65,17 @@ function TenantKeys({ tenant, onPlaintext }: { tenant: AdminTenant; onPlaintext:
 
   async function createKey() {
     setBusy(true);
-    try {
-      const res = await adminFetch(`/api/admin/tenants/${tenant.id}/keys`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ label: label.trim() || undefined }),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error);
-      onPlaintext(data.data.plaintext);
-      setCreating(false);
-      setLabel("");
-      await mutate();
-    } catch { toast.error("Failed to create key"); }
-    finally { setBusy(false); }
+    const r = await runAdminAction<{ data?: { plaintext?: string } }>(`/api/admin/tenants/${tenant.id}/keys`, {
+      method: "POST", body: JSON.stringify({ label: label.trim() || undefined }), errorPrefix: "Failed to create key",
+    });
+    if (r?.data?.plaintext) { onPlaintext(r.data.plaintext); setCreating(false); setLabel(""); await mutate(); }
+    setBusy(false);
   }
 
   async function revokeKey(keyId: string, prefix: string) {
     if (!confirm(`Revoke key ${prefix}…? Apps using it will lose access immediately.`)) return;
-    try {
-      const res = await adminFetch(`/api/admin/keys/${keyId}`, { method: "DELETE" });
-      if (!res.ok) throw new Error();
-      toast.success("Key revoked");
-      await mutate();
-    } catch { toast.error("Failed to revoke key"); }
+    const r = await runAdminAction(`/api/admin/keys/${keyId}`, { method: "DELETE", success: "Key revoked", errorPrefix: "Failed to revoke key" });
+    if (r) await mutate();
   }
 
   return (
@@ -168,34 +155,26 @@ export default function AdminTenantsPage() {
   async function createTenant() {
     if (!form.name.trim() || !form.email.trim()) { toast.error("Name and email are required"); return; }
     setBusy(true);
-    try {
-      const res = await adminFetch("/api/admin/tenants", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: form.name.trim(), email: form.email.trim(), plan: form.plan }),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error);
+    const r = await runAdminAction<{ data?: { apiKey?: { plaintext?: string }; tenant?: { name?: string } } }>("/api/admin/tenants", {
+      method: "POST",
+      body: JSON.stringify({ name: form.name.trim(), email: form.email.trim(), plan: form.plan }),
+      errorPrefix: "Failed to create tenant",
+    });
+    if (r) {
       setCreateOpen(false);
       setForm({ name: "", email: "", plan: "FREE" });
-      setPlaintext(data.data.apiKey.plaintext);
-      toast.success(`Tenant ${data.data.tenant.name} created`);
+      if (r.data?.apiKey?.plaintext) setPlaintext(r.data.apiKey.plaintext);
+      toast.success(`Tenant ${r.data?.tenant?.name ?? ""} created`);
       await mutate();
-    } catch { toast.error("Failed to create tenant (email may already be registered)"); }
-    finally { setBusy(false); }
+    }
+    setBusy(false);
   }
 
   async function patchTenant(t: AdminTenant, patch: { plan?: string; status?: string }) {
-    try {
-      const res = await adminFetch(`/api/admin/tenants/${t.id}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(patch),
-      });
-      if (!res.ok) throw new Error();
-      toast.success("Tenant updated");
-      await mutate();
-    } catch { toast.error("Update failed"); }
+    const r = await runAdminAction(`/api/admin/tenants/${t.id}`, {
+      method: "PATCH", body: JSON.stringify(patch), success: "Tenant updated", errorPrefix: "Update failed",
+    });
+    if (r) await mutate();
   }
 
   return (
