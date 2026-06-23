@@ -124,7 +124,7 @@ secret-less `/api/admin/[...path]` forwarder, which passes the `x-ml-admin-*` he
 
 | File | Purpose |
 |---|---|
-| `src/lib/admin-fetch.ts` | **The one way to call the admin API.** `adminFetch(path, opts)` signs the request (SDK `encodeAdminHeaders`). Accepts `/admin/…` or `/api/admin/…`. **Every admin call — reads + writes — must use this.** |
+| `src/lib/admin-fetch.ts` | **The one way to call the admin API.** `adminFetch(path, opts)` signs the request (SDK `encodeAdminHeaders`). Accepts `/admin/…` or `/api/admin/…`. **Every admin call — reads + writes — must use this.** Also exports `runAdminAction(path, { method, body, success?, errorPrefix? })` — see feedback below. |
 | `src/lib/admin-session.ts` | `startAdminSession` / `getAdminSession` / `clearAdminSession` (sessionStorage). |
 | `src/lib/admin-allowlist.ts` | `isAdminAddress` — **client UI hint only** (`NEXT_PUBLIC_STARKNET_ADMIN_ADDRESSES`); decides whether to show admin UI, NOT a boundary. |
 | `src/app/admin/layout.tsx` | Connect + one-signature sign-in gate; nav uses Next `<Link>` (client-side — never `<a>`, which full-reloads and drops the wallet). |
@@ -139,6 +139,21 @@ that read the backend directly with `ADMIN_API_KEY`. Everything client-side uses
 
 **Coin settings:** `/admin/coins/[contract]` is a dedicated page (not a modal) with a feature-image
 uploader — see "Image upload" below. Collections still uses an inline modal (fast-follow to match).
+
+**Admin action feedback (mandatory pattern).** Admin pages give feedback via **`sonner`** toasts —
+mounted as `<SonnerToaster/>` in the root layout (rich colors, close button, top-center). For any
+admin **write**, use **`runAdminAction`** rather than a bare `adminFetch` + generic `toast.error`:
+
+```ts
+const r = await runAdminAction(`/admin/coins/${addr}`, { method: "PATCH", body, success: "Coin updated" });
+if (r) await mutate();   // r is the parsed response, or null (error already shown)
+```
+
+It surfaces the backend's real `{ error }` message in a long-lived, dismissible toast (never a generic
+"Failed"). The coin **settings page** uses a persistent inline banner instead (its save is multi-step).
+Do **not** reintroduce: a bare `toast.error("Failed")` that swallows the reason, or a `sonner` `toast()`
+without the mounted `<SonnerToaster/>` (its toasts render nothing — the original "admin feedback is
+broken" bug). The shadcn `Toaster` (`ui/toaster`, `use-toast`) is also mounted, used by `MediaUploader`.
 
 ---
 
@@ -248,7 +263,11 @@ No `DATABASE_URL`, no `CRON_SECRET`, no Clerk/ChipiPay secrets — those systems
   (they use `ADMIN_API_KEY` server-side).
 - **Admin/account nav must be `<Link>`, not `<a>`** — a plain `<a>` full-reloads the document, tears
   down the wallet context, and drops the session.
-- **Image upload** — reuse `<MediaUploader>` + `useIpfsUpload`; never add a new uploader.
+- **Admin write feedback** — use `runAdminAction` (specific, visible, dismissible). Admin toasts are
+  `sonner` and require the mounted `<SonnerToaster/>`; a `sonner` `toast()` with no mounted toaster
+  renders nothing.
+- **Image upload** — reuse `<MediaUploader>` + `useIpfsUpload`; never add a new uploader. Uploads need a
+  valid `PINATA_JWT` (with upload scope) on the server; `/api/pinata` returns the real reason on failure.
 - **`"use client"`** on the component that owns the hook, not the parent.
 - **`bun` path** — plain `bun` (nvm), never `~/.bun/bin/bun`.
 - **FloatingNav overlay** — fixed, ~70px; pages use `pt-28` top padding.
