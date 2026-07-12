@@ -39,12 +39,22 @@ export interface AdminUsernameClaimRecord {
   createdAt: string;
 }
 
-export interface AdminTenant {
+export interface AdminAccountIdentity {
+  scheme: string;
+  provider: string | null;
+  chain: string | null;
+  address: string | null;
+  email: string | null;
+}
+
+export interface AdminAccount {
   id: string;
-  name: string;
-  email: string;
+  publicId: string;
+  type: string;
   plan: "FREE" | "PREMIUM";
   status: "ACTIVE" | "SUSPENDED";
+  creditBalance: number;
+  identities: AdminAccountIdentity[];
   keyCount: number;
   createdAt: string;
 }
@@ -56,7 +66,6 @@ export interface AdminApiKey {
   appSource: string | null;
   status: "ACTIVE" | "REVOKED";
   lastUsedAt: string | null;
-  monthlyRequestCount: number;
   createdAt: string;
 }
 

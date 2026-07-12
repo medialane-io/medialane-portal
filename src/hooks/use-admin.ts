@@ -5,7 +5,7 @@ import type {
   AdminCollectionRecord,
   AdminCoinRecord,
   AdminReport,
-  AdminTenant,
+  AdminAccount,
   AdminApiKey,
   AdminComment,
   AdminSlugClaimRecord,
@@ -98,24 +98,25 @@ export function useAdminCollections(
   };
 }
 
-export function useAdminTenants() {
+export function useAdminAccounts(q?: string) {
+  const search = q?.trim() ? `?q=${encodeURIComponent(q.trim())}` : "";
   const { data, error, isLoading, mutate } = useSWR(
-    "admin-tenants",
-    () => adminFetch("/api/admin/tenants").then((r) => r.json()),
+    `admin-accounts-${search}`,
+    () => adminFetch(`/api/admin/accounts${search}`).then((r) => r.json()),
     { revalidateOnFocus: false }
   );
   return {
-    tenants: (data?.data ?? []) as AdminTenant[],
+    accounts: (data?.data ?? []) as AdminAccount[],
     isLoading,
     error,
     mutate,
   };
 }
 
-export function useAdminTenantKeys(tenantId: string | null) {
+export function useAdminAccountKeys(accountId: string | null) {
   const { data, error, isLoading, mutate } = useSWR(
-    tenantId ? `admin-tenant-keys-${tenantId}` : null,
-    () => adminFetch(`/api/admin/tenants/${tenantId}/keys`).then((r) => r.json()),
+    accountId ? `admin-account-keys-${accountId}` : null,
+    () => adminFetch(`/api/admin/accounts/${accountId}/keys`).then((r) => r.json()),
     { revalidateOnFocus: false }
   );
   return {
