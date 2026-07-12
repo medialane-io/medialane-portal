@@ -65,7 +65,7 @@ Deploy = **push `main`** (Vercel git integration). Wallet/upload flows are prod-
 | `/docs/*` | Permanent redirect → `docs.medialane.io/docs/*` | Redirect only |
 | `/changelog`, `/terms`, `/privacy` | Static | Yes |
 | `/account` | Signed-in Account console (API Keys, Credits, Usage) | Yes |
-| `/admin`, `/admin/*` | Admin console (signed-request auth) — dashboard, services, tenants, claims, collections, coins (+ `/admin/coins/[contract]` settings), reports, moderation, rewards, tokens, creators, maintenance | Yes |
+| `/admin`, `/admin/*` | Admin console (signed-request auth) — dashboard, services, accounts, claims, collections, coins (+ `/admin/coins/[contract]` settings), reports, moderation, rewards, tokens, creators, maintenance | Yes |
 | `/mint`, `/workshop` | **DO NOT TOUCH** |
 
 ---
@@ -100,6 +100,12 @@ expiry the user re-signs. `POST /api/auth/signout` clears the cookie.
 | `src/hooks/use-portal-auth.ts` | `usePortalAuth()` — `session`, `signIn()`, `signOut()` (reads `/api/auth/session`). |
 | `src/app/api/auth/{challenge,verify,session,signout}/route.ts` | The four auth endpoints (challenge + verify proxy the backend). |
 | `src/lib/starknet-address.ts` | `normalizeStarknetAddress` — lowercase, zero-pad to 64 hex. Use before any address compare. |
+
+**Admin Accounts console** (`/admin/accounts`, replaced `/admin/tenants` 2026-07-12 — the
+backend dropped the Tenant model, Phase D): account list + search (`GET /admin/accounts?q=`),
+per-account API keys (create/revoke), credit grants, plan/status suspend — all through
+`adminFetch`/`runAdminAction` against `/admin/accounts/*`. Accounts appear when a wallet signs
+in; there is nothing to create by hand.
 
 **Account console UI:** `src/app/account/page.tsx` → `AccountDashboard` (`dashboard.tsx`) with three
 tabs — **API Keys**, **Credits**, **Usage** (`src/components/portal/*-tab.tsx`). Data goes through
