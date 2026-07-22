@@ -3,9 +3,10 @@
 import { StarknetConfig, InjectedConnector, useInjectedConnectors } from '@starknet-react/core';
 import { mainnet } from '@starknet-react/chains';
 import { RpcProvider } from 'starknet';
+import { createFailoverFetch } from '@medialane/sdk';
 import { useMemo } from 'react';
 import type { ReactNode } from 'react';
-import { createFailoverFetch, PUBLIC_RPC_FALLBACKS } from '@/src/lib/rpc-failover';
+import { RPC_PROXY_PATH, RPC_FALLBACK_URL } from '@/src/lib/constants';
 
 /**
  * Injected-only Starknet connection for the portal.
@@ -17,13 +18,14 @@ import { createFailoverFetch, PUBLIC_RPC_FALLBACKS } from '@/src/lib/rpc-failove
  * `useInjectedConnectors` discovers installed extensions via the wallet
  * standard, so Ready (formerly Argent) is found regardless of whether it
  * advertises itself as `argentX` or `ready`. Braavos likewise.
+ *
+ * 🔑 The browser talks to the same-origin `/api/rpc` proxy (`src/app/api/rpc/route.ts`),
+ * never a keyed URL directly — a NEXT_PUBLIC_ keyed RPC URL is inlined into the
+ * client bundle (this is exactly how the portal leaked its Alchemy key). The
+ * proxy holds the keyed MAIN URL server-only and rotates to the keyless public
+ * FALLBACK on a transient error.
  */
 export default function StarknetProviderWrapper({ children }: { children: ReactNode }) {
-  const nodeUrl =
-    process.env.NEXT_PUBLIC_RPC_URL ||
-    process.env.NEXT_PUBLIC_STARKNET_RPC_URL ||
-    'https://starknet-mainnet.public.blastapi.io/rpc/v0_8';
-
   const { connectors } = useInjectedConnectors({
     recommended: [
       new InjectedConnector({ options: { id: 'argentX', name: 'Ready (formerly Argent)' } }),
@@ -33,12 +35,12 @@ export default function StarknetProviderWrapper({ children }: { children: ReactN
     order: 'alphabetical',
   });
 
-  // Fail over to public endpoints when the primary RPC intermittently 503s /
-  // returns -32001, so the post-connect chain-match check doesn't hang.
+  // Primary is the same-origin proxy; the keyless public fallback is safe to
+  // hit directly if the proxy itself is unreachable.
   const provider = useMemo(() => {
-    const failoverFetch = createFailoverFetch([nodeUrl, ...PUBLIC_RPC_FALLBACKS]);
-    return () => new RpcProvider({ nodeUrl, baseFetch: failoverFetch });
-  }, [nodeUrl]);
+    const failoverFetch = createFailoverFetch([RPC_PROXY_PATH, RPC_FALLBACK_URL]);
+    return () => new RpcProvider({ nodeUrl: RPC_PROXY_PATH, baseFetch: failoverFetch });
+  }, []);
 
   return (
     <StarknetConfig chains={[mainnet]} provider={provider} connectors={connectors} autoConnect>

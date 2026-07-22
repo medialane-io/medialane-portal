@@ -1,6 +1,3 @@
-import { RpcProvider } from "starknet";
-import { PUBLIC_RPC_FALLBACKS } from "@medialane/sdk";
-
 export const CONTRACTS = {
   ETH: "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
   USDC: "0x033068f6539f8e6e6b131e6b2b814e6c34a5224bc66947c47dab9dfee93b35fb",
@@ -14,10 +11,4 @@ export const CONTRACTS = {
     "0x05e73b7be06d82beeb390a0e0d655f2c9e7cf519658e04f05d9c690ccc41da03",
 };
 
-export const provider = new RpcProvider({
-  nodeUrl:
-    process.env.NEXT_PUBLIC_RPC_URL ||
-    process.env.NEXT_PUBLIC_STARKNET_RPC_URL ||
-    PUBLIC_RPC_FALLBACKS[0],
-});
 export const IPFS_URL = process.env.NEXT_PUBLIC_PINATA_HOST!;

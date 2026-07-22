@@ -231,13 +231,22 @@ Root layout (`src/app/layout.tsx`) = `Providers` (starknet-react) + `FloatingNav
 ```
 # App / public
 NEXT_PUBLIC_APP_URL=
-NEXT_PUBLIC_STARKNET_RPC_URL=            # (or NEXT_PUBLIC_RPC_URL)
 NEXT_PUBLIC_EXPLORER_URL=                # Voyager/Starkscan base (no trailing slash)
 NEXT_PUBLIC_COLLECTION_CONTRACT_ADDRESS=
 NEXT_PUBLIC_CONTRACT_ADDRESS_MIP=
 NEXT_PUBLIC_IPFS_GATEWAY=                # (and/or NEXT_PUBLIC_PINATA_GATEWAY / NEXT_PUBLIC_PINATA_HOST)
 NEXT_PUBLIC_STARKNET_X402_TREASURY=      # Creator's Fund (credit top-ups)
 NEXT_PUBLIC_STARKNET_ADMIN_ADDRESSES=    # admin UI hint (comma-separated); NEXT_PUBLIC_ADMIN_ADDRESSES = transitional fallback
+
+# Starknet RPC — two role-based, SERVER-ONLY vars (browser uses the /api/rpc proxy).
+# Defined once in src/lib/constants.ts (RPC_MAIN_URL / RPC_FALLBACK_URL / RPC_PROXY_PATH).
+STARKNET_RPC_URL                         # MAIN (primary): the keyed provider URL (Alchemy). SERVER-ONLY —
+                                          # never NEXT_PUBLIC_ (a NEXT_PUBLIC_ keyed URL is inlined into the
+                                          # browser bundle — the fix for this is what removed the old
+                                          # NEXT_PUBLIC_RPC_URL / NEXT_PUBLIC_STARKNET_RPC_URL vars below).
+                                          # The /api/rpc proxy (src/app/api/rpc/route.ts) forwards to it.
+STARKNET_RPC_FALLBACK_URL                # FALLBACK: keyless public node (lava). OPTIONAL — the code
+                                          # hardcodes https://rpc.starknet.lava.build as the default.
 
 # Auth / backend
 JWT_SECRET=                              # 32+ chars — signs the portal-session JWT
@@ -264,6 +273,10 @@ No `DATABASE_URL`, no `CRON_SECRET`, no Clerk/ChipiPay secrets — those systems
 
 ## Common Pitfalls
 
+- **Never put a keyed RPC URL in a `NEXT_PUBLIC_` var** — it is inlined into the client bundle
+  (this leaked a live Alchemy key, found 2026-07-22). The browser talks to the same-origin
+  `/api/rpc` proxy (`src/app/api/rpc/route.ts`, `starknet-provider-wrapper.tsx`); the keyed URL
+  lives only in the server-only `STARKNET_RPC_URL`.
 - **Every admin API call goes through `adminFetch`** (`src/lib/admin-fetch.ts`) — never raw `fetch` to
   `/api/admin/*`, or it reaches the backend unsigned and 401s. Server components are the only exception
   (they use `ADMIN_API_KEY` server-side).
