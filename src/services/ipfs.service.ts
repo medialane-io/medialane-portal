@@ -104,7 +104,7 @@ export class IPFSService {
   /**
    * Get IPFS content from hash using gateway
    */
-  async getFromIPFS(hash: string, gateway: keyof typeof IPFS_GATEWAYS = 'pinata'): Promise<any> {
+  async getFromIPFS(hash: string, gateway: keyof typeof IPFS_GATEWAYS = 'pinata'): Promise<unknown> {
     try {
       const url = `${IPFS_GATEWAYS[gateway]}${hash}`
       const response = await fetch(url, {

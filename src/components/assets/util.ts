@@ -1,14 +1,21 @@
+type SetFieldValue = (field: string, value: unknown) => void;
+
+interface TagFormValues {
+  newTag: string;
+  tags: string[];
+}
+
 export const handleNewTagChange = (
   e: React.ChangeEvent<HTMLInputElement>,
-  setFieldValue: any
+  setFieldValue: SetFieldValue
 ) => {
   setFieldValue("newTag", e.target.value);
 };
 
 export const handleNewTagKeyDown = (
   e: React.KeyboardEvent<HTMLInputElement>,
-  values: any,
-  setFieldValue: any,
+  values: TagFormValues,
+  setFieldValue: SetFieldValue,
   quickTags: string[]
 ) => {
   if (e.key === "Enter") {
@@ -18,8 +25,8 @@ export const handleNewTagKeyDown = (
 };
 
 export const tryAddTag = (
-  values: any,
-  setFieldValue: any,
+  values: TagFormValues,
+  setFieldValue: SetFieldValue,
   quickTags: string[]
 ) => {
   const tag = values.newTag.trim().toLowerCase();

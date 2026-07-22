@@ -7,7 +7,7 @@ export interface IpfsMetadata {
   description: string;
   image?: string;
   attributes?: { trait_type: string; value: string }[];
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 const getSignedUrl = async (): Promise<string> => {

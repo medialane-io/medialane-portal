@@ -7,7 +7,6 @@ import { Button } from "@/src/components/ui/button";
 import { Input } from "@/src/components/ui/input";
 import { Label } from "@/src/components/ui/label";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/src/components/ui/dialog";
-import { toast } from "sonner";
 import { ExternalLink, Wrench } from "lucide-react";
 import type { AdminUsernameClaimRecord } from "@/src/types/admin";
 

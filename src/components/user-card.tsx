@@ -69,7 +69,6 @@ export default function UserCard({ user }: { user: MarketplaceUser }) {
 
   const collections = typeof user?.collections === "number" ? user.collections : 0
   const assets = typeof user?.assets === "number" ? user.assets : 0
-  const listed = typeof user?.listed === "number" ? user.listed : 0
   const volumeEth = typeof user?.volumeEth === "number" ? user.volumeEth : 0
   const followers = typeof user?.followers === "number" ? user.followers : 0
 

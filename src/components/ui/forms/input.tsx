@@ -1,6 +1,6 @@
 "use client";
 import { useField } from "formik";
-import { LockKeyhole, LockKeyholeOpen, PenTool } from "lucide-react";
+import { LockKeyhole, LockKeyholeOpen } from "lucide-react";
 import { useState } from "react";
 import { Input, InputProps } from "../input";
 import { Label } from "../label";

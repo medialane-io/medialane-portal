@@ -8,7 +8,6 @@ import { Badge } from "@/src/components/ui/badge";
 import { Textarea } from "@/src/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/src/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/src/components/ui/select";
-import { toast } from "sonner";
 import { formatDistanceToNow } from "date-fns";
 import { AtSign, FileCheck } from "lucide-react";
 import type { AdminCollectionClaimRecord, AdminUsernameClaimRecord } from "@/src/types/admin";

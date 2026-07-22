@@ -16,13 +16,19 @@ export interface CachedResponse<T> {
     expiresAt: number
 }
 
+function getErrorMessage(error: unknown): string {
+    if (error instanceof Error) return error.message
+    if (typeof error === "string") return error
+    return String(error)
+}
+
 export class RateLimiterService {
     private config: RateLimiterConfig
     private requestQueue: Array<() => Promise<void>> = []
     private isProcessing: boolean = false
     private lastRequestTime: number = 0
-    private cache: Map<string, CachedResponse<any>> = new Map()
-    private requestsInProgress: Map<string, Promise<any>> = new Map()
+    private cache: Map<string, CachedResponse<unknown>> = new Map()
+    private requestsInProgress: Map<string, Promise<unknown>> = new Map()
 
     constructor(config: Partial<RateLimiterConfig> = {}) {
         this.config = {
@@ -48,7 +54,7 @@ export class RateLimiterService {
             const cached = this.cache.get(cacheKey)!
             if (cached.expiresAt > Date.now()) {
                 console.debug(`Cache hit for ${cacheKey}`)
-                return cached.data
+                return cached.data as T
             } else {
                 this.cache.delete(cacheKey)
             }
@@ -56,7 +62,7 @@ export class RateLimiterService {
 
         // Check if same request is already in progress
         if (cacheKey && this.requestsInProgress.has(cacheKey)) {
-            return await this.requestsInProgress.get(cacheKey)!
+            return await (this.requestsInProgress.get(cacheKey)! as Promise<T>)
         }
 
         const executeWithRetry = async (attempt: number = 0): Promise<T> => {
@@ -75,24 +81,24 @@ export class RateLimiterService {
                 }
                 
                 return result
-            } catch (error: any) {
+            } catch (error: unknown) {
                 if (attempt < this.config.maxRetries && this.shouldRetry(error)) {
                     const backoffMs = Math.min(
                         this.config.initialBackoffMs * Math.pow(2, attempt),
                         this.config.maxBackoffMs
                     )
-                    
+
                     console.warn(
                         `Request failed (attempt ${attempt + 1}/${this.config.maxRetries + 1}), retrying in ${backoffMs}ms:`,
-                        error.message || error.toString()
+                        getErrorMessage(error)
                     )
-                    
+
                     await this.delay(backoffMs)
                     return executeWithRetry(attempt + 1)
                 } else {
                     // Only log non-contract errors to avoid spam
-                    const errorMessage = error.message || error.toString()
-                    const isContractError = errorMessage.includes('Contract error') || 
+                    const errorMessage = getErrorMessage(error)
+                    const isContractError = errorMessage.includes('Contract error') ||
                                           errorMessage.includes('ERC721: invalid token ID') ||
                                           errorMessage.includes('invalid token ID')
                     
@@ -107,7 +113,7 @@ export class RateLimiterService {
         // Track request in progress
         if (cacheKey) {
             const promise = executeWithRetry()
-            this.requestsInProgress.set(cacheKey, promise)
+            this.requestsInProgress.set(cacheKey, promise as Promise<unknown>)
             
             try {
                 const result = await promise
@@ -163,11 +169,11 @@ export class RateLimiterService {
     /**
      * Determine if an error should trigger a retry
      */
-    private shouldRetry(error: any): boolean {
+    private shouldRetry(error: unknown): boolean {
         if (!error) return false
-        
-        const errorMessage = error.message || error.toString()
-        
+
+        const errorMessage = getErrorMessage(error)
+
         // Debug logging to see what errors we're getting
         console.debug('shouldRetry check:', {
             errorMessage: errorMessage.substring(0, 200),

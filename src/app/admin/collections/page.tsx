@@ -116,17 +116,18 @@ export default function AdminCollectionsPage() {
   const [registerOpen, setRegisterOpen]             = useState(false);
   const [registerContract, setRegisterContract]     = useState("");
   const [registerStartBlock, setRegisterStartBlock] = useState("");
+  const [registerStandard, setRegisterStandard]     = useState<"ERC721" | "ERC1155">("ERC721");
   const [registering, setRegistering]               = useState(false);
 
   async function handleRegister() {
     if (!registerContract.trim()) return;
     setRegistering(true);
-    const body: Record<string, unknown> = { contractAddress: registerContract.trim() };
+    const body: Record<string, unknown> = { contractAddress: registerContract.trim(), standard: registerStandard };
     if (registerStartBlock.trim()) body.startBlock = parseInt(registerStartBlock.trim(), 10);
     const r = await runAdminAction("/admin/collections", {
       method: "POST", body: JSON.stringify(body), success: "Collection registered", errorPrefix: "Registration failed",
     });
-    if (r) { setRegisterOpen(false); setRegisterContract(""); setRegisterStartBlock(""); await mutate(); }
+    if (r) { setRegisterOpen(false); setRegisterContract(""); setRegisterStartBlock(""); setRegisterStandard("ERC721"); await mutate(); }
     setRegistering(false);
   }
 
@@ -329,6 +330,16 @@ export default function AdminCollectionsPage() {
             <div className="space-y-2">
               <Label>Contract Address</Label>
               <Input placeholder="0x…" value={registerContract} onChange={(e) => setRegisterContract(e.target.value)} />
+            </div>
+            <div className="space-y-2">
+              <Label>Standard</Label>
+              <Select value={registerStandard} onValueChange={(v) => setRegisterStandard(v as "ERC721" | "ERC1155")}>
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="ERC721">ERC721</SelectItem>
+                  <SelectItem value="ERC1155">ERC1155</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
             <div className="space-y-2">
               <Label>Start Block <span className="text-muted-foreground font-normal">(optional)</span></Label>

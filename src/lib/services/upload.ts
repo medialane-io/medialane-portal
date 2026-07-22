@@ -10,9 +10,9 @@ export async function uploadToIPFS(file: File): Promise<string> {
     return `ipfs://QmMock${btoa(file.name).substring(0, 10)}`
 }
 
-export async function uploadMetadata(metadata: any): Promise<string> {
+export async function uploadMetadata(metadata: Record<string, unknown>): Promise<string> {
     // TODO: Implement metadata upload
-    console.warn("Using mock Metadata upload.")
+    console.warn("Using mock Metadata upload.", metadata)
 
     await new Promise((resolve) => setTimeout(resolve, 1000))
 

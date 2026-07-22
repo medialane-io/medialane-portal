@@ -18,6 +18,10 @@ const eslintConfig = [
       "out/**",
       "build/**",
       "next-env.d.ts",
+      // One-off root debug/test scripts (ad hoc CommonJS, not part of the app)
+      "debug-*.js",
+      "test-*.js",
+      "tx-check.js",
     ],
   },
 ];

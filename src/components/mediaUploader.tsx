@@ -20,9 +20,8 @@ import {
   TabsTrigger,
 } from "@/src/components/ui/tabs";
 
-import { Upload, X, CheckCircle, LinkIcon, Camera } from "lucide-react";
+import { Upload, X, LinkIcon, Camera } from "lucide-react";
 import Image from "next/image";
-import { toast } from "@/src/hooks/use-toast";
 
 export interface MediaUploaderRef {
   getFileAsync: () => Promise<File | null>;
@@ -86,21 +85,6 @@ const MediaUploader = forwardRef<MediaUploaderRef, MediaUploaderProps>(
       fileInputRef.current?.click();
     };
 
-    const handleFileSelect = useCallback(
-      (event: React.ChangeEvent<HTMLInputElement>) => {
-        const file = event.target.files?.[0];
-        if (file) handleFileChosen(file);
-      },
-      []
-    );
-
-    const handleDrop = useCallback((e: React.DragEvent) => {
-      e.preventDefault();
-      setIsDragOver(false);
-      const file = e.dataTransfer.files?.[0];
-      if (file) handleFileChosen(file);
-    }, []);
-
     const handleFileChosen = useCallback(
       (file: File) => {
         setIsUploading(true);
@@ -129,6 +113,21 @@ const MediaUploader = forwardRef<MediaUploaderRef, MediaUploaderProps>(
       },
       [onChange]
     );
+
+    const handleFileSelect = useCallback(
+      (event: React.ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0];
+        if (file) handleFileChosen(file);
+      },
+      [handleFileChosen]
+    );
+
+    const handleDrop = useCallback((e: React.DragEvent) => {
+      e.preventDefault();
+      setIsDragOver(false);
+      const file = e.dataTransfer.files?.[0];
+      if (file) handleFileChosen(file);
+    }, [handleFileChosen]);
 
     const handleUrlChange = (url: string) => {
       setMediaUrlInput(url);
@@ -281,5 +280,7 @@ const MediaUploader = forwardRef<MediaUploaderRef, MediaUploaderProps>(
     );
   }
 );
+
+MediaUploader.displayName = "MediaUploader";
 
 export default MediaUploader;

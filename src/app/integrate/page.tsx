@@ -3,7 +3,7 @@ import { Button } from "@/src/components/ui/button"
 import { Card, CardContent } from "@/src/components/ui/card"
 import { Badge } from "@/src/components/ui/badge"
 import { BackgroundGradients } from "@/src/components/background-gradients"
-import { Check, Coins, Code2, Webhook, LayoutDashboard, ArrowRight, Zap } from "lucide-react"
+import { Coins, Code2, Webhook, LayoutDashboard, ArrowRight, Zap } from "lucide-react"
 
 const MDLN_TIERS = [
   { range: "500 – 999 MDLN", multiplier: "1.0×", note: "Base access" },

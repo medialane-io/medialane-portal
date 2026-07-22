@@ -27,7 +27,7 @@ export function resolveIpfsUrl(uri: string): string {
  * Uses a local API proxy to avoid CORS issues.
  * Returns null if fetching fails.
  */
-export async function fetchIpfsJson<T = any>(uri: string): Promise<T | null> {
+export async function fetchIpfsJson<T = unknown>(uri: string): Promise<T | null> {
     if (!uri) return null
 
     try {
@@ -59,12 +59,12 @@ export async function fetchIpfsJson<T = any>(uri: string): Promise<T | null> {
 
             const data = await response.json()
             return data as T
-        } catch (error: any) {
+        } catch (error) {
             clearTimeout(timeoutId)
-            if (error.name === 'AbortError') {
+            if (error instanceof Error && error.name === 'AbortError') {
                 console.warn(`[IPFS] Fetch timeout for ${ipfsUrl}`)
             } else {
-                console.error(`[IPFS] Fetch error for ${ipfsUrl} via proxy ${proxyUrl}:`, error.message)
+                console.error(`[IPFS] Fetch error for ${ipfsUrl} via proxy ${proxyUrl}:`, error instanceof Error ? error.message : error)
             }
             return null
         }

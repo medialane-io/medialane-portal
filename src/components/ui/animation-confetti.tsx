@@ -10,8 +10,20 @@ interface ConfettiProps {
 
 const colors = ["#ff0000", "#00ff00", "#0000ff", "#ffff00", "#ff00ff", "#00ffff"];
 
+interface Particle {
+  id: number;
+  x: number;
+  y: number;
+  tx: number;
+  ty: number;
+  rotation: number;
+  scale: number;
+  color: string;
+  delay: number;
+}
+
 export const Confetti = ({ duration = 3000, particleCount = 100 }: ConfettiProps) => {
-  const [particles, setParticles] = useState<any[]>([]);
+  const [particles, setParticles] = useState<Particle[]>([]);
 
   useEffect(() => {
     // Generate particles for a center burst

@@ -3,14 +3,13 @@
 import type React from "react"
 
 import { useState, useEffect } from "react"
-import { useRouter, usePathname } from "next/navigation"
+import { usePathname } from "next/navigation"
 import Link from "next/link"
 import { motion, AnimatePresence } from "framer-motion"
 import {
   Menu,
   X,
   Home,
-  Key,
   Play,
   Sparkles,
   User,
@@ -27,7 +26,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/src/components/ui/dropdown-menu"
-import { Avatar, AvatarFallback, AvatarImage } from "@/src/components/ui/avatar"
+import { Avatar, AvatarFallback } from "@/src/components/ui/avatar"
 import { useMobile } from "@/src/hooks/use-mobile"
 
 export function Navbar() {

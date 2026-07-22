@@ -9,11 +9,9 @@ import { Card, CardContent } from "@/src/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/src/components/ui/tabs"
 import { Copy, Check, DollarSign, Users, Zap } from "lucide-react"
 import { useToast } from "@/src/components/ui/use-toast"
-import { useMobile } from "@/src/hooks/use-mobile"
 
 export default function ProgrammableIPDemo() {
   const { toast } = useToast()
-  const isMobile = useMobile()
   const [copied, setCopied] = useState(false)
   const [settings, setSettings] = useState({
     commercialUse: true,

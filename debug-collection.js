@@ -1,6 +1,6 @@
 const { RpcProvider, Contract, num } = require("starknet");
 
-const RPC_URL = "https://starknet-mainnet.g.alchemy.com/starknet/version/rpc/v0_10/tOTwt1ug3YNOsaPjinDvS";
+const RPC_URL = process.env.STARKNET_RPC_URL || "https://rpc.starknet.lava.build";
 const COLLECTION_ADDRESS = "0x05e73b7be06d82beeb390a0e0d655f2c9e7cf519658e04f05d9c690ccc41da03";
 
 const abi = [
