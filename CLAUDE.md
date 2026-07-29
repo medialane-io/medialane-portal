@@ -112,8 +112,19 @@ tabs — **API Keys**, **Credits**, **Usage** (`src/components/portal/*-tab.tsx`
 the `/api/portal/*` proxy. Credits + x402 are **backend-owned**; the Credits tab reads balance +
 history from the account-admin surface and tops up via the backend fund endpoint
 (`NEXT_PUBLIC_STARKNET_X402_TREASURY` = Creator's Fund). There is **no MDLN access gate** (MDLN is a
-credit *bonus* applied by the backend's x402 multiplier; the marketing copy on `/integrate` +
-`/pricing` documents it).
+credit *bonus* applied by the backend's x402 multiplier — `/integrate`'s MDLN tier table + hero
+copy document this).
+
+**`/integrate` pricing table is live, not marketing copy (added 2026-07-28).** It's an `async`
+server component that `fetch`es `GET https://api.medialane.io/v1/pricing` at render time
+(`next: { revalidate: 300 } }`), degrading to a link if the fetch fails — never a hardcoded
+credit-cost table. Two earlier hardcoded copies (here and in `medialane-docs`) had already
+drifted to fictional numbers; this page and `docs.medialane.io/dev/api`+`/dev/fees` all read the
+same live endpoint now, so they can't disagree. The `MDLN_TIERS` array stays a plain constant
+(it changes far less often, and matching it to `config/x402.ts`'s `MDLN_TIERS` by hand is the
+whole content of that table) — but it must start at **0 MDLN = 1.0×** (base access, no minimum),
+not imply a holding is required to use the API at all; that inversion was live for a while and
+directly contradicted the page's own hero copy.
 
 ---
 
