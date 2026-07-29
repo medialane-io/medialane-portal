@@ -6,20 +6,62 @@ import { BackgroundGradients } from "@/src/components/background-gradients"
 import { Coins, Code2, Webhook, LayoutDashboard, ArrowRight, Zap } from "lucide-react"
 
 const MDLN_TIERS = [
-  { range: "500 – 999 MDLN", multiplier: "1.0×", note: "Base access" },
-  { range: "1,000 – 1,999 MDLN", multiplier: "1.2×", note: "20% more credits per deposit" },
-  { range: "2,000 – 4,999 MDLN", multiplier: "1.5×", note: "50% more credits per deposit" },
+  { range: "0 MDLN", multiplier: "1.0×", note: "Base access — no MDLN required" },
+  { range: "500+ MDLN", multiplier: "1.2×", note: "20% more credits per deposit" },
+  { range: "2,000+ MDLN", multiplier: "1.5×", note: "50% more credits per deposit" },
   { range: "5,000+ MDLN", multiplier: "2.0×", note: "Double credits per deposit" },
 ]
 
-const CREDIT_COSTS = [
-  { category: "Read / query", credits: "1 credit", examples: "Get asset, list collections, search, activity" },
-  { category: "Trade intents (SNIP-12)", credits: "5 credits", examples: "Create listing, fulfill order, counter-offer" },
-  { category: "Minting", credits: "10 credits", examples: "Mint token, batch mint" },
-  { category: "Launchpad / deploy", credits: "100 credits", examples: "Deploy collection contract, Collection Drop, POP Protocol" },
-]
+const API_BASE = "https://api.medialane.io"
 
-export default function IntegratePage() {
+// Display order + human labels for known actionKeys. Any actionKey the live
+// API returns that isn't listed here still renders (raw key as the label) —
+// this is presentation only, never a source of truth for what's priced.
+const ACTION_LABELS: Record<string, string> = {
+  "read": "Read / query",
+  "intent:mint": "Mint an asset",
+  "intent:create-collection": "Deploy a collection",
+  "intent:create-tier": "Create a ticket type / membership tier",
+  "intent:listing": "List an asset for sale",
+  "intent:offer": "Make an offer",
+  "intent:cancel": "Cancel an order",
+  "intent:fulfill": "Buy / fulfill an order",
+  "intent:counter-offer": "Counter an offer",
+  "intent:checkout": "Checkout",
+  "metadata:upload-json": "Upload metadata JSON to IPFS",
+  "metadata:upload-file": "Upload a media file to IPFS",
+}
+
+interface PricingRule { actionKey: string; chain: string; service: string; credits: number }
+interface PricingResponse { creditsPerUsdc: number; pricing: { default: number; rules: PricingRule[] } }
+
+// Live pricing, never hardcoded — this is the same endpoint PATCH
+// /admin/pricing writes to, so the table can't drift from what callers are
+// actually charged. Revalidates every 5 minutes; a fetch failure degrades to
+// a link instead of a broken page.
+async function getLivePricing(): Promise<PricingResponse | null> {
+  try {
+    const res = await fetch(`${API_BASE}/v1/pricing`, { next: { revalidate: 300 } })
+    if (!res.ok) return null
+    return (await res.json()) as PricingResponse
+  } catch {
+    return null
+  }
+}
+
+export default async function IntegratePage() {
+  const pricing = await getLivePricing()
+  const defaultRules = pricing?.pricing.rules.filter((r) => r.chain === "ALL" && r.service === "ALL") ?? []
+  const knownKeys = Object.keys(ACTION_LABELS)
+  const orderedActionKeys = [
+    ...knownKeys.filter((k) => defaultRules.some((r) => r.actionKey === k)),
+    ...defaultRules.map((r) => r.actionKey).filter((k) => !knownKeys.includes(k)),
+  ]
+  const creditRows = orderedActionKeys.map((actionKey) => {
+    const rule = defaultRules.find((r) => r.actionKey === actionKey)!
+    return { actionKey, label: ACTION_LABELS[actionKey] ?? actionKey, credits: rule.credits }
+  })
+
   return (
     <div className="relative w-full overflow-hidden">
       <BackgroundGradients />
@@ -34,7 +76,7 @@ export default function IntegratePage() {
             Start Building
           </h1>
           <p className="text-lg text-muted-foreground max-w-xl mx-auto">
-            API access is gated by MDLN token balance. Top up credits with USDC. Hold more MDLN for bonus credits.
+            API access is open to any connected wallet — no minimum balance, no gate. Top up credits with USDC. Hold MDLN for bonus credits per deposit.
           </p>
           <Button asChild size="lg" className="px-10">
             <Link href="/account">Connect Wallet &amp; Get Access</Link>
@@ -94,31 +136,44 @@ export default function IntegratePage() {
                 <h2 className="text-2xl font-bold text-white">Credits</h2>
               </div>
               <p className="text-muted-foreground text-sm max-w-2xl">
-                Credits are the billing unit. Top up by depositing USDC on Starknet from your{" "}
+                Credits are the billing unit — 1 credit = $0.01. Top up by depositing USDC on Starknet from your{" "}
                 <Link href="/account" className="text-primary hover:underline">dashboard</Link>.
-                Credits never expire. Different endpoint categories consume different amounts per call.
+                Credits never expire. This table is live, pulled from the same endpoint every call is
+                actually priced against, never a hand-maintained copy.
               </p>
             </div>
 
-            <div className="rounded-xl border border-white/10 overflow-hidden bg-white/[0.02]">
-              <div className="grid grid-cols-3 px-6 py-4 border-b border-white/10 bg-white/[0.03] text-sm font-semibold">
-                <div className="text-muted-foreground">Category</div>
-                <div className="text-center text-white">Cost</div>
-                <div className="text-muted-foreground">Examples</div>
-              </div>
-              {CREDIT_COSTS.map((row, i) => (
-                <div
-                  key={row.category}
-                  className={`grid grid-cols-3 px-6 py-4 items-start text-sm gap-4 ${i < CREDIT_COSTS.length - 1 ? "border-b border-white/5" : ""}`}
-                >
-                  <div className="text-white font-medium">{row.category}</div>
-                  <div className="text-center">
-                    <span className="font-mono font-bold text-primary">{row.credits}</span>
-                  </div>
-                  <div className="text-muted-foreground text-xs leading-relaxed">{row.examples}</div>
+            {creditRows.length > 0 ? (
+              <div className="rounded-xl border border-white/10 overflow-hidden bg-white/[0.02]">
+                <div className="grid grid-cols-3 px-6 py-4 border-b border-white/10 bg-white/[0.03] text-sm font-semibold">
+                  <div className="text-muted-foreground">Action</div>
+                  <div className="text-center text-white">Credits</div>
+                  <div className="text-right text-muted-foreground">USD</div>
                 </div>
-              ))}
-            </div>
+                {creditRows.map((row, i) => (
+                  <div
+                    key={row.actionKey}
+                    className={`grid grid-cols-3 px-6 py-4 items-center text-sm gap-4 ${i < creditRows.length - 1 ? "border-b border-white/5" : ""}`}
+                  >
+                    <div className="text-white font-medium">{row.label}</div>
+                    <div className="text-center">
+                      <span className="font-mono font-bold text-primary">{row.credits}</span>
+                    </div>
+                    <div className="text-right font-mono text-muted-foreground text-xs">
+                      ${(row.credits / (pricing?.creditsPerUsdc ?? 100)).toFixed(2)}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-muted-foreground text-sm">
+                Live pricing is temporarily unavailable here — see{" "}
+                <a href={`${API_BASE}/v1/pricing`} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
+                  {API_BASE}/v1/pricing
+                </a>{" "}
+                directly.
+              </p>
+            )}
 
             <div className="rounded-xl border border-amber-500/20 bg-amber-500/5 p-5 space-y-2">
               <p className="text-sm font-semibold text-amber-300">402 Payment Required</p>
@@ -129,7 +184,7 @@ export default function IntegratePage() {
                 <code className="font-mono bg-white/10 px-1.5 py-0.5 rounded">X-Credits-Remaining: 0</code>{" "}
                 header. AI agents can detect this response and trigger a USDC deposit autonomously.
                 See the{" "}
-                <a href="https://docs.medialane.io/docs/agents" target="_blank" rel="noopener noreferrer" className="text-amber-300 hover:underline">
+                <a href="https://docs.medialane.io/dev/agents" target="_blank" rel="noopener noreferrer" className="text-amber-300 hover:underline">
                   Agent Quickstart
                 </a>{" "}
                 for a code example.

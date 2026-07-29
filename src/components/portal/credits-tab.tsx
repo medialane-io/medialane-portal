@@ -116,7 +116,7 @@ export function CreditsTab({ address }: Props) {
             <Coins className="w-5 h-5 text-primary" />
             API Credits
           </CardTitle>
-          <CardDescription>1 credit = 1 API request · 1 USDC = {CREDITS_PER_USDC} credits · pay as you go</CardDescription>
+          <CardDescription>Billed per API call, priced by action · 1 USDC = {CREDITS_PER_USDC} credits · pay as you go</CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
           <div className="rounded-xl border border-border bg-muted/20 p-4 space-y-1">
