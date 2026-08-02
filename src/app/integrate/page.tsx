@@ -7,9 +7,9 @@ import { Coins, Code2, Webhook, LayoutDashboard, ArrowRight, Zap } from "lucide-
 
 const MDLN_TIERS = [
   { range: "0 MDLN", multiplier: "1.0×", note: "Base access — no MDLN required" },
-  { range: "500+ MDLN", multiplier: "1.2×", note: "20% more credits per deposit" },
-  { range: "2,000+ MDLN", multiplier: "1.5×", note: "50% more credits per deposit" },
-  { range: "5,000+ MDLN", multiplier: "2.0×", note: "Double credits per deposit" },
+  { range: "100,000+ MDLN", multiplier: "1.2×", note: "20% more credits per deposit" },
+  { range: "200,000+ MDLN", multiplier: "1.5×", note: "50% more credits per deposit" },
+  { range: "500,000+ MDLN", multiplier: "2.0×", note: "Double credits per deposit" },
 ]
 
 const API_BASE = "https://api.medialane.io"

@@ -55,7 +55,7 @@ const API_CARDS = [
   },
   {
     icon: FileImage,
-    title: "Asset Metadata",
+    title: "Decentralized Metadata",
     description:
       "Resolve full metadata for any token, including license terms, remix history, and provenance.",
     color: "text-green-400",
@@ -64,7 +64,7 @@ const API_CARDS = [
   },
   {
     icon: Activity,
-    title: "On-chain Activity",
+    title: "Onchain Activity",
     description:
       "Stream every event: mints, transfers, sales, offers, cancellations — indexed in real time.",
     color: "text-cyan-400",
@@ -161,7 +161,7 @@ export default function FeaturesPage() {
         {/* Hero */}
         <section className="container mx-auto px-4 pt-28 pb-16 max-w-5xl text-center space-y-6">
           <Badge className="bg-primary/10 text-primary border-primary/30 px-4 py-1.5 text-sm">
-            Platform Features
+            Medialane
           </Badge>
           <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight text-white">
             Build on Creator Capital Markets

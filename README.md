@@ -1,25 +1,22 @@
-<img width="2972" height="2160" alt="Medialane — Developer Portal for Programmable IP on Starknet" src="https://github.com/user-attachments/assets/abd42bec-d6b9-4636-a9cf-21fe8ec3ba0d" />
+# Medialane Portal 
 
-# Medialane Developer Portal
+**Developer and Business Portal for Programmable IP — [portal.medialane.io](https://portal.medialane.io)**
 
-**Developer Portal for Programmable IP on Starknet — [portal.medialane.io](https://portal.medialane.io)**
+[portal.medialane.io](https://portal.medialane.io) is the enterprise, developer and ai agent facing gateway to tokenization and monetization of digital assets onchain — Launchpad services, API access, SDK documentation, API key management, webhooks, usage analytics.
 
-[portal.medialane.io](https://portal.medialane.io) is the developer-facing gateway to the Medialane platform — API access, SDK documentation, API key management, webhooks, and usage analytics.
-
-Everything you need to build Programmable IP on Starknet. One REST API. All the data. No indexer needed.
+Everything you need to build Programmable IP onchain. One REST API. All the data.
 
 ---
 
 ## What is Medialane?
 
-Medialane is infrastructure for the **creative economy on Starknet**. It enables creators, businesses, and AI agents to own, license, and trade intellectual property as NFTs — with programmable licensing terms embedded immutably in IPFS metadata, compliant with the Berne Convention.
+Medialane is infrastructure for the **creative economy onchain**. It enables creators, businesses, and AI agents to own, license, and trade intellectual property as digital assets with programmable licensing terms embedded immutably in IPFS metadata, compliant with 181 countries worldwide.
 
 The platform operates through two integrated products:
 
-- **[Medialane.io](https://medialane.io)** — Consumer marketplace and creator launchpad. Mint IP assets, trade NFTs, manage collections. No wallet required — gasless transactions via ChipiPay.
-- **[portal.medialane.io](https://portal.medialane.io)** — Developer portal. API keys, REST endpoint docs, SDK quickstart, webhooks, usage analytics.
-
-Both are powered by the Medialane backend (Starknet indexer + Hono REST API) and the `@medialane/sdk` TypeScript package.
+- **[medialane.io](https://medialane.io)** — Creator launchpad and nft marketplace with frictionless user experience. Mint IP assets, trade NFTs, manage collections.
+- **[starknet.medialane.io](https://starknet.medialane.io)** — Creator launchpad and nft marketplace for Starknet users.
+- **[portal.medialane.io](https://portal.medialane.io)** — Enterprise and Developer portal. API keys, REST endpoint docs, SDK quickstart, webhooks, usage analytics.
 
 ---
 
@@ -40,7 +37,8 @@ Both are powered by the Medialane backend (Starknet indexer + Hono REST API) and
 - **Contact form** — Reach the team at `/connect`
 
 ### Platform
-- **Pricing** — FREE tier + pay-as-you-go credits with MDLN multipliers
+- **Pricing** — Pay-as-you-go credits with MDLN multipliers
+- **IP Protection** — Compliance with the Berne Convention for the Protection of Literary and Artistic Works
 - **Changelog** — Release timeline at `/changelog`
 - **Dark-theme UI** — Glass navigation, gradient backgrounds, Framer Motion animations
 
@@ -61,43 +59,6 @@ The Medialane REST API indexes Starknet in real time and exposes structured data
 | **Portal** | API keys, webhooks, usage — self-service from `/account`. |
 
 Get your API key at [portal.medialane.io/account](https://portal.medialane.io/account). Full reference at [portal.medialane.io/docs/api](https://portal.medialane.io/docs/api).
-
----
-
-## Tech Stack
-
-| Layer | Technology |
-|---|---|
-| Framework | [Next.js 15](https://nextjs.org/) (App Router) |
-| Runtime | [Bun](https://bun.sh) |
-| Language | TypeScript |
-| UI | React 19 + [Tailwind CSS](https://tailwindcss.com/) + [Radix UI](https://www.radix-ui.com/) |
-| Animation | [Framer Motion](https://www.framer.com/motion/) |
-| Auth | SIWS — Sign In With Starknet (stateless, JWT cookie) |
-| Database | PostgreSQL (Neon) — accounts, sessions, credits, deposits |
-| Email | nodemailer v8 (SMTP — contact form) |
-| Validation | [Zod](https://zod.dev/) + [React Hook Form](https://react-hook-form.com/) |
-| SDK | [@medialane/sdk](https://www.npmjs.com/package/@medialane/sdk) |
-
----
-
-## Site Map
-
-| Route | Description |
-|---|---|
-| `/` | Hero, feature overview, pricing teaser, ecosystem links |
-| `/features` | API surface, AI agent support, webhooks, real-time indexing |
-| `/pricing` | FREE tier + pay-as-you-go + MDLN multiplier table |
-| `/connect` | Community links + contact form (SMTP) |
-| `/docs` | Getting started guide |
-| `/docs/api` | Full REST endpoint reference |
-| `/docs/sdk` | `@medialane/sdk` quickstart and method reference |
-| `/docs/agents` | AI agent quickstart — SIWS auth, 402 handling, autonomous top-up |
-| `/changelog` | Release timeline |
-| `/account` | API portal dashboard (API keys, webhooks, usage) — SIWS auth required |
-| `/sign-in` | Wallet connect + SIWS sign-in |
-| `/terms` | Terms of service |
-| `/privacy` | Privacy policy |
 
 ---
 
@@ -134,57 +95,6 @@ bun dev          # Development server (localhost:3000)
 bun run build    # Production build — must pass clean before deploy
 bun lint         # ESLint
 ```
-
----
-
-## Environment Variables
-
-| Variable | Required | Purpose |
-|---|---|---|
-| `DATABASE_URL` | Yes | PostgreSQL connection string |
-| `JWT_SECRET` | Yes | Secret for signing session JWT cookies |
-| `NEXT_PUBLIC_MEDIALANE_BACKEND_URL` | Yes | Medialane API base URL |
-| `NEXT_PUBLIC_MEDIALANE_API_KEY` | Yes | Medialane API key (portal calls) |
-| `BACKEND_ADMIN_KEY` | Yes | Admin key for backend provisioning |
-| `SMTP_HOST` | Contact form | SMTP hostname (e.g. `smtp.hostinger.com`) |
-| `SMTP_PORT` | Contact form | SMTP port (e.g. `465`) |
-| `SMTP_USER` | Contact form | SMTP username |
-| `SMTP_PASS` | Contact form | SMTP password |
-| `CONTACT_TO_EMAIL` | Contact form | Recipient address |
-| `CONTACT_FROM_EMAIL` | Contact form | Sender address |
-
----
-
-## Architecture
-
-### Component model
-
-Next.js 15 App Router — server components by default. Client components (`"use client"`) only where hooks or browser APIs are needed.
-
-```
-src/app/layout.tsx              ← Root: FloatingNav + Footer
-  src/app/(pages)/              ← Marketing pages (server components)
-  src/app/docs/layout.tsx       ← Docs: 2-col (DocsSidebar + content)
-  src/app/account/              ← Portal dashboard (SIWS auth required)
-  src/app/sign-in/              ← Wallet connect + SIWS
-```
-
-### Auth flow (SIWS)
-
-1. User connects Starknet wallet on `/sign-in`
-2. Portal issues a nonce challenge (`/api/auth/challenge`)
-3. User signs the typed-data message with their wallet
-4. Portal verifies the signature (`/api/auth/verify`), creates a JWT cookie session
-5. Subsequent requests use the JWT cookie — no Clerk, no custodial key
-
-### Key components
-
-| Component | Purpose |
-|---|---|
-| `FloatingNav` | Fixed top nav (~70px). Pages need `pt-28` top padding. |
-| `Footer` | 3-column footer + social links |
-| `BackgroundGradients` | Fixed purple/cyan gradient blobs (full-page routes) |
-| `DocsSidebar` | Sticky left nav for `/docs/*` |
 
 ---
 
@@ -237,7 +147,6 @@ Contributions are welcome. If you have a feature or improvement to suggest:
 | Repo | Description |
 |---|---|
 | [medialane-io](https://github.com/medialane-io/medialane-io) | Consumer dApp — creator launchpad + NFT marketplace |
-| [medialane-backend](https://github.com/medialane-io/medialane-backend) | Starknet indexer + Hono REST API |
 | [@medialane/sdk](https://github.com/medialane-io/sdk) | TypeScript SDK — `npm install @medialane/sdk` |
 
 ---
