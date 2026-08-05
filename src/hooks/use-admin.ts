@@ -113,10 +113,10 @@ export function useAdminAccounts(q?: string) {
   };
 }
 
-export function useAdminAccountKeys(accountId: string | null) {
+export function useAdminApiClientKeys(apiClientId: string | null) {
   const { data, error, isLoading, mutate } = useSWR(
-    accountId ? `admin-account-keys-${accountId}` : null,
-    () => adminFetch(`/api/admin/accounts/${accountId}/keys`).then((r) => r.json()),
+    apiClientId ? `admin-api-client-keys-${apiClientId}` : null,
+    () => adminFetch(`/api/admin/api-clients/${apiClientId}/keys`).then((r) => r.json()),
     { revalidateOnFocus: false }
   );
   return {

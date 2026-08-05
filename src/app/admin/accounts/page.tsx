@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useAdminAccounts, useAdminAccountKeys } from "@/src/hooks/use-admin";
+import { useAdminAccounts, useAdminApiClientKeys } from "@/src/hooks/use-admin";
 import { runAdminAction } from "@/src/lib/admin-fetch";
 import { Button } from "@/src/components/ui/button";
 import { Input } from "@/src/components/ui/input";
@@ -10,8 +10,8 @@ import { Badge } from "@/src/components/ui/badge";
 import { Skeleton } from "@/src/components/ui/skeleton";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/src/components/ui/dialog";
 import { toast } from "sonner";
-import { KeyRound, Copy, Ban, ChevronDown, ChevronUp, Users, Coins, Search } from "lucide-react";
-import type { AdminAccount } from "@/src/types/admin";
+import { KeyRound, Copy, Ban, ChevronDown, ChevronUp, Users, Coins, Search, Plug } from "lucide-react";
+import type { AdminAccount, AdminApiClient } from "@/src/types/admin";
 
 const PLAN_STYLE: Record<string, string> = {
   FREE:    "bg-gray-500/20 text-gray-400 border-gray-500/30",
@@ -64,15 +64,15 @@ function PlaintextKeyDialog({ plaintext, onClose }: { plaintext: string | null; 
   );
 }
 
-function AccountKeys({ account, onPlaintext }: { account: AdminAccount; onPlaintext: (k: string) => void }) {
-  const { keys, isLoading, mutate } = useAdminAccountKeys(account.id);
+function ApiClientKeys({ apiClient, onPlaintext }: { apiClient: AdminApiClient; onPlaintext: (k: string) => void }) {
+  const { keys, isLoading, mutate } = useAdminApiClientKeys(apiClient.id);
   const [creating, setCreating] = useState(false);
   const [label, setLabel] = useState("");
   const [busy, setBusy] = useState(false);
 
   async function createKey() {
     setBusy(true);
-    const r = await runAdminAction<{ data?: { plaintext?: string } }>(`/api/admin/accounts/${account.id}/keys`, {
+    const r = await runAdminAction<{ data?: { plaintext?: string } }>(`/api/admin/api-clients/${apiClient.id}/keys`, {
       method: "POST", body: JSON.stringify({ label: label.trim() || undefined }), errorPrefix: "Failed to create key",
     });
     if (r?.data?.plaintext) { onPlaintext(r.data.plaintext); setCreating(false); setLabel(""); await mutate(); }
@@ -81,7 +81,7 @@ function AccountKeys({ account, onPlaintext }: { account: AdminAccount; onPlaint
 
   async function revokeKey(keyId: string, prefix: string) {
     if (!confirm(`Revoke key ${prefix}…? Apps using it will lose access immediately.`)) return;
-    const r = await runAdminAction(`/api/admin/accounts/${account.id}/keys/${keyId}`, {
+    const r = await runAdminAction(`/api/admin/api-clients/${apiClient.id}/keys/${keyId}`, {
       method: "DELETE", success: "Key revoked", errorPrefix: "Failed to revoke key",
     });
     if (r) await mutate();
@@ -151,8 +151,8 @@ function AccountKeys({ account, onPlaintext }: { account: AdminAccount; onPlaint
 }
 
 function GrantCreditsDialog({
-  account, open, onClose, onGranted,
-}: { account: AdminAccount | null; open: boolean; onClose: () => void; onGranted: () => void }) {
+  apiClient, open, onClose, onGranted,
+}: { apiClient: AdminApiClient | null; open: boolean; onClose: () => void; onGranted: () => void }) {
   const [amount, setAmount] = useState("");
   const [busy, setBusy] = useState(false);
 
@@ -160,7 +160,7 @@ function GrantCreditsDialog({
     const n = Number(amount);
     if (!Number.isInteger(n) || n === 0) { toast.error("Enter a non-zero integer (negative deducts)"); return; }
     setBusy(true);
-    const r = await runAdminAction(`/api/admin/accounts/${account!.id}/credits/grant`, {
+    const r = await runAdminAction(`/api/admin/api-clients/${apiClient!.id}/credits/grant`, {
       method: "POST", body: JSON.stringify({ amount: n }), success: "Credits updated", errorPrefix: "Grant failed",
     });
     setBusy(false);
@@ -174,7 +174,7 @@ function GrantCreditsDialog({
           <DialogTitle>Adjust credits</DialogTitle>
         </DialogHeader>
         <p className="text-sm text-muted-foreground">
-          Current balance: <span className="font-mono">{account?.creditBalance.toLocaleString()}</span>.
+          Current balance: <span className="font-mono">{apiClient?.creditBalance.toLocaleString()}</span>.
           Positive grants, negative deducts (floors at 0).
         </p>
         <Input value={amount} onChange={(e) => setAmount(e.target.value)} placeholder="e.g. 100000 or -5000" />
@@ -193,11 +193,25 @@ export default function AdminAccountsPage() {
   const { accounts, isLoading, mutate } = useAdminAccounts(q);
   const [expanded, setExpanded] = useState<string | null>(null);
   const [plaintext, setPlaintext] = useState<string | null>(null);
-  const [granting, setGranting] = useState<AdminAccount | null>(null);
+  const [granting, setGranting] = useState<AdminApiClient | null>(null);
 
-  async function patchAccount(a: AdminAccount, patch: { plan?: string; status?: string }) {
+  async function patchAccount(a: AdminAccount, patch: { status: string }) {
     const r = await runAdminAction(`/api/admin/accounts/${a.id}`, {
       method: "PATCH", body: JSON.stringify(patch), success: "Account updated", errorPrefix: "Update failed",
+    });
+    if (r) await mutate();
+  }
+
+  async function patchApiClient(apiClient: AdminApiClient, patch: { plan: string }) {
+    const r = await runAdminAction(`/api/admin/api-clients/${apiClient.id}`, {
+      method: "PATCH", body: JSON.stringify(patch), success: "Plan updated", errorPrefix: "Update failed",
+    });
+    if (r) await mutate();
+  }
+
+  async function grantApiAccess(a: AdminAccount) {
+    const r = await runAdminAction(`/api/admin/api-clients`, {
+      method: "POST", body: JSON.stringify({ accountId: a.id }), success: "API access granted", errorPrefix: "Failed to grant API access",
     });
     if (r) await mutate();
   }
@@ -206,10 +220,10 @@ export default function AdminAccountsPage() {
     <div className="space-y-4">
       <div className="flex items-center justify-between gap-4 flex-wrap">
         <div>
-          <h1 className="text-xl font-semibold flex items-center gap-2"><Users className="h-5 w-5" />Accounts & API Keys</h1>
+          <h1 className="text-xl font-semibold flex items-center gap-2"><Users className="h-5 w-5" />Accounts & API Clients</h1>
           <p className="text-sm text-muted-foreground mt-0.5">
-            Every SDK/API consumer is an Account (07-identity §III) — keys, credits and plan live here.
-            New accounts appear when a wallet signs in; there is nothing to create by hand.
+            Every wallet/identity that connects to any Medialane app is an Account. Keys, credits, and plan
+            only apply to accounts that are also SDK/API clients — grant that separately below.
           </p>
         </div>
         <form
@@ -245,20 +259,31 @@ export default function AdminAccountsPage() {
                     <p className="text-xs text-muted-foreground truncate">{subtitle}</p>
                   </div>
                   <div className="ml-auto flex items-center gap-2">
-                    <span className="text-xs text-muted-foreground font-mono flex items-center gap-1">
-                      <Coins className="h-3 w-3" />{a.creditBalance.toLocaleString()}
-                    </span>
-                    <Badge variant="outline" className={`text-[10px] ${PLAN_STYLE[a.plan] ?? ""}`}>{a.plan}</Badge>
-                    <Badge variant="outline" className={`text-[10px] ${STATUS_STYLE[a.status] ?? ""}`}>{a.status}</Badge>
-                    <span className="text-xs text-muted-foreground">{a.keyCount} key{a.keyCount !== 1 ? "s" : ""}</span>
-                    <Button size="sm" variant="ghost" className="h-7 px-2 text-xs" onClick={() => setGranting(a)}>
-                      Credits
-                    </Button>
-                    <Button
-                      size="sm" variant="ghost" className="h-7 px-2 text-xs"
-                      onClick={() => patchAccount(a, { plan: a.plan === "FREE" ? "PREMIUM" : "FREE" })}>
-                      {a.plan === "FREE" ? "Upgrade" : "Downgrade"}
-                    </Button>
+                    {a.apiClient ? (
+                      <>
+                        <span className="text-xs text-muted-foreground font-mono flex items-center gap-1">
+                          <Coins className="h-3 w-3" />{a.apiClient.creditBalance.toLocaleString()}
+                        </span>
+                        <Badge variant="outline" className={`text-[10px] ${PLAN_STYLE[a.apiClient.plan] ?? ""}`}>{a.apiClient.plan}</Badge>
+                        <Badge variant="outline" className={`text-[10px] ${STATUS_STYLE[a.status] ?? ""}`}>{a.status}</Badge>
+                        <span className="text-xs text-muted-foreground">{a.apiClient.keyCount} key{a.apiClient.keyCount !== 1 ? "s" : ""}</span>
+                        <Button size="sm" variant="ghost" className="h-7 px-2 text-xs" onClick={() => setGranting(a.apiClient)}>
+                          Credits
+                        </Button>
+                        <Button
+                          size="sm" variant="ghost" className="h-7 px-2 text-xs"
+                          onClick={() => patchApiClient(a.apiClient!, { plan: a.apiClient!.plan === "FREE" ? "PREMIUM" : "FREE" })}>
+                          {a.apiClient.plan === "FREE" ? "Upgrade" : "Downgrade"}
+                        </Button>
+                      </>
+                    ) : (
+                      <>
+                        <Badge variant="outline" className={`text-[10px] ${STATUS_STYLE[a.status] ?? ""}`}>{a.status}</Badge>
+                        <Button size="sm" variant="outline" className="h-7 px-2 text-xs gap-1" onClick={() => grantApiAccess(a)}>
+                          <Plug className="h-3 w-3" />Grant API access
+                        </Button>
+                      </>
+                    )}
                     <Button
                       size="sm" variant="ghost"
                       className={`h-7 px-2 text-xs ${a.status === "ACTIVE" ? "text-destructive" : "text-green-500"}`}
@@ -269,12 +294,14 @@ export default function AdminAccountsPage() {
                       }}>
                       {a.status === "ACTIVE" ? "Suspend" : "Reactivate"}
                     </Button>
-                    <Button size="sm" variant="ghost" className="h-7 px-2" onClick={() => setExpanded(expanded === a.id ? null : a.id)}>
-                      {expanded === a.id ? <ChevronUp className="h-3.5 w-3.5" /> : <ChevronDown className="h-3.5 w-3.5" />}
-                    </Button>
+                    {a.apiClient && (
+                      <Button size="sm" variant="ghost" className="h-7 px-2" onClick={() => setExpanded(expanded === a.id ? null : a.id)}>
+                        {expanded === a.id ? <ChevronUp className="h-3.5 w-3.5" /> : <ChevronDown className="h-3.5 w-3.5" />}
+                      </Button>
+                    )}
                   </div>
                 </div>
-                {expanded === a.id && <AccountKeys account={a} onPlaintext={setPlaintext} />}
+                {expanded === a.id && a.apiClient && <ApiClientKeys apiClient={a.apiClient} onPlaintext={setPlaintext} />}
               </div>
             );
           })}
@@ -282,7 +309,7 @@ export default function AdminAccountsPage() {
       )}
 
       <GrantCreditsDialog
-        account={granting}
+        apiClient={granting}
         open={!!granting}
         onClose={() => setGranting(null)}
         onGranted={() => void mutate()}
