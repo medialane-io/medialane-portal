@@ -47,15 +47,22 @@ export interface AdminAccountIdentity {
   email: string | null;
 }
 
+/** The billing facet, present only when this Account is also an SDK/API
+ *  client — see medialane-core/docs/superpowers/specs/2026-08-05-api-client-model-design.md. */
+export interface AdminApiClient {
+  id: string;
+  plan: "FREE" | "PREMIUM";
+  creditBalance: number;
+  keyCount: number;
+}
+
 export interface AdminAccount {
   id: string;
   publicId: string;
   type: string;
-  plan: "FREE" | "PREMIUM";
   status: "ACTIVE" | "SUSPENDED";
-  creditBalance: number;
   identities: AdminAccountIdentity[];
-  keyCount: number;
+  apiClient: AdminApiClient | null;
   createdAt: string;
 }
 
