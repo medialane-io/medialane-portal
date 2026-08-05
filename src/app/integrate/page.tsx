@@ -22,6 +22,8 @@ const ACTION_LABELS: Record<string, string> = {
   "intent:mint": "Mint an asset",
   "intent:create-collection": "Deploy a collection",
   "intent:create-tier": "Create a ticket type / membership tier",
+  "intent:create-coin": "Deploy a Creator Coin",
+  "intent:launch-coin": "Launch a Creator Coin on Ekubo",
   "intent:listing": "List an asset for sale",
   "intent:offer": "Make an offer",
   "intent:cancel": "Cancel an order",
