@@ -8,11 +8,12 @@ export async function GET(req: NextRequest) {
   if (!address) return NextResponse.json({ error: "Missing address" }, { status: 400 });
 
   const apiUrl = process.env.MEDIALANE_API_URL;
-  if (!apiUrl) return NextResponse.json({ error: "Backend not configured" }, { status: 500 });
+  const apiKey = process.env.MEDIALANE_API_KEY;
+  if (!apiUrl || !apiKey) return NextResponse.json({ error: "Backend not configured" }, { status: 500 });
 
   const res = await fetch(`${apiUrl}/v1/auth/siws/nonce`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: { "Content-Type": "application/json", "x-api-key": apiKey },
     body: JSON.stringify({ walletAddress: address }),
   });
   const json = await res.json().catch(() => null);
