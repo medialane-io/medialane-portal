@@ -19,7 +19,8 @@ export async function POST(req: NextRequest) {
 
   const apiUrl = process.env.MEDIALANE_API_URL;
   const apiSecret = process.env.MEDIALANE_API_SECRET;
-  if (!apiUrl || !apiSecret) return NextResponse.json({ error: "Backend not configured" }, { status: 500 });
+  const apiKey = process.env.MEDIALANE_API_KEY;
+  if (!apiUrl || !apiSecret || !apiKey) return NextResponse.json({ error: "Backend not configured" }, { status: 500 });
 
   let address: string;
   try {
@@ -31,7 +32,7 @@ export async function POST(req: NextRequest) {
   // 1) Verify the wallet signature via the backend's proven SIWS verify.
   const verifyRes = await fetch(`${apiUrl}/v1/auth/siws/verify`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: { "Content-Type": "application/json", "x-api-key": apiKey },
     body: JSON.stringify({ walletAddress: address, nonce: parsed.data.nonce, signature: parsed.data.signature }),
   });
   if (!verifyRes.ok) {
