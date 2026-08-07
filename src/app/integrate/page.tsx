@@ -263,7 +263,7 @@ export default async function IntegratePage() {
                   <p className="text-xs font-mono text-muted-foreground">medialane.io</p>
                   <h3 className="text-lg font-bold text-white">Creator Launchpad</h3>
                   <p className="text-sm text-muted-foreground leading-relaxed">
-                    Consumer-grade marketplace with invisible wallet (ChipiPay). Mint, list, remix,
+                    Consumer-grade marketplace with an invisible, self-custody wallet. Mint, list, remix,
                     and comment without managing a seed phrase. Runs on the Collections, Minting,
                     Orders, and Remix APIs.
                   </p>
