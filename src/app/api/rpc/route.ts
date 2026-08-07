@@ -14,7 +14,7 @@ import { RPC_MAIN_URL, RPC_FALLBACK_URL } from "@/src/lib/constants";
  * the PRIMARY upstream; on a transient failure it rotates to the keyless
  * public FALLBACK (lava).
  *
- * The portal has no Clerk session to gate this on. Abuse protection:
+ * The portal has no user session to gate this on. Abuse protection:
  *  - same-origin guard: reject browser requests whose Origin is a different
  *    host (the realistic cross-origin abuse vector). Requests without an
  *    Origin (non-CORS / SSR) are allowed.
