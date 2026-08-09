@@ -21,6 +21,13 @@ import { RPC_MAIN_URL, RPC_FALLBACK_URL } from "@/src/lib/constants";
  *  - method allowlist: reads + the one write path the portal actually uses
  *    (the Credits tab's USDC top-up `account.execute`, `credits-tab.tsx`).
  *  - per-IP rate limit bounds residual abuse from a same-origin script.
+ *  - credit metering: every forwarded call bills the backend's metered
+ *    POST /v1/rpc/meter first (medialane-backend/src/api/routes/rpc-meter.ts)
+ *    — mirrors medialane-io and medialane-starknet's /api/rpc, which this
+ *    route had drifted out of sync with (this proxy forwarded to the keyed
+ *    Alchemy upstream with no billing at all). The RPC call itself still
+ *    goes straight to the upstream with this app's own key below; billing
+ *    only makes it a credited action instead of a free bypass.
  */
 
 const RPC_URLS = Array.from(new Set(
@@ -101,6 +108,43 @@ function checkRateLimit(ip: string): boolean {
   return true;
 }
 
+function extractMethod(body: unknown): string {
+  if (Array.isArray(body)) return "batch";
+  if (body && typeof body === "object") {
+    const method = (body as Record<string, unknown>).method;
+    if (typeof method === "string") return method;
+  }
+  return "unknown";
+}
+
+/**
+ * Bill this app's credit balance for the upcoming upstream RPC call, via the
+ * backend's metered POST /v1/rpc/meter (medialane-backend/src/api/routes/rpc-meter.ts).
+ * The RPC call itself still goes straight to the upstream with this app's own
+ * key below — this only makes it a credited action instead of a free bypass.
+ * Returns false (caller must refuse to forward) on insufficient credits or
+ * any billing failure — an RPC call this app can't account for must not run.
+ */
+async function billRpcCall(method: string): Promise<boolean> {
+  const apiUrl = process.env.MEDIALANE_API_URL;
+  const apiKey = process.env.MEDIALANE_API_KEY;
+  if (!apiUrl || !apiKey) {
+    console.error("[/api/rpc] MEDIALANE_API_URL/MEDIALANE_API_KEY are not configured — refusing to bill/forward");
+    return false;
+  }
+  try {
+    const res = await fetch(`${apiUrl.replace(/\/$/, "")}/v1/rpc/meter`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "x-api-key": apiKey },
+      body: JSON.stringify({ method }),
+    });
+    return res.ok;
+  } catch (err) {
+    console.error("[/api/rpc] billing call failed", { err: err instanceof Error ? err.message : String(err) });
+    return false;
+  }
+}
+
 export async function POST(req: NextRequest) {
   if (!isSameOrigin(req)) {
     return rpcError(-32600, "Cross-origin requests are not allowed", 403);
@@ -123,6 +167,11 @@ export async function POST(req: NextRequest) {
       ? String((body as Record<string, unknown>).method ?? "<unknown>")
       : "<batch or invalid>";
     return rpcError(-32601, `Method not allowed: ${method}`);
+  }
+
+  const method = extractMethod(body);
+  if (!(await billRpcCall(method))) {
+    return rpcError(-32003, "Insufficient credits or billing unavailable — RPC call not forwarded", 402);
   }
 
   let lastError = "No RPC upstream configured";
