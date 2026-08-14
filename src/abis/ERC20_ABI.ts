@@ -1,4 +1,4 @@
-// ERC20 ABI for balance queries
+
 export const ERC20_ABI = [
   {
     name: "balanceOf",

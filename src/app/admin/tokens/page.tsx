@@ -44,8 +44,19 @@ function CopyButton({ text }: { text: string }) {
   );
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type TokenData = Record<string, any>;
+type TokenData = {
+  name?: string;
+  standard?: string;
+  owner?: string;
+  tokenUri?: string;
+  metadataStatus?: string;
+  metadata?: {
+    name?: string;
+    image?: string;
+    ipType?: string;
+    attributes?: Array<{ trait_type?: string; value?: unknown }>;
+  };
+};
 
 export default function AdminTokensPage() {
   const [contract, setContract] = useState("");

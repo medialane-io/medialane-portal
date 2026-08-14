@@ -36,7 +36,7 @@ export default function PricingPage() {
       <BackgroundGradients />
 
       <div className="relative z-10">
-        {/* Hero */}
+
         <section className="container mx-auto px-4 pt-28 pb-16 max-w-4xl text-center space-y-5">
           <Badge className="bg-primary/10 text-primary border-primary/30 px-4 py-1.5 text-sm">
             Pricing
@@ -50,11 +50,9 @@ export default function PricingPage() {
           </p>
         </section>
 
-        {/* Plan cards */}
         <section className="container mx-auto px-4 pb-12 max-w-4xl">
           <div className="grid md:grid-cols-2 gap-6">
-            
-            {/* PAY-AS-YOU-GO */}
+
             <Card className="border-primary/30 bg-gradient-to-br from-primary/10 to-background/50 backdrop-blur-sm relative overflow-hidden">
               <div className="absolute top-4 right-4">
                 <Badge className="bg-primary/20 text-primary border-primary/30 text-xs">
@@ -87,7 +85,6 @@ export default function PricingPage() {
           </div>
         </section>
 
-        {/* MDLN tier benefits */}
         <section className="container mx-auto px-4 pb-16 max-w-4xl">
           <div className="space-y-4">
             <div className="text-center space-y-2">
@@ -122,7 +119,6 @@ export default function PricingPage() {
           </div>
         </section>
 
-        {/* Feature comparison table */}
         <section className="container mx-auto px-4 pb-24 max-w-4xl">
           <div className="space-y-4">
             <h2 className="text-xl font-bold text-white text-center">Everything included</h2>
@@ -143,7 +139,7 @@ export default function PricingPage() {
                 </div>
               ))}
             </div>
-            
+
           </div>
         </section>
       </div>

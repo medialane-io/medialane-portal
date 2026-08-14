@@ -11,7 +11,6 @@ import { Coins, Zap, ExternalLink, Loader2 } from "lucide-react";
 import { portalFetcher } from "@/src/lib/portal/fetcher";
 import { CREDITS_PER_USDC } from "@/src/lib/constants";
 
-// Circle-native USDC on Starknet — must match the backend x402 settlement asset.
 const USDC_CONTRACT = "0x033068f6539f8e6e6b131e6b2b814e6c34a5224bc66947c47dab9dfee93b35fb";
 
 interface Props {
@@ -27,7 +26,7 @@ interface Payment {
   status: string;
   createdAt: string;
 }
-// The account-admin surface returns balance + ledger from a single endpoint.
+
 interface CreditsData {
   data?: { balance?: number; history?: Payment[] };
 }
@@ -40,15 +39,11 @@ export function CreditsTab({ address }: Props) {
   const [credited, setCredited] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  // Balance + history come from the backend (the x402 credit owner) via the
-  // account-admin surface, which returns both from one /credits endpoint.
   const { data: creditsData, mutate: mutateCredits } = useSWR<CreditsData>(
     `/api/portal/credits?address=${address}`,
     portalFetcher,
   );
 
-  // The Creator's Fund treasury on Starknet (x402 settles here). Chain-prefixed
-  // for multichain readiness (NEXT_PUBLIC_BASE_X402_TREASURY etc. later).
   const treasuryAddress = process.env.NEXT_PUBLIC_STARKNET_X402_TREASURY ?? "";
   const balance = creditsData?.data?.balance ?? 0;
   const payments = creditsData?.data?.history ?? [];
@@ -56,8 +51,6 @@ export function CreditsTab({ address }: Props) {
   const previewCredits =
     !isNaN(parsedUsdc) && parsedUsdc > 0 ? Math.floor(parsedUsdc * CREDITS_PER_USDC) : null;
 
-  // Submit a (finalized) USDC transfer tx to the backend, which verifies it
-  // on-chain and credits the tenant. Safe to retry — the backend dedups on txHash.
   async function fundCredit(txHash: string) {
     setError(null);
     const res = await fetch(`/api/portal/credits/fund?address=${address}`, {
@@ -67,7 +60,7 @@ export function CreditsTab({ address }: Props) {
     });
     const json = (await res.json().catch(() => ({}))) as { data?: { credited: number }; error?: string };
     if (!res.ok) {
-      // Most common: the transfer isn't finalized yet — keep the tx for retry.
+
       setError(json.error ?? "Could not verify the payment yet. Try “Confirm credit” again in a moment.");
       return;
     }
@@ -87,7 +80,7 @@ export function CreditsTab({ address }: Props) {
     setPendingTx(null);
 
     try {
-      const amount = BigInt(Math.round(usdc * 1_000_000)); // USDC has 6 decimals
+      const amount = BigInt(Math.round(usdc * 1_000_000));
       const result = await account.execute([
         {
           contractAddress: USDC_CONTRACT,
@@ -98,8 +91,7 @@ export function CreditsTab({ address }: Props) {
       const txHash = result.transaction_hash;
       setPendingTx(txHash);
       setUsdcAmount("");
-      // Attempt to credit immediately; if the tx isn't finalized yet the user
-      // can retry via the Confirm button.
+
       await fundCredit(txHash);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Transaction failed");

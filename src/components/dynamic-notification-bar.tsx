@@ -8,10 +8,9 @@ import { useMobile } from "@/src/hooks/use-mobile"
 import { useRouter } from "next/navigation"
 
 interface NotificationBarProps {
-  interval?: number // Time in ms between notifications
+  interval?: number
 }
 
-// Array of notification messages
 const notifications = [
   {
     id: "1",
@@ -48,7 +47,6 @@ export default function DynamicNotificationBar({ interval = 30000 }: Notificatio
   useEffect(() => {
     if (!visible) return
 
-    // Rotate through notifications
     const timer = setInterval(() => {
       setCurrentIndex((prevIndex) => (prevIndex + 1) % notifications.length)
     }, interval)
@@ -56,7 +54,6 @@ export default function DynamicNotificationBar({ interval = 30000 }: Notificatio
     return () => clearInterval(timer)
   }, [interval, visible])
 
-  // Don't show on very small screens
   if (isMobile && window.innerWidth < 400) return null
 
   if (!visible) return null

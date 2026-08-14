@@ -33,7 +33,7 @@ export default function Footer() {
     <footer className="border-t border-white/10 bg-black/40 backdrop-blur-sm">
       <div className="container mx-auto px-4 py-12 max-w-5xl">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-          {/* Brand */}
+
           <div className="col-span-2 md:col-span-1 space-y-4">
             <LogoMedialane />
             <p className="text-sm text-muted-foreground leading-relaxed">
@@ -41,7 +41,6 @@ export default function Footer() {
             </p>
           </div>
 
-          {/* Platform */}
           <div className="space-y-3">
             <h3 className="text-sm font-semibold text-white">Platform</h3>
             <ul className="space-y-2">
@@ -55,7 +54,6 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* Community */}
           <div className="space-y-3">
             <h3 className="text-sm font-semibold text-white">Community</h3>
             <ul className="space-y-2">
@@ -75,7 +73,6 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* Legal */}
           <div className="space-y-3">
             <h3 className="text-sm font-semibold text-white">Legal</h3>
             <ul className="space-y-2">
@@ -90,7 +87,6 @@ export default function Footer() {
           </div>
         </div>
 
-        {/* Bottom row */}
         <div className="mt-12 pt-6 border-t border-white/10 flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-4">
             {SOCIALS.map((s) => (

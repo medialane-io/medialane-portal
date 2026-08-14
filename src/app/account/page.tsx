@@ -11,12 +11,10 @@ export default function AccountPage() {
   const { address, isConnected, isConnecting } = useWallet();
   const { session, isLoading, signingIn, error, signIn } = usePortalAuth();
 
-  // Signed in → the console (scoped to the resolved Account).
   if (session) {
     return <AccountDashboard address={session.address} />;
   }
 
-  // Wallet connected but not signed in → prompt a one-time signature.
   if (isConnected && address && !isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center px-4">
@@ -45,7 +43,6 @@ export default function AccountPage() {
     );
   }
 
-  // No wallet yet.
   return (
     <div className="min-h-screen flex items-center justify-center px-4">
       <div className="flex flex-col items-center gap-4 text-center pt-28">

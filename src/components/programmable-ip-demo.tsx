@@ -18,7 +18,7 @@ export default function ProgrammableIPDemo() {
     derivativeWorks: true,
     attribution: true,
     royaltyPercentage: 5,
-    licenseDuration: 12, // months
+    licenseDuration: 12,
     territoryRestriction: false,
     autoRenewal: true,
   })
@@ -39,22 +39,17 @@ export default function ProgrammableIPDemo() {
     }))
   }
 
-  // Calculate estimated revenue based on settings
   const calculateEstimatedRevenue = () => {
     let baseAmount = 1000
 
-    // Adjust based on settings
     if (settings.commercialUse) baseAmount *= 1.5
     if (settings.derivativeWorks) baseAmount *= 1.2
     if (!settings.attribution) baseAmount *= 0.8
 
-    // Adjust for royalty percentage
     baseAmount *= 1 + settings.royaltyPercentage / 100
 
-    // Adjust for license duration
     baseAmount *= settings.licenseDuration / 12
 
-    // Format as currency
     return new Intl.NumberFormat("en-US", {
       style: "currency",
       currency: "USD",
@@ -267,7 +262,7 @@ import "@openzeppelin/contracts/utils/Counters.sol";
 contract MediaLaneProgrammableIP is ERC721URIStorage, Ownable {
     using Counters for Counters.Counter;
     Counters.Counter private _tokenIds;
-    
+
     struct License {
         bool commercialUse;
         bool derivativeWorks;
@@ -281,16 +276,16 @@ contract MediaLaneProgrammableIP is ERC721URIStorage, Ownable {
         address licensee;
         bool active;
     }
-    
+
     mapping(uint256 => License) public licenses;
     mapping(uint256 => string) public territories;
-    
+
     event LicenseCreated(uint256 tokenId, address licensee);
     event LicenseRenewed(uint256 tokenId, address licensee);
     event RoyaltyPaid(uint256 tokenId, address licensee, uint256 amount);
-    
+
     constructor() ERC721("MediaLane Programmable IP", "MLIP") {}
-    
+
     function createProgrammableIP(
         address creator,
         string memory tokenURI,
@@ -304,10 +299,10 @@ contract MediaLaneProgrammableIP is ERC721URIStorage, Ownable {
     ) public returns (uint256) {
         _tokenIds.increment();
         uint256 newItemId = _tokenIds.current();
-        
+
         _mint(creator, newItemId);
         _setTokenURI(newItemId, tokenURI);
-        
+
         licenses[newItemId] = License({
             commercialUse: _commercialUse,
             derivativeWorks: _derivativeWorks,
@@ -321,54 +316,54 @@ contract MediaLaneProgrammableIP is ERC721URIStorage, Ownable {
             licensee: address(0),
             active: false
         });
-        
+
         return newItemId;
     }
-    
+
     function acquireLicense(uint256 tokenId) public payable {
         require(_exists(tokenId), "Token does not exist");
         require(licenses[tokenId].licensee == address(0) || !licenses[tokenId].active, "License already active");
-        
+
         // Transfer payment to token owner
         address payable owner = payable(ownerOf(tokenId));
         owner.transfer(msg.value);
-        
+
         // Activate license
         licenses[tokenId].licensee = msg.sender;
         licenses[tokenId].active = true;
         licenses[tokenId].startDate = block.timestamp;
         licenses[tokenId].endDate = block.timestamp + (licenses[tokenId].licenseDuration * 30 days);
-        
+
         emit LicenseCreated(tokenId, msg.sender);
     }
-    
+
     function renewLicense(uint256 tokenId) public payable {
         require(_exists(tokenId), "Token does not exist");
         require(licenses[tokenId].licensee == msg.sender, "Not the licensee");
         require(licenses[tokenId].autoRenewal, "Auto renewal not enabled");
-        
+
         // Transfer payment to token owner
         address payable owner = payable(ownerOf(tokenId));
         owner.transfer(msg.value);
-        
+
         // Renew license
         licenses[tokenId].startDate = block.timestamp;
         licenses[tokenId].endDate = block.timestamp + (licenses[tokenId].licenseDuration * 30 days);
-        
+
         emit LicenseRenewed(tokenId, msg.sender);
     }
-    
+
     function payRoyalty(uint256 tokenId) public payable {
         require(_exists(tokenId), "Token does not exist");
         require(licenses[tokenId].licensee == msg.sender, "Not the licensee");
-        
+
         // Transfer royalty to token owner
         address payable owner = payable(ownerOf(tokenId));
         owner.transfer(msg.value);
-        
+
         emit RoyaltyPaid(tokenId, msg.sender, msg.value);
     }
-    
+
     function isLicenseActive(uint256 tokenId) public view returns (bool) {
         return licenses[tokenId].active && block.timestamp <= licenses[tokenId].endDate;
     }

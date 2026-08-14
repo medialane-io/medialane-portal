@@ -2,57 +2,29 @@ import { NextRequest, NextResponse } from "next/server";
 import { isTransientRpcError } from "@medialane/sdk";
 import { RPC_MAIN_URL, RPC_FALLBACK_URL } from "@/src/lib/constants";
 
-/**
- * Server-side Starknet RPC proxy.
- *
- * Keeps the keyed RPC key OUT of the browser bundle (this replaces a prior
- * NEXT_PUBLIC_RPC_URL that inlined the keyed Alchemy URL directly into the
- * client — the same class of leak medialane-starknet fixed on 2026-06-23).
- * The portal's client RPC provider (`starknet-provider-wrapper.tsx`) points at
- * this same-origin route; the keyed URL lives only in the server-only
- * STARKNET_RPC_URL var (`src/lib/constants.ts`, the single source). MAIN stays
- * the PRIMARY upstream; on a transient failure it rotates to the keyless
- * public FALLBACK (lava).
- *
- * The portal has no user session to gate this on. Abuse protection:
- *  - same-origin guard: reject browser requests whose Origin is a different
- *    host (the realistic cross-origin abuse vector). Requests without an
- *    Origin (non-CORS / SSR) are allowed.
- *  - method allowlist: reads + the one write path the portal actually uses
- *    (the Credits tab's USDC top-up `account.execute`, `credits-tab.tsx`).
- *  - per-IP rate limit bounds residual abuse from a same-origin script.
- *  - credit metering: every forwarded call bills the backend's metered
- *    POST /v1/rpc/meter first (medialane-backend/src/api/routes/rpc-meter.ts)
- *    — mirrors medialane-io and medialane-starknet's /api/rpc, which this
- *    route had drifted out of sync with (this proxy forwarded to the keyed
- *    Alchemy upstream with no billing at all). The RPC call itself still
- *    goes straight to the upstream with this app's own key below; billing
- *    only makes it a credited action instead of a free bypass.
- */
-
 const RPC_URLS = Array.from(new Set(
   [RPC_MAIN_URL, RPC_FALLBACK_URL].filter((url): url is string => Boolean(url)),
 ));
 
 const ALLOWED_METHODS = new Set([
-  // ── Write — Credits tab USDC top-up (account.execute) ────────────────────
+
   "starknet_addInvokeTransaction",
-  // ── Transaction lifecycle ─────────────────────────────────────────────────
+
   "starknet_getTransactionReceipt",
   "starknet_getTransactionStatus",
   "starknet_getTransactionByHash",
   "starknet_getTransaction",
   "starknet_getBlockWithReceipts",
-  // ── Fee estimation & nonce ────────────────────────────────────────────────
+
   "starknet_estimateFee",
   "starknet_getNonce",
   "starknet_simulateTransactions",
-  // ── Provider initialisation (called automatically by starknet.js / starknet-react) ──
+
   "starknet_specVersion",
   "starknet_chainId",
   "starknet_blockNumber",
   "starknet_blockHashAndNumber",
-  // ── Reads ─────────────────────────────────────────────────────────────────
+
   "starknet_call",
   "starknet_getBlockWithTxHashes",
   "starknet_getBlockWithTxs",
@@ -76,7 +48,7 @@ function isAllowedMethod(body: unknown): boolean {
 
 function isSameOrigin(req: NextRequest): boolean {
   const origin = req.headers.get("origin");
-  if (!origin) return true; // no Origin (SSR / non-CORS) → allow
+  if (!origin) return true;
   const host = req.headers.get("host");
   try {
     return new URL(origin).host === host;
@@ -117,14 +89,6 @@ function extractMethod(body: unknown): string {
   return "unknown";
 }
 
-/**
- * Bill this app's credit balance for the upcoming upstream RPC call, via the
- * backend's metered POST /v1/rpc/meter (medialane-backend/src/api/routes/rpc-meter.ts).
- * The RPC call itself still goes straight to the upstream with this app's own
- * key below — this only makes it a credited action instead of a free bypass.
- * Returns false (caller must refuse to forward) on insufficient credits or
- * any billing failure — an RPC call this app can't account for must not run.
- */
 async function billRpcCall(method: string): Promise<boolean> {
   const apiUrl = process.env.MEDIALANE_API_URL;
   const apiKey = process.env.MEDIALANE_API_KEY;

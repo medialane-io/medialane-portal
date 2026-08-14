@@ -23,7 +23,7 @@ export const FEATURED_DATA: FeaturedItem[] = [
         title: "New Yorker",
         description: "New York City Photography Collection",
         image: "/moma.jpg",
-        link: "/collections/0x2c215c0925d5e85224a9d74ef4c09ed4d5c168f8a251d330aca410b62569252", // Assuming this route exists or will be created/redirected
+        link: "/collections/0x2c215c0925d5e85224a9d74ef4c09ed4d5c168f8a251d330aca410b62569252",
         ctaText: "Explore",
         tag: "Photography"
     },

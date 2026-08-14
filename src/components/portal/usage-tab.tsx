@@ -8,7 +8,6 @@ import { Badge } from "@/src/components/ui/badge";
 import { BarChart2, AlertCircle, Key } from "lucide-react";
 import { portalFetcher } from "@/src/lib/portal/fetcher";
 
-// FREE rate limit is per API key, per calendar month (backend rateLimit.ts).
 const FREE_MONTHLY_LIMIT = 50;
 
 interface KeyUsage {
@@ -20,8 +19,6 @@ interface KeyUsage {
   monthlyResetAt: string | null;
 }
 
-// The account-admin surface (/admin/accounts/:id/usage) returns an aggregate
-// monthly count plus per-key counters — not a daily series or a request log.
 interface UsageData {
   data?: { totalMonthlyRequests?: number; keys?: KeyUsage[] };
 }
@@ -78,7 +75,7 @@ export function UsageTab({ address }: UsageTabProps) {
 
   return (
     <div className="space-y-4">
-      {/* Account-wide monthly total */}
+
       <Card className="border-primary/20 bg-background/50 backdrop-blur-sm">
         <CardHeader>
           <CardTitle className="text-lg flex items-center gap-2">
@@ -98,7 +95,6 @@ export function UsageTab({ address }: UsageTabProps) {
         </CardContent>
       </Card>
 
-      {/* Per-key usage */}
       <Card className="border-primary/20 bg-background/50 backdrop-blur-sm">
         <CardHeader>
           <CardTitle className="text-base">Per-Key Usage</CardTitle>

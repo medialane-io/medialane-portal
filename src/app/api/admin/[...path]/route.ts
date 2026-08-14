@@ -6,9 +6,6 @@ const FORWARD_HEADERS = [
   "x-ml-admin-grant", "x-ml-admin-sig", "x-ml-admin-nonce", "x-ml-admin-ts", "content-type",
 ];
 
-// Secret-less same-origin forwarder. Holds NO secret and makes NO auth decision:
-// the backend verifies the signed x-ml-admin-* headers. Forwards path + query +
-// body + signed headers verbatim so the bytes match what the client signed.
 async function handler(req: NextRequest, context: { params: Promise<{ path: string[] }> }) {
   const { path } = await context.params;
   if (path.some((seg) => seg === "" || seg === "." || seg === "..")) {

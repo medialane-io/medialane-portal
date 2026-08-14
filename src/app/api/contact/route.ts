@@ -14,7 +14,6 @@ export async function POST(req: NextRequest) {
   try {
     const body = await req.json()
 
-    // Honeypot check — bots fill hidden fields, humans don't
     if (body._hp) {
       return NextResponse.json({ success: true })
     }

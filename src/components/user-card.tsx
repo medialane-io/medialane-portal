@@ -130,7 +130,7 @@ export default function UserCard({ user }: { user: MarketplaceUser }) {
       whileHover={{ y: -2 }}
       onClick={() => router.push(`/users/${user.id}`)}
     >
-      {/* Banner */}
+
       <div className="relative h-32 overflow-hidden">
         <img
           src={banner || "/placeholder.svg"}
@@ -141,7 +141,6 @@ export default function UserCard({ user }: { user: MarketplaceUser }) {
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
 
-        {/* Status Indicators */}
         <div className="absolute top-3 right-3 flex gap-2">
           {user.isActive && (
             <Badge className="bg-green-500/90 text-white">
@@ -157,7 +156,6 @@ export default function UserCard({ user }: { user: MarketplaceUser }) {
           )}
         </div>
 
-        {/* Quick Actions */}
         <div className="absolute top-3 left-3 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
           <Button variant="secondary" size="sm" className="h-8 w-8 p-0 bg-white/90 hover:bg-white" onClick={handleLike}>
             <Heart className={`h-3 w-3 ${isLiked ? "fill-red-500 text-red-500" : ""}`} />
@@ -173,16 +171,14 @@ export default function UserCard({ user }: { user: MarketplaceUser }) {
         </div>
       </div>
 
-      {/* Profile Content */}
       <div className="relative -mt-10 px-4 pb-4">
-        {/* Avatar */}
+
         <div className="relative mb-3">
           <Avatar className="h-16 w-16 border-4 border-background">
             <AvatarImage src={avatar || "/placeholder.svg"} alt={`${name} avatar`} />
             <AvatarFallback>{(name || "NA").slice(0, 2).toUpperCase()}</AvatarFallback>
           </Avatar>
 
-          {/* Role Badge */}
           {user.role && (
             <Badge variant="outline" className="absolute -bottom-1 -right-1 text-xs bg-background">
               {user.role === "creator" ? <Award className="h-3 w-3 mr-1" /> : <UserPlus className="h-3 w-3 mr-1" />}
@@ -191,7 +187,6 @@ export default function UserCard({ user }: { user: MarketplaceUser }) {
           )}
         </div>
 
-        {/* Name and Verification */}
         <div className="mb-2">
           <div className="flex items-center gap-1 mb-1">
             <h4 className="font-semibold truncate text-lg">{name}</h4>
@@ -200,10 +195,8 @@ export default function UserCard({ user }: { user: MarketplaceUser }) {
           <p className="text-sm text-muted-foreground">@{username}</p>
         </div>
 
-        {/* Bio */}
         <p className="text-sm text-muted-foreground mb-3 line-clamp-2">{bio}</p>
 
-        {/* Meta Info */}
         <div className="flex flex-wrap items-center gap-3 text-xs text-muted-foreground mb-3">
           {location && (
             <div className="flex items-center gap-1">
@@ -223,7 +216,6 @@ export default function UserCard({ user }: { user: MarketplaceUser }) {
           )}
         </div>
 
-        {/* Stats Grid */}
         <div className="grid grid-cols-3 gap-2 mb-4">
           <div className="text-center p-2 rounded-md bg-muted/50">
             <div className="text-sm font-semibold">{assets.toLocaleString()}</div>
@@ -239,7 +231,6 @@ export default function UserCard({ user }: { user: MarketplaceUser }) {
           </div>
         </div>
 
-        {/* Tags */}
         <div className="flex flex-wrap gap-1 mb-4">
           {(user?.tags || []).slice(0, 3).map((tag) => (
             <Badge
@@ -262,7 +253,6 @@ export default function UserCard({ user }: { user: MarketplaceUser }) {
           )}
         </div>
 
-        {/* Action Buttons */}
         <div className="flex gap-2">
           <Button variant={isFollowing ? "outline" : "default"} size="sm" className="flex-1" onClick={handleFollow}>
             {isFollowing ? (

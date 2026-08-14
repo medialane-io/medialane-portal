@@ -1,15 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getPortalSession } from "@/src/lib/portal-session";
 
-/**
- * Portal proxy → backend Account-admin endpoints. Authorizes by the signed-in
- * session (carrying the AccountID), then calls the backend with the single portal
- * service secret, scoped to that account. No per-wallet key, no provisioning.
- *
- *   /api/portal/keys            → /admin/accounts/{accountId}/keys
- *   /api/portal/credits         → /admin/accounts/{accountId}/credits
- *   /api/portal/usage           → /admin/accounts/{accountId}/usage   (etc.)
- */
 async function handler(req: NextRequest, context: { params: Promise<{ path: string[] }> }) {
   const session = await getPortalSession();
   if (!session) {

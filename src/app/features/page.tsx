@@ -158,7 +158,7 @@ export default function FeaturesPage() {
       <BackgroundGradients />
 
       <div className="relative z-10">
-        {/* Hero */}
+
         <section className="container mx-auto px-4 pt-28 pb-16 max-w-5xl text-center space-y-6">
           <Badge className="bg-primary/10 text-primary border-primary/30 px-4 py-1.5 text-sm">
             Medialane
@@ -172,7 +172,6 @@ export default function FeaturesPage() {
           </p>
         </section>
 
-        {/* AI Agents section */}
         <section className="container mx-auto px-4 pb-16 max-w-5xl">
           <Card className="border-primary/20 bg-gradient-to-br from-primary/10 to-background/50">
             <CardContent className="p-10 flex flex-col md:flex-row gap-8 items-start">
@@ -212,7 +211,6 @@ export default function FeaturesPage() {
           </Card>
         </section>
 
-        {/* API Surface Grid */}
         <section className="container mx-auto px-4 pb-20 max-w-5xl">
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
             {API_CARDS.map((card) => (
@@ -229,7 +227,6 @@ export default function FeaturesPage() {
           </div>
         </section>
 
-        {/* Webhooks */}
         <section className="container mx-auto px-4 pb-20 max-w-5xl">
           <div className="space-y-6">
             <div className="flex items-center gap-3">
@@ -253,7 +250,6 @@ export default function FeaturesPage() {
           </div>
         </section>
 
-        {/* SDK Card */}
         <section className="container mx-auto px-4 pb-20 max-w-5xl">
           <Card className="border-white/10 bg-white/5 backdrop-blur-sm">
             <CardContent className="p-8 flex flex-col md:flex-row gap-6 items-start">
@@ -279,7 +275,6 @@ export default function FeaturesPage() {
           </Card>
         </section>
 
-        {/* Bottom CTA */}
         <section className="container mx-auto px-4 pb-24 max-w-5xl text-center space-y-6">
           <h2 className="text-3xl font-bold text-white">Ready to build?</h2>
           <p className="text-muted-foreground">Get a free API key and go live in minutes.</p>

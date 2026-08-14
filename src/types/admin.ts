@@ -47,8 +47,6 @@ export interface AdminAccountIdentity {
   email: string | null;
 }
 
-/** The billing facet, present only when this Account is also an SDK/API
- *  client — see medialane-core/docs/superpowers/specs/2026-08-05-api-client-model-design.md. */
 export interface AdminApiClient {
   id: string;
   plan: "FREE" | "PREMIUM";
@@ -155,7 +153,7 @@ export interface AdminCollectionRecord {
   name?: string;
   symbol?: string | null;
   contractAddress: string;
-  /** @deprecated backend no longer returns this — CollectionSource dropped in Phase 2D.4 */
+
   source?: string;
   service?: string | null;
   metadataStatus: "FETCHED" | "PENDING" | "FETCHING" | "FAILED";

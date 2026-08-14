@@ -58,7 +58,7 @@ export function Navbar() {
 
   return (
     <>
-      {/* Desktop Navbar */}
+
       <motion.nav
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${isScrolled ? "bg-background/95 backdrop-blur-md border-b shadow-sm" : "bg-background/80 backdrop-blur-sm"
           }`}
@@ -68,7 +68,7 @@ export function Navbar() {
       >
         <div className="max-w-7xl mx-auto px-4">
           <div className="flex items-center justify-between h-16">
-            {/* Logo */}
+
             <Link href="/" className="flex items-center space-x-2 group">
               <div className="w-8 h-8 bg-gradient-to-br from-primary to-purple-600 rounded-lg flex items-center justify-center group-hover:scale-105 transition-transform">
                 <Zap className="w-4 h-4 text-white" />
@@ -78,7 +78,6 @@ export function Navbar() {
               </span>
             </Link>
 
-            {/* Desktop Navigation */}
             {!isMobile && (
               <div className="hidden md:flex items-center space-x-1">
                 {navItems.map((item) => {
@@ -99,9 +98,8 @@ export function Navbar() {
               </div>
             )}
 
-            {/* Right Side Actions */}
             <div className="flex items-center space-x-2">
-              {/* User Menu */}
+
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" size="sm" className="relative p-0 h-auto">
@@ -135,7 +133,6 @@ export function Navbar() {
                 </DropdownMenuContent>
               </DropdownMenu>
 
-              {/* Mobile Menu Button */}
               {isMobile && (
                 <Button variant="ghost" size="sm" onClick={() => setIsOpen(!isOpen)}>
                   {isOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
@@ -146,7 +143,6 @@ export function Navbar() {
         </div>
       </motion.nav>
 
-      {/* Mobile Menu */}
       <AnimatePresence>
         {isMobile && isOpen && (
           <motion.div
@@ -157,7 +153,7 @@ export function Navbar() {
             transition={{ duration: 0.2 }}
           >
             <div className="flex flex-col h-full pt-16">
-              {/* Mobile Navigation */}
+
               <div className="flex-1 overflow-y-auto">
                 <div className="px-4 py-4 space-y-2">
                   {navItems.map((item) => {
@@ -192,7 +188,6 @@ export function Navbar() {
         )}
       </AnimatePresence>
 
-      {/* Mobile Bottom Navigation */}
       {isMobile && (
         <div className="fixed bottom-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-md border-t">
           <div className="grid grid-cols-4 gap-1 p-2">
@@ -215,7 +210,6 @@ export function Navbar() {
         </div>
       )}
 
-      {/* Spacer for fixed navbar */}
       <div className="h-16" />
       {isMobile && <div className="h-16" />}
     </>

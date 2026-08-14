@@ -9,7 +9,7 @@ const Slider = React.forwardRef<
   React.ElementRef<typeof SliderPrimitive.Root>,
   React.ComponentPropsWithoutRef<typeof SliderPrimitive.Root>
 >(({ className, ...props }, ref) => {
-  // Determine how many thumbs to render based on provided value(s)
+
   const valueArrayLength = Array.isArray(props.value)
     ? props.value.length
     : Array.isArray(props.defaultValue)

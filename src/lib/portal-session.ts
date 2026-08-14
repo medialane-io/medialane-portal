@@ -1,12 +1,6 @@
 import { SignJWT, jwtVerify } from "jose";
 import { cookies } from "next/headers";
 
-/**
- * The portal session. The wallet is authenticated by signature, then resolved to
- * its Account (07-identity §III) — the session carries the AccountID, never a
- * per-wallet backend key. `chain`/`address` record which wallet signed in (any
- * chain); `is_admin` is computed at verify time from the admin allowlist.
- */
 export type PortalSession = {
   accountId: string;
   chain: string;
@@ -37,7 +31,6 @@ export async function createSession(payload: PortalSession): Promise<string> {
     .sign(getSecret());
 }
 
-/** Read + verify the session from the request cookies (server components / route handlers). */
 export async function getPortalSession(): Promise<PortalSession | null> {
   const token = (await cookies()).get(SESSION_COOKIE)?.value;
   if (!token) return null;

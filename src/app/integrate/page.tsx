@@ -14,9 +14,6 @@ const MDLN_TIERS = [
 
 const API_BASE = "https://api.medialane.io"
 
-// Display order + human labels for known actionKeys. Any actionKey the live
-// API returns that isn't listed here still renders (raw key as the label) —
-// this is presentation only, never a source of truth for what's priced.
 const ACTION_LABELS: Record<string, string> = {
   "read": "Read / query",
   "intent:mint": "Mint an asset",
@@ -37,10 +34,6 @@ const ACTION_LABELS: Record<string, string> = {
 interface PricingRule { actionKey: string; chain: string; service: string; credits: number }
 interface PricingResponse { creditsPerUsdc: number; pricing: { default: number; rules: PricingRule[] } }
 
-// Live pricing, never hardcoded — this is the same endpoint PATCH
-// /admin/pricing writes to, so the table can't drift from what callers are
-// actually charged. Revalidates every 5 minutes; a fetch failure degrades to
-// a link instead of a broken page.
 async function getLivePricing(): Promise<PricingResponse | null> {
   try {
     const res = await fetch(`${API_BASE}/v1/pricing`, { next: { revalidate: 300 } })
@@ -69,7 +62,7 @@ export default async function IntegratePage() {
       <BackgroundGradients />
 
       <div className="relative z-10">
-        {/* Hero */}
+
         <section className="container mx-auto px-4 pt-28 pb-16 max-w-4xl text-center space-y-5">
           <Badge className="bg-primary/10 text-primary border-primary/30 px-4 py-1.5 text-sm">
             Integrate
@@ -85,7 +78,6 @@ export default async function IntegratePage() {
           </Button>
         </section>
 
-        {/* Section 1: MDLN Credit Bonus */}
         <section className="container mx-auto px-4 pb-16 max-w-4xl">
           <div className="space-y-6">
             <div className="space-y-2">
@@ -129,7 +121,6 @@ export default async function IntegratePage() {
           </div>
         </section>
 
-        {/* Section 2: Credit System */}
         <section className="container mx-auto px-4 pb-16 max-w-4xl">
           <div className="space-y-6">
             <div className="space-y-2">
@@ -195,7 +186,6 @@ export default async function IntegratePage() {
           </div>
         </section>
 
-        {/* Section 3: What you get */}
         <section className="container mx-auto px-4 pb-16 max-w-4xl">
           <div className="space-y-6">
             <h2 className="text-2xl font-bold text-white">What you get</h2>
@@ -248,7 +238,6 @@ export default async function IntegratePage() {
           </div>
         </section>
 
-        {/* Section 4: Consumer App Examples */}
         <section className="container mx-auto px-4 pb-24 max-w-4xl">
           <div className="space-y-6">
             <div className="space-y-2">

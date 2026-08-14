@@ -283,10 +283,8 @@ export function ApiKeysTab({ address }: { address: string }) {
         )}
       </Card>
 
-      {/* Quickstart snippets */}
       <QuickstartCard />
 
-      {/* Create key dialog */}
       <Dialog open={createOpen} onOpenChange={(open) => !open && handleCloseCreate()}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>

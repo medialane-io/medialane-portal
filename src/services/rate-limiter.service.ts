@@ -1,6 +1,4 @@
-/**
- * Rate Limiter Service for managing RPC requests with throttling and retry logic
- */
+
 
 export interface RateLimiterConfig {
     maxRequestsPerSecond: number
@@ -32,24 +30,21 @@ export class RateLimiterService {
 
     constructor(config: Partial<RateLimiterConfig> = {}) {
         this.config = {
-            maxRequestsPerSecond: 3, // More conservative limit for blockchain RPC endpoints
-            maxRetries: 2, // Reduced since we're smarter about what to retry
+            maxRequestsPerSecond: 3,
+            maxRetries: 2,
             initialBackoffMs: 1000,
             maxBackoffMs: 30000,
-            cacheTimeoutMs: 60000, // 1 minute cache
+            cacheTimeoutMs: 60000,
             ...config
         }
     }
 
-    /**
-     * Execute a function with rate limiting and retry logic
-     */
     public async executeWithRateLimit<T>(
         fn: () => Promise<T>,
         cacheKey?: string,
         cacheTimeout?: number
     ): Promise<T> {
-        // Check cache first
+
         if (cacheKey && this.cache.has(cacheKey)) {
             const cached = this.cache.get(cacheKey)!
             if (cached.expiresAt > Date.now()) {
@@ -60,7 +55,6 @@ export class RateLimiterService {
             }
         }
 
-        // Check if same request is already in progress
         if (cacheKey && this.requestsInProgress.has(cacheKey)) {
             return await (this.requestsInProgress.get(cacheKey)! as Promise<T>)
         }
@@ -69,8 +63,7 @@ export class RateLimiterService {
             try {
                 await this.waitForRateLimit()
                 const result = await fn()
-                
-                // Cache the result
+
                 if (cacheKey) {
                     const timeout = cacheTimeout || this.config.cacheTimeoutMs
                     this.cache.set(cacheKey, {
@@ -79,7 +72,7 @@ export class RateLimiterService {
                         expiresAt: Date.now() + timeout
                     })
                 }
-                
+
                 return result
             } catch (error: unknown) {
                 if (attempt < this.config.maxRetries && this.shouldRetry(error)) {
@@ -96,12 +89,12 @@ export class RateLimiterService {
                     await this.delay(backoffMs)
                     return executeWithRetry(attempt + 1)
                 } else {
-                    // Only log non-contract errors to avoid spam
+
                     const errorMessage = getErrorMessage(error)
                     const isContractError = errorMessage.includes('Contract error') ||
                                           errorMessage.includes('ERC721: invalid token ID') ||
                                           errorMessage.includes('invalid token ID')
-                    
+
                     if (!isContractError) {
                         console.error('Request failed after retries:', errorMessage)
                     }
@@ -110,11 +103,10 @@ export class RateLimiterService {
             }
         }
 
-        // Track request in progress
         if (cacheKey) {
             const promise = executeWithRetry()
             this.requestsInProgress.set(cacheKey, promise as Promise<unknown>)
-            
+
             try {
                 const result = await promise
                 return result
@@ -126,33 +118,26 @@ export class RateLimiterService {
         return executeWithRetry()
     }
 
-    /**
-     * Execute multiple functions with controlled concurrency
-     */
     public async executeBatch<T>(
         functions: Array<() => Promise<T>>,
         batchSize: number = 3
     ): Promise<T[]> {
         const results: T[] = []
-        
+
         for (let i = 0; i < functions.length; i += batchSize) {
             const batch = functions.slice(i, i + batchSize)
             const batchPromises = batch.map(fn => this.executeWithRateLimit(fn))
             const batchResults = await Promise.all(batchPromises)
             results.push(...batchResults)
-            
-            // Add a delay between batches to be more conservative with RPC endpoints
+
             if (i + batchSize < functions.length) {
-                await this.delay(500) // Increased delay between batches
+                await this.delay(500)
             }
         }
-        
+
         return results
     }
 
-    /**
-     * Wait for rate limit compliance
-     */
     private async waitForRateLimit(): Promise<void> {
         const now = Date.now()
         const timeSinceLastRequest = now - this.lastRequestTime
@@ -166,21 +151,16 @@ export class RateLimiterService {
         this.lastRequestTime = Date.now()
     }
 
-    /**
-     * Determine if an error should trigger a retry
-     */
     private shouldRetry(error: unknown): boolean {
         if (!error) return false
 
         const errorMessage = getErrorMessage(error)
 
-        // Debug logging to see what errors we're getting
         console.debug('shouldRetry check:', {
             errorMessage: errorMessage.substring(0, 200),
             maxRetries: this.config.maxRetries
         })
-        
-        // Don't retry on expected contract errors - these are permanent/logical errors
+
         const contractErrors = [
             'ERC721: invalid token ID',
             'invalid token ID',
@@ -198,45 +178,39 @@ export class RateLimiterService {
             'token does not exist',
             'collection not found'
         ]
-        
-        // Check if this is a contract error that shouldn't be retried
+
         const shouldNotRetry = contractErrors.some(err => errorMessage.toLowerCase().includes(err.toLowerCase()))
         if (shouldNotRetry) {
             console.debug('Not retrying contract error:', errorMessage.substring(0, 100))
             return false
         }
-        
-        // Don't retry on most contract errors unless they're clearly rate limiting related
-        if (errorMessage.includes('Contract error') && 
-            !errorMessage.includes('Rate limit') && 
+
+        if (errorMessage.includes('Contract error') &&
+            !errorMessage.includes('Rate limit') &&
             !errorMessage.includes('429') &&
             !errorMessage.includes('Too Many Requests')) {
             console.debug('Not retrying generic contract error')
             return false
         }
-        
-        // Additional specific check for the hex-encoded ERC721 error
+
         if (errorMessage.includes('0x4552433732313a20696e76616c696420746f6b656e204944')) {
             console.debug('Not retrying hex-encoded ERC721 invalid token ID error')
             return false
         }
-        
-        // Retry on rate limit errors (429, Too Many Requests)
-        if (errorMessage.includes('429') || 
+
+        if (errorMessage.includes('429') ||
             errorMessage.includes('Too Many Requests') ||
             errorMessage.includes('Rate limit')) {
             return true
         }
-        
-        // Retry on network connectivity issues
-        if (errorMessage.includes('network') || 
+
+        if (errorMessage.includes('network') ||
             errorMessage.includes('timeout') ||
             errorMessage.includes('connection') ||
             errorMessage.includes('fetch')) {
             return true
         }
-        
-        // Retry on RPC server errors (5xx) but not contract errors
+
         if ((errorMessage.includes('500') ||
             errorMessage.includes('502') ||
             errorMessage.includes('503') ||
@@ -244,28 +218,19 @@ export class RateLimiterService {
             !errorMessage.includes('Contract error')) {
             return true
         }
-        
+
         return false
     }
 
-    /**
-     * Delay execution for specified milliseconds
-     */
     private delay(ms: number): Promise<void> {
         return new Promise(resolve => setTimeout(resolve, ms))
     }
 
-    /**
-     * Clear the cache
-     */
     public clearCache(): void {
         this.cache.clear()
         this.requestsInProgress.clear()
     }
 
-    /**
-     * Get cache statistics
-     */
     public getCacheStats(): {
         size: number
         hitRate: number
@@ -273,7 +238,7 @@ export class RateLimiterService {
     } {
         const now = Date.now()
         let validEntries = 0
-        
+
         for (const [key, entry] of this.cache.entries()) {
             if (entry.expiresAt > now) {
                 validEntries++
@@ -281,23 +246,19 @@ export class RateLimiterService {
                 this.cache.delete(key)
             }
         }
-        
+
         return {
             size: validEntries,
-            hitRate: 0, // We'd need to track hits/misses to calculate this
+            hitRate: 0,
             requestsInProgress: this.requestsInProgress.size
         }
     }
 
-    /**
-     * Update configuration
-     */
     public updateConfig(newConfig: Partial<RateLimiterConfig>): void {
         this.config = { ...this.config, ...newConfig }
     }
 }
 
-// Export a singleton instance with fresh configuration
 export const rateLimiter = new RateLimiterService({
     maxRequestsPerSecond: 3,
     maxRetries: 2,
@@ -306,5 +267,4 @@ export const rateLimiter = new RateLimiterService({
     cacheTimeoutMs: 60000
 })
 
-// Clear any existing cache on initialization
-rateLimiter.clearCache() 
+rateLimiter.clearCache()

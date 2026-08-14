@@ -27,7 +27,7 @@ export function useIpfsUpload() {
   const simulateProgress = () => {
     let value = 0;
     const interval = setInterval(() => {
-      value += Math.random() * 10; // simulate irregular speed
+      value += Math.random() * 10;
       setProgress((prev) => Math.min(prev + value, 95));
     }, 200);
     return interval;
@@ -46,7 +46,6 @@ export function useIpfsUpload() {
       try {
         let uploadedFileUrl = metadata.image || "";
 
-        // Upload file if provided
         if (file) {
           const fileSignedUrl = await getSignedUrl();
           const fileUpload = await pinata.upload.public
@@ -56,7 +55,6 @@ export function useIpfsUpload() {
           setFileUrl(uploadedFileUrl);
         }
 
-        // Upload metadata
         const metadataWithImage = {
           ...metadata,
           image: uploadedFileUrl,
@@ -69,7 +67,7 @@ export function useIpfsUpload() {
         const uploadedMetadataUrl = `${IPFS_URL}/${metadataUpload.cid}`;
         setMetadataUrl(uploadedMetadataUrl);
 
-        setProgress(100); // done
+        setProgress(100);
         clearInterval(progressInterval);
 
         return {
@@ -84,7 +82,7 @@ export function useIpfsUpload() {
         throw error;
       } finally {
         setLoading(false);
-        setTimeout(() => setProgress(0), 1000); // optional: reset progress after delay
+        setTimeout(() => setProgress(0), 1000);
       }
     },
     []

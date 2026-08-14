@@ -1,10 +1,4 @@
-/**
- * Shared SWR fetcher for portal API routes.
- *
- * Throws an ApiError on non-2xx responses so SWR enters the error state
- * and components can display a proper message rather than silently showing
- * stale/empty data.
- */
+
 export class ApiError extends Error {
   constructor(
     public readonly status: number,

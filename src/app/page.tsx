@@ -29,7 +29,7 @@ export default function Home() {
     <div className="relative w-full overflow-hidden">
       <BackgroundGradients />
       <div className="relative z-10">
-        {/* Hero */}
+
         <section className="container mx-auto px-4 pt-24 pb-16 max-w-5xl text-center space-y-8">
           <Badge className="bg-primary/10 text-primary border-primary/30 px-4 py-1.5 text-sm">
             <Sparkles className="w-3.5 h-3.5 mr-1.5 inline" />
@@ -61,7 +61,6 @@ export default function Home() {
             </Button>
           </div>
 
-          {/* Feature chips */}
           <div className="flex flex-wrap justify-center gap-3 pt-4">
             {[
               { icon: Coins, label: "Revenue Flows" },
@@ -81,7 +80,6 @@ export default function Home() {
             ))}
           </div>
 
-          {/* Terminal code preview */}
           <div className="mx-auto max-w-2xl text-left mt-8">
             <div className="rounded-xl border border-white/10 bg-white/5 backdrop-blur-sm overflow-hidden">
               <div className="flex items-center gap-2 px-4 py-2.5 border-b border-white/10 bg-white/[0.03]">
@@ -97,7 +95,6 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Integrate teaser */}
         <section className="container mx-auto px-4 pb-16 max-w-5xl">
           <div className="grid md:grid-cols-2 gap-6">
             <Card className="border-white/10 bg-white/5 backdrop-blur-sm">
@@ -148,7 +145,6 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Cards row */}
         <section className="container mx-auto px-4 pb-20 max-w-5xl">
           <div className="grid md:grid-cols-2 gap-6">
             <Card className="border-primary/20 bg-gradient-to-br from-primary/10 to-background/50 backdrop-blur-sm overflow-hidden group hover:border-primary/40 transition-all">

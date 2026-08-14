@@ -50,7 +50,6 @@ export function useAdminUsernameClaims(status?: string, page = 1) {
   };
 }
 
-
 export function useAdminReports(status?: string, page = 1) {
   const params = new URLSearchParams({ page: String(page), limit: "20" });
   if (status) params.set("status", status);

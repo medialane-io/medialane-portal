@@ -21,7 +21,6 @@ export type LicensingOffer = {
 
 const STORAGE_KEY = "medialane_offers_v1"
 
-// Fallback memory store for non-browser environments
 let memOffers: LicensingOffer[] = []
 
 function isBrowser() {
@@ -44,7 +43,7 @@ function setOffers(next: LicensingOffer[]) {
     return
   }
   localStorage.setItem(STORAGE_KEY, JSON.stringify(next))
-  // notify listeners
+
   window.dispatchEvent(new CustomEvent("offers:update"))
 }
 

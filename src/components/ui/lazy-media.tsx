@@ -27,7 +27,7 @@ export function LazyMedia({
     const containerRef = useRef<HTMLDivElement>(null)
 
     useEffect(() => {
-        // If priority is true, load immediately without observer
+
         if (priority) {
             setIsVisible(true)
             return
@@ -43,7 +43,7 @@ export function LazyMedia({
                 })
             },
             {
-                rootMargin: "50px", // Start loading when 50px away from viewport
+                rootMargin: "50px",
                 threshold: 0.1
             }
         )
@@ -57,17 +57,14 @@ export function LazyMedia({
         }
     }, [priority])
 
-    // Reset state if src changes
     useEffect(() => {
         setIsLoaded(false)
         setError(false)
         if (!priority) {
-            // Re-observe if src changes and we want to lazy load again (though usually we just want to show the new image if already visible)
-            // For simplicity, if it was already visible, we keep it visible to load the new src
+
         }
     }, [src, priority])
 
-    // Fallback for when src is missing or empty
     if (!src) {
         return (
             <div
@@ -83,10 +80,10 @@ export function LazyMedia({
             className={cn("relative overflow-hidden bg-muted", className)}
         >
             {!isVisible ? (
-                // Skeleton / Placeholder state
+
                 <div className="absolute inset-0 bg-muted" />
             ) : (
-                // Image Loading
+
                 <>
                     <Image
                         src={src}
@@ -99,15 +96,13 @@ export function LazyMedia({
                         )}
                         onLoad={() => setIsLoaded(true)}
                         onError={() => setError(true)}
-                        unoptimized={true} // Force bypass Next.js optimization as requested/configured already, but explicit here for safety
+                        unoptimized={true}
                     />
 
-                    {/* Loading Skeleton Overlay (component-based) */}
                     {!isLoaded && !error && (
                         <div className="absolute inset-0 bg-muted animate-pulse" />
                     )}
 
-                    {/* Error State */}
                     {error && (
                         <div className="absolute inset-0 flex items-center justify-center bg-muted text-muted-foreground text-sm p-4 text-center">
                             Failed to load image

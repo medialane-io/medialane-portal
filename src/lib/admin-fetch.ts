@@ -2,23 +2,10 @@ import { encodeAdminHeaders } from "@medialane/sdk";
 import { toast } from "sonner";
 import { getAdminSession } from "@/src/lib/admin-session";
 
-/** Thrown when there's no valid admin session — the UI prompts a re-sign. */
 export class NoAdminSessionError extends Error {
   constructor() { super("No admin session"); this.name = "NoAdminSessionError"; }
 }
 
-/**
- * The ONE way to call the admin API. Signs the request with the admin session
- * key (SNIP-12 session grant) so the backend's adminSignatureAuth can verify it.
- *
- * Accepts either path convention:
- *   - the same-origin forwarder path:  `/api/admin/<sub>`
- *   - the backend path:                `/admin/<sub>`
- * Both are normalized to the forwarder for the actual fetch, and the request is
- * signed over the BACKEND path (`/admin/<sub>` incl. query) the backend verifies.
- *
- * Drop-in for `fetch(path, opts)` — same signature, returns the same Response.
- */
 export function adminFetch(path: string, opts: RequestInit = {}): Promise<Response> {
   const session = getAdminSession();
   if (!session) throw new NoAdminSessionError();
@@ -39,15 +26,6 @@ export function adminFetch(path: string, opts: RequestInit = {}): Promise<Respon
   });
 }
 
-/**
- * Run an admin write with consistent, SPECIFIC, readable feedback. On failure it
- * surfaces the backend's `{ error }` message (never a generic "Failed") in a
- * long-lived, dismissible error toast; on success it shows `success`. Returns the
- * parsed response on success, or `null` on failure (already reported).
- *
- *   const r = await runAdminAction(`/admin/coins/${addr}`, { method: "PATCH", body, success: "Coin updated" });
- *   if (r) await mutate();
- */
 export async function runAdminAction<T = unknown>(
   path: string,
   opts: RequestInit & { success?: string; errorPrefix?: string } = {},

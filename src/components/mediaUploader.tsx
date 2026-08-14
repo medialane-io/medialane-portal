@@ -61,8 +61,7 @@ const MediaUploader = forwardRef<MediaUploaderRef, MediaUploaderProps>(
             });
           } catch (err) {
             console.error("Error converting URL to file:", err);
-            // Don't show toast error here as it might be a valid URL that just blocks CORS
-            // The parent component handles the case where file is null but URL is present
+
             return null;
           }
         }
@@ -228,12 +227,7 @@ const MediaUploader = forwardRef<MediaUploaderRef, MediaUploaderProps>(
                       <X className="w-3 h-3" />
                     </Button>
                   </div>
-                  {/*
-                  <div className="flex items-center justify-center space-x-2 text-sm text-muted-foreground">
-                    <CheckCircle className="w-4 h-4 text-green-500" />
-                     <span>{mediaFile?.name}</span> 
-                  </div>
-                  */}
+
                 </div>
               )}
 

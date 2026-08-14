@@ -6,12 +6,6 @@ export interface WalletSigner {
   signMessage: (typedData: TypedData) => Promise<unknown>;
 }
 
-/**
- * Normalize a wallet signature to a felt-string array — the dapp's proven shape.
- * Pass arrays through raw (`.map(String)`): Braavos returns a longer, signer-
- * prefixed array that `stark.formatSignature` mangles, which breaks on-chain
- * `is_valid_signature`. Handle `{r,s}` objects too.
- */
 function normalizeSignature(signature: unknown): string[] {
   if (Array.isArray(signature)) return signature.map(String);
   if (signature && typeof signature === "object") {
@@ -21,11 +15,6 @@ function normalizeSignature(signature: unknown): string[] {
   return [String(signature)];
 }
 
-/**
- * Runs the portal sign-in: fetch a challenge, sign it with the wallet, post the
- * signature to /api/auth/verify (which verifies on-chain, resolves the Account,
- * and sets the HttpOnly session cookie). Throws with a usable message on failure.
- */
 export async function requestPortalSession(address: string, signer: WalletSigner): Promise<void> {
   const challengeRes = await fetch(`/api/auth/challenge?address=${address}`);
   const challengeData = await challengeRes.json();

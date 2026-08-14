@@ -4,7 +4,6 @@ import Link from 'next/link'
 import Image from "next/image";
 import { useMobile } from "@/src/hooks/use-mobile"
 
-
 export function LogoMedialane() {
   const isMobile = useMobile()
   return (

@@ -28,8 +28,7 @@ interface ServiceCoverage {
   sampleMissing: { contractAddress: string; source: string | null }[];
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type HealthData = Record<string, any> | null;
+type HealthData = { status?: string; database?: string; indexer?: { lastBlock?: number | string } } | null;
 
 export default function AdminMaintenancePage() {
   const [health, setHealth]                     = useState<HealthData>(null);

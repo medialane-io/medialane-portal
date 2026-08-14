@@ -1,8 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
 
-// GET /api/auth/challenge?address=0x... — proxy the backend's proven SIWS nonce.
-// The portal does NOT build its own challenge or verify signatures; it reuses the
-// exact handshake the dapp uses in production (works with Braavos/Argent).
 export async function GET(req: NextRequest) {
   const address = req.nextUrl.searchParams.get("address");
   if (!address) return NextResponse.json({ error: "Missing address" }, { status: 400 });

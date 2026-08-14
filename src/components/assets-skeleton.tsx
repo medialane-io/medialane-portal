@@ -3,7 +3,7 @@ import { Skeleton } from "@/src/components/ui/skeleton"
 export function AssetsSkeleton() {
     return (
         <div className="min-h-screen pt-20 md:pt-24 pb-24 md:pb-32 px-4 md:px-8">
-            {/* Hero Skeleton */}
+
             <div className="flex flex-col items-center text-center mb-6 md:mb-10 animate-pulse">
                 <Skeleton className="h-8 w-64 rounded-full mb-3" />
                 <Skeleton className="h-10 md:h-14 w-3/4 md:w-1/2 mb-3" />
@@ -14,14 +14,12 @@ export function AssetsSkeleton() {
                 </div>
             </div>
 
-            {/* Toolbar Skeleton */}
             <div className="max-w-7xl mx-auto mb-4 md:mb-6">
                 <div className="flex flex-col gap-3 p-3 md:p-4 rounded-xl border border-white/10 bg-zinc-900/50">
                     <div className="flex flex-col md:flex-row gap-3 md:items-center md:justify-between">
-                        {/* Search */}
+
                         <Skeleton className="h-10 w-full md:w-[420px] rounded-md" />
 
-                        {/* Right controls */}
                         <div className="flex items-center gap-2 md:gap-3">
                             <Skeleton className="h-10 w-[160px] rounded-md" />
                             <div className="flex gap-1">
@@ -34,7 +32,6 @@ export function AssetsSkeleton() {
                 </div>
             </div>
 
-            {/* Grid Skeleton */}
             <div className="max-w-7xl mx-auto">
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
                     {Array.from({ length: 8 }).map((_, i) => (

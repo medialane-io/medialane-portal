@@ -22,7 +22,7 @@ function CoinThumb({ coin }: { coin: AdminCoinRecord }) {
   return (
     <div className="relative h-12 w-12 rounded-full overflow-hidden shrink-0 border border-border bg-muted">
       {src ? (
-        // eslint-disable-next-line @next/next/no-img-element
+
         <img src={src} alt={coin.name ?? ""} className="h-full w-full object-cover" />
       ) : (
         <div className="h-full w-full flex items-center justify-center text-[10px] font-bold uppercase text-muted-foreground">
@@ -48,7 +48,6 @@ export default function AdminCoinsPage() {
     searchTimer.current = setTimeout(() => { setDebouncedSearch(val); setPage(1); }, 400);
   }, []);
 
-  // ── Add external coin ────────────────────────────────────────────────────
   const [addOpen, setAddOpen] = useState(false);
   const [addContract, setAddContract] = useState("");
   const [addOwner, setAddOwner] = useState("");

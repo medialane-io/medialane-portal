@@ -10,9 +10,6 @@ const bodySchema = z.object({
   signature: z.array(z.string()).min(1),
 });
 
-// POST /api/auth/verify — delegate signature verification to the backend's proven
-// SIWS verify (the exact endpoint the dapp uses with Braavos), then resolve the
-// AccountID and issue the portal session. The portal verifies nothing on-chain itself.
 export async function POST(req: NextRequest) {
   const parsed = bodySchema.safeParse(await req.json().catch(() => null));
   if (!parsed.success) return NextResponse.json({ error: "Invalid body" }, { status: 400 });
@@ -29,7 +26,6 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Invalid address" }, { status: 400 });
   }
 
-  // 1) Verify the wallet signature via the backend's proven SIWS verify.
   const verifyRes = await fetch(`${apiUrl}/v1/auth/siws/verify`, {
     method: "POST",
     headers: { "Content-Type": "application/json", "x-api-key": apiKey },
@@ -46,7 +42,6 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Signature verification failed" }, { status: 401 });
   }
 
-  // 2) Resolve (find-or-create) the AccountID for this wallet.
   const resolveRes = await fetch(`${apiUrl}/admin/accounts/resolve`, {
     method: "POST",
     headers: { "x-api-key": apiSecret, "Content-Type": "application/json" },
@@ -58,7 +53,6 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Could not resolve account" }, { status: 502 });
   }
 
-  // 3) Issue the portal session.
   const token = await createSession({ accountId, chain: "STARKNET", address, is_admin: isAdminAddress(address) });
   const response = NextResponse.json({ data: { accountId, address, chain: "STARKNET" } });
   setSessionCookie(response, token);

@@ -112,7 +112,6 @@ export default function AdminCollectionsPage() {
     setStatusFilter(""); setFeaturedOnly(false); setShowHidden(false); setPage(1);
   }
 
-  // ── Register dialog ──────────────────────────────────────────────────────────
   const [registerOpen, setRegisterOpen]             = useState(false);
   const [registerContract, setRegisterContract]     = useState("");
   const [registerStartBlock, setRegisterStartBlock] = useState("");
@@ -131,7 +130,6 @@ export default function AdminCollectionsPage() {
     setRegistering(false);
   }
 
-  // ── Backfill dialog ──────────────────────────────────────────────────────────
   const [backfillOpen, setBackfillOpen]           = useState(false);
   const [backfillContract, setBackfillContract]   = useState("");
   const [backfillFromBlock, setBackfillFromBlock] = useState("");
@@ -158,7 +156,6 @@ export default function AdminCollectionsPage() {
     setBackfilling(false);
   }
 
-  // ── Edit service dialog ──────────────────────────────────────────────────────
   const [editOpen, setEditOpen]         = useState(false);
   const [editCol, setEditCol]           = useState<AdminCollectionRecord | null>(null);
   const [editService, setEditService]   = useState("");
@@ -193,7 +190,6 @@ export default function AdminCollectionsPage() {
     setSaving(false);
   }
 
-  // ── Delete dialog ────────────────────────────────────────────────────────────
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [deleteCol, setDeleteCol]   = useState<AdminCollectionRecord | null>(null);
   const [deleting, setDeleting]     = useState(false);
@@ -215,7 +211,6 @@ export default function AdminCollectionsPage() {
     setDeleting(false);
   }
 
-  // ── Per-row actions ──────────────────────────────────────────────────────────
   async function handleRefresh(contractAddress: string) {
     await runAdminAction(`/admin/collections/${contractAddress}/refresh`, { method: "POST", success: "Metadata refresh queued" });
   }
@@ -399,7 +394,7 @@ export default function AdminCollectionsPage() {
               <Label>Image (URL or ipfs://…)</Label>
               <Input value={editImage} onChange={(e) => setEditImage(e.target.value)} placeholder="ipfs://… or https://…" />
               {editImage.trim() && (
-                // eslint-disable-next-line @next/next/no-img-element
+
                 <img
                   src={editImage.trim().startsWith("ipfs://") ? `https://ipfs.io/ipfs/${editImage.trim().slice(7)}` : editImage.trim()}
                   alt=""

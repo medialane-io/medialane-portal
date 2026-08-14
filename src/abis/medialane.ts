@@ -19,17 +19,17 @@ export enum ItemType {
 export interface OfferItem {
   item_type: ItemType;
   token: string;
-  identifier_or_criteria: string; // u256 as string
-  start_amount: string; // u256 as string
-  end_amount: string; // u256 as string
+  identifier_or_criteria: string;
+  start_amount: string;
+  end_amount: string;
 }
 
 export interface ConsiderationItem {
   item_type: ItemType;
   token: string;
-  identifier_or_criteria: string; // u256 as string
-  start_amount: string; // u256 as string
-  end_amount: string; // u256 as string
+  identifier_or_criteria: string;
+  start_amount: string;
+  end_amount: string;
   recipient: string;
 }
 
@@ -37,15 +37,15 @@ export interface OrderParameters {
   offerer: string;
   offer: OfferItem;
   consideration: ConsiderationItem;
-  start_time: string; // felt252/u64 as string
-  end_time: string; // felt252/u64 as string
-  salt: string; // felt252
-  nonce: string; // felt252
+  start_time: string;
+  end_time: string;
+  salt: string;
+  nonce: string;
 }
 
 export interface Order {
   parameters: OrderParameters;
-  signature: string[]; // Array<felt252>
+  signature: string[];
 }
 
 export interface OrderDetails {

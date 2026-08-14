@@ -2,13 +2,6 @@ import { NextResponse } from "next/server";
 
 export const dynamic = "force-dynamic";
 
-// Returns a short-lived Pinata signed upload URL via medialane-backend's
-// metered Pinata path (POST /v1/metadata/upload-directory's sibling, GET
-// /v1/metadata/signed-url — medialane-backend/src/api/routes/metadata.ts).
-// This route used to hold its own PINATA_JWT and call Pinata directly,
-// which meant every upload went completely unbilled — the same "no free
-// endpoints" bug medialane-io and medialane-starknet already closed for
-// their equivalent routes. Portal never gets a Pinata credential of its own.
 export async function GET() {
   const apiUrl = process.env.MEDIALANE_API_URL;
   const apiKey = process.env.MEDIALANE_API_KEY;

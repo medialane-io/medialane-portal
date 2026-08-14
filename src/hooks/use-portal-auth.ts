@@ -15,11 +15,6 @@ export type PortalSessionView = {
 
 const fetcher = (url: string) => fetch(url).then((r) => r.json());
 
-/**
- * The portal's sign-in hook. Reads the current session (HttpOnly cookie, via
- * /api/auth/session), and drives sign-in (challenge → wallet signature → verify
- * → AccountID session) and sign-out. The connected wallet is the signer.
- */
 export function usePortalAuth() {
   const { account, address } = useAccount();
   const { data, isLoading, mutate } = useSWR<{ session: PortalSessionView | null }>(

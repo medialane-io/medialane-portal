@@ -5,11 +5,6 @@ import { Button } from "@/src/components/ui/button";
 import { useConnect } from "@starknet-react/core";
 import { Wallet } from "lucide-react";
 
-/**
- * Connect-only wallet picker (Ready / Braavos). No signing happens here — it
- * connects an injected wallet and closes. The connected address becomes the
- * portal's identity.
- */
 export function WalletConnectModal({
   open,
   onOpenChange,

@@ -26,24 +26,24 @@ export const Confetti = ({ duration = 3000, particleCount = 100 }: ConfettiProps
   const [particles, setParticles] = useState<Particle[]>([]);
 
   useEffect(() => {
-    // Generate particles for a center burst
+
     const newParticles = Array.from({ length: particleCount }).map((_, i) => {
-      const angle = Math.random() * 360; // Random direction
-      const distance = 100 + Math.random() * 400; // Random distance from center (min 100px)
-      // Convert polar to cartesian coordinates for the explosion
+      const angle = Math.random() * 360;
+      const distance = 100 + Math.random() * 400;
+
       const tx = Math.cos((angle * Math.PI) / 180) * distance;
       const ty = Math.sin((angle * Math.PI) / 180) * distance;
 
       return {
         id: i,
-        x: 50, // Start at center
-        y: 50, // Start at center
-        tx: tx, // Target x offset (pixels from center is simpler, but let's use viewport units or pixels? Pixels are safer for consistent burst)
-        ty: ty, // Target y offset
+        x: 50,
+        y: 50,
+        tx: tx,
+        ty: ty,
         rotation: Math.random() * 360,
         scale: 0.5 + Math.random(),
         color: colors[Math.floor(Math.random() * colors.length)],
-        delay: Math.random() * 0.2, // Small delay variance for "burst" feel
+        delay: Math.random() * 0.2,
       };
     });
     setParticles(newParticles);
@@ -67,11 +67,11 @@ export const Confetti = ({ duration = 3000, particleCount = 100 }: ConfettiProps
             y: particle.ty,
             opacity: 0,
             scale: particle.scale,
-            rotate: particle.rotation + 720, // Spin while flying
+            rotate: particle.rotation + 720,
           }}
           transition={{
             duration: duration / 1000,
-            ease: [0.25, 0.1, 0.25, 1], // Cubic bezier for explosive pop
+            ease: [0.25, 0.1, 0.25, 1],
             delay: particle.delay,
           }}
           style={{

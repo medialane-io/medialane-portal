@@ -8,10 +8,6 @@ import { isAdminAddress } from "@/src/lib/admin-allowlist";
 import { getAdminSession, startAdminSession, clearAdminSession } from "@/src/lib/admin-session";
 import { Button } from "@/src/components/ui/button";
 
-// Access control is server-side: every /api/admin/* request is authorized by a
-// signed-request session the backend verifies (SNIP-12 grant + session-key
-// signature). The client gate below only decides whether to SHOW the admin UI
-// (NEXT_PUBLIC_ADMIN_ADDRESSES is a UI hint, not a boundary).
 const navItems = [
   { label: "Dashboard",   href: "/admin" },
   { label: "Services",    href: "/admin/services" },

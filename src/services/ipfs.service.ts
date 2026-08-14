@@ -1,4 +1,4 @@
-// IPFS Service for uploading metadata and media files
+
 export interface IPFSUploadResponse {
   hash: string
   url: string
@@ -21,7 +21,6 @@ export interface IPFSMetadata {
   created_at?: string
 }
 
-// IPFS Gateway configurations
 const IPFS_GATEWAYS = {
   pinata: process.env.NEXT_PUBLIC_PINATA_GATEWAY || 'https://gateway.pinata.cloud/ipfs/',
   ipfs: 'https://ipfs.io/ipfs/',
@@ -29,10 +28,7 @@ const IPFS_GATEWAYS = {
 }
 
 export class IPFSService {
-  
-  /**
-   * Upload JSON metadata to IPFS using server-side API
-   */
+
   async uploadMetadata(metadata: IPFSMetadata, name?: string): Promise<IPFSUploadResponse> {
     try {
       const response = await fetch('/api/ipfs/upload-metadata', {
@@ -52,20 +48,16 @@ export class IPFSService {
       return result
     } catch (error) {
       console.error('IPFS metadata upload failed:', error)
-      
-      // Fallback to local storage simulation for development
+
       if (process.env.NODE_ENV === 'development') {
         console.warn('Using development fallback for IPFS upload')
         return this.developmentFallback(metadata)
       }
-      
+
       throw error
     }
   }
 
-  /**
-   * Upload file to IPFS using server-side API
-   */
   async uploadFile(file: File): Promise<IPFSUploadResponse> {
     try {
       const formData = new FormData()
@@ -85,8 +77,7 @@ export class IPFSService {
       return result
     } catch (error) {
       console.error('IPFS file upload failed:', error)
-      
-      // Fallback for development
+
       if (process.env.NODE_ENV === 'development') {
         console.warn('Using development fallback for IPFS file upload')
         const mockHash = `Qm${Math.random().toString(36).substr(2, 44)}`
@@ -96,19 +87,16 @@ export class IPFSService {
           gateway: URL.createObjectURL(file)
         }
       }
-      
+
       throw error
     }
   }
 
-  /**
-   * Get IPFS content from hash using gateway
-   */
   async getFromIPFS(hash: string, gateway: keyof typeof IPFS_GATEWAYS = 'pinata'): Promise<unknown> {
     try {
       const url = `${IPFS_GATEWAYS[gateway]}${hash}`
       const response = await fetch(url, {
-        signal: AbortSignal.timeout(10000) // 10 second timeout
+        signal: AbortSignal.timeout(10000)
       })
 
       if (!response.ok) {
@@ -127,9 +115,6 @@ export class IPFSService {
     }
   }
 
-  /**
-   * Development fallback when IPFS is not configured
-   */
   private developmentFallback(metadata: IPFSMetadata): IPFSUploadResponse {
     const mockHash = `Qm${Math.random().toString(36).substr(2, 44)}`
     console.log('🔧 Development Mode: IPFS Upload Simulation')
@@ -138,7 +123,7 @@ export class IPFSService {
       hash: mockHash,
       metadata
     })
-    
+
     return {
       hash: mockHash,
       url: `ipfs://${mockHash}`,
@@ -146,9 +131,6 @@ export class IPFSService {
     }
   }
 
-  /**
-   * Convert IPFS URL to gateway URL
-   */
   static ipfsToGateway(ipfsUrl: string, gateway: keyof typeof IPFS_GATEWAYS = 'pinata'): string {
     if (ipfsUrl.startsWith('ipfs://')) {
       const hash = ipfsUrl.replace('ipfs://', '')
@@ -157,14 +139,10 @@ export class IPFSService {
     return ipfsUrl
   }
 
-  /**
-   * Validate IPFS hash format
-   */
   static isValidIPFSHash(hash: string): boolean {
-    // Basic validation for IPFS v1 CID (starts with 'Qm' and is 46 chars) or v2 CID
+
     return /^Qm[1-9A-HJ-NP-Za-km-z]{44}$|^b[A-Za-z2-7]{58}$/.test(hash)
   }
 }
 
-// Export singleton instance
-export const ipfsService = new IPFSService() 
+export const ipfsService = new IPFSService()

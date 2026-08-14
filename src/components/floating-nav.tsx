@@ -73,9 +73,6 @@ function WalletButton({ onOpenChange }: { onOpenChange: (v: boolean) => void }) 
   )
 }
 
-// Isolated to avoid wrapping entire nav in Suspense. When redirected here from
-// the account page (?connect=1): if a wallet is already connected, route to the
-// dashboard; otherwise open the wallet picker.
 function ConnectParamWatcher({
   onNeedConnect,
   onConnected,
@@ -94,8 +91,7 @@ function ConnectParamWatcher({
       firedRef.current = true
       onConnected()
     } else {
-      // Not connected yet: open the picker (idempotent) and stay armed so the
-      // navigation still fires once the wallet connects.
+
       firedRef.current = false
       onNeedConnect()
     }
@@ -146,12 +142,11 @@ const FloatingNav = () => {
           )}
         >
           <div className="relative flex items-center justify-between h-12 md:h-14 px-1">
-            {/* Logo */}
+
             <div className="flex-shrink-0 flex items-center">
               <LogoMedialane />
             </div>
 
-            {/* Desktop Navigation */}
             {!isMobile && (
               <nav className="hidden md:flex px-2 space-x-1">
                 {NAV_LINKS.map((item) => {
@@ -174,7 +169,6 @@ const FloatingNav = () => {
               </nav>
             )}
 
-            {/* Right section */}
             <div className="flex items-center pr-3 md:pr-4 space-x-2">
               {!isMobile && <WalletButton onOpenChange={setConnectOpen} />}
               {isMobile && (
@@ -190,7 +184,6 @@ const FloatingNav = () => {
             </div>
           </div>
 
-          {/* Mobile Expanded Menu */}
           <AnimatePresence>
             {isMobile && isMobileMenuOpen && (
               <motion.div
@@ -233,7 +226,6 @@ const FloatingNav = () => {
         </div>
       </header>
 
-      {/* Background overlay */}
       <AnimatePresence>
         {isMobileMenuOpen && (
           <motion.div
@@ -247,7 +239,6 @@ const FloatingNav = () => {
         )}
       </AnimatePresence>
 
-      {/* Mobile connect modal */}
       {isMobile && (
         <WalletConnectModal open={connectOpen} onOpenChange={setConnectOpen} />
       )}

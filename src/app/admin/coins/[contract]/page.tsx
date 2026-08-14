@@ -39,7 +39,6 @@ export default function CoinSettingsPage() {
   const [seeded, setSeeded] = useState(false);
   const [status, setStatus] = useState<{ type: "error" | "success"; message: string } | null>(null);
 
-  // Seed the form once the coin record arrives.
   useEffect(() => {
     if (coin && !seeded) {
       setName(coin.name ?? "");
@@ -58,8 +57,6 @@ export default function CoinSettingsPage() {
     setSaving(true);
     setStatus(null);
 
-    // 1) Resolve the image — upload the chosen file (or use a pasted URL).
-    //    A failed upload aborts the save with a specific reason; nothing is persisted.
     let image: string | undefined;
     if (imageFile) {
       try {
@@ -79,7 +76,6 @@ export default function CoinSettingsPage() {
       image = imageUrl;
     }
 
-    // 2) Persist the coin fields.
     try {
       const patch: Record<string, unknown> = { isHidden: hidden };
       if (name.trim()) patch.name = name.trim();
@@ -135,10 +131,9 @@ export default function CoinSettingsPage() {
         <ArrowLeft className="h-4 w-4 mr-1.5" /> Back to coins
       </Button>
 
-      {/* Read-only header */}
       <div className="flex items-center gap-4 rounded-xl border border-border bg-muted/20 p-4">
         {coin.image ? (
-          // eslint-disable-next-line @next/next/no-img-element
+
           <img src={ipfsToHttp(coin.image)} alt={coin.name ?? ""} className="h-14 w-14 rounded-lg object-cover border border-border" />
         ) : (
           <div className="h-14 w-14 rounded-lg bg-muted flex items-center justify-center text-xs font-bold">
@@ -163,14 +158,12 @@ export default function CoinSettingsPage() {
         </div>
       </div>
 
-      {/* Feature image — upload or paste, with preview */}
       <MediaUploader
         label="Feature image"
         initialUrl={coin.image ? ipfsToHttp(coin.image) : ""}
         onChange={(url, file) => { setImageUrl(url); setImageFile(file ?? null); }}
       />
 
-      {/* Editable fields */}
       <div className="space-y-4">
         <div className="space-y-2"><Label>Name</Label><Input value={name} onChange={(e) => setName(e.target.value)} /></div>
         <div className="space-y-2"><Label>Symbol</Label><Input value={symbol} onChange={(e) => setSymbol(e.target.value)} /></div>
