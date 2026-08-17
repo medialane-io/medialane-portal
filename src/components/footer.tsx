@@ -23,7 +23,7 @@ const LEGAL_LINKS = [
 ]
 
 const SOCIALS = [
-  { icon: Twitter, href: "https://x.com/medialane_xyz", label: "X / Twitter" },
+  { icon: Twitter, href: "https://x.com/medialane_io", label: "X / Twitter" },
   { icon: MessageCircle, href: "https://t.me/medialane", label: "Telegram" },
   { icon: Github, href: "https://github.com/medialane-io", label: "GitHub" },
   { icon: Globe2, href: "https://medialane.org", label: "DAO" },
@@ -31,24 +31,24 @@ const SOCIALS = [
 
 export default function Footer() {
   return (
-    <footer className="border-t border-white/10 bg-black/40 backdrop-blur-sm">
+    <footer className="border-t border-border bg-background/40 backdrop-blur-sm">
       <div className="container mx-auto px-4 py-12 max-w-5xl">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
 
           <div className="col-span-2 md:col-span-1 space-y-4">
             <LogoMedialane />
             <p className="text-sm text-muted-foreground leading-relaxed">
-              Protocol infrastructure for licensed intellectual property — for the businesses,
-              integrators, and AI agents that build on it.
+              Protocol infrastructure for licensed intellectual property. Built for integrators
+              and the businesses and AI agents they serve.
             </p>
           </div>
 
           <div className="space-y-3">
-            <h3 className="text-sm font-semibold text-white">Platform</h3>
+            <h3 className="text-sm font-semibold text-foreground">Platform</h3>
             <ul className="space-y-2">
               {PLATFORM_LINKS.map((link) => (
                 <li key={link.href}>
-                  <Link href={link.href} className="text-sm text-muted-foreground hover:text-white transition-colors">
+                  <Link href={link.href} className="text-sm text-muted-foreground hover:text-foreground transition-colors">
                     {link.name}
                   </Link>
                 </li>
@@ -57,7 +57,7 @@ export default function Footer() {
           </div>
 
           <div className="space-y-3">
-            <h3 className="text-sm font-semibold text-white">Community</h3>
+            <h3 className="text-sm font-semibold text-foreground">Community</h3>
             <ul className="space-y-2">
               {COMMUNITY_LINKS.map((link) => (
                 <li key={link.href}>
@@ -65,7 +65,7 @@ export default function Footer() {
                     href={link.href}
                     target={link.external ? "_blank" : undefined}
                     rel={link.external ? "noopener noreferrer" : undefined}
-                    className="text-sm text-muted-foreground hover:text-white transition-colors"
+                    className="text-sm text-muted-foreground hover:text-foreground transition-colors"
                   >
                     {link.name}
                     {link.external && " ↗"}
@@ -76,11 +76,11 @@ export default function Footer() {
           </div>
 
           <div className="space-y-3">
-            <h3 className="text-sm font-semibold text-white">Legal</h3>
+            <h3 className="text-sm font-semibold text-foreground">Legal</h3>
             <ul className="space-y-2">
               {LEGAL_LINKS.map((link) => (
                 <li key={link.href}>
-                  <Link href={link.href} className="text-sm text-muted-foreground hover:text-white transition-colors">
+                  <Link href={link.href} className="text-sm text-muted-foreground hover:text-foreground transition-colors">
                     {link.name}
                   </Link>
                 </li>
@@ -89,7 +89,7 @@ export default function Footer() {
           </div>
         </div>
 
-        <div className="mt-12 pt-6 border-t border-white/10 flex flex-col md:flex-row items-center justify-between gap-4">
+        <div className="mt-12 pt-6 border-t border-border flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-4">
             {SOCIALS.map((s) => (
               <Link
@@ -97,7 +97,7 @@ export default function Footer() {
                 href={s.href}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-muted-foreground hover:text-white transition-colors"
+                className="text-muted-foreground hover:text-foreground transition-colors"
                 aria-label={s.label}
               >
                 <s.icon className="w-4 h-4" />

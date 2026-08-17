@@ -6,7 +6,6 @@ import {
   ListOrdered, LayoutGrid, FileImage, Activity, Signature,
   Code2, Check, Zap,
 } from "lucide-react"
-import { BackgroundGradients } from "@/src/components/background-gradients"
 
 const API_BASE = "https://api.medialane.io"
 
@@ -41,12 +40,12 @@ async function getLivePricing(): Promise<PricingResponse | null> {
 }
 
 const API_CARDS = [
-  { icon: ListOrdered, title: "Marketplace Orders", description: "Query active listings, bids, and completed sales. Filter by contract, token, or wallet.", color: "text-purple-400", bg: "bg-purple-500/10", border: "border-purple-500/20" },
-  { icon: LayoutGrid, title: "Collections & Drops", description: "Fetch collection metadata, floor prices, volume, and token inventories. Includes POP and Collection Drop sources.", color: "text-blue-400", bg: "bg-blue-500/10", border: "border-blue-500/20" },
-  { icon: Zap, title: "Launch & Mint", description: "Deploy collection contracts and mint assets programmatically. Get ready-to-sign calldata for on-chain deployment.", color: "text-orange-400", bg: "bg-orange-500/10", border: "border-orange-500/20" },
-  { icon: FileImage, title: "Decentralized Metadata", description: "Resolve full metadata for any token, including license terms, remix history, and provenance.", color: "text-green-400", bg: "bg-green-500/10", border: "border-green-500/20" },
-  { icon: Activity, title: "Onchain Activity", description: "Stream every event: mints, transfers, sales, offers, cancellations — indexed in real time.", color: "text-cyan-400", bg: "bg-cyan-500/10", border: "border-cyan-500/20" },
-  { icon: Signature, title: "Trade Intents", description: "Create and sign structured trade intents using SNIP-12. Submit orders without exposing private keys.", color: "text-amber-400", bg: "bg-amber-500/10", border: "border-amber-500/20" },
+  { icon: ListOrdered, title: "Marketplace Orders", description: "Query active listings, bids, and completed sales. Filter by contract, token, or wallet.", color: "text-brand-purple", bg: "bg-brand-purple/10", border: "border-brand-purple/20" },
+  { icon: LayoutGrid, title: "Collections & Drops", description: "Fetch collection metadata, floor prices, volume, and token inventories. Includes POP and Collection Drop sources.", color: "text-brand-blue", bg: "bg-brand-blue/10", border: "border-brand-blue/20" },
+  { icon: Zap, title: "Launch & Mint", description: "Deploy collection contracts and mint assets programmatically. Get ready-to-sign calldata for on-chain deployment.", color: "text-brand-orange", bg: "bg-brand-orange/10", border: "border-brand-orange/20" },
+  { icon: FileImage, title: "Decentralized Metadata", description: "Resolve full metadata for any token, including license terms, remix history, and provenance.", color: "text-brand-rose", bg: "bg-brand-rose/10", border: "border-brand-rose/20" },
+  { icon: Activity, title: "Onchain Activity", description: "Stream every event, from mints and transfers to sales, offers, and cancellations, indexed in real time.", color: "text-brand-maeve", bg: "bg-brand-maeve/10", border: "border-brand-maeve/20" },
+  { icon: Signature, title: "Trade Intents", description: "Create and sign structured trade intents using SNIP-12. Submit orders without exposing private keys.", color: "text-brand-purple", bg: "bg-brand-purple/10", border: "border-brand-purple/20" },
 ]
 
 const MDLN_TIERS = [
@@ -62,7 +61,7 @@ const FEATURES = [
   { label: "Portal dashboard", free: true, paid: true },
   { label: "MDLN token multipliers", free: true, paid: true },
   { label: "Agent-native 402 responses", free: true, paid: true },
-  { label: "Free quota reset", free: "1st of each month", paid: "—" },
+  { label: "Free quota reset", free: "1st of each month", paid: "n/a" },
   { label: "x402 Payments", free: false, paid: "Pay-as-you-go" },
   { label: "Credit rate", free: false, paid: "$0.01 / credit" },
   { label: "API keys", free: false, paid: true },
@@ -70,8 +69,8 @@ const FEATURES = [
 
 function Cell({ value }: { value: boolean | string }) {
   if (value === true) return <Check className="w-5 h-5 text-green-400 mx-auto" />
-  if (value === "—") return <span className="text-muted-foreground text-sm">—</span>
-  return <span className="text-sm text-white font-medium">{value}</span>
+  if (value === "n/a") return <span className="text-muted-foreground text-sm">n/a</span>
+  return <span className="text-sm text-foreground font-medium">{value}</span>
 }
 
 export default async function DevelopersPage() {
@@ -89,7 +88,6 @@ export default async function DevelopersPage() {
 
   return (
     <div className="relative w-full overflow-hidden">
-      <BackgroundGradients />
       <div className="relative z-10">
 
         <section className="container mx-auto px-4 pt-28 pb-16 max-w-4xl text-center space-y-5">
@@ -97,11 +95,11 @@ export default async function DevelopersPage() {
             <Code2 className="w-3.5 h-3.5 mr-1.5 inline" />
             Developers
           </Badge>
-          <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight text-white">
+          <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight text-foreground">
             Typed access to the full protocol
           </h1>
           <p className="text-lg text-muted-foreground max-w-xl mx-auto">
-            Assets, orders, licensing, drops, and real-time events — usage-priced, no gatekeeping.
+            Assets, orders, licensing, drops, and real-time events, priced by usage from your first call.
             Connect a wallet to get an API key.
           </p>
           <Button asChild size="lg" className="px-10">
@@ -115,7 +113,7 @@ export default async function DevelopersPage() {
               <Card key={title} className={`${border} ${bg} backdrop-blur-sm`}>
                 <CardContent className="p-6 space-y-3">
                   <Icon className={`w-6 h-6 ${color}`} />
-                  <h3 className="text-lg font-bold text-white">{title}</h3>
+                  <h3 className="text-lg font-bold text-foreground">{title}</h3>
                   <p className="text-sm text-muted-foreground">{description}</p>
                 </CardContent>
               </Card>
@@ -126,15 +124,15 @@ export default async function DevelopersPage() {
         {creditRows.length > 0 && (
           <section className="container mx-auto px-4 pb-16 max-w-4xl">
             <div className="space-y-4">
-              <h2 className="text-2xl font-bold text-white text-center">Live pricing</h2>
-              <div className="rounded-xl border border-white/10 overflow-hidden bg-white/[0.02]">
+              <h2 className="text-2xl font-bold text-foreground text-center">Live pricing</h2>
+              <div className="rounded-xl border border-border overflow-hidden bg-foreground/[0.02]">
                 {creditRows.map((row, i) => (
                   <div
                     key={row.actionKey}
-                    className={`flex items-center justify-between px-6 py-3 text-sm ${i < creditRows.length - 1 ? "border-b border-white/5" : ""}`}
+                    className={`flex items-center justify-between px-6 py-3 text-sm ${i < creditRows.length - 1 ? "border-b border-border/50" : ""}`}
                   >
                     <span className="text-muted-foreground">{row.label}</span>
-                    <span className="text-white font-medium">{row.credits} credits</span>
+                    <span className="text-foreground font-medium">{row.credits} credits</span>
                   </div>
                 ))}
               </div>
@@ -145,24 +143,24 @@ export default async function DevelopersPage() {
         <section className="container mx-auto px-4 pb-16 max-w-4xl">
           <div className="space-y-4">
             <div className="text-center space-y-2">
-              <h2 className="text-2xl font-bold text-white">MDLN Token Multipliers</h2>
+              <h2 className="text-2xl font-bold text-foreground">MDLN Token Multipliers</h2>
               <p className="text-sm text-muted-foreground">
-                Hold MDLN at deposit time to receive bonus credits — no lock-up required.
+                Hold MDLN at deposit time to receive bonus credits, unlocked immediately.
               </p>
             </div>
-            <div className="rounded-xl border border-white/10 overflow-hidden bg-white/[0.02]">
-              <div className="grid grid-cols-3 px-6 py-4 border-b border-white/10 bg-white/[0.03] text-sm font-semibold">
+            <div className="rounded-xl border border-border overflow-hidden bg-foreground/[0.02]">
+              <div className="grid grid-cols-3 px-6 py-4 border-b border-border bg-foreground/[0.03] text-sm font-semibold">
                 <div className="text-muted-foreground">MDLN Holdings</div>
-                <div className="text-center text-white">Multiplier</div>
+                <div className="text-center text-foreground">Multiplier</div>
                 <div className="text-center text-primary">Effective Rate</div>
               </div>
               {MDLN_TIERS.map((tier, i) => (
                 <div
                   key={tier.range}
-                  className={`grid grid-cols-3 px-6 py-4 items-center text-sm ${i < MDLN_TIERS.length - 1 ? "border-b border-white/5" : ""}`}
+                  className={`grid grid-cols-3 px-6 py-4 items-center text-sm ${i < MDLN_TIERS.length - 1 ? "border-b border-border/50" : ""}`}
                 >
                   <div className="text-muted-foreground">{tier.range}</div>
-                  <div className="text-center text-white font-medium">{tier.multiplier}</div>
+                  <div className="text-center text-foreground font-medium">{tier.multiplier}</div>
                   <div className="text-center text-primary font-medium">{tier.rate}</div>
                 </div>
               ))}
@@ -172,17 +170,17 @@ export default async function DevelopersPage() {
 
         <section className="container mx-auto px-4 pb-24 max-w-4xl">
           <div className="space-y-4">
-            <h2 className="text-xl font-bold text-white text-center">Everything included</h2>
-            <div className="rounded-xl border border-white/10 overflow-hidden bg-white/[0.02]">
-              <div className="grid grid-cols-3 px-6 py-4 border-b border-white/10 bg-white/[0.03]">
+            <h2 className="text-xl font-bold text-foreground text-center">Everything included</h2>
+            <div className="rounded-xl border border-border overflow-hidden bg-foreground/[0.02]">
+              <div className="grid grid-cols-3 px-6 py-4 border-b border-border bg-foreground/[0.03]">
                 <div className="text-sm font-semibold text-muted-foreground">Feature</div>
-                <div className="text-sm font-semibold text-white text-center">x402 Payments</div>
+                <div className="text-sm font-semibold text-foreground text-center">x402 Payments</div>
                 <div className="text-sm font-semibold text-primary text-center">Pay-as-you-go</div>
               </div>
               {FEATURES.map((row, i) => (
                 <div
                   key={row.label}
-                  className={`grid grid-cols-3 px-6 py-4 items-center ${i < FEATURES.length - 1 ? "border-b border-white/5" : ""}`}
+                  className={`grid grid-cols-3 px-6 py-4 items-center ${i < FEATURES.length - 1 ? "border-b border-border/50" : ""}`}
                 >
                   <div className="text-sm text-muted-foreground">{row.label}</div>
                   <div className="text-center"><Cell value={row.free} /></div>
