@@ -1,7 +1,8 @@
 import Link from "next/link"
 import { Badge } from "@/src/components/ui/badge"
+import { Button } from "@/src/components/ui/button"
 import { Card, CardContent } from "@/src/components/ui/card"
-import { Code2, ArrowRight, Sparkles, Bot, Building2, Blocks } from "lucide-react"
+import { Code2, ArrowRight, Sparkles, Bot, Building2, Blocks, ShieldCheck, LayoutGrid } from "lucide-react"
 
 const SERVICE_LINES = [
   {
@@ -60,6 +61,21 @@ export default function Home() {
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
             Turn what you own into digital assets you can license, sell, and track.
           </p>
+
+          <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
+            <Button asChild variant="outline" size="sm">
+              <Link href="/platform">
+                <ShieldCheck className="w-3.5 h-3.5 mr-1.5" />
+                How it works
+              </Link>
+            </Button>
+            <Button asChild variant="outline" size="sm">
+              <Link href="/services">
+                <LayoutGrid className="w-3.5 h-3.5 mr-1.5" />
+                Launchpad services
+              </Link>
+            </Button>
+          </div>
         </section>
 
         <section className="container mx-auto px-4 pb-24 max-w-5xl">

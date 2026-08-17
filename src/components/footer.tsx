@@ -3,6 +3,8 @@ import { Github, Twitter, Globe2, MessageCircle } from "lucide-react"
 import { LogoMedialane } from "./logo-medialane"
 
 const PLATFORM_LINKS = [
+  { name: "Platform", href: "/platform" },
+  { name: "Services", href: "/services" },
   { name: "Developers", href: "/developers" },
   { name: "Pricing", href: "/pricing" },
   { name: "Enterprise", href: "/enterprise" },

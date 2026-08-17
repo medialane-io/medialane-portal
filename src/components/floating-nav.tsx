@@ -14,6 +14,8 @@ import { WalletConnectModal } from "./wallet-connect-modal"
 import { ThemeToggle } from "./theme-toggle"
 
 const NAV_LINKS = [
+  { label: "Platform", href: "/platform" },
+  { label: "Services", href: "/services" },
   { label: "Developers", href: "/developers" },
   { label: "Pricing", href: "/pricing" },
   { label: "Enterprise", href: "/enterprise" },
@@ -151,7 +153,7 @@ const FloatingNav = () => {
             </div>
 
             {!isMobile && (
-              <nav className="hidden md:flex px-2 space-x-1">
+              <nav className="hidden md:flex px-2 flex-wrap gap-1">
                 {NAV_LINKS.map((item) => {
                   const active = isNavActive(pathname, item.href)
                   return (
