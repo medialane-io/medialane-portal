@@ -1,6 +1,4 @@
-import Link from "next/link"
 import { Badge } from "@/src/components/ui/badge"
-import { Button } from "@/src/components/ui/button"
 import { ListChecks, Plug, LayoutTemplate, Globe2 } from "lucide-react"
 
 const STEPS = [
@@ -44,7 +42,7 @@ export default function InfrastructurePage() {
             Infrastructure
           </Badge>
           <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight text-foreground">
-            Add tokenization to your product, without building it yourself
+            Power your product with Medialane&apos;s tokenization platform
           </h1>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
             Plug in ready-made tokenization capabilities. Ship in days on infrastructure
@@ -70,15 +68,6 @@ export default function InfrastructurePage() {
               </div>
             ))}
           </div>
-        </section>
-
-        <section className="container mx-auto px-4 pb-24 max-w-2xl text-center space-y-4">
-          <p className="text-muted-foreground">
-            Tell us what you&apos;re building and we&apos;ll help you get started.
-          </p>
-          <Button asChild size="lg">
-            <Link href="/enterprise">Talk to us</Link>
-          </Button>
         </section>
       </div>
     </div>

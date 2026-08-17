@@ -10,7 +10,7 @@ const ITEMS: FeatureRowItem[] = [
     eyebrow: "Headless authentication",
     color: "bg-brand-blue",
     title: "An agent authenticates on its own",
-    description: "Any agent with a Starknet keypair authenticates, provisions credits, and calls the API without a person in the loop.",
+    description: "Any agent with a Starknet keypair authenticates, provisions credits, and calls the API entirely on its own.",
   },
   {
     icon: Zap,

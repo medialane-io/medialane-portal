@@ -39,7 +39,7 @@ const WHY: FeatureRowItem[] = [
     eyebrow: "Immutable by design",
     color: "bg-brand-blue",
     title: "Compliance you can point to",
-    description: "Rules and royalty terms are secured by immutable contracts the moment you launch, including for Medialane itself. Nothing changes later without your sign-off.",
+    description: "Rules and royalty terms are secured by immutable contracts the moment you launch, including for Medialane itself. Any later change requires your sign-off.",
   },
   {
     icon: KeyRound,
@@ -53,7 +53,7 @@ const WHY: FeatureRowItem[] = [
     eyebrow: "Instant settlement",
     color: "bg-brand-rose",
     title: "Paid the moment a deal completes",
-    description: "Sales, licenses, and sponsorships pay out the instant a transaction completes, worldwide, without a payment processor in the middle.",
+    description: "Sales, licenses, and sponsorships pay out the instant a transaction completes, worldwide, directly between the two parties.",
   },
   {
     icon: Repeat,

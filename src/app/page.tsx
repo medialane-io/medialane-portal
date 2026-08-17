@@ -91,7 +91,7 @@ const SERVICE_LINES = [
   {
     icon: Blocks,
     title: "Infrastructure",
-    description: "Add tokenization to your own product without building it from scratch.",
+    description: "Run tokenization inside your own product, powered by Medialane.",
     href: "/infrastructure",
     color: "text-brand-purple",
     bg: "bg-brand-purple/10",

@@ -29,7 +29,7 @@ const API_CARDS = [
   { icon: Zap, title: "Launch & Mint", description: "Deploy collection contracts and mint assets programmatically. Get ready-to-sign calldata for on-chain deployment.", color: "text-brand-rose", bg: "bg-brand-rose/10" },
   { icon: FileImage, title: "Decentralized Metadata", description: "Resolve full metadata for any token, including license terms, remix history, and provenance.", color: "text-brand-maeve", bg: "bg-brand-maeve/10" },
   { icon: Activity, title: "Onchain Activity", description: "Stream every event, from mints and transfers to sales, offers, and cancellations, indexed in real time.", color: "text-brand-blue", bg: "bg-brand-blue/10" },
-  { icon: Signature, title: "Trade Intents", description: "Sign a buy or sell order with your wallet without exposing your private key. Submit it, and it settles or it doesn't; nothing sits in escrow in between.", color: "text-brand-orange", bg: "bg-brand-orange/10" },
+  { icon: Signature, title: "Trade Intents", description: "Sign a buy or sell order with your wallet, keeping your private key on your own device. Submit it for direct settlement.", color: "text-brand-orange", bg: "bg-brand-orange/10" },
 ]
 
 export default function DevelopersPage() {
