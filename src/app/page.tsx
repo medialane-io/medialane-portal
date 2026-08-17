@@ -7,7 +7,7 @@ const SERVICE_LINES = [
   {
     icon: Code2,
     title: "Developers",
-    description: "Typed, metered access to the full protocol: assets, orders, licensing, drops, real-time events. Usage-priced from the first call.",
+    description: "Build with our API. Pay only for what you use.",
     href: "/developers",
     color: "text-brand-blue",
     bg: "bg-brand-blue/10",
@@ -16,7 +16,7 @@ const SERVICE_LINES = [
   {
     icon: Building2,
     title: "Enterprise",
-    description: "Issue credentials, tickets, or gated access on verifiable rails. Tokenize a content library for licensing and AI training, with Medialane administering creator payouts.",
+    description: "Tokenize credentials, tickets, or a content library. We handle the technical side.",
     href: "/enterprise",
     color: "text-brand-orange",
     bg: "bg-brand-orange/10",
@@ -25,7 +25,7 @@ const SERVICE_LINES = [
   {
     icon: Blocks,
     title: "Infrastructure",
-    description: "Register a service, get a UI variant, and ship on the same registry Medialane's own apps run on.",
+    description: "Add tokenization to your own product without building it from scratch.",
     href: "/infrastructure",
     color: "text-brand-purple",
     bg: "bg-brand-purple/10",
@@ -34,7 +34,7 @@ const SERVICE_LINES = [
   {
     icon: Bot,
     title: "AI Agents",
-    description: "x402-native, machine-payable IP access. An agent authenticates, provisions credits, and calls the API on its own.",
+    description: "Let AI agents pay for access automatically, per request.",
     href: "/agents",
     color: "text-brand-maeve",
     bg: "bg-brand-maeve/10",
@@ -50,7 +50,7 @@ export default function Home() {
         <section className="container mx-auto px-4 pt-24 pb-16 max-w-5xl text-center space-y-8">
           <Badge className="bg-primary/10 text-primary border-primary/30 px-4 py-1.5 text-sm">
             <Sparkles className="w-3.5 h-3.5 mr-1.5 inline" />
-            Protocol infrastructure for licensed intellectual property
+            Tokenization for business
           </Badge>
 
           <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-foreground via-foreground to-foreground/50 leading-tight">
@@ -58,9 +58,7 @@ export default function Home() {
           </h1>
 
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-            Every business building on Medialane finds its own path in: the API for integrators,
-            enterprise deployments for publishers and institutions, embedded infrastructure for
-            partners, and agent-native access for AI. Find yours below.
+            Turn what you own into digital assets you can license, sell, and track.
           </p>
         </section>
 

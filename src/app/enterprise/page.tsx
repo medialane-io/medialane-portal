@@ -6,23 +6,23 @@ import { Ticket, GraduationCap, Newspaper, ShieldCheck, Mail } from "lucide-reac
 const DEPLOYMENT_TYPES = [
   {
     icon: GraduationCap,
-    title: "Credentials & gated access",
-    description: "Issue soulbound passes for gated content, memberships, or attendance through POP Protocol. Assets land directly in wallets already provisioned for your audience.",
+    title: "Digital passes",
+    description: "Give members, students, or attendees a pass that can't be faked or copied. Nothing for them to download or set up.",
   },
   {
     icon: Ticket,
-    title: "Ticketing",
-    description: "Redeemable, tradeable admission via IP Tickets. Assets are pre-issued to wallets provisioned for the recipient, ready to use at the door.",
+    title: "Event tickets",
+    description: "Tickets that show up ready to use, ahead of time, and can be resold safely if plans change.",
   },
   {
     icon: Newspaper,
-    title: "Content licensing & AI training",
-    description: "Tokenize your content library for licensing, including AI-training use, with a provenance-verified, Berne-aligned audit trail.",
+    title: "Content licensing",
+    description: "Turn your catalog into something you can license and track, including for AI use.",
   },
   {
     icon: ShieldCheck,
-    title: "Managed creator payouts",
-    description: "Medialane administers licensing payments to your underlying creators on your behalf, so you keep the relationship while we handle distribution.",
+    title: "Payouts, handled",
+    description: "We pay your creators or partners on your behalf. You keep the relationship, we handle the paperwork.",
   },
 ]
 
@@ -36,13 +36,11 @@ export default function EnterprisePage() {
             Enterprise
           </Badge>
           <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight text-foreground">
-            Licensing infrastructure that carries proof
+            Passes, tickets, and licenses people can trust
           </h1>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Today&apos;s AI-content deals run on bilateral contracts, verifiable to the two parties
-            that signed them. Medialane gives publishers, schools, festivals, and rights holders
-            the same commercial relationships on infrastructure that carries a shared, provenance-verified
-            record for every license.
+            Schools, festivals, publishers, and rights holders use Medialane to issue and license
+            digital assets. No blockchain experience needed on your end, or your audience&apos;s.
           </p>
         </section>
 
@@ -62,7 +60,7 @@ export default function EnterprisePage() {
 
         <section className="container mx-auto px-4 pb-24 max-w-2xl text-center space-y-4">
           <p className="text-muted-foreground">
-            Reach out and tell us what you&apos;re building. We&apos;ll scope it with you.
+            Tell us what you&apos;re building. We&apos;ll help you get started.
           </p>
           <Button asChild size="lg">
             <a href="mailto:dao@medialane.org">

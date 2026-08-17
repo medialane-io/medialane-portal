@@ -4,6 +4,7 @@ import { LogoMedialane } from "./logo-medialane"
 
 const PLATFORM_LINKS = [
   { name: "Developers", href: "/developers" },
+  { name: "Pricing", href: "/pricing" },
   { name: "Enterprise", href: "/enterprise" },
   { name: "Infrastructure", href: "/infrastructure" },
   { name: "Agents", href: "/agents" },
