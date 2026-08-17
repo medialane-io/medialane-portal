@@ -1,7 +1,6 @@
 import { Badge } from "@/src/components/ui/badge"
 import { Card, CardContent } from "@/src/components/ui/card"
 import { Button } from "@/src/components/ui/button"
-import { BackgroundGradients } from "@/src/components/background-gradients"
 import { Ticket, GraduationCap, Newspaper, ShieldCheck, Mail } from "lucide-react"
 
 const DEPLOYMENT_TYPES = [
@@ -30,14 +29,13 @@ const DEPLOYMENT_TYPES = [
 export default function EnterprisePage() {
   return (
     <div className="relative w-full overflow-hidden">
-      <BackgroundGradients />
       <div className="relative z-10">
 
         <section className="container mx-auto px-4 pt-28 pb-16 max-w-4xl text-center space-y-5">
           <Badge className="bg-primary/10 text-primary border-primary/30 px-4 py-1.5 text-sm">
             Enterprise
           </Badge>
-          <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight text-white">
+          <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight text-foreground">
             Licensing infrastructure that carries proof
           </h1>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
@@ -51,10 +49,10 @@ export default function EnterprisePage() {
         <section className="container mx-auto px-4 pb-16 max-w-5xl">
           <div className="grid md:grid-cols-2 gap-6">
             {DEPLOYMENT_TYPES.map(({ icon: Icon, title, description }) => (
-              <Card key={title} className="border-white/10 bg-white/5 backdrop-blur-sm">
+              <Card key={title} className="border-border bg-foreground/5 backdrop-blur-sm">
                 <CardContent className="p-6 space-y-3">
                   <Icon className="w-6 h-6 text-primary" />
-                  <h3 className="text-lg font-bold text-white">{title}</h3>
+                  <h3 className="text-lg font-bold text-foreground">{title}</h3>
                   <p className="text-sm text-muted-foreground">{description}</p>
                 </CardContent>
               </Card>

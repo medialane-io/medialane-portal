@@ -6,7 +6,6 @@ import {
   ListOrdered, LayoutGrid, FileImage, Activity, Signature,
   Code2, Check, Zap,
 } from "lucide-react"
-import { BackgroundGradients } from "@/src/components/background-gradients"
 
 const API_BASE = "https://api.medialane.io"
 
@@ -71,7 +70,7 @@ const FEATURES = [
 function Cell({ value }: { value: boolean | string }) {
   if (value === true) return <Check className="w-5 h-5 text-green-400 mx-auto" />
   if (value === "n/a") return <span className="text-muted-foreground text-sm">n/a</span>
-  return <span className="text-sm text-white font-medium">{value}</span>
+  return <span className="text-sm text-foreground font-medium">{value}</span>
 }
 
 export default async function DevelopersPage() {
@@ -89,7 +88,6 @@ export default async function DevelopersPage() {
 
   return (
     <div className="relative w-full overflow-hidden">
-      <BackgroundGradients />
       <div className="relative z-10">
 
         <section className="container mx-auto px-4 pt-28 pb-16 max-w-4xl text-center space-y-5">
@@ -97,7 +95,7 @@ export default async function DevelopersPage() {
             <Code2 className="w-3.5 h-3.5 mr-1.5 inline" />
             Developers
           </Badge>
-          <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight text-white">
+          <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight text-foreground">
             Typed access to the full protocol
           </h1>
           <p className="text-lg text-muted-foreground max-w-xl mx-auto">
@@ -115,7 +113,7 @@ export default async function DevelopersPage() {
               <Card key={title} className={`${border} ${bg} backdrop-blur-sm`}>
                 <CardContent className="p-6 space-y-3">
                   <Icon className={`w-6 h-6 ${color}`} />
-                  <h3 className="text-lg font-bold text-white">{title}</h3>
+                  <h3 className="text-lg font-bold text-foreground">{title}</h3>
                   <p className="text-sm text-muted-foreground">{description}</p>
                 </CardContent>
               </Card>
@@ -126,15 +124,15 @@ export default async function DevelopersPage() {
         {creditRows.length > 0 && (
           <section className="container mx-auto px-4 pb-16 max-w-4xl">
             <div className="space-y-4">
-              <h2 className="text-2xl font-bold text-white text-center">Live pricing</h2>
-              <div className="rounded-xl border border-white/10 overflow-hidden bg-white/[0.02]">
+              <h2 className="text-2xl font-bold text-foreground text-center">Live pricing</h2>
+              <div className="rounded-xl border border-border overflow-hidden bg-foreground/[0.02]">
                 {creditRows.map((row, i) => (
                   <div
                     key={row.actionKey}
-                    className={`flex items-center justify-between px-6 py-3 text-sm ${i < creditRows.length - 1 ? "border-b border-white/5" : ""}`}
+                    className={`flex items-center justify-between px-6 py-3 text-sm ${i < creditRows.length - 1 ? "border-b border-border/50" : ""}`}
                   >
                     <span className="text-muted-foreground">{row.label}</span>
-                    <span className="text-white font-medium">{row.credits} credits</span>
+                    <span className="text-foreground font-medium">{row.credits} credits</span>
                   </div>
                 ))}
               </div>
@@ -145,24 +143,24 @@ export default async function DevelopersPage() {
         <section className="container mx-auto px-4 pb-16 max-w-4xl">
           <div className="space-y-4">
             <div className="text-center space-y-2">
-              <h2 className="text-2xl font-bold text-white">MDLN Token Multipliers</h2>
+              <h2 className="text-2xl font-bold text-foreground">MDLN Token Multipliers</h2>
               <p className="text-sm text-muted-foreground">
                 Hold MDLN at deposit time to receive bonus credits, unlocked immediately.
               </p>
             </div>
-            <div className="rounded-xl border border-white/10 overflow-hidden bg-white/[0.02]">
-              <div className="grid grid-cols-3 px-6 py-4 border-b border-white/10 bg-white/[0.03] text-sm font-semibold">
+            <div className="rounded-xl border border-border overflow-hidden bg-foreground/[0.02]">
+              <div className="grid grid-cols-3 px-6 py-4 border-b border-border bg-foreground/[0.03] text-sm font-semibold">
                 <div className="text-muted-foreground">MDLN Holdings</div>
-                <div className="text-center text-white">Multiplier</div>
+                <div className="text-center text-foreground">Multiplier</div>
                 <div className="text-center text-primary">Effective Rate</div>
               </div>
               {MDLN_TIERS.map((tier, i) => (
                 <div
                   key={tier.range}
-                  className={`grid grid-cols-3 px-6 py-4 items-center text-sm ${i < MDLN_TIERS.length - 1 ? "border-b border-white/5" : ""}`}
+                  className={`grid grid-cols-3 px-6 py-4 items-center text-sm ${i < MDLN_TIERS.length - 1 ? "border-b border-border/50" : ""}`}
                 >
                   <div className="text-muted-foreground">{tier.range}</div>
-                  <div className="text-center text-white font-medium">{tier.multiplier}</div>
+                  <div className="text-center text-foreground font-medium">{tier.multiplier}</div>
                   <div className="text-center text-primary font-medium">{tier.rate}</div>
                 </div>
               ))}
@@ -172,17 +170,17 @@ export default async function DevelopersPage() {
 
         <section className="container mx-auto px-4 pb-24 max-w-4xl">
           <div className="space-y-4">
-            <h2 className="text-xl font-bold text-white text-center">Everything included</h2>
-            <div className="rounded-xl border border-white/10 overflow-hidden bg-white/[0.02]">
-              <div className="grid grid-cols-3 px-6 py-4 border-b border-white/10 bg-white/[0.03]">
+            <h2 className="text-xl font-bold text-foreground text-center">Everything included</h2>
+            <div className="rounded-xl border border-border overflow-hidden bg-foreground/[0.02]">
+              <div className="grid grid-cols-3 px-6 py-4 border-b border-border bg-foreground/[0.03]">
                 <div className="text-sm font-semibold text-muted-foreground">Feature</div>
-                <div className="text-sm font-semibold text-white text-center">x402 Payments</div>
+                <div className="text-sm font-semibold text-foreground text-center">x402 Payments</div>
                 <div className="text-sm font-semibold text-primary text-center">Pay-as-you-go</div>
               </div>
               {FEATURES.map((row, i) => (
                 <div
                   key={row.label}
-                  className={`grid grid-cols-3 px-6 py-4 items-center ${i < FEATURES.length - 1 ? "border-b border-white/5" : ""}`}
+                  className={`grid grid-cols-3 px-6 py-4 items-center ${i < FEATURES.length - 1 ? "border-b border-border/50" : ""}`}
                 >
                   <div className="text-sm text-muted-foreground">{row.label}</div>
                   <div className="text-center"><Cell value={row.free} /></div>

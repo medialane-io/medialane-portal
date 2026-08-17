@@ -11,10 +11,12 @@ import { Providers } from "./providers";
 const inter = Inter({ subsets: ["latin"], display: "swap" })
 
 import type { Metadata } from "next"
-import { BackgroundGradients } from "../components/background-gradients"
 
 export const viewport = {
-  themeColor: 'black',
+  themeColor: [
+    { media: '(prefers-color-scheme: light)', color: '#ffffff' },
+    { media: '(prefers-color-scheme: dark)', color: '#09090b' },
+  ],
   width: 'device-width',
   initialScale: 1,
   maximumScale: 1,
@@ -76,9 +78,8 @@ export default function RootLayout({
 }) {
   return (
       <Providers>
-        <html lang="en" className="dark">
-          <body className={`${inter.className} bg-black`}>
-            <BackgroundGradients />
+        <html lang="en" suppressHydrationWarning>
+          <body className={`${inter.className} bg-background text-foreground`}>
             <FramerMotionProvider>
               <div className="relative min-h-screen flex flex-col">
                 <FloatingNav />

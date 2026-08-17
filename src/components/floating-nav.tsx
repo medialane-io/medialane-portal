@@ -11,6 +11,7 @@ import { LogoMedialane } from "./logo-medialane"
 import Link from "next/link"
 import { useWallet } from "@/src/hooks/use-wallet"
 import { WalletConnectModal } from "./wallet-connect-modal"
+import { ThemeToggle } from "./theme-toggle"
 
 const NAV_LINKS = [
   { label: "Developers", href: "/developers" },
@@ -35,7 +36,7 @@ function WalletButton({ onOpenChange }: { onOpenChange: (v: boolean) => void }) 
         <Button
           size="sm"
           variant="ghost"
-          className="rounded-full text-white hover:bg-white/20 gap-2 hidden md:flex"
+          className="rounded-full text-foreground hover:bg-foreground/10 gap-2 hidden md:flex"
           onClick={() => router.push("/account")}
         >
           <LayoutDashboard className="w-4 h-4" />
@@ -44,7 +45,7 @@ function WalletButton({ onOpenChange }: { onOpenChange: (v: boolean) => void }) 
         <Button
           size="sm"
           variant="ghost"
-          className="rounded-full text-muted-foreground hover:text-white hover:bg-white/10 h-8 w-8 p-0"
+          className="rounded-full text-muted-foreground hover:text-foreground hover:bg-foreground/10 h-8 w-8 p-0"
           onClick={() => disconnect()}
           title="Disconnect"
         >
@@ -138,8 +139,8 @@ const FloatingNav = () => {
       >
         <div
           className={cn(
-            "w-full mx-auto rounded-full glass-effect border border-white/10 transition-all duration-300",
-            scrolled ? "shadow-lg bg-black/70" : "bg-black/50",
+            "w-full mx-auto rounded-full backdrop-blur-md border border-border bg-background/80 transition-all duration-300",
+            scrolled ? "shadow-lg bg-background/90" : "bg-background/70",
           )}
         >
           <div className="relative flex items-center justify-between h-12 md:h-14 px-1">
@@ -159,8 +160,8 @@ const FloatingNav = () => {
                       variant={active ? "secondary" : "ghost"}
                       size="sm"
                       className={cn(
-                        "rounded-full text-white hover:bg-white/20",
-                        active ? "bg-primary/30 text-white" : "",
+                        "rounded-full text-foreground hover:bg-foreground/10",
+                        active ? "bg-primary/30 text-foreground" : "",
                       )}
                     >
                       <Link href={item.href}>{item.label}</Link>
@@ -171,12 +172,14 @@ const FloatingNav = () => {
             )}
 
             <div className="flex items-center pr-3 md:pr-4 space-x-2">
+              {!isMobile && <ThemeToggle className="text-foreground hover:bg-foreground/10" />}
               {!isMobile && <WalletButton onOpenChange={setConnectOpen} />}
+              {isMobile && <ThemeToggle className="text-foreground hover:bg-foreground/10" />}
               {isMobile && (
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="rounded-full text-white hover:bg-white/20 h-8 w-8"
+                  className="rounded-full text-foreground hover:bg-foreground/10 h-8 w-8"
                   onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
                 >
                   {isMobileMenuOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
@@ -192,7 +195,7 @@ const FloatingNav = () => {
                 animate={{ height: "auto", opacity: 1 }}
                 exit={{ height: 0, opacity: 0 }}
                 transition={{ duration: 0.3 }}
-                className="overflow-hidden border-t border-white/10"
+                className="overflow-hidden border-t border-border"
               >
                 <div className="px-4 py-3 space-y-1">
                   {NAV_LINKS.map((item) => {
@@ -203,7 +206,7 @@ const FloatingNav = () => {
                         asChild
                         variant={active ? "secondary" : "ghost"}
                         className={cn(
-                          "w-full justify-start rounded-lg text-white hover:bg-white/20",
+                          "w-full justify-start rounded-lg text-foreground hover:bg-foreground/10",
                           active ? "bg-primary/30" : "",
                         )}
                       >

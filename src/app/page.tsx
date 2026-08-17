@@ -2,7 +2,6 @@ import Link from "next/link"
 import { Badge } from "@/src/components/ui/badge"
 import { Card, CardContent } from "@/src/components/ui/card"
 import { Code2, ArrowRight, Sparkles, Bot, Building2, Blocks } from "lucide-react"
-import { BackgroundGradients } from "@/src/components/background-gradients"
 
 const SERVICE_LINES = [
   {
@@ -46,7 +45,6 @@ const SERVICE_LINES = [
 export default function Home() {
   return (
     <div className="relative w-full overflow-hidden">
-      <BackgroundGradients />
       <div className="relative z-10">
 
         <section className="container mx-auto px-4 pt-24 pb-16 max-w-5xl text-center space-y-8">
@@ -55,7 +53,7 @@ export default function Home() {
             Protocol infrastructure for licensed intellectual property
           </Badge>
 
-          <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white via-white to-gray-500 leading-tight">
+          <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-foreground via-foreground to-foreground/50 leading-tight">
             Medialane
           </h1>
 
@@ -70,12 +68,12 @@ export default function Home() {
           <div className="grid md:grid-cols-2 gap-6">
             {SERVICE_LINES.map(({ icon: Icon, title, description, href, color, bg, border }) => (
               <Link key={href} href={href} className="group">
-                <Card className={`${border} ${bg} backdrop-blur-sm h-full transition-all group-hover:border-white/20`}>
+                <Card className={`${border} ${bg} backdrop-blur-sm h-full transition-all group-hover:border-foreground/20`}>
                   <CardContent className="p-8 space-y-4">
                     <Icon className={`w-8 h-8 ${color}`} />
-                    <h2 className="text-2xl font-bold text-white">{title}</h2>
+                    <h2 className="text-2xl font-bold text-foreground">{title}</h2>
                     <p className="text-muted-foreground text-sm leading-relaxed">{description}</p>
-                    <div className="flex items-center text-sm font-medium text-white/80 group-hover:text-white transition-colors">
+                    <div className="flex items-center text-sm font-medium text-foreground/80 group-hover:text-foreground transition-colors">
                       Explore
                       <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
                     </div>
