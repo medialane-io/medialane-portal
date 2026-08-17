@@ -33,8 +33,8 @@ export default function TokenizeEnterprisePage() {
             Credentials people can trust
           </h1>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Every credential is immutable and self-custodied by the person holding it. Nothing
-            for your organization to store, and nothing for them to lose.
+            Every credential is tamper-proof and owned directly by the person holding it.
+            Nothing for your organization to store, and nothing for them to lose.
           </p>
         </section>
 

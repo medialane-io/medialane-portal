@@ -7,7 +7,7 @@ import { Bot, Zap, ScrollText, Mail, ArrowLeft, ArrowRight } from "lucide-react"
 const ITEMS: FeatureRowItem[] = [
   {
     icon: Zap,
-    eyebrow: "x402, pay-per-call",
+    eyebrow: "Usage-based payments",
     color: "bg-brand-orange",
     title: "Get paid every time your catalog is used",
     description: "The same machine-payable rail AI agents already use to pay for access, in reverse: you get paid per call, the moment your content is used.",
@@ -24,7 +24,7 @@ const ITEMS: FeatureRowItem[] = [
     eyebrow: "The other side",
     color: "bg-brand-maeve",
     title: "The same rail an AI agent pays through",
-    description: "An agent authenticates and calls the API on the same x402 rail. Your catalog and their access meet on one shared payment layer.",
+    description: "An agent authenticates and calls the API on the same usage-based payment system. Your catalog and their access meet on one shared payment layer.",
   },
 ]
 

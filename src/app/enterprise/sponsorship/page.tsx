@@ -10,7 +10,7 @@ const ITEMS: FeatureRowItem[] = [
     eyebrow: "Direct settlement",
     color: "bg-brand-blue",
     title: "Sponsor an asset, receive a license",
-    description: "A sponsor bids on an asset you own; you accept; they receive a license and payment moves directly between the two of you. No escrow holding funds in between.",
+    description: "A sponsor bids on an asset you own; you accept; they receive a license and payment settles directly between the two of you, the moment the deal is accepted.",
   },
   {
     icon: Gavel,
@@ -24,7 +24,7 @@ const ITEMS: FeatureRowItem[] = [
     eyebrow: "Owner-verified",
     color: "bg-brand-rose",
     title: "Only the owner can accept",
-    description: "Only the asset's owner can accept a bid, and the license mints atomically the moment they do, on-chain.",
+    description: "Only the asset's owner can accept a bid, and the license issues automatically the moment they do.",
   },
 ]
 

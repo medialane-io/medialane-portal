@@ -17,7 +17,7 @@ const ITEMS: FeatureRowItem[] = [
     eyebrow: "Collection Drop",
     color: "bg-brand-blue",
     title: "A timed release with a price and a window",
-    description: "Set a price, a supply, and a start and end time. Collectors mint directly from a branded drop page on their own schedule.",
+    description: "Set a price, a supply, and a start and end time. Collectors purchase directly from a branded drop page on their own schedule.",
   },
 ]
 

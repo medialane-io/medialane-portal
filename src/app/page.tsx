@@ -23,8 +23,8 @@ const IP_TYPES = [
   { icon: File, title: "Documents", useCase: "A freelancer proves the exact date a contract was signed.", color: "text-slate-400", bg: "bg-slate-500/10" },
   { icon: Layers, title: "Custom", useCase: "A team registers any other asset outside the standard categories.", color: "text-indigo-400", bg: "bg-indigo-500/10" },
   { icon: Fingerprint, title: "Proof of Participation", useCase: "An event issues a permanent badge that can't be transferred or faked.", color: "text-fuchsia-400", bg: "bg-fuchsia-500/10" },
-  { icon: BadgeCheck, title: "Certificates", useCase: "A rights holder issues an immutable certificate of ownership for a high-value asset.", color: "text-yellow-400", bg: "bg-yellow-500/10" },
-  { icon: Ticket, title: "Tickets", useCase: "A festival issues tickets that are verifiable on-chain at the door.", color: "text-rose-400", bg: "bg-rose-500/10" },
+  { icon: BadgeCheck, title: "Certificates", useCase: "A rights holder issues a tamper-proof certificate of ownership for a high-value asset.", color: "text-yellow-400", bg: "bg-yellow-500/10" },
+  { icon: Ticket, title: "Tickets", useCase: "A festival issues tickets that are verifiable at the door.", color: "text-rose-400", bg: "bg-rose-500/10" },
   { icon: Users, title: "Clubs", useCase: "A brand issues membership cards with tiers for fans, supporters, and press.", color: "text-sky-400", bg: "bg-sky-500/10" },
   { icon: Scale, title: "Licensing", useCase: "A publisher licenses their catalog and tracks usage, including for AI training.", color: "text-green-400", bg: "bg-green-500/10" },
   { icon: GitBranch, title: "Remix", useCase: "A creator publishes a derivative work with attribution and royalties flowing back automatically.", color: "text-purple-400", bg: "bg-purple-500/10" },
@@ -63,7 +63,7 @@ const HUBS = [
   {
     icon: ShoppingBag,
     title: "Marketplace",
-    description: "List, offer, and auction everything issued through the Launchpad. Direct settlement, no escrow.",
+    description: "List, offer, and auction everything issued through the Launchpad. Payment settles the moment a sale completes.",
     color: "text-brand-purple",
     bg: "bg-brand-purple/10",
   },
@@ -100,7 +100,7 @@ const SERVICE_LINES = [
   {
     icon: Bot,
     title: "AI Agents & Data",
-    description: "Agents pay per call over x402. Rights holders get paid the same way for AI training access.",
+    description: "Agents pay automatically for what they use. Rights holders get paid the same way for AI training access.",
     href: "/agents",
     color: "text-brand-maeve",
     bg: "bg-brand-maeve/10",
@@ -167,8 +167,8 @@ export default function Home() {
         <section className="container mx-auto px-4 pb-16 max-w-5xl">
           <h2 className="text-2xl font-bold text-foreground text-center mb-2">What can be registered and tokenized?</h2>
           <p className="text-sm text-muted-foreground text-center mb-6">
-            Any IP type can be secured on-chain. Here&apos;s what Medialane supports today, with
-            an example use case for each.
+            Any IP type can be registered and protected. Here&apos;s what Medialane supports
+            today, with an example use case for each.
           </p>
           <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
             {IP_TYPES.map(({ icon: Icon, title, useCase, color, bg }) => (

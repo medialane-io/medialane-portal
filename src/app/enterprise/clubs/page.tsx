@@ -10,7 +10,7 @@ const ITEMS: FeatureRowItem[] = [
     eyebrow: "Membership tiers",
     color: "bg-brand-maeve",
     title: "Fans, supporters, press, season passes",
-    description: "Set up as many membership tiers as you need, each minted as its own card. One club, several ways to belong to it.",
+    description: "Set up as many membership tiers as you need, each issued as its own card. One club, several ways to belong to it.",
   },
   {
     icon: Users,
@@ -40,8 +40,8 @@ export default function ClubsPage() {
             Membership that outlasts one event
           </h1>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Built on IP Club, live on Medialane today. Membership cards your community actually
-            holds in their own wallet.
+            Built on IP Club, live on Medialane today. Membership cards your community owns
+            directly, ready to use everywhere.
           </p>
         </section>
 

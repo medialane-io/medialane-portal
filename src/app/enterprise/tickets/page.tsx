@@ -10,7 +10,7 @@ const ITEMS: FeatureRowItem[] = [
     eyebrow: "Festivals & event brands",
     color: "bg-brand-rose",
     title: "Tickets that show up ready to use",
-    description: "Every ticket has its own supply and validity window, and is verifiable on-chain at the door, ahead of time.",
+    description: "Every ticket has its own supply and validity window, and is verifiable at the door, ahead of time.",
   },
   {
     icon: Repeat,

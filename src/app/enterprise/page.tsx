@@ -4,7 +4,7 @@ import { Card, CardContent } from "@/src/components/ui/card"
 import { FeatureRowList, type FeatureRowItem } from "@/src/components/marketing/feature-row-list"
 import {
   Building2, ScrollText, Ticket, Handshake, Users, Layers, Bot, ArrowRight,
-  Lock, Wallet, ShoppingBag, Zap,
+  ShieldCheck, KeyRound, Banknote, Repeat, TrendingUp, Award, GitBranch, ShoppingBag,
 } from "lucide-react"
 
 const UMBRELLAS = [
@@ -27,48 +27,55 @@ const UMBRELLAS = [
 ]
 
 const STATS = [
-  { value: "13", label: "Live Launchpad services" },
+  { value: "$63B", label: "Global intellectual property industry" },
   { value: "181", label: "Countries with automatic copyright protection" },
-  { value: "0", label: "Escrow accounts holding your funds" },
+  { value: "13", label: "Live tokenization services" },
 ]
 
 const WHY: FeatureRowItem[] = [
   {
-    icon: Lock,
-    eyebrow: "Immutable & permissionless",
+    icon: ShieldCheck,
+    eyebrow: "Immutable by design",
     color: "bg-brand-blue",
-    title: "Set once, in public",
-    description: "Contracts are immutable and permissionless. Once deployed, they stay exactly as set, including for Medialane itself.",
+    title: "Compliance you can point to",
+    description: "Rules and royalty terms are secured by immutable contracts the moment you launch, including for Medialane itself. Nothing changes later without your sign-off.",
   },
   {
-    icon: Wallet,
-    eyebrow: "Self-custody",
+    icon: KeyRound,
+    eyebrow: "Direct ownership",
     color: "bg-brand-orange",
-    title: "Held in your audience's own wallet",
-    description: "Every credential, ticket, and membership card lives in the holder's own wallet. Nothing for your organization to store.",
+    title: "Your audience owns it directly",
+    description: "Every credential, ticket, and membership card is owned directly by the holder. No account system for your team to maintain or reconcile.",
   },
   {
-    icon: ShoppingBag,
-    eyebrow: "Direct settlement",
+    icon: Banknote,
+    eyebrow: "Instant settlement",
     color: "bg-brand-rose",
-    title: "Payment and asset move together",
-    description: "Sales, licenses, and sponsorships settle directly between the two parties, in one transaction, or neither moves.",
+    title: "Paid the moment a deal completes",
+    description: "Sales, licenses, and sponsorships pay out the instant a transaction completes, worldwide, without a payment processor in the middle.",
   },
   {
-    icon: Zap,
-    eyebrow: "x402 payments",
+    icon: Repeat,
+    eyebrow: "Usage-based payments",
     color: "bg-brand-maeve",
-    title: "Pay per use, get paid per use",
-    description: "Every call is metered over x402, the same rail enterprises and AI agents both use to pay for access.",
+    title: "Pay for use, get paid for use",
+    description: "Access is metered automatically. You pay only for what you use, and get paid the same way when others, including AI systems, use your catalog.",
   },
 ]
 
 const MONETIZATION = [
-  { icon: Ticket, title: "Tickets", description: "Verifiable, resellable admission tickets, issued per event.", href: "/enterprise/tickets", color: "text-brand-rose", bg: "bg-brand-rose/10" },
-  { icon: Users, title: "Clubs", description: "Membership tiers, minted as cards, for ongoing access.", href: "/enterprise/clubs", color: "text-brand-maeve", bg: "bg-brand-maeve/10" },
-  { icon: Layers, title: "Limited Editions", description: "Numbered copies or timed drops, at whatever run size you choose.", href: "/enterprise/editions", color: "text-brand-purple", bg: "bg-brand-purple/10" },
-  { icon: Handshake, title: "Sponsorship", description: "Direct sponsorship offers settled asset-to-asset, with no escrow.", href: "/enterprise/sponsorship", color: "text-brand-blue", bg: "bg-brand-blue/10" },
-  { icon: Bot, title: "AI Data & Training", description: "Get paid per call, over x402, when AI systems use your catalog.", href: "/enterprise/ai-data", color: "text-brand-orange", bg: "bg-brand-orange/10" },
+  { icon: Ticket, title: "Tickets", description: "Verifiable, resellable admission tickets, issued at scale for any event.", href: "/enterprise/tickets", color: "text-brand-rose", bg: "bg-brand-rose/10" },
+  { icon: Users, title: "Clubs", description: "Tiered membership programs, issued as tradeable cards, for ongoing audience relationships.", href: "/enterprise/clubs", color: "text-brand-maeve", bg: "bg-brand-maeve/10" },
+  { icon: Layers, title: "Limited Editions", description: "Controlled-supply releases and timed drops, sized to your catalog.", href: "/enterprise/editions", color: "text-brand-purple", bg: "bg-brand-purple/10" },
+  { icon: Handshake, title: "Sponsorship", description: "Structured sponsorship deals between your brand and rights holders, settled automatically.", href: "/enterprise/sponsorship", color: "text-brand-blue", bg: "bg-brand-blue/10" },
+  { icon: Bot, title: "AI Data & Training", description: "Turn catalog access for AI training into a recurring revenue line.", href: "/enterprise/ai-data", color: "text-brand-orange", bg: "bg-brand-orange/10" },
+]
+
+const MORE_CAPABILITIES = [
+  { icon: TrendingUp, title: "Creator Capital Markets", description: "Launch a public trading market for your brand or community, and stay in control of it." },
+  { icon: Award, title: "Proof of Participation", description: "Issue permanent, tamper-proof badges your audience can claim and keep." },
+  { icon: GitBranch, title: "Remix & Licensing", description: "License your catalog for reuse, with royalties flowing back to you automatically." },
+  { icon: ShoppingBag, title: "Marketplace", description: "List, offer, and auction everything you issue, in one connected market." },
 ]
 
 export default function EnterprisePage() {
@@ -81,12 +88,13 @@ export default function EnterprisePage() {
             Enterprise
           </Badge>
           <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight text-foreground">
-            Tokenization and monetization, on your terms
+            Tokenization and monetization, at enterprise scale
           </h1>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
             Schools, festivals, publishers, and rights holders use Medialane to issue, license,
-            and monetize digital assets. No blockchain experience needed on your end, or your
-            audience&apos;s.
+            and monetize intellectual property, and to participate directly in worldwide creator
+            capital markets. Fully managed, low-cost, and secured by immutable contracts for
+            compliance you can point to.
           </p>
         </section>
 
@@ -126,7 +134,7 @@ export default function EnterprisePage() {
         <section className="container mx-auto px-4 pb-16 max-w-4xl">
           <h2 className="text-2xl font-bold text-foreground text-center mb-2">Why enterprises tokenize with Medialane</h2>
           <p className="text-sm text-muted-foreground text-center mb-6">
-            The same protocol properties every asset on Medialane gets, applied to your business.
+            The same operating properties every asset on Medialane gets, applied to your business.
           </p>
           <FeatureRowList items={WHY} />
         </section>
@@ -150,6 +158,21 @@ export default function EnterprisePage() {
                   </CardContent>
                 </Card>
               </Link>
+            ))}
+          </div>
+        </section>
+
+        <section className="container mx-auto px-4 pb-24 max-w-5xl">
+          <h2 className="text-xl font-bold text-foreground text-center mb-6">More ways to build value</h2>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {MORE_CAPABILITIES.map(({ icon: Icon, title, description }) => (
+              <div key={title} className="space-y-2">
+                <div className="h-10 w-10 rounded-lg bg-foreground/10 flex items-center justify-center">
+                  <Icon className="w-5 h-5 text-foreground" />
+                </div>
+                <h3 className="font-bold text-foreground text-sm">{title}</h3>
+                <p className="text-sm text-muted-foreground">{description}</p>
+              </div>
             ))}
           </div>
         </section>
