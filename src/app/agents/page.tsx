@@ -9,17 +9,17 @@ const CAPABILITIES = [
   {
     icon: KeyRound,
     title: "Headless authentication",
-    description: "Any agent with a Starknet keypair authenticates, provisions credits, and calls the API — zero human interaction required.",
+    description: "Any agent with a Starknet keypair authenticates, provisions credits, and calls the API on its own.",
   },
   {
     icon: Zap,
     title: "x402-native, pay-per-call",
-    description: "Machine-payable IP access over the x402 protocol. No subscription, no human approval step — an agent pays for what it uses, per call.",
+    description: "Machine-payable IP access over the x402 protocol lets an agent pay for what it uses, per call, the moment it needs it.",
   },
   {
     icon: Code2,
     title: "Machine-readable capabilities",
-    description: "Action descriptions in the service registry are structured JSON, not human-only docs — an agent reads the same registry the UI does.",
+    description: "Action descriptions in the service registry are structured JSON, the same registry the UI itself reads.",
   },
 ]
 
@@ -38,8 +38,8 @@ export default function AgentsPage() {
             x402-native, machine-payable IP access
           </h1>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            An agent authenticates, provisions credits, and calls the API — no human interaction,
-            no different fee schedule than a human integrator.
+            An agent authenticates, provisions credits, and calls the API on the same fee schedule
+            as a human integrator.
           </p>
           <Button asChild size="lg" className="px-10">
             <a href="https://docs.medialane.io/docs/agents" target="_blank" rel="noopener noreferrer">
@@ -65,7 +65,7 @@ export default function AgentsPage() {
 
         <section className="container mx-auto px-4 pb-24 max-w-2xl text-center space-y-4">
           <p className="text-muted-foreground">
-            Same credits, same pricing, same registry as human integrators — see the full API surface.
+            Agents run on the same registry human integrators use, at the same pricing. See the full API surface.
           </p>
           <Button asChild variant="outline" size="lg">
             <Link href="/developers">View developer docs</Link>

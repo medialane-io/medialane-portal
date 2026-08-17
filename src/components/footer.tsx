@@ -38,8 +38,8 @@ export default function Footer() {
           <div className="col-span-2 md:col-span-1 space-y-4">
             <LogoMedialane />
             <p className="text-sm text-muted-foreground leading-relaxed">
-              Protocol infrastructure for licensed intellectual property — for the businesses,
-              integrators, and AI agents that build on it.
+              Protocol infrastructure for licensed intellectual property. Built for integrators
+              and the businesses and AI agents they serve.
             </p>
           </div>
 

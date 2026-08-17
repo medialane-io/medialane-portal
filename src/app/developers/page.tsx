@@ -41,12 +41,12 @@ async function getLivePricing(): Promise<PricingResponse | null> {
 }
 
 const API_CARDS = [
-  { icon: ListOrdered, title: "Marketplace Orders", description: "Query active listings, bids, and completed sales. Filter by contract, token, or wallet.", color: "text-purple-400", bg: "bg-purple-500/10", border: "border-purple-500/20" },
-  { icon: LayoutGrid, title: "Collections & Drops", description: "Fetch collection metadata, floor prices, volume, and token inventories. Includes POP and Collection Drop sources.", color: "text-blue-400", bg: "bg-blue-500/10", border: "border-blue-500/20" },
-  { icon: Zap, title: "Launch & Mint", description: "Deploy collection contracts and mint assets programmatically. Get ready-to-sign calldata for on-chain deployment.", color: "text-orange-400", bg: "bg-orange-500/10", border: "border-orange-500/20" },
-  { icon: FileImage, title: "Decentralized Metadata", description: "Resolve full metadata for any token, including license terms, remix history, and provenance.", color: "text-green-400", bg: "bg-green-500/10", border: "border-green-500/20" },
-  { icon: Activity, title: "Onchain Activity", description: "Stream every event: mints, transfers, sales, offers, cancellations — indexed in real time.", color: "text-cyan-400", bg: "bg-cyan-500/10", border: "border-cyan-500/20" },
-  { icon: Signature, title: "Trade Intents", description: "Create and sign structured trade intents using SNIP-12. Submit orders without exposing private keys.", color: "text-amber-400", bg: "bg-amber-500/10", border: "border-amber-500/20" },
+  { icon: ListOrdered, title: "Marketplace Orders", description: "Query active listings, bids, and completed sales. Filter by contract, token, or wallet.", color: "text-brand-purple", bg: "bg-brand-purple/10", border: "border-brand-purple/20" },
+  { icon: LayoutGrid, title: "Collections & Drops", description: "Fetch collection metadata, floor prices, volume, and token inventories. Includes POP and Collection Drop sources.", color: "text-brand-blue", bg: "bg-brand-blue/10", border: "border-brand-blue/20" },
+  { icon: Zap, title: "Launch & Mint", description: "Deploy collection contracts and mint assets programmatically. Get ready-to-sign calldata for on-chain deployment.", color: "text-brand-orange", bg: "bg-brand-orange/10", border: "border-brand-orange/20" },
+  { icon: FileImage, title: "Decentralized Metadata", description: "Resolve full metadata for any token, including license terms, remix history, and provenance.", color: "text-brand-rose", bg: "bg-brand-rose/10", border: "border-brand-rose/20" },
+  { icon: Activity, title: "Onchain Activity", description: "Stream every event, from mints and transfers to sales, offers, and cancellations, indexed in real time.", color: "text-brand-maeve", bg: "bg-brand-maeve/10", border: "border-brand-maeve/20" },
+  { icon: Signature, title: "Trade Intents", description: "Create and sign structured trade intents using SNIP-12. Submit orders without exposing private keys.", color: "text-brand-purple", bg: "bg-brand-purple/10", border: "border-brand-purple/20" },
 ]
 
 const MDLN_TIERS = [
@@ -62,7 +62,7 @@ const FEATURES = [
   { label: "Portal dashboard", free: true, paid: true },
   { label: "MDLN token multipliers", free: true, paid: true },
   { label: "Agent-native 402 responses", free: true, paid: true },
-  { label: "Free quota reset", free: "1st of each month", paid: "—" },
+  { label: "Free quota reset", free: "1st of each month", paid: "n/a" },
   { label: "x402 Payments", free: false, paid: "Pay-as-you-go" },
   { label: "Credit rate", free: false, paid: "$0.01 / credit" },
   { label: "API keys", free: false, paid: true },
@@ -70,7 +70,7 @@ const FEATURES = [
 
 function Cell({ value }: { value: boolean | string }) {
   if (value === true) return <Check className="w-5 h-5 text-green-400 mx-auto" />
-  if (value === "—") return <span className="text-muted-foreground text-sm">—</span>
+  if (value === "n/a") return <span className="text-muted-foreground text-sm">n/a</span>
   return <span className="text-sm text-white font-medium">{value}</span>
 }
 
@@ -101,7 +101,7 @@ export default async function DevelopersPage() {
             Typed access to the full protocol
           </h1>
           <p className="text-lg text-muted-foreground max-w-xl mx-auto">
-            Assets, orders, licensing, drops, and real-time events — usage-priced, no gatekeeping.
+            Assets, orders, licensing, drops, and real-time events, priced by usage from your first call.
             Connect a wallet to get an API key.
           </p>
           <Button asChild size="lg" className="px-10">
@@ -147,7 +147,7 @@ export default async function DevelopersPage() {
             <div className="text-center space-y-2">
               <h2 className="text-2xl font-bold text-white">MDLN Token Multipliers</h2>
               <p className="text-sm text-muted-foreground">
-                Hold MDLN at deposit time to receive bonus credits — no lock-up required.
+                Hold MDLN at deposit time to receive bonus credits, unlocked immediately.
               </p>
             </div>
             <div className="rounded-xl border border-white/10 overflow-hidden bg-white/[0.02]">

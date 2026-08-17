@@ -8,38 +8,38 @@ const SERVICE_LINES = [
   {
     icon: Code2,
     title: "Developers",
-    description: "Typed, metered access to the full protocol — assets, orders, licensing, drops, real-time events. No gatekeeping, usage-priced.",
+    description: "Typed, metered access to the full protocol: assets, orders, licensing, drops, real-time events. Usage-priced from the first call.",
     href: "/developers",
-    color: "text-purple-400",
-    bg: "bg-purple-500/10",
-    border: "border-purple-500/20",
+    color: "text-brand-blue",
+    bg: "bg-brand-blue/10",
+    border: "border-brand-blue/20",
   },
   {
     icon: Building2,
     title: "Enterprise",
-    description: "Issue credentials, tickets, or gated access on verifiable rails — or tokenize a content library for licensing and AI-training, with Medialane administering creator payouts.",
+    description: "Issue credentials, tickets, or gated access on verifiable rails. Tokenize a content library for licensing and AI training, with Medialane administering creator payouts.",
     href: "/enterprise",
-    color: "text-orange-400",
-    bg: "bg-orange-500/10",
-    border: "border-orange-500/20",
+    color: "text-brand-orange",
+    bg: "bg-brand-orange/10",
+    border: "border-brand-orange/20",
   },
   {
     icon: Blocks,
     title: "Infrastructure",
-    description: "Don't build a tokenization stack. Register a service, get a UI variant, ship — the same registry Medialane's own apps run on.",
+    description: "Register a service, get a UI variant, and ship on the same registry Medialane's own apps run on.",
     href: "/infrastructure",
-    color: "text-cyan-400",
-    bg: "bg-cyan-500/10",
-    border: "border-cyan-500/20",
+    color: "text-brand-purple",
+    bg: "bg-brand-purple/10",
+    border: "border-brand-purple/20",
   },
   {
     icon: Bot,
     title: "AI Agents",
-    description: "x402-native, machine-payable IP access. An agent authenticates, provisions credits, and calls the API — zero human interaction required.",
+    description: "x402-native, machine-payable IP access. An agent authenticates, provisions credits, and calls the API on its own.",
     href: "/agents",
-    color: "text-green-400",
-    bg: "bg-green-500/10",
-    border: "border-green-500/20",
+    color: "text-brand-maeve",
+    bg: "bg-brand-maeve/10",
+    border: "border-brand-maeve/20",
   },
 ]
 
@@ -60,9 +60,9 @@ export default function Home() {
           </h1>
 
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-            The businesses, integrators, and AI agents that build on Medialane use the API, deploy
-            enterprise services, embed the registry as infrastructure, or transact as agents.
-            Find your path below.
+            Every business building on Medialane finds its own path in: the API for integrators,
+            enterprise deployments for publishers and institutions, embedded infrastructure for
+            partners, and agent-native access for AI. Find yours below.
           </p>
         </section>
 
