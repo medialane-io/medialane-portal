@@ -86,7 +86,9 @@ export default async function PricingPage() {
             Pay for what you use
           </h1>
           <p className="text-lg text-muted-foreground max-w-xl mx-auto">
-            No subscription. Buy credits with USDC and spend them as you go. Hold MDLN for a discount.
+            No subscription. Every call is paid over x402, the same pay-per-call rail enterprises
+            and AI agents both use. Buy credits with USDC and spend them as you go; hold MDLN for
+            a discount.
           </p>
           <Button asChild size="lg" className="px-10">
             <Link href="/account">Get started</Link>
@@ -97,11 +99,11 @@ export default async function PricingPage() {
           <section className="container mx-auto px-4 pb-16 max-w-4xl">
             <div className="space-y-4">
               <h2 className="text-2xl font-bold text-foreground text-center">What things cost</h2>
-              <div className="rounded-xl border border-border overflow-hidden bg-foreground/[0.02]">
-                {creditRows.map((row, i) => (
+              <div className="divide-y divide-border/40">
+                {creditRows.map((row) => (
                   <div
                     key={row.actionKey}
-                    className={`flex items-center justify-between px-6 py-3 text-sm ${i < creditRows.length - 1 ? "border-b border-border/50" : ""}`}
+                    className="flex items-center justify-between px-2 py-3 text-sm"
                   >
                     <span className="text-muted-foreground">{row.label}</span>
                     <span className="text-foreground font-medium">{row.credits} credits</span>
@@ -120,16 +122,16 @@ export default async function PricingPage() {
                 Your discount applies the moment you deposit. Nothing to lock up or stake.
               </p>
             </div>
-            <div className="rounded-xl border border-border overflow-hidden bg-foreground/[0.02]">
-              <div className="grid grid-cols-3 px-6 py-4 border-b border-border bg-foreground/[0.03] text-sm font-semibold">
+            <div className="divide-y divide-border/40">
+              <div className="grid grid-cols-3 px-2 py-4 text-sm font-semibold">
                 <div className="text-muted-foreground">MDLN Holdings</div>
                 <div className="text-center text-foreground">Multiplier</div>
                 <div className="text-center text-primary">Rate</div>
               </div>
-              {MDLN_TIERS.map((tier, i) => (
+              {MDLN_TIERS.map((tier) => (
                 <div
                   key={tier.range}
-                  className={`grid grid-cols-3 px-6 py-4 items-center text-sm ${i < MDLN_TIERS.length - 1 ? "border-b border-border/50" : ""}`}
+                  className="grid grid-cols-3 px-2 py-4 items-center text-sm"
                 >
                   <div className="text-muted-foreground">{tier.range}</div>
                   <div className="text-center text-foreground font-medium">{tier.multiplier}</div>
@@ -143,16 +145,16 @@ export default async function PricingPage() {
         <section className="container mx-auto px-4 pb-16 max-w-4xl">
           <div className="space-y-4">
             <h2 className="text-xl font-bold text-foreground text-center">What&apos;s included</h2>
-            <div className="rounded-xl border border-border overflow-hidden bg-foreground/[0.02]">
-              <div className="grid grid-cols-3 px-6 py-4 border-b border-border bg-foreground/[0.03]">
+            <div className="divide-y divide-border/40">
+              <div className="grid grid-cols-3 px-2 py-4">
                 <div className="text-sm font-semibold text-muted-foreground">Feature</div>
                 <div className="text-sm font-semibold text-foreground text-center">x402 Payments</div>
                 <div className="text-sm font-semibold text-primary text-center">Pay-as-you-go</div>
               </div>
-              {FEATURES.map((row, i) => (
+              {FEATURES.map((row) => (
                 <div
                   key={row.label}
-                  className={`grid grid-cols-3 px-6 py-4 items-center ${i < FEATURES.length - 1 ? "border-b border-border/50" : ""}`}
+                  className="grid grid-cols-3 px-2 py-4 items-center"
                 >
                   <div className="text-sm text-muted-foreground">{row.label}</div>
                   <div className="text-center"><Cell value={row.free} /></div>
