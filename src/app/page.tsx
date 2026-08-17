@@ -2,7 +2,48 @@ import Link from "next/link"
 import { Badge } from "@/src/components/ui/badge"
 import { Button } from "@/src/components/ui/button"
 import { Card, CardContent } from "@/src/components/ui/card"
-import { Code2, ArrowRight, Sparkles, Bot, Building2, Blocks, ShieldCheck, LayoutGrid } from "lucide-react"
+import {
+  Code2, ArrowRight, Sparkles, Bot, Building2, Blocks, ShieldCheck, LayoutGrid,
+  ImagePlus, Layers, Users, Coins, ShoppingBag,
+} from "lucide-react"
+
+const HUBS = [
+  {
+    icon: ImagePlus,
+    title: "Originals & Collections",
+    description: "Single-edition NFTs, remixes with automatic attribution, and timed collection drops.",
+    color: "text-brand-blue",
+    bg: "bg-brand-blue/10",
+  },
+  {
+    icon: Layers,
+    title: "Limited Editions",
+    description: "Numbered copies of one work, released in whatever run size you choose.",
+    color: "text-brand-orange",
+    bg: "bg-brand-orange/10",
+  },
+  {
+    icon: Users,
+    title: "Community",
+    description: "Attendance badges, tickets, membership clubs, and direct sponsorship offers.",
+    color: "text-brand-rose",
+    bg: "bg-brand-rose/10",
+  },
+  {
+    icon: Coins,
+    title: "Coins",
+    description: "Launch a creator coin with a public trading pool, or claim one you already made.",
+    color: "text-brand-maeve",
+    bg: "bg-brand-maeve/10",
+  },
+  {
+    icon: ShoppingBag,
+    title: "Marketplace",
+    description: "List, offer, and auction everything issued through the Launchpad. Direct settlement, no escrow.",
+    color: "text-brand-purple",
+    bg: "bg-brand-purple/10",
+  },
+]
 
 const SERVICE_LINES = [
   {
@@ -17,7 +58,7 @@ const SERVICE_LINES = [
   {
     icon: Building2,
     title: "Enterprise",
-    description: "Tokenize credentials, tickets, or a content library. We handle the technical side.",
+    description: "Tokenize credentials, IP, tickets, clubs, and limited editions. We handle the technical side.",
     href: "/enterprise",
     color: "text-brand-orange",
     bg: "bg-brand-orange/10",
@@ -34,8 +75,8 @@ const SERVICE_LINES = [
   },
   {
     icon: Bot,
-    title: "AI Agents",
-    description: "Let AI agents pay for access automatically, per request.",
+    title: "AI Agents & Data",
+    description: "Agents pay per call over x402. Rights holders get paid the same way for AI training access.",
     href: "/agents",
     color: "text-brand-maeve",
     bg: "bg-brand-maeve/10",
@@ -54,7 +95,7 @@ export default function Home() {
             Tokenization for business
           </Badge>
 
-          <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-foreground via-foreground to-foreground/50 leading-tight">
+          <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight text-foreground leading-tight">
             Medialane
           </h1>
 
@@ -75,6 +116,21 @@ export default function Home() {
                 Launchpad services
               </Link>
             </Button>
+          </div>
+        </section>
+
+        <section className="container mx-auto px-4 pb-16 max-w-5xl">
+          <h2 className="text-2xl font-bold text-foreground text-center mb-6">Five hubs, thirteen live services</h2>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-5 gap-4">
+            {HUBS.map(({ icon: Icon, title, description, color, bg }) => (
+              <div key={title} className="space-y-3">
+                <div className={`h-10 w-10 rounded-lg ${bg} flex items-center justify-center`}>
+                  <Icon className={`w-5 h-5 ${color}`} />
+                </div>
+                <h3 className="font-bold text-foreground">{title}</h3>
+                <p className="text-sm text-muted-foreground">{description}</p>
+              </div>
+            ))}
           </div>
         </section>
 
