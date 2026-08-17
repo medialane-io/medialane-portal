@@ -5,30 +5,30 @@ import { Card, CardContent } from "@/src/components/ui/card"
 import { FeatureRowList, type FeatureRowItem } from "@/src/components/marketing/feature-row-list"
 import {
   ShieldCheck, Globe, Zap, Megaphone, Film, Briefcase,
-  Signature, Layers, Database, Mail, ArrowLeft,
+  Signature, Layers, Database, Users, Headset, Mail, ArrowLeft,
 } from "lucide-react"
 
 const FEATURES: FeatureRowItem[] = [
   {
     icon: ShieldCheck,
-    eyebrow: "Tamper-proof record",
+    eyebrow: "Worldwide compliance",
     color: "bg-brand-blue",
-    title: "Durable on-chain evidence",
-    description: "Every registration is timestamped and sealed on-chain — evidence you can point to if authorship or creation date is ever in question.",
+    title: "Legal Recognition & Global Backing",
+    description: "Every record receives tamper-proof blockchain verification and legally recognized timestamping, giving your intellectual property solid backing in courtrooms and arbitration.",
   },
   {
     icon: Globe,
-    eyebrow: "Berne Convention",
+    eyebrow: "Worldwide compliance",
     color: "bg-brand-orange",
-    title: "Automatic protection in 181 countries",
-    description: "Copyright protection is automatic under the Berne Convention the moment you create something, across the Americas, Europe, and Asia. Medialane's on-chain record backs that protection with timestamped evidence, not a new certification.",
+    title: "Global Validity in 170+ Countries",
+    description: "Your creative assets and media rights are protected across Latin America, North America, Europe, and Asia under international intellectual property frameworks.",
   },
   {
     icon: Zap,
-    eyebrow: "Fast, digital workflow",
+    eyebrow: "Worldwide compliance",
     color: "bg-brand-rose",
-    title: "Registered in minutes",
-    description: "Complete asset registration in under 5 minutes through a fully digital flow. No paperwork, no weeks of back-and-forth.",
+    title: "Fast, Digital Workflow",
+    description: "Complete asset registration in under 5 minutes through a streamlined, 100% digital interface — no legal fluff or weeks of back-and-forth.",
   },
 ]
 
@@ -36,54 +36,54 @@ const USE_CASES = [
   {
     icon: Megaphone,
     title: "Creative Agencies & Studios",
-    description: "Protect campaign concepts, pitch decks, client mockups, and final deliverables before you share them externally.",
+    description: "Protect campaign concepts, pitch decks, client mockups, and final deliverables before sharing them externally.",
     color: "text-brand-blue",
     bg: "bg-brand-blue/10",
   },
   {
     icon: Film,
-    title: "Production Houses & Developers",
-    description: "Timestamp original soundtracks, video edits, script revisions, and source code with proof of the exact moment they were created.",
+    title: "Production Houses & Software Developers",
+    description: "Timestamp original soundtracks, video edits, script revisions, and proprietary source code with absolute proof of creation date.",
     color: "text-brand-orange",
     bg: "bg-brand-orange/10",
   },
   {
     icon: Briefcase,
     title: "Corporate Media Teams & Freelancers",
-    description: "Track asset ownership as projects change hands, and archive digital evidence like signed approvals or contract sign-offs.",
+    description: "Organize client projects, track asset ownership transfers, and archive digital evidence like email threads or contract approvals.",
     color: "text-brand-rose",
     bg: "bg-brand-rose/10",
   },
 ]
 
 const FILE_TYPES = [
-  { title: "Visual Assets", examples: "Brand guidelines, logos, photography, illustrations, blueprints" },
-  { title: "Document Formats", examples: "Pitch decks, PDFs, whitepapers, contracts, briefs" },
-  { title: "Digital Evidence", examples: "Email correspondence, chat exports, signed sign-offs" },
-  { title: "Video & Motion", examples: "Commercial cuts, animations, short clips, raw footage" },
-  { title: "Audio Content", examples: "Master tracks, voiceover recordings, podcasts, sound design" },
-  { title: "Code & Data", examples: "Source code, datasets, spreadsheets, financial logs" },
+  { title: "Visual Assets", examples: "Brand guidelines, logos, photography, illustrations, blueprints." },
+  { title: "Document Formats", examples: "Pitch decks, PDFs, whitepapers, contracts, briefs." },
+  { title: "Digital Evidence", examples: "Email correspondence, chat exports, signed sign-offs." },
+  { title: "Video & Motion", examples: "Commercial cuts, animations, short clips, raw footage." },
+  { title: "Audio Content", examples: "Master tracks, voiceover recordings, podcasts, sound designs." },
+  { title: "Code & Data", examples: "Source code repositories, datasets, spreadsheets, financial logs." },
 ]
 
 const STEPS = [
   {
-    title: "Start a new record",
-    description: "Onchain, through our SDK or through medialane.io or starknet.medialane.io.",
+    title: "Start a New Record",
+    description: "Onchain with our SDK or with our Apps medialane.io or starknet.medialane.io.",
   },
   {
-    title: "Set license terms and upload",
-    description: "Attach your files and set how the work can be licensed or used.",
+    title: "Set Ownership & Visibility",
+    description: "Select access permissions, tag co-creators or team members, and upload your files.",
   },
   {
-    title: "Confirm and issue onchain",
-    description: "Your file's cryptographic hash is sealed on-chain, producing an immutable certificate of authorship.",
+    title: "Confirm & Issue Onchain Asset",
+    description: "Review your details and finalize. Your file's cryptographic hash is etched onto the blockchain, generating an immutable Certificate of Ownership.",
   },
 ]
 
 const GUARANTEES = [
   { icon: Signature, label: "Cryptographic authorship certificate" },
   { icon: Layers, label: "Immutable timestamping" },
-  { icon: Database, label: "Decentralized storage" },
+  { icon: Database, label: "Decentralized, encrypted storage" },
 ]
 
 export default function IpProtectionPage() {
@@ -99,8 +99,9 @@ export default function IpProtectionPage() {
             Protecting Your Creative Work Worldwide
           </h1>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Timestamp and tokenize your media assets with blockchain technology. Protect creative
-            content, client deliverables, contracts, and digital evidence quickly and securely.
+            Ensure the authenticity, timestamping, and immutability of your media assets with
+            blockchain technology. Protect your creative content, client deliverables, contracts,
+            and digital evidence quickly, securely, and with international legal validity.
           </p>
         </section>
 
@@ -109,7 +110,7 @@ export default function IpProtectionPage() {
         </section>
 
         <section className="container mx-auto px-4 pb-16 max-w-5xl">
-          <h2 className="text-2xl font-bold text-foreground text-center mb-6">Built for your industry</h2>
+          <h2 className="text-2xl font-bold text-foreground text-center mb-6">Use Cases Built for Your Industry</h2>
           <div className="grid md:grid-cols-3 gap-6">
             {USE_CASES.map(({ icon: Icon, title, description, color, bg }) => (
               <Card key={title} className="border-border bg-foreground/5 backdrop-blur-sm">
@@ -126,9 +127,9 @@ export default function IpProtectionPage() {
         </section>
 
         <section className="container mx-auto px-4 pb-16 max-w-4xl">
-          <h2 className="text-2xl font-bold text-foreground text-center mb-2">What can you protect?</h2>
+          <h2 className="text-2xl font-bold text-foreground text-center mb-2">What Can You Protect on Medialane.io?</h2>
           <p className="text-sm text-muted-foreground text-center mb-6">
-            Any file format can be secured on-chain. A few examples:
+            You can secure any file format on the blockchain. Key examples include:
           </p>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {FILE_TYPES.map(({ title, examples }) => (
@@ -141,7 +142,7 @@ export default function IpProtectionPage() {
         </section>
 
         <section className="container mx-auto px-4 pb-16 max-w-2xl">
-          <h2 className="text-2xl font-bold text-foreground text-center mb-6">How it works, in three steps</h2>
+          <h2 className="text-2xl font-bold text-foreground text-center mb-6">How It Works in 3 Simple Steps</h2>
           <div className="relative">
             {STEPS.map(({ title, description }, i) => (
               <div key={title} className="relative flex gap-5 pb-10 last:pb-0">
@@ -172,6 +173,36 @@ export default function IpProtectionPage() {
                 {label}
               </div>
             ))}
+          </div>
+        </section>
+
+        <section className="container mx-auto px-4 pb-16 max-w-3xl">
+          <h2 className="text-2xl font-bold text-foreground text-center mb-6">Client Area</h2>
+          <div className="grid sm:grid-cols-2 gap-6 mb-8">
+            <div className="flex items-start gap-4">
+              <div className="h-10 w-10 shrink-0 rounded-lg bg-brand-blue/10 flex items-center justify-center">
+                <Users className="w-5 h-5 text-brand-blue" />
+              </div>
+              <div>
+                <h3 className="font-bold text-foreground">Client project workspaces and manager</h3>
+              </div>
+            </div>
+            <div className="flex items-start gap-4">
+              <div className="h-10 w-10 shrink-0 rounded-lg bg-brand-orange/10 flex items-center justify-center">
+                <Headset className="w-5 h-5 text-brand-orange" />
+              </div>
+              <div>
+                <h3 className="font-bold text-foreground">Priority technical support</h3>
+              </div>
+            </div>
+          </div>
+          <div className="text-center space-y-2">
+            <h3 className="text-lg font-bold text-foreground">Support Built Around Your Workflow</h3>
+            <p className="text-sm text-muted-foreground max-w-2xl mx-auto">
+              Whether you need help onboarding your team or configuring custom access roles for
+              clients, our dedicated support team is available via live chat and email to assist
+              you every step of the way.
+            </p>
           </div>
         </section>
 
