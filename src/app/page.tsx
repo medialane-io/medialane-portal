@@ -64,11 +64,13 @@ export default function Home() {
 
         <section className="container mx-auto px-4 pb-24 max-w-5xl">
           <div className="grid md:grid-cols-2 gap-6">
-            {SERVICE_LINES.map(({ icon: Icon, title, description, href, color, bg, border }) => (
+            {SERVICE_LINES.map(({ icon: Icon, title, description, href, color, bg }) => (
               <Link key={href} href={href} className="group">
-                <Card className={`${border} ${bg} backdrop-blur-sm h-full transition-all group-hover:border-foreground/20`}>
+                <Card className="border-border bg-foreground/5 backdrop-blur-sm h-full transition-all group-hover:border-foreground/20">
                   <CardContent className="p-8 space-y-4">
-                    <Icon className={`w-8 h-8 ${color}`} />
+                    <div className={`h-10 w-10 rounded-lg ${bg} flex items-center justify-center`}>
+                      <Icon className={`w-5 h-5 ${color}`} />
+                    </div>
                     <h2 className="text-2xl font-bold text-foreground">{title}</h2>
                     <p className="text-muted-foreground text-sm leading-relaxed">{description}</p>
                     <div className="flex items-center text-sm font-medium text-foreground/80 group-hover:text-foreground transition-colors">

@@ -9,21 +9,29 @@ const PILLARS = [
     icon: Layers,
     title: "Register a service",
     description: "Medialane's service registry is open-ended. Adding a new product type is a registry entry, keeping your integration decoupled from schema migrations.",
+    color: "text-brand-blue",
+    bg: "bg-brand-blue/10",
   },
   {
     icon: Puzzle,
     title: "Ship a UI variant",
     description: "Each registered service declares its capabilities and asset shape. Your interface reads from the same registry Medialane's own apps consume.",
+    color: "text-brand-orange",
+    bg: "bg-brand-orange/10",
   },
   {
     icon: Wallet,
     title: "Embed working product surfaces",
     description: "Media Wallet, Medialane's own self-custody wallet, is built as a modular component designed to embed in other apps. Integrating means reusing shipped product surfaces.",
+    color: "text-brand-rose",
+    bg: "bg-brand-rose/10",
   },
   {
     icon: GitBranch,
     title: "Stay interoperable",
     description: "Assets follow OpenSea-compatible ERC-721/1155 metadata standards. What you build on Medialane's registry travels freely beyond Medialane's own apps.",
+    color: "text-brand-maeve",
+    bg: "bg-brand-maeve/10",
   },
 ]
 
@@ -47,10 +55,12 @@ export default function InfrastructurePage() {
 
         <section className="container mx-auto px-4 pb-16 max-w-5xl">
           <div className="grid md:grid-cols-2 gap-6">
-            {PILLARS.map(({ icon: Icon, title, description }) => (
+            {PILLARS.map(({ icon: Icon, title, description, color, bg }) => (
               <Card key={title} className="border-border bg-foreground/5 backdrop-blur-sm">
                 <CardContent className="p-6 space-y-3">
-                  <Icon className="w-6 h-6 text-primary" />
+                  <div className={`h-10 w-10 rounded-lg ${bg} flex items-center justify-center`}>
+                    <Icon className={`w-5 h-5 ${color}`} />
+                  </div>
                   <h3 className="text-lg font-bold text-foreground">{title}</h3>
                   <p className="text-sm text-muted-foreground">{description}</p>
                 </CardContent>

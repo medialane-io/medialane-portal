@@ -8,21 +8,29 @@ const DEPLOYMENT_TYPES = [
     icon: GraduationCap,
     title: "Digital passes",
     description: "Give members, students, or attendees a pass that can't be faked or copied. Nothing for them to download or set up.",
+    color: "text-brand-blue",
+    bg: "bg-brand-blue/10",
   },
   {
     icon: Ticket,
     title: "Event tickets",
     description: "Tickets that show up ready to use, ahead of time, and can be resold safely if plans change.",
+    color: "text-brand-orange",
+    bg: "bg-brand-orange/10",
   },
   {
     icon: Newspaper,
     title: "Content licensing",
     description: "Turn your catalog into something you can license and track, including for AI use.",
+    color: "text-brand-rose",
+    bg: "bg-brand-rose/10",
   },
   {
     icon: ShieldCheck,
     title: "Payouts, handled",
     description: "We pay your creators or partners on your behalf. You keep the relationship, we handle the paperwork.",
+    color: "text-brand-maeve",
+    bg: "bg-brand-maeve/10",
   },
 ]
 
@@ -46,10 +54,12 @@ export default function EnterprisePage() {
 
         <section className="container mx-auto px-4 pb-16 max-w-5xl">
           <div className="grid md:grid-cols-2 gap-6">
-            {DEPLOYMENT_TYPES.map(({ icon: Icon, title, description }) => (
+            {DEPLOYMENT_TYPES.map(({ icon: Icon, title, description, color, bg }) => (
               <Card key={title} className="border-border bg-foreground/5 backdrop-blur-sm">
                 <CardContent className="p-6 space-y-3">
-                  <Icon className="w-6 h-6 text-primary" />
+                  <div className={`h-10 w-10 rounded-lg ${bg} flex items-center justify-center`}>
+                    <Icon className={`w-5 h-5 ${color}`} />
+                  </div>
                   <h3 className="text-lg font-bold text-foreground">{title}</h3>
                   <p className="text-sm text-muted-foreground">{description}</p>
                 </CardContent>
