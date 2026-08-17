@@ -7,28 +7,28 @@ const STEPS = [
   {
     icon: Layers,
     title: "Register a service",
-    description: "Medialane's service registry is open-ended. Adding a new product type is a registry entry, keeping your integration decoupled from schema migrations.",
+    description: "Every product type Medialane supports is an entry in a shared registry, not a hardcoded route. Adding a new one is a registry entry, so your integration never breaks when the underlying schema changes.",
     color: "text-brand-blue",
     bg: "bg-brand-blue/10",
   },
   {
     icon: Puzzle,
     title: "Ship a UI variant",
-    description: "Each registered service declares its capabilities and asset shape. Your interface reads from the same registry Medialane's own apps consume.",
+    description: "Each registered service declares what it can do and what its assets look like. Build your interface against that declaration, and it stays correct as the registry grows.",
     color: "text-brand-orange",
     bg: "bg-brand-orange/10",
   },
   {
     icon: Wallet,
     title: "Embed working product surfaces",
-    description: "Media Wallet, Medialane's own self-custody wallet, is built as a modular component designed to embed in other apps. Integrating means reusing shipped product surfaces.",
+    description: "Media Wallet, Medialane's own self-custody wallet, is built to embed in other apps. Integrating means reusing a product surface that already works, not building a wallet from scratch.",
     color: "text-brand-rose",
     bg: "bg-brand-rose/10",
   },
   {
     icon: GitBranch,
     title: "Stay interoperable",
-    description: "Assets follow OpenSea-compatible ERC-721/1155 metadata standards. What you build on Medialane's registry travels freely beyond Medialane's own apps.",
+    description: "Every asset follows the OpenSea-compatible ERC-721/1155 metadata standard. What you build on Medialane's registry works in wallets and marketplaces beyond Medialane's own apps too.",
     color: "text-brand-maeve",
     bg: "bg-brand-maeve/10",
   },
@@ -47,8 +47,9 @@ export default function InfrastructurePage() {
             Build on a registry, ship in days
           </h1>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Register a service, get a UI variant, and ship on the same open-ended registry
-            Medialane&apos;s own apps run on.
+            Add tokenization to your own product without writing the contracts yourself. Register
+            what you need in Medialane&apos;s open-ended service registry, and your interface reads
+            from the same registry Medialane&apos;s own apps use.
           </p>
         </section>
 
