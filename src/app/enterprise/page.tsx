@@ -18,7 +18,7 @@ const UMBRELLAS = [
   {
     icon: ScrollText,
     title: "Tokenization for IP",
-    description: "Proof of authorship in minutes, plus licensing and catalog tracking, including for AI use.",
+    description: "Protect creative work worldwide: proof of authorship in minutes, plus licensing and catalog tracking, including for AI use.",
     href: "/enterprise/ip",
     color: "text-brand-orange",
     bg: "bg-brand-orange/10",

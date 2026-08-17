@@ -3,7 +3,7 @@ import { Badge } from "@/src/components/ui/badge"
 import { Button } from "@/src/components/ui/button"
 import { Card, CardContent } from "@/src/components/ui/card"
 import {
-  Code2, ArrowRight, Sparkles, Bot, Building2, Blocks, ShieldCheck, LayoutGrid,
+  Code2, ArrowRight, Sparkles, Bot, Building2, Blocks, ShieldCheck, LayoutGrid, Globe,
   ImagePlus, Layers, Users, Coins, ShoppingBag,
 } from "lucide-react"
 
@@ -114,6 +114,12 @@ export default function Home() {
               <Link href="/services">
                 <LayoutGrid className="w-3.5 h-3.5 mr-1.5" />
                 Launchpad services
+              </Link>
+            </Button>
+            <Button asChild variant="outline" size="sm">
+              <Link href="/enterprise/ip">
+                <Globe className="w-3.5 h-3.5 mr-1.5" />
+                Protect your IP worldwide
               </Link>
             </Button>
           </div>
