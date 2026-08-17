@@ -1,34 +1,34 @@
 import Link from "next/link"
 import { Badge } from "@/src/components/ui/badge"
 import { Button } from "@/src/components/ui/button"
-import { Puzzle, Wallet, Layers, GitBranch } from "lucide-react"
+import { ListChecks, Plug, LayoutTemplate, Globe2 } from "lucide-react"
 
 const STEPS = [
   {
-    icon: Layers,
-    title: "Register a service",
-    description: "Every product type Medialane supports is an entry in a shared registry. Adding a new one is a registry entry, so your integration stays stable when the underlying schema changes.",
+    icon: ListChecks,
+    title: "Pick what you want to add",
+    description: "Tickets, memberships, collections, licensing, or a coin. Each is a ready-made capability you can add directly.",
     color: "text-brand-blue",
     bg: "bg-brand-blue/10",
   },
   {
-    icon: Puzzle,
-    title: "Ship a UI variant",
-    description: "Each registered service declares what it can do and what its assets look like. Build your interface against that declaration, and it stays correct as the registry grows.",
+    icon: Plug,
+    title: "Connect through one API",
+    description: "Call Medialane's API to issue and manage assets for your product. No contracts to write, audit, or deploy yourself.",
     color: "text-brand-orange",
     bg: "bg-brand-orange/10",
   },
   {
-    icon: Wallet,
-    title: "Embed working product surfaces",
-    description: "Media Wallet, Medialane's own self-custody wallet, is built to embed in other apps. Integrating means reusing a product surface that already works.",
+    icon: LayoutTemplate,
+    title: "Build your own screens",
+    description: "You design the interface your customers see. Medialane runs the tokenization underneath it, out of view.",
     color: "text-brand-rose",
     bg: "bg-brand-rose/10",
   },
   {
-    icon: GitBranch,
-    title: "Stay interoperable",
-    description: "Every asset follows the OpenSea-compatible ERC-721/1155 metadata standard. What you build on Medialane's registry works in wallets and marketplaces beyond Medialane's own apps too.",
+    icon: Globe2,
+    title: "Works beyond your product",
+    description: "Every asset follows the same industry-standard format, recognized by other marketplaces and apps across the industry.",
     color: "text-brand-maeve",
     bg: "bg-brand-maeve/10",
   },
@@ -44,12 +44,11 @@ export default function InfrastructurePage() {
             Infrastructure
           </Badge>
           <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight text-foreground">
-            Build on a registry, ship in days
+            Add tokenization to your product, without building it yourself
           </h1>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Add tokenization to your own product without writing the contracts yourself. Register
-            what you need in Medialane&apos;s open-ended service registry, and your interface reads
-            from the same registry Medialane&apos;s own apps use.
+            Plug in ready-made tokenization capabilities. Ship in days on infrastructure
+            Medialane&apos;s own products already run on.
           </p>
         </section>
 
