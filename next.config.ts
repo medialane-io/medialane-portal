@@ -5,7 +5,17 @@ const nextConfig: NextConfig = {
     return [
       {
         source: "/pricing",
-        destination: "/integrate",
+        destination: "/developers",
+        permanent: true,
+      },
+      {
+        source: "/integrate",
+        destination: "/developers",
+        permanent: true,
+      },
+      {
+        source: "/features",
+        destination: "/developers",
         permanent: true,
       },
       // Docs migrated to docs.medialane.io (Phase 3 of the portal-docs migration).

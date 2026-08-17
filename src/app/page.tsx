@@ -1,28 +1,47 @@
 import Link from "next/link"
-import { Button } from "@/src/components/ui/button"
 import { Badge } from "@/src/components/ui/badge"
 import { Card, CardContent } from "@/src/components/ui/card"
-import {
-  Code2, Key, ArrowRight, Sparkles, Bot, Check,
-  GitFork, Coins, Ticket, ShoppingBag,
-} from "lucide-react"
+import { Code2, ArrowRight, Sparkles, Bot, Building2, Blocks } from "lucide-react"
 import { BackgroundGradients } from "@/src/components/background-gradients"
 
-const SAMPLE_RESPONSE = `{
-  "data": [
-    {
-      "contractAddress": "0x04a...",
-      "name": "Sonic Bloom",
-      "floorPrice": "0.05",
-      "volume24h": "1.2",
-      "itemsCount": 512,
-      "ownersCount": 314,
-      "licenseType": "CC BY",
-      "source": "collection_drop"
-    }
-  ],
-  "meta": { "total": 48, "page": 1, "limit": 20 }
-}`
+const SERVICE_LINES = [
+  {
+    icon: Code2,
+    title: "Developers",
+    description: "Typed, metered access to the full protocol — assets, orders, licensing, drops, real-time events. No gatekeeping, usage-priced.",
+    href: "/developers",
+    color: "text-purple-400",
+    bg: "bg-purple-500/10",
+    border: "border-purple-500/20",
+  },
+  {
+    icon: Building2,
+    title: "Enterprise",
+    description: "Issue credentials, tickets, or gated access on verifiable rails — or tokenize a content library for licensing and AI-training, with Medialane administering creator payouts.",
+    href: "/enterprise",
+    color: "text-orange-400",
+    bg: "bg-orange-500/10",
+    border: "border-orange-500/20",
+  },
+  {
+    icon: Blocks,
+    title: "Infrastructure",
+    description: "Don't build a tokenization stack. Register a service, get a UI variant, ship — the same registry Medialane's own apps run on.",
+    href: "/infrastructure",
+    color: "text-cyan-400",
+    bg: "bg-cyan-500/10",
+    border: "border-cyan-500/20",
+  },
+  {
+    icon: Bot,
+    title: "AI Agents",
+    description: "x402-native, machine-payable IP access. An agent authenticates, provisions credits, and calls the API — zero human interaction required.",
+    href: "/agents",
+    color: "text-green-400",
+    bg: "bg-green-500/10",
+    border: "border-green-500/20",
+  },
+]
 
 export default function Home() {
   return (
@@ -33,164 +52,37 @@ export default function Home() {
         <section className="container mx-auto px-4 pt-24 pb-16 max-w-5xl text-center space-y-8">
           <Badge className="bg-primary/10 text-primary border-primary/30 px-4 py-1.5 text-sm">
             <Sparkles className="w-3.5 h-3.5 mr-1.5 inline" />
-            The monetization platform for creators, collectors, and AI agents
+            Protocol infrastructure for licensed intellectual property
           </Badge>
 
           <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white via-white to-gray-500 leading-tight">
-            Creator Capital Markets
+            Medialane
           </h1>
 
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-            Medialane is where creative work becomes programmable capital. The portal gives developers
-            API and SDK access to the full ecosystem — assets, orders, licensing, drops, credentials,
-            and real-time events.
+            The businesses, integrators, and AI agents that build on Medialane use the API, deploy
+            enterprise services, embed the registry as infrastructure, or transact as agents.
+            Find your path below.
           </p>
+        </section>
 
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Button asChild size="lg" className="px-8 h-12 text-base font-semibold">
-              <Link href="/account">
-                <Key className="w-5 h-5 mr-2" />
-                Get API Access
+        <section className="container mx-auto px-4 pb-24 max-w-5xl">
+          <div className="grid md:grid-cols-2 gap-6">
+            {SERVICE_LINES.map(({ icon: Icon, title, description, href, color, bg, border }) => (
+              <Link key={href} href={href} className="group">
+                <Card className={`${border} ${bg} backdrop-blur-sm h-full transition-all group-hover:border-white/20`}>
+                  <CardContent className="p-8 space-y-4">
+                    <Icon className={`w-8 h-8 ${color}`} />
+                    <h2 className="text-2xl font-bold text-white">{title}</h2>
+                    <p className="text-muted-foreground text-sm leading-relaxed">{description}</p>
+                    <div className="flex items-center text-sm font-medium text-white/80 group-hover:text-white transition-colors">
+                      Explore
+                      <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
+                    </div>
+                  </CardContent>
+                </Card>
               </Link>
-            </Button>
-            <Button asChild size="lg" variant="outline" className="px-8 h-12 text-base border-white/10 hover:bg-white/5">
-              <a href="https://docs.medialane.io/docs" target="_blank" rel="noopener noreferrer">
-                <Code2 className="w-5 h-5 mr-2" />
-                Read the Docs
-              </a>
-            </Button>
-          </div>
-
-          <div className="flex flex-wrap justify-center gap-3 pt-4">
-            {[
-              { icon: Coins, label: "Revenue Flows" },
-              { icon: GitFork, label: "Programmable Licensing" },
-              { icon: ShoppingBag, label: "Collection Drops" },
-              { icon: Ticket, label: "POP Credentials" },
-              { icon: Bot, label: "AI Agent Access" },
-              { icon: Code2, label: "Webhooks" },
-            ].map(({ icon: Icon, label }) => (
-              <div
-                key={label}
-                className="flex items-center gap-2 bg-white/5 border border-white/10 rounded-full px-4 py-2 text-sm text-muted-foreground"
-              >
-                <Icon className="w-3.5 h-3.5 text-primary" />
-                {label}
-              </div>
             ))}
-          </div>
-
-          <div className="mx-auto max-w-2xl text-left mt-8">
-            <div className="rounded-xl border border-white/10 bg-white/5 backdrop-blur-sm overflow-hidden">
-              <div className="flex items-center gap-2 px-4 py-2.5 border-b border-white/10 bg-white/[0.03]">
-                <span className="w-2.5 h-2.5 rounded-full bg-red-500/70" />
-                <span className="w-2.5 h-2.5 rounded-full bg-yellow-500/70" />
-                <span className="w-2.5 h-2.5 rounded-full bg-green-500/70" />
-                <span className="ml-2 text-xs text-muted-foreground font-mono">GET /v1/collections</span>
-              </div>
-              <pre className="p-4 text-xs font-mono text-green-300/90 overflow-x-auto leading-relaxed">
-                {SAMPLE_RESPONSE}
-              </pre>
-            </div>
-          </div>
-        </section>
-
-        <section className="container mx-auto px-4 pb-16 max-w-5xl">
-          <div className="grid md:grid-cols-2 gap-6">
-            <Card className="border-white/10 bg-white/5 backdrop-blur-sm">
-              <CardContent className="p-6 space-y-4">
-                <div className="flex items-center justify-between">
-                  <h3 className="text-lg font-bold text-white">Open Access</h3>
-                  <span className="text-sm font-semibold text-muted-foreground">No token required</span>
-                </div>
-                <p className="text-sm text-muted-foreground">
-                  Connect any Starknet wallet to get an API key — no minimum balance, no gate. Pay only for what you use; hold MDLN for bonus credits.
-                </p>
-                <ul className="space-y-2 text-sm text-muted-foreground">
-                  {["All API endpoints", "Up to 5 API keys", "Portal dashboard", "Webhooks included"].map((f) => (
-                    <li key={f} className="flex items-center gap-2">
-                      <Check className="w-4 h-4 text-green-400 flex-shrink-0" />
-                      {f}
-                    </li>
-                  ))}
-                </ul>
-                <Button asChild className="w-full">
-                  <Link href="/account">Connect Wallet</Link>
-                </Button>
-              </CardContent>
-            </Card>
-
-            <Card className="border-primary/30 bg-gradient-to-br from-primary/10 to-background/50 backdrop-blur-sm">
-              <CardContent className="p-6 space-y-4">
-                <div className="flex items-center justify-between">
-                  <h3 className="text-lg font-bold text-white">MDLN Multipliers</h3>
-                  <span className="text-sm font-semibold text-primary">up to 2×</span>
-                </div>
-                <p className="text-sm text-muted-foreground">
-                  Top up credits with USDC. Hold more MDLN to get bonus credits automatically at deposit time.
-                </p>
-                <ul className="space-y-2 text-sm text-muted-foreground">
-                  {["No MDLN → 1.0× base", "500+ MDLN → 1.2×", "2,000+ MDLN → 1.5×", "5,000+ MDLN → 2.0×"].map((f) => (
-                    <li key={f} className="flex items-center gap-2">
-                      <Check className="w-4 h-4 text-primary flex-shrink-0" />
-                      {f}
-                    </li>
-                  ))}
-                </ul>
-                <Button asChild variant="outline" className="w-full border-primary/30 hover:bg-primary/10">
-                  <Link href="/integrate">See integration details</Link>
-                </Button>
-              </CardContent>
-            </Card>
-          </div>
-        </section>
-
-        <section className="container mx-auto px-4 pb-20 max-w-5xl">
-          <div className="grid md:grid-cols-2 gap-6">
-            <Card className="border-primary/20 bg-gradient-to-br from-primary/10 to-background/50 backdrop-blur-sm overflow-hidden group hover:border-primary/40 transition-all">
-              <CardContent className="p-8 space-y-4">
-                <div className="inline-flex items-center rounded-full border border-primary/30 bg-primary/10 px-3 py-1 text-xs text-primary">
-                  <Bot className="w-3 h-3 mr-2" />
-                  AI Agent Quickstart
-                </div>
-                <h2 className="text-2xl font-bold text-white">
-                  Headless Auth for Agents
-                </h2>
-                <p className="text-muted-foreground text-sm leading-relaxed">
-                  Any agent with a Starknet keypair can authenticate, provision credits, and call the API —
-                  zero human interaction required.
-                </p>
-                <Button asChild variant="outline" className="border-primary/30 hover:bg-primary/10 text-primary hover:text-primary">
-                  <a href="https://docs.medialane.io/docs/agents" target="_blank" rel="noopener noreferrer">
-                    Read the guide
-                    <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
-                  </a>
-                </Button>
-              </CardContent>
-            </Card>
-
-            <Card className="border-cyan-500/20 bg-gradient-to-br from-cyan-900/20 to-background/50 backdrop-blur-sm overflow-hidden group hover:border-cyan-500/40 transition-all">
-              <CardContent className="p-8 space-y-4">
-                <div className="inline-flex items-center rounded-full border border-cyan-500/30 bg-cyan-500/10 px-3 py-1 text-xs text-cyan-300">
-                  <Code2 className="w-3 h-3 mr-2" />
-                  Launchpad Services
-                </div>
-                <h2 className="text-2xl font-bold text-white">
-                  Deploy, Drop, and Credential
-                </h2>
-                <p className="text-muted-foreground text-sm leading-relaxed">
-                  POP Protocol for event credentials, Collection Drop for fixed-supply
-                  public minting, and Remix Licensing for derivative works — all accessible
-                  via one SDK.
-                </p>
-                <Button asChild variant="outline" className="border-cyan-500/30 hover:bg-cyan-500/10 text-cyan-300 hover:text-cyan-200">
-                  <a href="https://docs.medialane.io/docs/sdk" target="_blank" rel="noopener noreferrer">
-                    Explore the SDK
-                    <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
-                  </a>
-                </Button>
-              </CardContent>
-            </Card>
           </div>
         </section>
       </div>

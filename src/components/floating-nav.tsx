@@ -13,10 +13,11 @@ import { useWallet } from "@/src/hooks/use-wallet"
 import { WalletConnectModal } from "./wallet-connect-modal"
 
 const NAV_LINKS = [
-  { label: "Features", href: "/features" },
-  { label: "Integrate", href: "/integrate" },
+  { label: "Developers", href: "/developers" },
+  { label: "Enterprise", href: "/enterprise" },
+  { label: "Infrastructure", href: "/infrastructure" },
+  { label: "Agents", href: "/agents" },
   { label: "Docs", href: "https://docs.medialane.io/docs" },
-  { label: "Connect", href: "https://docs.medialane.io/contact" },
 ]
 
 function isNavActive(pathname: string, href: string) {
