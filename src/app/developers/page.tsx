@@ -7,6 +7,22 @@ import {
   Code2, Zap,
 } from "lucide-react"
 
+const SAMPLE_RESPONSE = `{
+  "data": [
+    {
+      "contractAddress": "0x04a...",
+      "name": "Sonic Bloom",
+      "floorPrice": "0.05",
+      "volume24h": "1.2",
+      "itemsCount": 512,
+      "ownersCount": 314,
+      "licenseType": "CC BY",
+      "source": "collection_drop"
+    }
+  ],
+  "meta": { "total": 48, "page": 1, "limit": 20 }
+}`
+
 const API_CARDS = [
   { icon: ListOrdered, title: "Marketplace Orders", description: "Query active listings, bids, and completed sales. Filter by contract, token, or wallet.", color: "text-brand-blue", bg: "bg-brand-blue/10" },
   { icon: LayoutGrid, title: "Collections & Drops", description: "Fetch collection metadata, floor prices, volume, and token inventories. Includes POP and Collection Drop sources.", color: "text-brand-orange", bg: "bg-brand-orange/10" },
@@ -40,6 +56,20 @@ export default function DevelopersPage() {
             <Button asChild variant="outline" size="lg" className="px-10">
               <Link href="/pricing">See pricing</Link>
             </Button>
+          </div>
+        </section>
+
+        <section className="container mx-auto px-4 pb-16 max-w-2xl">
+          <div className="rounded-xl border border-border bg-foreground/[0.02] overflow-hidden">
+            <div className="flex items-center gap-2 px-4 py-2.5 border-b border-border bg-foreground/[0.03]">
+              <span className="w-2.5 h-2.5 rounded-full bg-red-500/70" />
+              <span className="w-2.5 h-2.5 rounded-full bg-yellow-500/70" />
+              <span className="w-2.5 h-2.5 rounded-full bg-green-500/70" />
+              <span className="ml-2 text-xs text-muted-foreground font-mono">GET /v1/collections</span>
+            </div>
+            <pre className="p-4 text-xs font-mono text-green-500/90 overflow-x-auto leading-relaxed">
+              {SAMPLE_RESPONSE}
+            </pre>
           </div>
         </section>
 

@@ -1,10 +1,9 @@
 import Link from "next/link"
 import { Badge } from "@/src/components/ui/badge"
-import { Card, CardContent } from "@/src/components/ui/card"
 import { Button } from "@/src/components/ui/button"
 import { Puzzle, Wallet, Layers, GitBranch } from "lucide-react"
 
-const PILLARS = [
+const STEPS = [
   {
     icon: Layers,
     title: "Register a service",
@@ -53,18 +52,22 @@ export default function InfrastructurePage() {
           </p>
         </section>
 
-        <section className="container mx-auto px-4 pb-16 max-w-5xl">
-          <div className="grid md:grid-cols-2 gap-6">
-            {PILLARS.map(({ icon: Icon, title, description, color, bg }) => (
-              <Card key={title} className="border-border bg-foreground/5 backdrop-blur-sm">
-                <CardContent className="p-6 space-y-3">
-                  <div className={`h-10 w-10 rounded-lg ${bg} flex items-center justify-center`}>
-                    <Icon className={`w-5 h-5 ${color}`} />
-                  </div>
+        <section className="container mx-auto px-4 pb-16 max-w-2xl">
+          <div className="relative">
+            {STEPS.map(({ icon: Icon, title, description, color, bg }, i) => (
+              <div key={title} className="relative flex gap-5 pb-10 last:pb-0">
+                {i < STEPS.length - 1 && (
+                  <div className="absolute left-5 top-10 bottom-0 w-px bg-border" />
+                )}
+                <div className={`relative z-10 h-10 w-10 shrink-0 rounded-full ${bg} flex items-center justify-center`}>
+                  <Icon className={`w-5 h-5 ${color}`} />
+                </div>
+                <div className="pt-1.5">
+                  <p className="text-xs font-mono text-muted-foreground mb-1">Step {i + 1}</p>
                   <h3 className="text-lg font-bold text-foreground">{title}</h3>
-                  <p className="text-sm text-muted-foreground">{description}</p>
-                </CardContent>
-              </Card>
+                  <p className="text-sm text-muted-foreground mt-1">{description}</p>
+                </div>
+              </div>
             ))}
           </div>
         </section>

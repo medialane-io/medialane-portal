@@ -1,11 +1,11 @@
 import { Badge } from "@/src/components/ui/badge"
-import { Card, CardContent } from "@/src/components/ui/card"
 import { Button } from "@/src/components/ui/button"
 import { Ticket, GraduationCap, Newspaper, ShieldCheck, Mail } from "lucide-react"
 
 const DEPLOYMENT_TYPES = [
   {
     icon: GraduationCap,
+    audience: "Schools & organizations",
     title: "Digital passes",
     description: "Give members, students, or attendees a pass that can't be faked or copied. Nothing for them to download or set up.",
     color: "text-brand-blue",
@@ -13,6 +13,7 @@ const DEPLOYMENT_TYPES = [
   },
   {
     icon: Ticket,
+    audience: "Festivals & event brands",
     title: "Event tickets",
     description: "Tickets that show up ready to use, ahead of time, and can be resold safely if plans change.",
     color: "text-brand-orange",
@@ -20,6 +21,7 @@ const DEPLOYMENT_TYPES = [
   },
   {
     icon: Newspaper,
+    audience: "Publishers & rights holders",
     title: "Content licensing",
     description: "Turn your catalog into something you can license and track, including for AI use.",
     color: "text-brand-rose",
@@ -27,6 +29,7 @@ const DEPLOYMENT_TYPES = [
   },
   {
     icon: ShieldCheck,
+    audience: "Publishers & rights holders",
     title: "Payouts, handled",
     description: "We pay your creators or partners on your behalf. You keep the relationship, we handle the paperwork.",
     color: "text-brand-maeve",
@@ -52,18 +55,22 @@ export default function EnterprisePage() {
           </p>
         </section>
 
-        <section className="container mx-auto px-4 pb-16 max-w-5xl">
-          <div className="grid md:grid-cols-2 gap-6">
-            {DEPLOYMENT_TYPES.map(({ icon: Icon, title, description, color, bg }) => (
-              <Card key={title} className="border-border bg-foreground/5 backdrop-blur-sm">
-                <CardContent className="p-6 space-y-3">
-                  <div className={`h-10 w-10 rounded-lg ${bg} flex items-center justify-center`}>
-                    <Icon className={`w-5 h-5 ${color}`} />
-                  </div>
+        <section className="container mx-auto px-4 pb-16 max-w-3xl">
+          <div className="rounded-xl border border-border overflow-hidden bg-foreground/[0.02]">
+            {DEPLOYMENT_TYPES.map(({ icon: Icon, audience, title, description, color, bg }, i) => (
+              <div
+                key={title}
+                className={`flex items-start gap-5 px-6 py-6 ${i < DEPLOYMENT_TYPES.length - 1 ? "border-b border-border/50" : ""}`}
+              >
+                <div className={`h-12 w-12 shrink-0 rounded-lg ${bg} flex items-center justify-center`}>
+                  <Icon className={`w-6 h-6 ${color}`} />
+                </div>
+                <div>
+                  <p className={`text-xs font-medium ${color} mb-1`}>{audience}</p>
                   <h3 className="text-lg font-bold text-foreground">{title}</h3>
-                  <p className="text-sm text-muted-foreground">{description}</p>
-                </CardContent>
-              </Card>
+                  <p className="text-sm text-muted-foreground mt-1">{description}</p>
+                </div>
+              </div>
             ))}
           </div>
         </section>
