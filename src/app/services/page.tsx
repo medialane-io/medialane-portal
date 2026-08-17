@@ -4,7 +4,7 @@ import { Card, CardContent } from "@/src/components/ui/card"
 import { Button } from "@/src/components/ui/button"
 import {
   ImagePlus, Layers, GitBranch, Award, Package, Ticket, Users, Handshake,
-  Coins, TrendingUp, AtSign, FolderInput, Link2, ShoppingBag, ArrowRight,
+  Coins, TrendingUp, ShoppingBag, ArrowRight, Gamepad2, Landmark, Mic2, HeartHandshake,
 } from "lucide-react"
 
 interface ServiceCard {
@@ -61,16 +61,6 @@ const GROUPS: ServiceGroup[] = [
       { icon: Coins, title: "Claim Memecoin", description: "Add a coin you already launched to list it on the Coins page and your profile.", color: "text-brand-blue", bg: "bg-brand-blue/10" },
     ],
   },
-  {
-    key: "claims",
-    title: "Claims",
-    tagline: "Reserve your username, your collection's name, or bring in a collection you already made.",
-    services: [
-      { icon: AtSign, title: "Claim Username", description: "Claim your username to get a shareable creator page, your public portfolio at a clean, memorable URL.", color: "text-brand-orange", bg: "bg-brand-orange/10" },
-      { icon: FolderInput, title: "Claim Collection", description: "Claim a collection you made elsewhere to link it to your profile and give it a branded page.", color: "text-brand-rose", bg: "bg-brand-rose/10" },
-      { icon: Link2, title: "Claim Collection Name", description: "Claim a custom name for your collection page and get a clean, shareable URL.", color: "text-brand-maeve", bg: "bg-brand-maeve/10" },
-    ],
-  },
 ]
 
 const MARKETPLACE_FEATURES = [
@@ -78,6 +68,64 @@ const MARKETPLACE_FEATURES = [
   "Make or accept an offer",
   "Run an auction",
   "License or remix with attribution",
+]
+
+interface UseCase {
+  icon: typeof Gamepad2
+  eyebrow: string
+  title: string
+  description: string
+  services: string[]
+  color: string
+  bg: string
+}
+
+const USE_CASES: UseCase[] = [
+  {
+    icon: Gamepad2,
+    eyebrow: "Game studios & esports orgs",
+    title: "Reward tournament wins, sell season memberships",
+    description: "Hand out a permanent badge the moment a player wins, and sell tiered fan memberships for the season alongside it.",
+    services: ["POP Protocol", "IP Club"],
+    color: "text-brand-maeve",
+    bg: "bg-brand-maeve/10",
+  },
+  {
+    icon: Landmark,
+    eyebrow: "Museums & galleries",
+    title: "Certify a physical piece, sell numbered prints",
+    description: "Mint a certificate of authenticity for a physical work, then release numbered print editions of it with the same provenance attached.",
+    services: ["Single Edition NFTs", "Limited Editions"],
+    color: "text-brand-blue",
+    bg: "bg-brand-blue/10",
+  },
+  {
+    icon: Mic2,
+    eyebrow: "Podcast & media networks",
+    title: "Take direct sponsor deals, launch a listener coin",
+    description: "Settle sponsorship payments directly with a brand for a season of episodes, and give your audience a coin of their own to trade.",
+    services: ["IP Sponsorship", "Creator Coin"],
+    color: "text-brand-orange",
+    bg: "bg-brand-orange/10",
+  },
+  {
+    icon: HeartHandshake,
+    eyebrow: "Nonprofits & causes",
+    title: "Prove participation, keep the record permanent",
+    description: "Issue a non-transferable badge to every donor or volunteer, a record that can't be faked, sold, or lost.",
+    services: ["POP Protocol"],
+    color: "text-brand-rose",
+    bg: "bg-brand-rose/10",
+  },
+  {
+    icon: GitBranch,
+    eyebrow: "Sample libraries & stock catalogs",
+    title: "License a catalog, get paid every time it's reused",
+    description: "Publish a catalog once and get paid automatically each time a piece is licensed or remixed, no invoicing required.",
+    services: ["Remix Asset", "Collection Drop"],
+    color: "text-brand-purple",
+    bg: "bg-brand-purple/10",
+  },
 ]
 
 export default function ServicesPage() {
@@ -90,10 +138,10 @@ export default function ServicesPage() {
             Launchpad
           </Badge>
           <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight text-foreground">
-            Every way to issue, in one place
+            One Launchpad for everything you issue
           </h1>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Thirteen live services across five groups. The Launchpad grows by adding new ones
+            Ten live services across four groups. The Launchpad grows by adding new ones
             alongside what&apos;s already running.
           </p>
         </section>
@@ -119,6 +167,39 @@ export default function ServicesPage() {
             </div>
           </section>
         ))}
+
+        <section className="container mx-auto px-4 pb-16 max-w-5xl">
+          <div className="mb-6 text-center">
+            <h2 className="text-2xl font-bold text-foreground">How teams put this to work</h2>
+            <p className="text-sm text-muted-foreground mt-1">
+              A few of the services above, combined for a real deployment.
+            </p>
+          </div>
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {USE_CASES.map(({ icon: Icon, eyebrow, title, description, services, color, bg }) => (
+              <Card key={title} className="border-border bg-foreground/5 backdrop-blur-sm">
+                <CardContent className="p-6 space-y-3">
+                  <div className={`h-10 w-10 rounded-lg ${bg} flex items-center justify-center`}>
+                    <Icon className={`w-5 h-5 ${color}`} />
+                  </div>
+                  <p className="text-xs font-bold uppercase tracking-wide text-foreground/70">{eyebrow}</p>
+                  <h3 className="text-lg font-bold text-foreground">{title}</h3>
+                  <p className="text-sm text-muted-foreground">{description}</p>
+                  <div className="flex flex-wrap gap-2 pt-1">
+                    {services.map((service) => (
+                      <span
+                        key={service}
+                        className="text-xs font-medium text-foreground/70 bg-foreground/5 border border-border rounded-full px-2.5 py-1"
+                      >
+                        {service}
+                      </span>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </section>
 
         <section className="container mx-auto px-4 pb-24 max-w-4xl">
           <Card className="border-border bg-foreground/5 backdrop-blur-sm overflow-hidden">
