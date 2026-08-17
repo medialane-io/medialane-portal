@@ -2,43 +2,40 @@ import Link from "next/link"
 import { Badge } from "@/src/components/ui/badge"
 import { Card, CardContent } from "@/src/components/ui/card"
 import { Button } from "@/src/components/ui/button"
+import { FeatureRowList, type FeatureRowItem } from "@/src/components/marketing/feature-row-list"
 import {
   Lock, Database, Package, Monitor, ShieldCheck,
   ShoppingBag, Sparkles, ArrowRight, TrendingUp,
 } from "lucide-react"
 
-const LAYERS = [
+const LAYERS: FeatureRowItem[] = [
   {
-    num: "01",
-    label: "Chain",
     icon: Lock,
-    color: "text-brand-purple",
-    bg: "bg-brand-purple/10",
-    desc: "Immutable Cairo contracts on Starknet. The only source of truth. No admin key can change the rules once deployed.",
+    eyebrow: "01 · The rules",
+    color: "bg-brand-purple",
+    title: "Set once, in public",
+    description: "Contracts are immutable and permissionless. Nobody, not even Medialane, can quietly change them after deployment.",
   },
   {
-    num: "02",
-    label: "Indexer",
     icon: Database,
-    color: "text-brand-blue",
-    bg: "bg-brand-blue/10",
-    desc: "Reads on-chain events and builds a queryable cache. Delete the database and it rebuilds itself from the chain.",
+    eyebrow: "02 · The record",
+    color: "bg-brand-blue",
+    title: "Every asset, sale, and license, kept",
+    description: "The full history is searchable and could be rebuilt from nothing if it ever needed to be, because it's replayed from on-chain events, not stored as the source of truth.",
   },
   {
-    num: "03",
-    label: "SDK",
     icon: Package,
-    color: "text-brand-orange",
-    bg: "bg-brand-orange/10",
-    desc: "A typed interface and service registry. Everything the app can do, the SDK exposes to any integrator.",
+    eyebrow: "03 · The connection",
+    color: "bg-brand-orange",
+    title: "One shared catalog",
+    description: "Any product, Medialane's own or a partner's, plugs into the same capabilities and the same catalog through the SDK.",
   },
   {
-    num: "04",
-    label: "Apps",
     icon: Monitor,
-    color: "text-brand-rose",
-    bg: "bg-brand-rose/10",
-    desc: "Medialane's own apps and partner apps. Views and workflows. None of them can override what the contracts say.",
+    eyebrow: "04 · The apps",
+    color: "bg-brand-rose",
+    title: "Different views, same record",
+    description: "Medialane's apps and partner apps are just different ways of using the same underlying record. None of them can bend what it says.",
   },
 ]
 
@@ -46,7 +43,7 @@ const HUBS = [
   {
     icon: Sparkles,
     title: "Launchpad",
-    description: "Structure and issue: collection drops, editions, memberships, tickets, and coins.",
+    description: "Create and release something new: a collection, an edition, a membership, a ticket, a sponsorship offer, or a coin for your community.",
     href: "/services",
     color: "text-brand-blue",
     bg: "bg-brand-blue/10",
@@ -54,7 +51,7 @@ const HUBS = [
   {
     icon: ShoppingBag,
     title: "Marketplace",
-    description: "List, buy, offer, and auction. Payment and asset move together, or neither moves at all.",
+    description: "Buy, sell, and license everything issued on Medialane. A sale pays out the moment it completes, directly between buyer and seller, with no escrow holding funds in between.",
     href: "/services",
     color: "text-brand-orange",
     bg: "bg-brand-orange/10",
@@ -75,9 +72,9 @@ export default function PlatformPage() {
             How Medialane actually works
           </h1>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Tokenization turns an asset into a digital record that can be owned, traded, and verified.
-            It&apos;s the same idea behind real-world asset tokenization for real estate or bonds, applied
-            to intellectual property instead.
+            Tokenization turns something you own into a digital record you can trade, license, and
+            verify on Starknet, secured by zero-knowledge validity proofs at every step. It&apos;s the
+            same idea behind tokenizing real estate or bonds, applied to intellectual property.
           </p>
         </section>
 
@@ -85,29 +82,11 @@ export default function PlatformPage() {
           <div className="text-center mb-6">
             <h2 className="text-2xl font-bold text-foreground">Four layers, one system</h2>
             <p className="text-sm text-muted-foreground mt-1">
-              Authority only ever flows down. The chain is the only truth; everything above it is a
+              Authority only flows down. The chain is the only truth; everything above it is a
               cache, a lens, or a view.
             </p>
           </div>
-          <div className="rounded-xl border border-border overflow-hidden bg-foreground/[0.02]">
-            {LAYERS.map(({ num, label, icon: Icon, color, bg, desc }, i) => (
-              <div
-                key={num}
-                className={`flex items-start gap-4 px-6 py-5 ${i < LAYERS.length - 1 ? "border-b border-border/50" : ""}`}
-              >
-                <div className={`h-10 w-10 shrink-0 rounded-lg ${bg} flex items-center justify-center`}>
-                  <Icon className={`w-5 h-5 ${color}`} />
-                </div>
-                <div>
-                  <div className="flex items-center gap-2">
-                    <span className={`text-xs font-mono ${color}`}>{num}</span>
-                    <p className="font-bold text-foreground">{label}</p>
-                  </div>
-                  <p className="text-sm text-muted-foreground mt-1">{desc}</p>
-                </div>
-              </div>
-            ))}
-          </div>
+          <FeatureRowList items={LAYERS} />
         </section>
 
         <section className="container mx-auto px-4 pb-16 max-w-4xl">
@@ -143,9 +122,10 @@ export default function PlatformPage() {
               </div>
               <h3 className="text-xl font-bold text-foreground">Value you can verify</h3>
               <p className="text-sm text-muted-foreground">
-                Starknet&apos;s proof system lets Medialane attest to real-world facts on-chain: how many
+                Starknet&apos;s proof system will let Medialane attest to real-world facts on-chain: how many
                 times a song streamed, how many times an article was cited. As those proofs accumulate,
-                a licensed asset&apos;s value becomes something anyone can verify for themselves.
+                a licensed asset&apos;s value becomes something anyone can verify for themselves, not just
+                take Medialane&apos;s word for.
               </p>
             </CardContent>
           </Card>
