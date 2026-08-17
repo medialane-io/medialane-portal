@@ -142,7 +142,7 @@ export default async function PricingPage() {
 
         <section className="container mx-auto px-4 pb-16 max-w-4xl">
           <div className="space-y-4">
-            <h2 className="text-xl font-bold text-foreground text-center">What's included</h2>
+            <h2 className="text-xl font-bold text-foreground text-center">What&apos;s included</h2>
             <div className="rounded-xl border border-border overflow-hidden bg-foreground/[0.02]">
               <div className="grid grid-cols-3 px-6 py-4 border-b border-border bg-foreground/[0.03]">
                 <div className="text-sm font-semibold text-muted-foreground">Feature</div>

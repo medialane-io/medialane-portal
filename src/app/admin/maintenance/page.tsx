@@ -28,7 +28,7 @@ interface ServiceCoverage {
   sampleMissing: { contractAddress: string; source: string | null }[];
 }
 
-type HealthData = { status?: string; database?: string; indexer?: { lastBlock?: number | string } } | null;
+type HealthData = { status?: string; database?: string; indexer?: { lastBlock?: number | string; lagBlocks?: number } } | null;
 
 export default function AdminMaintenancePage() {
   const [health, setHealth]                     = useState<HealthData>(null);

@@ -157,7 +157,7 @@ export default function AdminTokensPage() {
                 <button onClick={() => setToken(null)} className="shrink-0 text-muted-foreground hover:text-foreground transition-colors"><X className="h-4 w-4" /></button>
               </div>
               <div className="flex items-center gap-2 flex-wrap">
-                <Badge variant="outline" className={STATUS_STYLE[token.metadataStatus] ?? ""}>{token.metadataStatus}</Badge>
+                <Badge variant="outline" className={STATUS_STYLE[token.metadataStatus ?? ""] ?? ""}>{token.metadataStatus}</Badge>
                 {token.metadata?.ipType && <Badge variant="outline">{token.metadata.ipType}</Badge>}
                 {token.standard && <Badge variant="outline" className="text-muted-foreground">{token.standard}</Badge>}
               </div>
