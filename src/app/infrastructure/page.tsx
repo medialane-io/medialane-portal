@@ -7,7 +7,7 @@ const STEPS = [
   {
     icon: Layers,
     title: "Register a service",
-    description: "Every product type Medialane supports is an entry in a shared registry, not a hardcoded route. Adding a new one is a registry entry, so your integration never breaks when the underlying schema changes.",
+    description: "Every product type Medialane supports is an entry in a shared registry. Adding a new one is a registry entry, so your integration stays stable when the underlying schema changes.",
     color: "text-brand-blue",
     bg: "bg-brand-blue/10",
   },
@@ -21,7 +21,7 @@ const STEPS = [
   {
     icon: Wallet,
     title: "Embed working product surfaces",
-    description: "Media Wallet, Medialane's own self-custody wallet, is built to embed in other apps. Integrating means reusing a product surface that already works, not building a wallet from scratch.",
+    description: "Media Wallet, Medialane's own self-custody wallet, is built to embed in other apps. Integrating means reusing a product surface that already works.",
     color: "text-brand-rose",
     bg: "bg-brand-rose/10",
   },

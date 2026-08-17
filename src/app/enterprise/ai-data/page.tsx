@@ -10,13 +10,13 @@ const ITEMS: FeatureRowItem[] = [
     eyebrow: "x402, pay-per-call",
     color: "bg-brand-orange",
     title: "Get paid every time your catalog is used",
-    description: "The same machine-payable rail AI agents already use to pay for access, in reverse: you get paid per call, the moment your content is used, not on some later invoice cycle.",
+    description: "The same machine-payable rail AI agents already use to pay for access, in reverse: you get paid per call, the moment your content is used.",
   },
   {
     icon: ScrollText,
     eyebrow: "Licensing",
     color: "bg-brand-rose",
-    title: "Terms attached to the asset, not a separate contract",
+    title: "License terms travel with the asset itself",
     description: "License terms live in the asset's metadata and travel with it. What's allowed for AI training use is set by you, per work or per collection.",
   },
   {
@@ -40,8 +40,8 @@ export default function AiDataPage() {
             License your catalog for AI, and get paid per use
           </h1>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Medialane provides the licensing and payment rail, not a training pipeline. What you
-            get is a way to be paid, per call, when AI systems use your catalog.
+            Medialane provides the licensing and payment rail. What you get is a way to be paid,
+            per call, when AI systems use your catalog.
           </p>
         </section>
 

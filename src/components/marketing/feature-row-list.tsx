@@ -6,7 +6,7 @@ export interface FeatureRowItem {
   eyebrow?: string
   title: string
   description: string
-  color: string // solid Tailwind bg class, e.g. "bg-brand-blue"
+  color: string
 }
 
 export function FeatureRowList({ items }: { items: FeatureRowItem[] }) {

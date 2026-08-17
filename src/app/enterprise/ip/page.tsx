@@ -28,7 +28,7 @@ const FEATURES: FeatureRowItem[] = [
     eyebrow: "Worldwide compliance",
     color: "bg-brand-rose",
     title: "Fast, Digital Workflow",
-    description: "Complete asset registration in under 5 minutes through a streamlined, 100% digital interface — no legal fluff or weeks of back-and-forth.",
+    description: "Complete asset registration in under 5 minutes through a streamlined, 100% digital interface, with no legal fluff or weeks of back-and-forth.",
   },
 ]
 

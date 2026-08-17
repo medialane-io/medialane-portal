@@ -24,7 +24,7 @@ const ITEMS: FeatureRowItem[] = [
     eyebrow: "Machine-readable",
     color: "bg-brand-maeve",
     title: "The same registry the UI reads",
-    description: "Action descriptions in the service registry are structured JSON, not documentation an agent has to interpret.",
+    description: "Action descriptions in the service registry are structured JSON an agent can call directly.",
   },
 ]
 

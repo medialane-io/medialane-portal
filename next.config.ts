@@ -13,8 +13,6 @@ const nextConfig: NextConfig = {
         destination: "/developers",
         permanent: true,
       },
-      // Docs migrated to docs.medialane.io (Phase 3 of the portal-docs migration).
-      // /docs, /docs/api, /docs/sdk, /docs/agents → docs.medialane.io
       {
         source: "/docs",
         destination: "https://docs.medialane.io/docs",

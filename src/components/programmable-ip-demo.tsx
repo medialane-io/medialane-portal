@@ -251,9 +251,7 @@ export default function ProgrammableIPDemo() {
             </Button>
 
             <pre className="p-6 overflow-auto bg-black/30 text-sm font-mono text-zinc-300 max-h-[500px]">
-              <code>{`// MediaLane Programmable IP Smart Contract
-// SPDX-License-Identifier: MIT
-pragma solidity ^0.8.17;
+              <code>{`pragma solidity ^0.8.17;
 
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
@@ -324,11 +322,9 @@ contract MediaLaneProgrammableIP is ERC721URIStorage, Ownable {
         require(_exists(tokenId), "Token does not exist");
         require(licenses[tokenId].licensee == address(0) || !licenses[tokenId].active, "License already active");
 
-        // Transfer payment to token owner
         address payable owner = payable(ownerOf(tokenId));
         owner.transfer(msg.value);
 
-        // Activate license
         licenses[tokenId].licensee = msg.sender;
         licenses[tokenId].active = true;
         licenses[tokenId].startDate = block.timestamp;
@@ -342,11 +338,9 @@ contract MediaLaneProgrammableIP is ERC721URIStorage, Ownable {
         require(licenses[tokenId].licensee == msg.sender, "Not the licensee");
         require(licenses[tokenId].autoRenewal, "Auto renewal not enabled");
 
-        // Transfer payment to token owner
         address payable owner = payable(ownerOf(tokenId));
         owner.transfer(msg.value);
 
-        // Renew license
         licenses[tokenId].startDate = block.timestamp;
         licenses[tokenId].endDate = block.timestamp + (licenses[tokenId].licenseDuration * 30 days);
 
@@ -357,7 +351,6 @@ contract MediaLaneProgrammableIP is ERC721URIStorage, Ownable {
         require(_exists(tokenId), "Token does not exist");
         require(licenses[tokenId].licensee == msg.sender, "Not the licensee");
 
-        // Transfer royalty to token owner
         address payable owner = payable(ownerOf(tokenId));
         owner.transfer(msg.value);
 

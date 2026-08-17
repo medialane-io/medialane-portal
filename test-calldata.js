@@ -13,7 +13,6 @@ function test() {
 
     console.log("nameBA structure:", JSON.stringify(nameBA, null, 2));
 
-    // Case 1: Manual array of BAs
     try {
         const compiled = CallData.compile([nameBA, symbolBA, baseUriBA]);
         console.log("Compiled Felt Array:", JSON.stringify(compiled, null, 2));

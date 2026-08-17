@@ -105,7 +105,6 @@ async function main() {
     console.log("Fetching collection 1...");
     try {
         const START_ID = 1;
-        // Explicitly use 'latest' block tag to avoid 'pending' issues
         const colData = await contract.get_collection(START_ID, { blockIdentifier: "latest" });
 
         console.log("IP NFT Address (dec):", colData.ip_nft);

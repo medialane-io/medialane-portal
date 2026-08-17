@@ -17,7 +17,7 @@ const ITEMS: FeatureRowItem[] = [
     eyebrow: "Ongoing access",
     color: "bg-brand-blue",
     title: "Not a single event, a standing relationship",
-    description: "A club membership can carry an optional validity window, so it renews or expires on your terms instead of being one-and-done like a ticket.",
+    description: "A club membership can carry an optional validity window, so it renews or expires on your own terms.",
   },
   {
     icon: ShoppingBag,
@@ -41,7 +41,7 @@ export default function ClubsPage() {
           </h1>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
             Built on IP Club, live on Medialane today. Membership cards your community actually
-            holds, not a login they can lose.
+            holds in their own wallet.
           </p>
         </section>
 

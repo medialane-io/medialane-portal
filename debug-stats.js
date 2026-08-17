@@ -61,7 +61,6 @@ async function main() {
     console.log("Fetching stats for collection 1...");
     try {
         const START_ID = 1;
-        // Check stats with latest block
         const stats = await contract.get_collection_stats(START_ID, { blockIdentifier: "latest" });
 
         console.log("Stats Raw:", stats);

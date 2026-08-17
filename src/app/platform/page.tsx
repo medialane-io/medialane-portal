@@ -14,14 +14,14 @@ const LAYERS: FeatureRowItem[] = [
     eyebrow: "01 · The rules",
     color: "bg-brand-purple",
     title: "Set once, in public",
-    description: "Contracts are immutable and permissionless. Nobody, not even Medialane, can quietly change them after deployment.",
+    description: "Contracts are immutable and permissionless. Once deployed, they stay exactly as set, including for Medialane itself.",
   },
   {
     icon: Database,
     eyebrow: "02 · The record",
     color: "bg-brand-blue",
     title: "Every asset, sale, and license, kept",
-    description: "The full history is searchable and could be rebuilt from nothing if it ever needed to be, because it's replayed from on-chain events, not stored as the source of truth.",
+    description: "The full history is searchable and could be rebuilt from nothing if it ever needed to be, replayed straight from on-chain events.",
   },
   {
     icon: Package,
@@ -124,8 +124,7 @@ export default function PlatformPage() {
               <p className="text-sm text-muted-foreground">
                 Starknet&apos;s proof system will let Medialane attest to real-world facts on-chain: how many
                 times a song streamed, how many times an article was cited. As those proofs accumulate,
-                a licensed asset&apos;s value becomes something anyone can verify for themselves, not just
-                take Medialane&apos;s word for.
+                a licensed asset&apos;s value becomes something anyone can verify for themselves.
               </p>
             </CardContent>
           </Card>

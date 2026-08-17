@@ -1,6 +1,3 @@
-// Grant (or revoke) admin on a portal account:
-//   DATABASE_URL=... bun run scripts/set-admin.ts 0x...          # grant
-//   DATABASE_URL=... bun run scripts/set-admin.ts 0x... --revoke # revoke
 import { Pool } from "pg";
 
 function normalizeStarknetAddress(address: string): string {
