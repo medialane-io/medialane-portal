@@ -2,9 +2,16 @@ import Link from "next/link"
 import { Badge } from "@/src/components/ui/badge"
 import { Button } from "@/src/components/ui/button"
 import { FeatureRowList, type FeatureRowItem } from "@/src/components/marketing/feature-row-list"
-import { Bot, Zap, ScrollText, Mail, ArrowLeft, ArrowRight } from "lucide-react"
+import { Bot, Zap, ScrollText, ShieldCheck, Mail, ArrowLeft, ArrowRight } from "lucide-react"
 
 const ITEMS: FeatureRowItem[] = [
+  {
+    icon: ShieldCheck,
+    eyebrow: "Provenance & compliance",
+    color: "bg-brand-blue",
+    title: "A record you can point to, worldwide",
+    description: "Every asset registered on Medialane carries an immutable, on-chain record of authorship and license terms, compliant with international copyright law including the Berne Convention. Provenance and permissions travel with the asset and stay verifiable by anyone, for its entire lifecycle.",
+  },
   {
     icon: Zap,
     eyebrow: "Usage-based payments",
@@ -40,8 +47,9 @@ export default function AiDataPage() {
             License your catalog for AI, and get paid per use
           </h1>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Medialane provides the licensing and payment rail. What you get is a way to be paid,
-            per call, when AI systems use your catalog.
+            Medialane provides the provenance, licensing, and payment rail. What you get is a
+            compliant record of authorship and terms, and a way to be paid, per call, when AI
+            systems use your catalog.
           </p>
         </section>
 

@@ -69,6 +69,12 @@ const HUBS = [
   },
 ]
 
+const DATA_COMPLIANCE = [
+  { value: "Immutable", label: "Provenance and license terms, secured on-chain the moment you register" },
+  { value: "181 Countries", label: "Automatic copyright protection under the Berne Convention" },
+  { value: "Per call", label: "Paid the moment an AI system uses your catalog" },
+]
+
 const SERVICE_LINES = [
   {
     icon: Code2,
@@ -189,6 +195,46 @@ export default function Home() {
               </Link>
             </Button>
           </div>
+        </section>
+
+        <section className="container mx-auto px-4 pb-16 max-w-4xl">
+          <Card className="border-border bg-foreground/5 backdrop-blur-sm overflow-hidden">
+            <CardContent className="p-8 md:p-10 space-y-8">
+              <div className="flex items-start gap-4">
+                <div className="h-12 w-12 shrink-0 rounded-lg bg-brand-blue/10 flex items-center justify-center">
+                  <ShieldCheck className="w-6 h-6 text-brand-blue" />
+                </div>
+                <div className="space-y-2">
+                  <Badge className="bg-primary/10 text-primary border-primary/30 px-3 py-1 text-xs">
+                    Data compliance for AI
+                  </Badge>
+                  <h2 className="text-2xl md:text-3xl font-bold text-foreground">
+                    Provenance and licensing for AI training data, built compliant
+                  </h2>
+                  <p className="text-sm md:text-base text-muted-foreground leading-relaxed max-w-2xl">
+                    Register your catalog once and get an immutable, on-chain record of authorship
+                    and license terms, compliant with international copyright law including the
+                    Berne Convention. Provenance and permissions travel with every asset and stay
+                    verifiable by anyone.
+                  </p>
+                </div>
+              </div>
+              <div className="grid sm:grid-cols-3 gap-6 text-center sm:text-left">
+                {DATA_COMPLIANCE.map(({ value, label }) => (
+                  <div key={label}>
+                    <p className="text-2xl font-black text-foreground">{value}</p>
+                    <p className="text-sm text-muted-foreground mt-1">{label}</p>
+                  </div>
+                ))}
+              </div>
+              <Button asChild variant="outline" size="sm">
+                <Link href="/enterprise/ai-data">
+                  See how AI data compliance works
+                  <ArrowRight className="w-3.5 h-3.5 ml-1.5" />
+                </Link>
+              </Button>
+            </CardContent>
+          </Card>
         </section>
 
         <section className="container mx-auto px-4 pb-24 max-w-5xl">
