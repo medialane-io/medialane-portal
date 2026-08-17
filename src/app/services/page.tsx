@@ -3,59 +3,73 @@ import { Badge } from "@/src/components/ui/badge"
 import { Card, CardContent } from "@/src/components/ui/card"
 import { Button } from "@/src/components/ui/button"
 import {
-  LayoutGrid, Layers, Ticket, Coins, GraduationCap, Handshake, Sparkles,
-  ShoppingBag, ArrowRight,
+  ImagePlus, Layers, GitBranch, Award, Package, Ticket, Users, Handshake,
+  Coins, TrendingUp, AtSign, FolderInput, Link2, ShoppingBag, ArrowRight,
 } from "lucide-react"
 
-const LAUNCHPAD_SERVICES = [
+interface ServiceCard {
+  icon: typeof ImagePlus
+  title: string
+  description: string
+  color: string
+  bg: string
+}
+
+interface ServiceGroup {
+  key: string
+  title: string
+  tagline: string
+  services: ServiceCard[]
+}
+
+const GROUPS: ServiceGroup[] = [
   {
-    icon: LayoutGrid,
-    title: "Collection Drops",
-    description: "Sequential minting with claim windows and an allowlist. Built for a launch with a start time and a cap.",
-    color: "text-brand-blue",
-    bg: "bg-brand-blue/10",
+    key: "nfts",
+    title: "Originals",
+    tagline: "Singular works, your own collections, timed drops, and remixes.",
+    services: [
+      { icon: ImagePlus, title: "Single Edition NFTs", description: "Publish any photo, video, audio, or document, minted once inside your collection. Licensing, provenance, and ownership live on-chain.", color: "text-brand-blue", bg: "bg-brand-blue/10" },
+      { icon: GitBranch, title: "Remix Asset", description: "Create a licensed derivative of another work. Attribution and royalties flow back to the original creator automatically.", color: "text-brand-rose", bg: "bg-brand-rose/10" },
+      { icon: Package, title: "Collection Drop", description: "Set a price, a supply, and a start and end time. Collectors mint directly from your branded drop page.", color: "text-brand-orange", bg: "bg-brand-orange/10" },
+    ],
   },
   {
-    icon: Layers,
-    title: "NFT Editions",
-    description: "Multiple copies of one piece, minted by the creator. For work that isn't meant to be one-of-one.",
-    color: "text-brand-orange",
-    bg: "bg-brand-orange/10",
+    key: "limited-editions",
+    title: "Limited Editions",
+    tagline: "Numbered copies of your work.",
+    services: [
+      { icon: Layers, title: "Limited Editions", description: "Create an editions collection and release each work in as many numbered copies as you choose.", color: "text-brand-purple", bg: "bg-brand-purple/10" },
+    ],
   },
   {
-    icon: Sparkles,
-    title: "IP Collection",
-    description: "A single-owner collection for standalone pieces, with full licensing and provenance attached.",
-    color: "text-brand-rose",
-    bg: "bg-brand-rose/10",
+    key: "community",
+    title: "Community",
+    tagline: "Badges, tickets, memberships, and direct sponsorship.",
+    services: [
+      { icon: Award, title: "POP Protocol", description: "Give out permanent badges. Each person can claim one, and it cannot be transferred or faked.", color: "text-brand-maeve", bg: "bg-brand-maeve/10" },
+      { icon: Ticket, title: "IP Tickets", description: "Create tickets with their own supply and validity window. Every ticket is verifiable on-chain at the door.", color: "text-brand-blue", bg: "bg-brand-blue/10" },
+      { icon: Users, title: "IP Club", description: "Create a club with membership tiers, fans, supporters, press, season passes. Mint the cards and sell them like any collection.", color: "text-brand-orange", bg: "bg-brand-orange/10" },
+      { icon: Handshake, title: "IP Sponsorship", description: "Let a sponsor back your work directly, for a license in return. Payment settles directly between sponsor and author.", color: "text-brand-rose", bg: "bg-brand-rose/10" },
+    ],
   },
   {
-    icon: GraduationCap,
-    title: "POP Protocol",
-    description: "Soulbound proof-of-presence. Issue a credential for attendance or membership that can't be transferred away.",
-    color: "text-brand-maeve",
-    bg: "bg-brand-maeve/10",
+    key: "coins",
+    title: "Coins",
+    tagline: "Launch your own coin, or bring one you already made.",
+    services: [
+      { icon: TrendingUp, title: "Creator Coin", description: "Launch your own coin with a public trading pool. You set the supply and allocation and stay in control of the liquidity.", color: "text-brand-purple", bg: "bg-brand-purple/10" },
+      { icon: Coins, title: "Claim Memecoin", description: "Add a coin you already launched to list it on the Coins page and your profile.", color: "text-brand-blue", bg: "bg-brand-blue/10" },
+    ],
   },
   {
-    icon: Ticket,
-    title: "IP Tickets",
-    description: "Redeemable, resellable admission tickets, issued per event through your own factory.",
-    color: "text-brand-purple",
-    bg: "bg-brand-purple/10",
-  },
-  {
-    icon: Handshake,
-    title: "IP Club",
-    description: "Membership clubs with an NFT membership card. One registry, ongoing access instead of a single event.",
-    color: "text-brand-blue",
-    bg: "bg-brand-blue/10",
-  },
-  {
-    icon: Coins,
-    title: "Creator Coins",
-    description: "A fixed-supply token for a creator or a community, launched permissionlessly with a locked liquidity pool.",
-    color: "text-brand-orange",
-    bg: "bg-brand-orange/10",
+    key: "claims",
+    title: "Claims",
+    tagline: "Reserve your username, your collection's name, or bring in a collection you already made.",
+    services: [
+      { icon: AtSign, title: "Claim Username", description: "Claim your username to get a shareable creator page, your public portfolio at a clean, memorable URL.", color: "text-brand-orange", bg: "bg-brand-orange/10" },
+      { icon: FolderInput, title: "Claim Collection", description: "Claim a collection you made elsewhere to link it to your profile and give it a branded page.", color: "text-brand-rose", bg: "bg-brand-rose/10" },
+      { icon: Link2, title: "Claim Collection Name", description: "Claim a custom name for your collection page and get a clean, shareable URL.", color: "text-brand-maeve", bg: "bg-brand-maeve/10" },
+    ],
   },
 ]
 
@@ -79,26 +93,32 @@ export default function ServicesPage() {
             Every way to issue, in one place
           </h1>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            The Launchpad grows by adding new services alongside the ones already running.
-            Here&apos;s what&apos;s live today.
+            Thirteen live services across five groups. The Launchpad grows by adding new ones
+            alongside what&apos;s already running.
           </p>
         </section>
 
-        <section className="container mx-auto px-4 pb-16 max-w-5xl">
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {LAUNCHPAD_SERVICES.map(({ icon: Icon, title, description, color, bg }) => (
-              <Card key={title} className="border-border bg-foreground/5 backdrop-blur-sm">
-                <CardContent className="p-6 space-y-3">
-                  <div className={`h-10 w-10 rounded-lg ${bg} flex items-center justify-center`}>
-                    <Icon className={`w-5 h-5 ${color}`} />
-                  </div>
-                  <h3 className="text-lg font-bold text-foreground">{title}</h3>
-                  <p className="text-sm text-muted-foreground">{description}</p>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </section>
+        {GROUPS.map((group) => (
+          <section key={group.key} className="container mx-auto px-4 pb-16 max-w-5xl">
+            <div className="mb-6">
+              <h2 className="text-2xl font-bold text-foreground">{group.title}</h2>
+              <p className="text-sm text-muted-foreground mt-1">{group.tagline}</p>
+            </div>
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {group.services.map(({ icon: Icon, title, description, color, bg }) => (
+                <Card key={title} className="border-border bg-foreground/5 backdrop-blur-sm">
+                  <CardContent className="p-6 space-y-3">
+                    <div className={`h-10 w-10 rounded-lg ${bg} flex items-center justify-center`}>
+                      <Icon className={`w-5 h-5 ${color}`} />
+                    </div>
+                    <h3 className="text-lg font-bold text-foreground">{title}</h3>
+                    <p className="text-sm text-muted-foreground">{description}</p>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </section>
+        ))}
 
         <section className="container mx-auto px-4 pb-24 max-w-4xl">
           <Card className="border-border bg-foreground/5 backdrop-blur-sm overflow-hidden">
