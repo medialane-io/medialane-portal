@@ -3,15 +3,16 @@ import { Github, Twitter, Globe2, MessageCircle } from "lucide-react"
 import { LogoMedialane } from "./logo-medialane"
 
 const PLATFORM_LINKS = [
-  { name: "Features", href: "/features" },
-  { name: "Integrate", href: "/integrate" },
+  { name: "Developers", href: "/developers" },
+  { name: "Enterprise", href: "/enterprise" },
+  { name: "Infrastructure", href: "/infrastructure" },
+  { name: "Agents", href: "/agents" },
   { name: "Docs", href: "https://docs.medialane.io/docs" },
   { name: "API Reference", href: "https://docs.medialane.io/docs/api" },
   { name: "SDK", href: "https://docs.medialane.io/docs/sdk" },
 ]
 
 const COMMUNITY_LINKS = [
-  { name: "Connect", href: "https://docs.medialane.io/contact", external: true },
   { name: "Changelog", href: "https://docs.medialane.io/dev/changelog", external: true },
   { name: "DAO", href: "https://medialane.org", external: true },
 ]
@@ -37,7 +38,8 @@ export default function Footer() {
           <div className="col-span-2 md:col-span-1 space-y-4">
             <LogoMedialane />
             <p className="text-sm text-muted-foreground leading-relaxed">
-              Creator capital markets. API and SDK access for assets, orders, licensing, drops, credentials, and real-time events.
+              Protocol infrastructure for licensed intellectual property — for the businesses,
+              integrators, and AI agents that build on it.
             </p>
           </div>
 
