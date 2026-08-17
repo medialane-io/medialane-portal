@@ -23,7 +23,7 @@ const LEGAL_LINKS = [
 ]
 
 const SOCIALS = [
-  { icon: Twitter, href: "https://x.com/medialane_xyz", label: "X / Twitter" },
+  { icon: Twitter, href: "https://x.com/medialane_io", label: "X / Twitter" },
   { icon: MessageCircle, href: "https://t.me/medialane", label: "Telegram" },
   { icon: Github, href: "https://github.com/medialane-io", label: "GitHub" },
   { icon: Globe2, href: "https://medialane.org", label: "DAO" },
