@@ -1,29 +1,30 @@
 import Link from "next/link"
 import { Badge } from "@/src/components/ui/badge"
 import { Button } from "@/src/components/ui/button"
+import { FeatureRowList, type FeatureRowItem } from "@/src/components/marketing/feature-row-list"
 import { Bot, Zap, KeyRound, Code2, ArrowRight } from "lucide-react"
 
-const FLOW = [
+const ITEMS: FeatureRowItem[] = [
   {
     icon: KeyRound,
-    title: "Headless authentication",
-    description: "Any agent with a Starknet keypair authenticates, provisions credits, and calls the API on its own.",
-    color: "text-brand-blue",
-    bg: "bg-brand-blue/10",
+    eyebrow: "Headless authentication",
+    color: "bg-brand-blue",
+    title: "An agent authenticates on its own",
+    description: "Any agent with a Starknet keypair authenticates, provisions credits, and calls the API without a person in the loop.",
   },
   {
     icon: Zap,
-    title: "x402-native, pay-per-call",
-    description: "Machine-payable IP access over the x402 protocol lets an agent pay for what it uses, per call, the moment it needs it.",
-    color: "text-brand-orange",
-    bg: "bg-brand-orange/10",
+    eyebrow: "x402, pay-per-call",
+    color: "bg-brand-orange",
+    title: "Pay for what you use, the moment you use it",
+    description: "Machine-payable access over the x402 protocol. It's the same rail enterprises use to get paid for AI training access to their catalogs, on the other side of the same transaction.",
   },
   {
     icon: Code2,
-    title: "Machine-readable capabilities",
-    description: "Action descriptions in the service registry are structured JSON, the same registry the UI itself reads.",
-    color: "text-brand-maeve",
-    bg: "bg-brand-maeve/10",
+    eyebrow: "Machine-readable",
+    color: "bg-brand-maeve",
+    title: "The same registry the UI reads",
+    description: "Action descriptions in the service registry are structured JSON, not documentation an agent has to interpret.",
   },
 ]
 
@@ -52,32 +53,23 @@ export default function AgentsPage() {
           </Button>
         </section>
 
-        <section className="container mx-auto px-4 pb-16 max-w-5xl">
-          <div className="flex flex-col md:flex-row items-stretch gap-3">
-            {FLOW.map(({ icon: Icon, title, description, color, bg }, i) => (
-              <div key={title} className="flex items-center flex-1 gap-3">
-                <div className="flex-1 rounded-xl border border-border bg-foreground/5 backdrop-blur-sm p-6 space-y-3">
-                  <div className={`h-10 w-10 rounded-lg ${bg} flex items-center justify-center`}>
-                    <Icon className={`w-5 h-5 ${color}`} />
-                  </div>
-                  <h3 className="text-lg font-bold text-foreground">{title}</h3>
-                  <p className="text-sm text-muted-foreground">{description}</p>
-                </div>
-                {i < FLOW.length - 1 && (
-                  <ArrowRight className="w-5 h-5 text-muted-foreground shrink-0 hidden md:block" />
-                )}
-              </div>
-            ))}
-          </div>
+        <section className="container mx-auto px-4 pb-16 max-w-2xl">
+          <FeatureRowList items={ITEMS} />
         </section>
 
         <section className="container mx-auto px-4 pb-24 max-w-2xl text-center space-y-4">
           <p className="text-muted-foreground">
-            Agents run on the same registry human integrators use, at the same pricing. See the full API surface.
+            x402 runs both directions: agents pay for access, and rights holders get paid the
+            same way when their catalog is used for AI training.
           </p>
-          <Button asChild variant="outline" size="lg">
-            <Link href="/developers">View developer docs</Link>
-          </Button>
+          <div className="flex flex-wrap justify-center gap-3">
+            <Button asChild variant="outline" size="lg">
+              <Link href="/developers">View developer docs</Link>
+            </Button>
+            <Button asChild variant="outline" size="lg">
+              <Link href="/enterprise/ai-data">See the rights-holder side<ArrowRight className="w-4 h-4 ml-2" /></Link>
+            </Button>
+          </div>
         </section>
       </div>
     </div>
