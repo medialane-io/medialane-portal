@@ -5,7 +5,31 @@ import { Card, CardContent } from "@/src/components/ui/card"
 import {
   Code2, ArrowRight, Sparkles, Bot, Building2, Blocks, ShieldCheck, LayoutGrid, Globe,
   ImagePlus, Layers, Users, Coins, ShoppingBag,
+  Music, Palette, Film, Camera, Gem, Award, FileText, BookOpen, File, Building,
+  Fingerprint, BadgeCheck, Ticket, Scale, GitBranch, Handshake,
 } from "lucide-react"
+
+const IP_TYPES = [
+  { icon: Music, title: "Audio", useCase: "A musician registers a master track before release.", color: "text-violet-400", bg: "bg-violet-500/10" },
+  { icon: Film, title: "Video", useCase: "A production house timestamps a script revision and a video edit.", color: "text-red-400", bg: "bg-red-500/10" },
+  { icon: Palette, title: "Art", useCase: "An illustrator secures a piece before sharing it with a client.", color: "text-pink-400", bg: "bg-pink-500/10" },
+  { icon: Camera, title: "Photography", useCase: "A photographer proves the creation date of a shoot before licensing it.", color: "text-amber-400", bg: "bg-amber-500/10" },
+  { icon: Gem, title: "NFT", useCase: "A collector brings an existing collection onto their profile.", color: "text-blue-400", bg: "bg-blue-500/10" },
+  { icon: Code2, title: "Software", useCase: "A developer timestamps proprietary source code.", color: "text-cyan-400", bg: "bg-cyan-500/10" },
+  { icon: Building, title: "RWA", useCase: "A team tokenizes a real-world asset record for tracking.", color: "text-lime-400", bg: "bg-lime-500/10" },
+  { icon: Award, title: "Patents", useCase: "An inventor timestamps a patent filing draft before submission.", color: "text-emerald-400", bg: "bg-emerald-500/10" },
+  { icon: FileText, title: "Posts", useCase: "A creator registers a social post before it's shared publicly.", color: "text-orange-400", bg: "bg-orange-500/10" },
+  { icon: BookOpen, title: "Publications", useCase: "A publisher timestamps a whitepaper before release.", color: "text-teal-400", bg: "bg-teal-500/10" },
+  { icon: File, title: "Documents", useCase: "A freelancer proves the exact date a contract was signed.", color: "text-slate-400", bg: "bg-slate-500/10" },
+  { icon: Layers, title: "Custom", useCase: "A team registers any other asset outside the standard categories.", color: "text-indigo-400", bg: "bg-indigo-500/10" },
+  { icon: Fingerprint, title: "Proof of Participation", useCase: "An event issues a permanent badge that can't be transferred or faked.", color: "text-fuchsia-400", bg: "bg-fuchsia-500/10" },
+  { icon: BadgeCheck, title: "Certificates", useCase: "A rights holder issues an immutable certificate of ownership for a high-value asset.", color: "text-yellow-400", bg: "bg-yellow-500/10" },
+  { icon: Ticket, title: "Tickets", useCase: "A festival issues tickets that are verifiable on-chain at the door.", color: "text-rose-400", bg: "bg-rose-500/10" },
+  { icon: Users, title: "Clubs", useCase: "A brand issues membership cards with tiers for fans, supporters, and press.", color: "text-sky-400", bg: "bg-sky-500/10" },
+  { icon: Scale, title: "Licensing", useCase: "A publisher licenses their catalog and tracks usage, including for AI training.", color: "text-green-400", bg: "bg-green-500/10" },
+  { icon: GitBranch, title: "Remix", useCase: "A creator publishes a derivative work with attribution and royalties flowing back automatically.", color: "text-purple-400", bg: "bg-purple-500/10" },
+  { icon: Handshake, title: "Sponsorships", useCase: "A creator takes a direct sponsorship offer in exchange for a license.", color: "text-stone-400", bg: "bg-stone-500/10" },
+]
 
 const HUBS = [
   {
@@ -137,6 +161,33 @@ export default function Home() {
                 <p className="text-sm text-muted-foreground">{description}</p>
               </div>
             ))}
+          </div>
+        </section>
+
+        <section className="container mx-auto px-4 pb-16 max-w-5xl">
+          <h2 className="text-2xl font-bold text-foreground text-center mb-2">What can be registered and tokenized?</h2>
+          <p className="text-sm text-muted-foreground text-center mb-6">
+            Any IP type can be secured on-chain. Here&apos;s what Medialane supports today, with
+            an example use case for each.
+          </p>
+          <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            {IP_TYPES.map(({ icon: Icon, title, useCase, color, bg }) => (
+              <div key={title} className="space-y-2">
+                <div className={`h-10 w-10 rounded-lg ${bg} flex items-center justify-center`}>
+                  <Icon className={`w-5 h-5 ${color}`} />
+                </div>
+                <h3 className="font-bold text-foreground">{title}</h3>
+                <p className="text-sm text-muted-foreground">{useCase}</p>
+              </div>
+            ))}
+          </div>
+          <div className="text-center mt-8">
+            <Button asChild variant="outline" size="sm">
+              <Link href="/enterprise/ip">
+                See how IP protection works
+                <ArrowRight className="w-3.5 h-3.5 ml-1.5" />
+              </Link>
+            </Button>
           </div>
         </section>
 
