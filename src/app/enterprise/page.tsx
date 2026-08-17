@@ -5,6 +5,7 @@ import { FeatureRowList, type FeatureRowItem } from "@/src/components/marketing/
 import {
   Building2, ScrollText, Ticket, Handshake, Users, Layers, Bot, ArrowRight,
   ShieldCheck, KeyRound, Banknote, Repeat, TrendingUp, Award, GitBranch, ShoppingBag,
+  ImagePlus, Gem,
 } from "lucide-react"
 
 const UMBRELLAS = [
@@ -64,18 +65,21 @@ const WHY: FeatureRowItem[] = [
 ]
 
 const MONETIZATION = [
+  { icon: ScrollText, title: "Tokenize & License IP", description: "Register your intellectual property and license it for reuse, including for AI training.", href: "/enterprise/ip", color: "text-brand-purple", bg: "bg-brand-purple/10" },
+  { icon: ImagePlus, title: "NFT Collections", description: "Publish and manage collections of unique or numbered works under your own brand.", href: "/services", color: "text-brand-maeve", bg: "bg-brand-maeve/10" },
   { icon: Ticket, title: "Tickets", description: "Verifiable, resellable admission tickets, issued at scale for any event.", href: "/enterprise/tickets", color: "text-brand-rose", bg: "bg-brand-rose/10" },
   { icon: Users, title: "Clubs", description: "Tiered membership programs, issued as tradeable cards, for ongoing audience relationships.", href: "/enterprise/clubs", color: "text-brand-maeve", bg: "bg-brand-maeve/10" },
   { icon: Layers, title: "Limited Editions", description: "Controlled-supply releases and timed drops, sized to your catalog.", href: "/enterprise/editions", color: "text-brand-purple", bg: "bg-brand-purple/10" },
   { icon: Handshake, title: "Sponsorship", description: "Structured sponsorship deals between your brand and rights holders, settled automatically.", href: "/enterprise/sponsorship", color: "text-brand-blue", bg: "bg-brand-blue/10" },
   { icon: Bot, title: "AI Data & Training", description: "Turn catalog access for AI training into a recurring revenue line.", href: "/enterprise/ai-data", color: "text-brand-orange", bg: "bg-brand-orange/10" },
+  { icon: ShoppingBag, title: "Marketplace", description: "List, offer, and auction everything you issue, in one connected market.", href: "/services", color: "text-brand-blue", bg: "bg-brand-blue/10" },
 ]
 
 const MORE_CAPABILITIES = [
   { icon: TrendingUp, title: "Creator Capital Markets", description: "Launch a public trading market for your brand or community, and stay in control of it." },
   { icon: Award, title: "Proof of Participation", description: "Issue permanent, tamper-proof badges your audience can claim and keep." },
   { icon: GitBranch, title: "Remix & Licensing", description: "License your catalog for reuse, with royalties flowing back to you automatically." },
-  { icon: ShoppingBag, title: "Marketplace", description: "List, offer, and auction everything you issue, in one connected market." },
+  { icon: Gem, title: "Custom Programmable IP", description: "A single-owner collection for standalone works, with full licensing and provenance attached." },
 ]
 
 export default function EnterprisePage() {
