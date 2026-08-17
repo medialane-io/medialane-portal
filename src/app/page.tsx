@@ -2,9 +2,10 @@ import Link from "next/link"
 import { Badge } from "@/src/components/ui/badge"
 import { Button } from "@/src/components/ui/button"
 import { Card, CardContent } from "@/src/components/ui/card"
+import { FeatureRowList, type FeatureRowItem } from "@/src/components/marketing/feature-row-list"
 import {
   Code2, ArrowRight, Sparkles, Bot, Building2, Blocks, ShieldCheck, LayoutGrid, Globe,
-  ImagePlus, Layers, Users, Coins, ShoppingBag,
+  ImagePlus, Layers, Users, Coins, ShoppingBag, KeyRound, Banknote, Repeat,
   Music, Palette, Film, Camera, Gem, Award, FileText, BookOpen, File, Building,
   Fingerprint, BadgeCheck, Ticket, Scale, GitBranch, Handshake,
 } from "lucide-react"
@@ -66,6 +67,37 @@ const HUBS = [
     description: "List, offer, and auction everything issued through the Launchpad. Payment settles the moment a sale completes.",
     color: "text-brand-purple",
     bg: "bg-brand-purple/10",
+  },
+]
+
+const WHY: FeatureRowItem[] = [
+  {
+    icon: ShieldCheck,
+    eyebrow: "Immutable by design",
+    color: "bg-brand-blue",
+    title: "Compliance you can point to",
+    description: "Rules and royalty terms are secured by immutable contracts the moment you launch, including for Medialane itself. Any later change requires your sign-off.",
+  },
+  {
+    icon: KeyRound,
+    eyebrow: "Direct ownership",
+    color: "bg-brand-orange",
+    title: "Your audience owns it directly",
+    description: "Every asset, ticket, and membership card is owned directly by the holder. No account system for your team to maintain or reconcile.",
+  },
+  {
+    icon: Banknote,
+    eyebrow: "Instant settlement",
+    color: "bg-brand-rose",
+    title: "Paid the moment a deal completes",
+    description: "Sales, licenses, and sponsorships pay out the instant a transaction completes, worldwide, directly between the two parties.",
+  },
+  {
+    icon: Repeat,
+    eyebrow: "Usage-based payments",
+    color: "bg-brand-maeve",
+    title: "Pay for use, get paid for use",
+    description: "Access is metered automatically. You pay only for what you use, and get paid the same way when others, including AI systems, use your catalog.",
   },
 ]
 
@@ -156,7 +188,6 @@ export default function Home() {
         </section>
 
         <section className="container mx-auto px-4 pb-16 max-w-5xl">
-          <h2 className="text-2xl font-bold text-foreground text-center mb-6">Five hubs, thirteen live services</h2>
           <div className="grid sm:grid-cols-2 lg:grid-cols-5 gap-4">
             {HUBS.map(({ icon: Icon, title, description, color, bg }) => (
               <div key={title} className="space-y-3">
@@ -170,31 +201,9 @@ export default function Home() {
           </div>
         </section>
 
-        <section className="container mx-auto px-4 pb-16 max-w-5xl">
-          <h2 className="text-2xl font-bold text-foreground text-center mb-2">What can be registered and tokenized?</h2>
-          <p className="text-sm text-muted-foreground text-center mb-6">
-            Any IP type can be registered and protected. Here&apos;s what Medialane supports
-            today, with an example use case for each.
-          </p>
-          <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            {IP_TYPES.map(({ icon: Icon, title, useCase, color, bg }) => (
-              <div key={title} className="space-y-2">
-                <div className={`h-10 w-10 rounded-lg ${bg} flex items-center justify-center`}>
-                  <Icon className={`w-5 h-5 ${color}`} />
-                </div>
-                <h3 className="font-bold text-foreground">{title}</h3>
-                <p className="text-sm text-muted-foreground">{useCase}</p>
-              </div>
-            ))}
-          </div>
-          <div className="text-center mt-8">
-            <Button asChild variant="outline" size="sm">
-              <Link href="/enterprise/ip">
-                See how IP protection works
-                <ArrowRight className="w-3.5 h-3.5 ml-1.5" />
-              </Link>
-            </Button>
-          </div>
+        <section className="container mx-auto px-4 pb-16 max-w-2xl">
+          <h2 className="text-2xl font-bold text-foreground text-center mb-6">Why businesses tokenize with Medialane</h2>
+          <FeatureRowList items={WHY} />
         </section>
 
         <section className="container mx-auto px-4 pb-16 max-w-4xl">
@@ -235,6 +244,33 @@ export default function Home() {
               </Button>
             </CardContent>
           </Card>
+        </section>
+
+        <section className="container mx-auto px-4 pb-16 max-w-5xl">
+          <h2 className="text-2xl font-bold text-foreground text-center mb-2">What can be registered and tokenized?</h2>
+          <p className="text-sm text-muted-foreground text-center mb-6">
+            Any IP type can be registered and protected. Here&apos;s what Medialane supports
+            today, with an example use case for each.
+          </p>
+          <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            {IP_TYPES.map(({ icon: Icon, title, useCase, color, bg }) => (
+              <div key={title} className="space-y-2">
+                <div className={`h-10 w-10 rounded-lg ${bg} flex items-center justify-center`}>
+                  <Icon className={`w-5 h-5 ${color}`} />
+                </div>
+                <h3 className="font-bold text-foreground">{title}</h3>
+                <p className="text-sm text-muted-foreground">{useCase}</p>
+              </div>
+            ))}
+          </div>
+          <div className="text-center mt-8">
+            <Button asChild variant="outline" size="sm">
+              <Link href="/enterprise/ip">
+                See how IP protection works
+                <ArrowRight className="w-3.5 h-3.5 ml-1.5" />
+              </Link>
+            </Button>
+          </div>
         </section>
 
         <section className="container mx-auto px-4 pb-24 max-w-5xl">
