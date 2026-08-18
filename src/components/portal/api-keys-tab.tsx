@@ -216,6 +216,8 @@ export function ApiKeysTab({ address }: { address: string }) {
           </div>
           <Button
             size="sm"
+            variant="gradient-fill"
+            className="from-brand-navy to-brand-purple"
             onClick={() => setCreateOpen(true)}
             disabled={activeCount >= 5}
             title={activeCount >= 5 ? "Maximum 5 active keys reached" : undefined}
@@ -246,7 +248,7 @@ export function ApiKeysTab({ address }: { address: string }) {
             <p className="text-sm text-muted-foreground max-w-xs">
               You don&apos;t have any API keys yet. Create one to start calling the Medialane API.
             </p>
-            <Button size="sm" onClick={() => setCreateOpen(true)} className="mt-1">
+            <Button size="sm" className="mt-1" onClick={() => setCreateOpen(true)}>
               <Plus className="w-4 h-4 mr-1" />
               Create your first key
             </Button>

@@ -131,7 +131,7 @@ export function CreditsTab({ address }: Props) {
               value={usdcAmount}
               onChange={(e) => setUsdcAmount(e.target.value)}
             />
-            <Button onClick={handleDeposit} disabled={depositing || !account || !usdcAmount || !treasuryAddress}>
+            <Button variant="gradient-fill" className="from-brand-navy to-brand-purple" onClick={handleDeposit} disabled={depositing || !account || !usdcAmount || !treasuryAddress}>
               {depositing ? <Loader2 className="w-4 h-4 animate-spin" /> : "Deposit"}
             </Button>
           </div>

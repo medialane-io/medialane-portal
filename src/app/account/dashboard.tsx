@@ -33,7 +33,7 @@ export function AccountDashboard({ address }: Props) {
         <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-6">
           <div className="flex-1 min-w-0">
             <p className="text-xs font-semibold text-primary uppercase tracking-widest mb-2">Developer Portal</p>
-            <h1 className="text-2xl sm:text-3xl font-bold text-foreground mb-2">Your API account</h1>
+            <h1 className="font-display text-2xl sm:text-3xl font-bold text-foreground mb-2">Your API account</h1>
             <p className="text-sm text-muted-foreground max-w-lg">
               Manage the keys, credits, and usage that power your integration with the Medialane API.
             </p>
@@ -52,21 +52,21 @@ export function AccountDashboard({ address }: Props) {
           <TabsList className="h-auto p-0 bg-transparent gap-6 justify-start w-full">
             <TabsTrigger
               value="keys"
-              className="flex items-center gap-1.5 px-0 py-2 text-sm font-medium rounded-none border-b-2 border-transparent text-muted-foreground data-[state=active]:border-primary data-[state=active]:text-foreground data-[state=active]:bg-transparent data-[state=active]:shadow-none"
+              className="flex items-center gap-1.5 px-0 py-2 text-sm font-medium rounded-none border-b-2 border-transparent text-muted-foreground data-[state=active]:border-brand-purple data-[state=active]:text-foreground data-[state=active]:bg-transparent data-[state=active]:shadow-none"
             >
               <Key className="w-4 h-4 shrink-0" />
               API Keys
             </TabsTrigger>
             <TabsTrigger
               value="credits"
-              className="flex items-center gap-1.5 px-0 py-2 text-sm font-medium rounded-none border-b-2 border-transparent text-muted-foreground data-[state=active]:border-primary data-[state=active]:text-foreground data-[state=active]:bg-transparent data-[state=active]:shadow-none"
+              className="flex items-center gap-1.5 px-0 py-2 text-sm font-medium rounded-none border-b-2 border-transparent text-muted-foreground data-[state=active]:border-brand-purple data-[state=active]:text-foreground data-[state=active]:bg-transparent data-[state=active]:shadow-none"
             >
               <Coins className="w-4 h-4 shrink-0" />
               Credits
             </TabsTrigger>
             <TabsTrigger
               value="usage"
-              className="flex items-center gap-1.5 px-0 py-2 text-sm font-medium rounded-none border-b-2 border-transparent text-muted-foreground data-[state=active]:border-primary data-[state=active]:text-foreground data-[state=active]:bg-transparent data-[state=active]:shadow-none"
+              className="flex items-center gap-1.5 px-0 py-2 text-sm font-medium rounded-none border-b-2 border-transparent text-muted-foreground data-[state=active]:border-brand-purple data-[state=active]:text-foreground data-[state=active]:bg-transparent data-[state=active]:shadow-none"
             >
               <BarChart2 className="w-4 h-4 shrink-0" />
               Usage
