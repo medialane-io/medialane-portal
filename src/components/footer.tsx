@@ -10,19 +10,21 @@ const PLATFORM_LINKS = [
   { name: "Enterprise", href: "/enterprise" },
   { name: "Infrastructure", href: "/infrastructure" },
   { name: "Agents", href: "/agents" },
-  { name: "Docs", href: "https://docs.medialane.io/docs" },
-  { name: "API Reference", href: "https://docs.medialane.io/docs/api" },
-  { name: "SDK", href: "https://docs.medialane.io/docs/sdk" },
+  { name: "Docs", href: "https://docs.medialane.io" },
+  { name: "API Reference", href: "https://docs.medialane.io/dev/api" },
+  { name: "SDK", href: "https://docs.medialane.io/dev/sdk" },
 ]
 
 const COMMUNITY_LINKS = [
-  { name: "Changelog", href: "https://docs.medialane.io/dev/changelog", external: true },
-  { name: "DAO", href: "https://medialane.org", external: true },
+  { name: "DAO", href: "https://medialane.org" },
+  { name: "Community Guidelines", href: "https://docs.medialane.io/guidelines/community" },
+  { name: "Support", href: "https://docs.medialane.io/support" },
 ]
 
 const LEGAL_LINKS = [
-  { name: "Terms", href: "https://docs.medialane.io/terms", external: true },
-  { name: "Privacy", href: "https://docs.medialane.io/privacy", external: true },
+  { name: "Terms", href: "https://docs.medialane.io/terms" },
+  { name: "Privacy", href: "https://docs.medialane.io/privacy" },
+  { name: "Compliance", href: "https://docs.medialane.io/guidelines/compliance" },
 ]
 
 const SOCIALS = [
@@ -32,67 +34,64 @@ const SOCIALS = [
   { icon: Globe2, href: "https://medialane.org", label: "DAO" },
 ]
 
+function FooterLink({ name, href }: { name: string; href: string }) {
+  const external = href.startsWith("http")
+  return (
+    <Link
+      href={href}
+      target={external ? "_blank" : undefined}
+      rel={external ? "noopener noreferrer" : undefined}
+      className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+    >
+      {name}
+      {external && " ↗"}
+    </Link>
+  )
+}
+
 export default function Footer() {
   return (
-    <footer className="border-t border-border bg-background/40 backdrop-blur-sm">
-      <div className="container mx-auto px-4 py-12 max-w-5xl">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+    <footer className="border-t border-border">
+      <div className="container mx-auto px-4 py-20 max-w-5xl">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-10">
 
           <div className="col-span-2 md:col-span-1 space-y-4">
             <LogoMedialane />
-            <p className="text-sm text-muted-foreground leading-relaxed">
+            <p className="text-sm text-muted-foreground leading-relaxed max-w-[26ch]">
               Protocol infrastructure for licensed intellectual property. Built for integrators
               and the businesses and AI agents they serve.
             </p>
           </div>
 
-          <div className="space-y-3">
-            <h3 className="text-sm font-semibold text-foreground">Platform</h3>
-            <ul className="space-y-2">
+          <div className="space-y-4">
+            <h3 className="text-sm font-semibold text-brand-blue">Platform</h3>
+            <ul className="space-y-2.5">
               {PLATFORM_LINKS.map((link) => (
-                <li key={link.href}>
-                  <Link href={link.href} className="text-sm text-muted-foreground hover:text-foreground transition-colors">
-                    {link.name}
-                  </Link>
-                </li>
+                <li key={link.href}><FooterLink {...link} /></li>
               ))}
             </ul>
           </div>
 
-          <div className="space-y-3">
-            <h3 className="text-sm font-semibold text-foreground">Community</h3>
-            <ul className="space-y-2">
+          <div className="space-y-4">
+            <h3 className="text-sm font-semibold text-brand-orange">Community</h3>
+            <ul className="space-y-2.5">
               {COMMUNITY_LINKS.map((link) => (
-                <li key={link.href}>
-                  <Link
-                    href={link.href}
-                    target={link.external ? "_blank" : undefined}
-                    rel={link.external ? "noopener noreferrer" : undefined}
-                    className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-                  >
-                    {link.name}
-                    {link.external && " ↗"}
-                  </Link>
-                </li>
+                <li key={link.href}><FooterLink {...link} /></li>
               ))}
             </ul>
           </div>
 
-          <div className="space-y-3">
-            <h3 className="text-sm font-semibold text-foreground">Legal</h3>
-            <ul className="space-y-2">
+          <div className="space-y-4">
+            <h3 className="text-sm font-semibold text-brand-maeve">Legal</h3>
+            <ul className="space-y-2.5">
               {LEGAL_LINKS.map((link) => (
-                <li key={link.href}>
-                  <Link href={link.href} className="text-sm text-muted-foreground hover:text-foreground transition-colors">
-                    {link.name}
-                  </Link>
-                </li>
+                <li key={link.href}><FooterLink {...link} /></li>
               ))}
             </ul>
           </div>
         </div>
 
-        <div className="mt-12 pt-6 border-t border-border flex flex-col md:flex-row items-center justify-between gap-4">
+        <div className="mt-16 pt-8 border-t border-border flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-4">
             {SOCIALS.map((s) => (
               <Link

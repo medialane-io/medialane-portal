@@ -21,7 +21,7 @@ const NAV_LINKS = [
   { label: "Enterprise", href: "/enterprise" },
   { label: "Infrastructure", href: "/infrastructure" },
   { label: "Agents", href: "/agents" },
-  { label: "Docs", href: "https://docs.medialane.io/docs" },
+  { label: "Docs", href: "https://docs.medialane.io" },
 ]
 
 function isNavActive(pathname: string, href: string) {
@@ -143,7 +143,7 @@ const FloatingNav = () => {
         <div
           className={cn(
             "w-full mx-auto rounded-full backdrop-blur-md border border-border bg-background/80 transition-all duration-300",
-            scrolled ? "shadow-lg bg-background/90" : "bg-background/70",
+            scrolled ? "bg-background/90" : "bg-background/70",
           )}
         >
           <div className="relative flex items-center justify-between h-12 md:h-14 px-1">
