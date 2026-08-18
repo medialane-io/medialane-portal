@@ -3,6 +3,7 @@ import { cookies } from "next/headers";
 
 export type PortalSession = {
   accountId: string;
+  apiClientId: string;
   chain: string;
   address: string;
   is_admin: boolean;
@@ -21,6 +22,7 @@ function getSecret() {
 export async function createSession(payload: PortalSession): Promise<string> {
   return new SignJWT({
     sub: payload.accountId,
+    api_client_id: payload.apiClientId,
     chain: payload.chain,
     address: payload.address,
     is_admin: payload.is_admin,
@@ -36,8 +38,10 @@ export async function getPortalSession(): Promise<PortalSession | null> {
   if (!token) return null;
   try {
     const { payload } = await jwtVerify(token, getSecret());
+    if (typeof payload.api_client_id !== "string") return null;
     return {
       accountId: payload.sub as string,
+      apiClientId: payload.api_client_id,
       chain: (payload.chain as string) ?? "STARKNET",
       address: payload.address as string,
       is_admin: payload.is_admin === true,

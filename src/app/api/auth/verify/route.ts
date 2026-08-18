@@ -10,6 +10,32 @@ const bodySchema = z.object({
   signature: z.array(z.string()).min(1),
 });
 
+/** Every signed-in account gets developer access — find its ApiClient, provisioning one on first sign-in. */
+async function resolveApiClientId(apiUrl: string, apiSecret: string, accountId: string): Promise<string | null> {
+  const headers = { "x-api-key": apiSecret, "Content-Type": "application/json" };
+
+  const lookup = await fetch(`${apiUrl}/admin/accounts?q=${encodeURIComponent(accountId)}`, { headers });
+  const lookupJson = await lookup.json().catch(() => null);
+  const existing = lookupJson?.data?.find((a: { id: string }) => a.id === accountId)?.apiClient?.id as
+    | string
+    | undefined;
+  if (existing) return existing;
+
+  const created = await fetch(`${apiUrl}/admin/api-clients`, {
+    method: "POST",
+    headers,
+    body: JSON.stringify({ accountId }),
+  });
+  const createdJson = await created.json().catch(() => null);
+  if (created.status === 201) return (createdJson?.data?.id as string | undefined) ?? null;
+  if (created.status !== 409) return null;
+
+  // Lost a create race — someone else provisioned it between our lookup and our create.
+  const retry = await fetch(`${apiUrl}/admin/accounts?q=${encodeURIComponent(accountId)}`, { headers });
+  const retryJson = await retry.json().catch(() => null);
+  return (retryJson?.data?.find((a: { id: string }) => a.id === accountId)?.apiClient?.id as string | undefined) ?? null;
+}
+
 export async function POST(req: NextRequest) {
   const parsed = bodySchema.safeParse(await req.json().catch(() => null));
   if (!parsed.success) return NextResponse.json({ error: "Invalid body" }, { status: 400 });
@@ -53,7 +79,12 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Could not resolve account" }, { status: 502 });
   }
 
-  const token = await createSession({ accountId, chain: "STARKNET", address, is_admin: isAdminAddress(address) });
+  const apiClientId = await resolveApiClientId(apiUrl, apiSecret, accountId);
+  if (!apiClientId) {
+    return NextResponse.json({ error: "Could not provision developer access for this account" }, { status: 502 });
+  }
+
+  const token = await createSession({ accountId, apiClientId, chain: "STARKNET", address, is_admin: isAdminAddress(address) });
   const response = NextResponse.json({ data: { accountId, address, chain: "STARKNET" } });
   setSessionCookie(response, token);
   return response;
