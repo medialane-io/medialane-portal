@@ -1,8 +1,16 @@
 import Link from "next/link"
+import type { Metadata } from "next"
 import { Badge } from "@/src/components/ui/badge"
 import { Button } from "@/src/components/ui/button"
 import { FeatureRowList, type FeatureRowItem } from "@/src/components/marketing/feature-row-list"
 import { GraduationCap, ShieldCheck, Mail, ArrowLeft } from "lucide-react"
+import { pageMetadata } from "@/src/lib/seo"
+
+export const metadata: Metadata = pageMetadata({
+  title: "Tokenization for Enterprise",
+  description: "Digital passes and credentials for schools and organizations that can't be faked or copied, with payouts handled on your behalf.",
+  path: "/enterprise/tokenize",
+})
 
 const ITEMS: FeatureRowItem[] = [
   {

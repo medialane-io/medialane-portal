@@ -1,8 +1,16 @@
 import Link from "next/link"
+import type { Metadata } from "next"
 import { Badge } from "@/src/components/ui/badge"
 import { Button } from "@/src/components/ui/button"
 import { FeatureRowList, type FeatureRowItem } from "@/src/components/marketing/feature-row-list"
 import { Ticket, ShieldCheck, Repeat, Mail, ArrowLeft } from "lucide-react"
+import { pageMetadata } from "@/src/lib/seo"
+
+export const metadata: Metadata = pageMetadata({
+  title: "Tickets",
+  description: "Verifiable, resellable admission tickets for festivals and event brands, issued at scale with their own supply and validity window, checkable at the door.",
+  path: "/enterprise/tickets",
+})
 
 const ITEMS: FeatureRowItem[] = [
   {

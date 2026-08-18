@@ -1,4 +1,5 @@
 import Link from "next/link"
+import type { Metadata } from "next"
 import { Badge } from "@/src/components/ui/badge"
 import { Button } from "@/src/components/ui/button"
 import { Card, CardContent } from "@/src/components/ui/card"
@@ -7,6 +8,13 @@ import {
   ShieldCheck, Globe, Zap, Megaphone, Film, Briefcase,
   Signature, Layers, Database, Users, Headset, Mail, ArrowLeft,
 } from "lucide-react"
+import { pageMetadata } from "@/src/lib/seo"
+
+export const metadata: Metadata = pageMetadata({
+  title: "Tokenization for IP",
+  description: "Protect creative work worldwide: proof of authorship in minutes, plus licensing and catalog tracking, including for AI training use.",
+  path: "/enterprise/ip",
+})
 
 const FEATURES: FeatureRowItem[] = [
   {

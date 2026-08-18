@@ -1,8 +1,16 @@
 import Link from "next/link"
+import type { Metadata } from "next"
 import { Badge } from "@/src/components/ui/badge"
 import { Button } from "@/src/components/ui/button"
 import { FeatureRowList, type FeatureRowItem } from "@/src/components/marketing/feature-row-list"
 import { Bot, Zap, KeyRound, Code2, ArrowRight } from "lucide-react"
+import { pageMetadata } from "@/src/lib/seo"
+
+export const metadata: Metadata = pageMetadata({
+  title: "AI Agents",
+  description: "Headless authentication and pay-per-call access over x402, the same fee schedule as a human integrator, so agents can authenticate, provision credits, and call the API on their own.",
+  path: "/agents",
+})
 
 const ITEMS: FeatureRowItem[] = [
   {

@@ -72,6 +72,28 @@ export const metadata: Metadata = {
   },
 }
 
+const JSON_LD = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "https://medialane.io/#organization",
+      name: "Medialane",
+      url: "https://medialane.io",
+      logo: "https://portal.medialane.io/medialane-icon.png",
+      sameAs: ["https://twitter.com/medialane_io"],
+    },
+    {
+      "@type": "WebSite",
+      "@id": "https://portal.medialane.io/#website",
+      url: "https://portal.medialane.io",
+      name: "Medialane",
+      description: "Tokenization for business. Turn what you own into digital assets you can license, sell, and track.",
+      publisher: { "@id": "https://medialane.io/#organization" },
+    },
+  ],
+}
+
 export default function RootLayout({
   children,
 }: {
@@ -81,6 +103,10 @@ export default function RootLayout({
       <Providers>
         <html lang="en" suppressHydrationWarning>
           <body className={`${inter.className} ${urbanist.variable} bg-background text-foreground`}>
+            <script
+              type="application/ld+json"
+              dangerouslySetInnerHTML={{ __html: JSON.stringify(JSON_LD) }}
+            />
             <FramerMotionProvider>
               <div className="relative min-h-screen flex flex-col">
                 <NavShell />

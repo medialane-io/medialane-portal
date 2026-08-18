@@ -1,4 +1,5 @@
 import Link from "next/link"
+import type { Metadata } from "next"
 import { Badge } from "@/src/components/ui/badge"
 import { Card, CardContent } from "@/src/components/ui/card"
 import { FeatureRowList, type FeatureRowItem } from "@/src/components/marketing/feature-row-list"
@@ -7,6 +8,13 @@ import {
   ShieldCheck, KeyRound, Banknote, Repeat, TrendingUp, Award, GitBranch, ShoppingBag,
   ImagePlus, Gem,
 } from "lucide-react"
+import { pageMetadata } from "@/src/lib/seo"
+
+export const metadata: Metadata = pageMetadata({
+  title: "Business",
+  description: "Fully managed tokenization for schools, festivals, publishers, and rights holders: credentials, tickets, membership clubs, licensing, and sponsorship, paid out the moment a deal completes.",
+  path: "/enterprise",
+})
 
 const UMBRELLAS = [
   {

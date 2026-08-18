@@ -1,7 +1,15 @@
 import Link from "next/link"
+import type { Metadata } from "next"
 import { Button } from "@/src/components/ui/button"
 import { Badge } from "@/src/components/ui/badge"
 import { Check, Coins } from "lucide-react"
+import { pageMetadata } from "@/src/lib/seo"
+
+export const metadata: Metadata = pageMetadata({
+  title: "Pricing",
+  description: "Pay-per-call pricing for every service on Medialane. Reads, mints, listings, and licenses billed the same for humans and AI agents.",
+  path: "/pricing",
+})
 
 const API_BASE = "https://api.medialane.io"
 

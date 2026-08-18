@@ -1,8 +1,16 @@
 import Link from "next/link"
+import type { Metadata } from "next"
 import { Badge } from "@/src/components/ui/badge"
 import { Button } from "@/src/components/ui/button"
 import { FeatureRowList, type FeatureRowItem } from "@/src/components/marketing/feature-row-list"
 import { Handshake, ShieldCheck, Gavel, Mail, ArrowLeft } from "lucide-react"
+import { pageMetadata } from "@/src/lib/seo"
+
+export const metadata: Metadata = pageMetadata({
+  title: "Sponsorship",
+  description: "Structured sponsorship deals between a brand and a rights holder, settled automatically the moment a sponsor's bid is accepted, no escrow.",
+  path: "/enterprise/sponsorship",
+})
 
 const ITEMS: FeatureRowItem[] = [
   {

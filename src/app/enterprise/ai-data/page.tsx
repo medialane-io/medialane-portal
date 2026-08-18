@@ -1,8 +1,16 @@
 import Link from "next/link"
+import type { Metadata } from "next"
 import { Badge } from "@/src/components/ui/badge"
 import { Button } from "@/src/components/ui/button"
 import { FeatureRowList, type FeatureRowItem } from "@/src/components/marketing/feature-row-list"
 import { Bot, Zap, ScrollText, ShieldCheck, Mail, ArrowLeft, ArrowRight } from "lucide-react"
+import { pageMetadata } from "@/src/lib/seo"
+
+export const metadata: Metadata = pageMetadata({
+  title: "AI Data & Training",
+  description: "Turn catalog access for AI training into a recurring revenue line, with license terms and provenance that travel with every asset, compliant with international copyright law.",
+  path: "/enterprise/ai-data",
+})
 
 const ITEMS: FeatureRowItem[] = [
   {

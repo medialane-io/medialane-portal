@@ -1,8 +1,16 @@
 import Link from "next/link"
+import type { Metadata } from "next"
 import { Badge } from "@/src/components/ui/badge"
 import { Button } from "@/src/components/ui/button"
 import { FeatureRowList, type FeatureRowItem } from "@/src/components/marketing/feature-row-list"
 import { Layers, Package, Mail, ArrowLeft } from "lucide-react"
+import { pageMetadata } from "@/src/lib/seo"
+
+export const metadata: Metadata = pageMetadata({
+  title: "Limited Editions",
+  description: "Controlled-supply releases and timed drops. Release a work in as many numbered copies as you choose, each carrying the same provenance back to the original.",
+  path: "/enterprise/editions",
+})
 
 const ITEMS: FeatureRowItem[] = [
   {

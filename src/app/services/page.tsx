@@ -1,4 +1,5 @@
 import Link from "next/link"
+import type { Metadata } from "next"
 import { Badge } from "@/src/components/ui/badge"
 import { Card, CardContent } from "@/src/components/ui/card"
 import { Button } from "@/src/components/ui/button"
@@ -6,6 +7,13 @@ import {
   ImagePlus, Layers, GitBranch, Award, Package, Ticket, Users, Handshake,
   Coins, TrendingUp, ShoppingBag, ArrowRight, Gamepad2, Landmark, Mic2, HeartHandshake,
 } from "lucide-react"
+import { pageMetadata } from "@/src/lib/seo"
+
+export const metadata: Metadata = pageMetadata({
+  title: "Services",
+  description: "Every way to tokenize and monetize on Medialane: originals and collections, limited editions, community badges and tickets, membership clubs, sponsorships, and creator coins.",
+  path: "/services",
+})
 
 interface ServiceCard {
   icon: typeof ImagePlus

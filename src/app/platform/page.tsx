@@ -1,4 +1,5 @@
 import Link from "next/link"
+import type { Metadata } from "next"
 import { Badge } from "@/src/components/ui/badge"
 import { Card, CardContent } from "@/src/components/ui/card"
 import { Button } from "@/src/components/ui/button"
@@ -7,6 +8,13 @@ import {
   Lock, Database, Package, Monitor, ShieldCheck,
   ShoppingBag, Sparkles, ArrowRight, TrendingUp,
 } from "lucide-react"
+import { pageMetadata } from "@/src/lib/seo"
+
+export const metadata: Metadata = pageMetadata({
+  title: "Platform",
+  description: "One shared, on-chain catalog behind every Medialane product and partner app: immutable contracts, a full replayable history, and the same record no matter which app reads it.",
+  path: "/platform",
+})
 
 const LAYERS: FeatureRowItem[] = [
   {

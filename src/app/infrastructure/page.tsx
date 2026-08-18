@@ -1,5 +1,13 @@
+import type { Metadata } from "next"
 import { Badge } from "@/src/components/ui/badge"
 import { ListChecks, Plug, LayoutTemplate, Globe2 } from "lucide-react"
+import { pageMetadata } from "@/src/lib/seo"
+
+export const metadata: Metadata = pageMetadata({
+  title: "Infrastructure",
+  description: "Add tokenization to your own product through one API. Tickets, memberships, collections, licensing, or a coin, ready-made, with your own interface on top.",
+  path: "/infrastructure",
+})
 
 const STEPS = [
   {

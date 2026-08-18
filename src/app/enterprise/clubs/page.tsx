@@ -1,8 +1,16 @@
 import Link from "next/link"
+import type { Metadata } from "next"
 import { Badge } from "@/src/components/ui/badge"
 import { Button } from "@/src/components/ui/button"
 import { FeatureRowList, type FeatureRowItem } from "@/src/components/marketing/feature-row-list"
 import { Users, LayoutList, ShoppingBag, Mail, ArrowLeft } from "lucide-react"
+import { pageMetadata } from "@/src/lib/seo"
+
+export const metadata: Metadata = pageMetadata({
+  title: "Clubs",
+  description: "Tiered membership programs issued as tradeable cards: fans, supporters, press, and season passes, sold like any collection.",
+  path: "/enterprise/clubs",
+})
 
 const ITEMS: FeatureRowItem[] = [
   {

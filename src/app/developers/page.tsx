@@ -1,4 +1,5 @@
 import Link from "next/link"
+import type { Metadata } from "next"
 import { Button } from "@/src/components/ui/button"
 import { Badge } from "@/src/components/ui/badge"
 import { Card, CardContent } from "@/src/components/ui/card"
@@ -8,6 +9,13 @@ import {
   Code2, Zap, KeyRound, Send, Ticket, Handshake, Coins,
   Building2, Bot, ArrowRight, Blocks,
 } from "lucide-react"
+import { pageMetadata } from "@/src/lib/seo"
+
+export const metadata: Metadata = pageMetadata({
+  title: "Developers",
+  description: "A typed SDK, a service registry, and one metered API for every live service on the protocol: marketplace orders, collections, minting, metadata, and on-chain activity.",
+  path: "/developers",
+})
 
 const SAMPLE_RESPONSE = `{
   "data": [
