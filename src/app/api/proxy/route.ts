@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { createRateLimiter, clientIp } from "@/src/lib/rate-limit";
 
 const ALLOWED_HOSTNAMES = new Set([
   "gateway.pinata.cloud",
@@ -8,7 +9,14 @@ const ALLOWED_HOSTNAMES = new Set([
   "nftstorage.link",
 ]);
 
+const MAX_BYTES = 25 * 1024 * 1024;
+const checkRateLimit = createRateLimiter(60_000, 120);
+
 export async function GET(req: NextRequest) {
+  if (!checkRateLimit(clientIp(req))) {
+    return new NextResponse("Too many requests", { status: 429 });
+  }
+
   const raw = req.nextUrl.searchParams.get("url");
   if (!raw) {
     return new NextResponse("Missing url", { status: 400 });

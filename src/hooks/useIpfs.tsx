@@ -1,6 +1,14 @@
+"use client";
+
 import { useState, useCallback } from "react";
-import { pinata } from "../services/config/server-config";
+import { PinataSDK } from "pinata";
 import { IPFS_URL } from "../services/constant";
+
+/** No JWT here on purpose — this client only ever uploads via a signed URL
+ * minted server-side (see /api/pinata), which carries its own auth. */
+const pinata = new PinataSDK({
+  pinataGateway: process.env.NEXT_PUBLIC_PINATA_GATEWAY,
+});
 
 export interface IpfsMetadata {
   name: string;
