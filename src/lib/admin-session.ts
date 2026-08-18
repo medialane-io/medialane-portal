@@ -1,4 +1,4 @@
-import { createAdminSessionGrant, type AdminSession } from "@medialane/sdk";
+import { createAdminSessionGrant, type AdminSession } from "@medialane/sdk/starknet";
 
 const KEY = "ml-admin-session";
 

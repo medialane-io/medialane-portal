@@ -1,15 +1,16 @@
 "use client";
 
-import Link from "next/link";
 import { Wallet, ShieldCheck, AlertCircle } from "lucide-react";
 import { useWallet } from "@/src/hooks/use-wallet";
 import { usePortalAuth } from "@/src/hooks/use-portal-auth";
 import { Button } from "@/src/components/ui/button";
+import { useConnectDialog } from "@/src/components/connect-dialog";
 import { AccountDashboard } from "./dashboard";
 
 export default function AccountPage() {
   const { address, isConnected, isConnecting } = useWallet();
   const { session, isLoading, signingIn, error, signIn } = usePortalAuth();
+  const { open: openConnectDialog } = useConnectDialog();
 
   if (session) {
     return <AccountDashboard address={session.address} />;
@@ -51,8 +52,8 @@ export default function AccountPage() {
         <p className="text-sm text-muted-foreground max-w-sm">
           Connect a Starknet wallet to manage your API keys, credits and usage.
         </p>
-        <Button asChild className="rounded-full bg-primary hover:bg-primary/90 text-white">
-          <Link href="/?connect=1">{isConnecting ? "Connecting…" : "Connect wallet"}</Link>
+        <Button onClick={openConnectDialog} disabled={isConnecting} className="rounded-full bg-primary hover:bg-primary/90 text-white">
+          {isConnecting ? "Connecting…" : "Connect wallet"}
         </Button>
       </div>
     </div>

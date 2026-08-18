@@ -9,8 +9,8 @@
     "start": "next start"
   },
   "dependencies": {
-    "@medialane/sdk": "0.40.0",
-    "@medialane/ui": "0.74.1",
+    "@medialane/sdk": "0.85.5",
+    "@medialane/ui": "0.125.7",
     "@radix-ui/react-avatar": "1.1.2",
     "@radix-ui/react-collapsible": "latest",
     "@radix-ui/react-progress": "latest",

@@ -3,7 +3,7 @@ import "@/src/app/globals.css"
 import { Inter, Urbanist } from "next/font/google"
 import { Toaster } from "@/src/components/ui/toaster"
 import { SonnerToaster } from "@/src/components/ui/sonner"
-import FloatingNav from "@/src/components/floating-nav"
+import { NavShell } from "@/src/components/nav-shell"
 import Footer from "@/src/components/footer"
 import FramerMotionProvider from "@/src/lib/framer-motion-provider"
 import { Providers } from "./providers";
@@ -83,7 +83,7 @@ export default function RootLayout({
           <body className={`${inter.className} ${urbanist.variable} bg-background text-foreground`}>
             <FramerMotionProvider>
               <div className="relative min-h-screen flex flex-col">
-                <FloatingNav />
+                <NavShell />
                 <main className="flex-1">{children}</main>
                 <Footer />
                 <Toaster />

@@ -1,4 +1,4 @@
-import { encodeAdminHeaders } from "@medialane/sdk";
+import { encodeAdminHeaders } from "@medialane/sdk/starknet";
 import { toast } from "sonner";
 import { getAdminSession } from "@/src/lib/admin-session";
 
