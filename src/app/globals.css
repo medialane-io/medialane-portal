@@ -126,6 +126,9 @@
   body {
     @apply bg-background text-foreground;
   }
+  .font-display {
+    font-family: var(--font-display), var(--font-sans), sans-serif;
+  }
 }
 
 /* Optimized scrollbar styling */
