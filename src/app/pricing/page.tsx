@@ -82,7 +82,7 @@ export default async function PricingPage() {
             <Coins className="w-3.5 h-3.5 mr-1.5 inline" />
             Pricing
           </Badge>
-          <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight text-foreground">
+          <h1 className="font-display text-4xl md:text-6xl font-extrabold tracking-tight text-foreground">
             Pay for what you use
           </h1>
           <p className="text-lg text-muted-foreground max-w-xl mx-auto">
@@ -98,7 +98,7 @@ export default async function PricingPage() {
         {creditRows.length > 0 && (
           <section className="container mx-auto px-4 pb-16 max-w-4xl">
             <div className="space-y-4">
-              <h2 className="text-2xl font-bold text-foreground text-center">What things cost</h2>
+              <h2 className="font-display text-2xl font-bold text-foreground text-center">What things cost</h2>
               <div className="divide-y divide-border/40">
                 {creditRows.map((row) => (
                   <div
@@ -117,7 +117,7 @@ export default async function PricingPage() {
         <section className="container mx-auto px-4 pb-16 max-w-4xl">
           <div className="space-y-4">
             <div className="text-center space-y-2">
-              <h2 className="text-2xl font-bold text-foreground">Hold MDLN, pay less</h2>
+              <h2 className="font-display text-2xl font-bold text-foreground">Hold MDLN, pay less</h2>
               <p className="text-sm text-muted-foreground">
                 Your discount applies the moment you deposit. Nothing to lock up or stake.
               </p>
@@ -144,7 +144,7 @@ export default async function PricingPage() {
 
         <section className="container mx-auto px-4 pb-16 max-w-4xl">
           <div className="space-y-4">
-            <h2 className="text-xl font-bold text-foreground text-center">What&apos;s included</h2>
+            <h2 className="font-display text-xl font-bold text-foreground text-center">What&apos;s included</h2>
             <div className="divide-y divide-border/40">
               <div className="grid grid-cols-3 px-2 py-4">
                 <div className="text-sm font-semibold text-muted-foreground">Feature</div>
