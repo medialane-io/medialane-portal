@@ -38,14 +38,14 @@ export default function AgentsPage() {
             <Bot className="w-3.5 h-3.5 mr-1.5 inline" />
             AI Agents
           </Badge>
-          <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight text-foreground">
+          <h1 className="font-display text-4xl md:text-6xl font-extrabold tracking-tight text-foreground">
             x402-native, machine-payable IP access
           </h1>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
             An agent authenticates, provisions credits, and calls the API on the same fee schedule
             as a human integrator.
           </p>
-          <Button asChild size="lg" className="px-10">
+          <Button asChild variant="gradient-fill" className="from-brand-rose to-brand-orange px-10" size="lg">
             <a href="https://docs.medialane.io/docs/agents" target="_blank" rel="noopener noreferrer">
               Read the agent quickstart
               <ArrowRight className="w-4 h-4 ml-2" />
@@ -63,10 +63,10 @@ export default function AgentsPage() {
             same way when their catalog is used for AI training.
           </p>
           <div className="flex flex-wrap justify-center gap-3">
-            <Button asChild variant="outline" size="lg">
+            <Button asChild variant="gradient-border" className="pair-rose-orange" size="lg">
               <Link href="/developers">View developer docs</Link>
             </Button>
-            <Button asChild variant="outline" size="lg">
+            <Button asChild variant="gradient-border" className="pair-rose-orange" size="lg">
               <Link href="/enterprise/ai-data">See the rights-holder side<ArrowRight className="w-4 h-4 ml-2" /></Link>
             </Button>
           </div>
