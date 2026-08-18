@@ -77,7 +77,7 @@ export function UsageTab({ address, onViewCredits }: UsageTabProps) {
           className="inline-flex items-center gap-1 text-sm text-primary hover:underline mt-3"
         >
           <Coins className="w-3.5 h-3.5" />
-          View your balance and spend history
+          View your balance and top-up history
           <ArrowRight className="w-3.5 h-3.5" />
         </button>
       </div>

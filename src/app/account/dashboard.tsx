@@ -1,31 +1,101 @@
 "use client";
 
-import { useState } from "react";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/src/components/ui/tabs";
-import { ApiKeysTab } from "@/src/components/portal/api-keys-tab";
-import { UsageTab } from "@/src/components/portal/usage-tab";
-import { CreditsTab } from "@/src/components/portal/credits-tab";
-import { Key, BarChart2, Coins } from "lucide-react";
+import useSWR from "swr";
+import { PortfolioOverview, StatTile, type PortfolioBentoTileConfig } from "@medialane/ui";
+import { Key, Plus } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useWallet } from "@/src/hooks/use-wallet";
 import { usePortalAuth } from "@/src/hooks/use-portal-auth";
 import { Button } from "@/src/components/ui/button";
+import { portalFetcher } from "@/src/lib/portal/fetcher";
 
 interface Props {
   address: string;
 }
 
+interface ApiKey {
+  id: string;
+  prefix: string;
+  label: string | null;
+  status: "ACTIVE" | "REVOKED";
+}
+
+interface CreditsData {
+  data?: { balance?: number };
+}
+
 export function AccountDashboard({ address }: Props) {
-  const [tab, setTab] = useState("keys");
   const router = useRouter();
   const { disconnect } = useWallet();
   const { signOut } = usePortalAuth();
+
+  const { data: keysData } = useSWR<{ data: ApiKey[] }>(`/api/portal/keys?address=${address}`, portalFetcher);
+  const { data: creditsData } = useSWR<CreditsData>(`/api/portal/credits?address=${address}`, portalFetcher);
 
   async function handleSignOut() {
     await signOut();
     disconnect();
     router.push("/");
   }
+
+  const keys = keysData?.data ?? [];
+  const activeKeys = keys.filter((k) => k.status === "ACTIVE");
+  const balance = creditsData?.data?.balance ?? 0;
+
+  const tiles: PortfolioBentoTileConfig[] = [
+    {
+      key: "keys",
+      title: "API Keys",
+      href: "/account/keys",
+      content: (
+        <div className="space-y-3">
+          <StatTile label="Active keys" value={activeKeys.length} big />
+          {activeKeys.length === 0 ? (
+            <p className="text-xs text-muted-foreground">No active keys yet.</p>
+          ) : (
+            <ul className="space-y-1.5">
+              {activeKeys.slice(0, 3).map((k) => (
+                <li key={k.id} className="flex items-center gap-2 text-xs">
+                  <Key className="w-3 h-3 text-muted-foreground shrink-0" />
+                  <code className="font-mono text-primary">{k.prefix}***</code>
+                  {k.label && <span className="text-muted-foreground truncate">({k.label})</span>}
+                </li>
+              ))}
+              {activeKeys.length > 3 && (
+                <li className="text-xs text-muted-foreground">+{activeKeys.length - 3} more</li>
+              )}
+            </ul>
+          )}
+        </div>
+      ),
+    },
+    {
+      key: "credits",
+      title: "Credits",
+      href: "/account/credits",
+      content: (
+        <div className="space-y-3">
+          <StatTile label="Balance" value={balance.toLocaleString()} sub="credits remaining" big accent="var(--primary)" />
+          <Button size="sm" variant="gradient-fill" className="w-full">
+            <Plus className="w-3.5 h-3.5 mr-1" />
+            Add credits
+          </Button>
+        </div>
+      ),
+    },
+    {
+      key: "usage",
+      title: "Usage",
+      href: "/account/usage",
+      size: "wide",
+      content: (
+        <p className="text-sm text-muted-foreground">
+          There&apos;s no monthly request cap — every call is metered by credits instead, drawn from the same
+          balance no matter which key made it.
+        </p>
+      ),
+    },
+  ];
 
   return (
     <div className="min-h-screen">
@@ -48,35 +118,7 @@ export function AccountDashboard({ address }: Props) {
       </div>
 
       <div className="container mx-auto px-4 max-w-5xl pb-8">
-        <Tabs value={tab} onValueChange={setTab} className="space-y-8">
-          <TabsList className="h-auto p-0 bg-transparent gap-6 justify-start w-full">
-            <TabsTrigger
-              value="keys"
-              className="flex items-center gap-1.5 px-0 py-2 text-sm font-medium rounded-none border-b-2 border-transparent text-muted-foreground data-[state=active]:border-brand-purple data-[state=active]:text-foreground data-[state=active]:bg-transparent data-[state=active]:shadow-none"
-            >
-              <Key className="w-4 h-4 shrink-0" />
-              API Keys
-            </TabsTrigger>
-            <TabsTrigger
-              value="credits"
-              className="flex items-center gap-1.5 px-0 py-2 text-sm font-medium rounded-none border-b-2 border-transparent text-muted-foreground data-[state=active]:border-brand-purple data-[state=active]:text-foreground data-[state=active]:bg-transparent data-[state=active]:shadow-none"
-            >
-              <Coins className="w-4 h-4 shrink-0" />
-              Credits
-            </TabsTrigger>
-            <TabsTrigger
-              value="usage"
-              className="flex items-center gap-1.5 px-0 py-2 text-sm font-medium rounded-none border-b-2 border-transparent text-muted-foreground data-[state=active]:border-brand-purple data-[state=active]:text-foreground data-[state=active]:bg-transparent data-[state=active]:shadow-none"
-            >
-              <BarChart2 className="w-4 h-4 shrink-0" />
-              Usage
-            </TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="keys"><ApiKeysTab address={address} /></TabsContent>
-          <TabsContent value="credits"><CreditsTab address={address} /></TabsContent>
-          <TabsContent value="usage"><UsageTab address={address} onViewCredits={() => setTab("credits")} /></TabsContent>
-        </Tabs>
+        <PortfolioOverview tiles={tiles} />
       </div>
     </div>
   );
