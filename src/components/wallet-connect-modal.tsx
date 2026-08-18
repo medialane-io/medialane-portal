@@ -40,7 +40,7 @@ export function WalletConnectModal({
           ))}
           {connectors.length === 0 && (
             <p className="text-sm text-muted-foreground">
-              No Starknet wallet detected. Install Ready or Braavos to continue.
+              No Starknet wallet detected. Install one to continue.
             </p>
           )}
         </div>

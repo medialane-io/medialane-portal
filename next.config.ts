@@ -31,7 +31,7 @@ const nextConfig: NextConfig = {
   eslint: {
     ignoreDuringBuilds: false,
   },
-  serverExternalPackages: ["pg", "pg-native", "@cartridge/connector", "@cartridge/controller", "@cartridge/controller-wasm"],
+  serverExternalPackages: ["pg", "pg-native"],
   images: {
     remotePatterns: [
       {
