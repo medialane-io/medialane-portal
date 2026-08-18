@@ -68,7 +68,7 @@ export default function PlatformPage() {
             <ShieldCheck className="w-3.5 h-3.5 mr-1.5 inline" />
             Platform
           </Badge>
-          <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight text-foreground">
+          <h1 className="font-display text-4xl md:text-6xl font-extrabold tracking-tight text-foreground">
             How Medialane actually works
           </h1>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
@@ -80,7 +80,7 @@ export default function PlatformPage() {
 
         <section className="container mx-auto px-4 pb-16 max-w-4xl">
           <div className="text-center mb-6">
-            <h2 className="text-2xl font-bold text-foreground">Four layers, one system</h2>
+            <h2 className="font-display text-2xl font-bold text-foreground">Four layers, one system</h2>
             <p className="text-sm text-muted-foreground mt-1">
               Authority only flows down. The chain is the only truth; everything above it is a
               cache, a lens, or a view.
@@ -91,7 +91,7 @@ export default function PlatformPage() {
 
         <section className="container mx-auto px-4 pb-16 max-w-4xl">
           <div className="text-center mb-6">
-            <h2 className="text-2xl font-bold text-foreground">Two hubs</h2>
+            <h2 className="font-display text-2xl font-bold text-foreground">Two hubs</h2>
             <p className="text-sm text-muted-foreground mt-1">
               Everything Medialane does falls into issuing an asset or trading one.
             </p>
@@ -99,7 +99,7 @@ export default function PlatformPage() {
           <div className="grid md:grid-cols-2 gap-6">
             {HUBS.map(({ icon: Icon, title, description, href, color, bg }) => (
               <Link key={title} href={href} className="group">
-                <Card className="border-border bg-foreground/5 backdrop-blur-sm h-full transition-all group-hover:border-foreground/20">
+                <Card className="bg-foreground/5 backdrop-blur-sm h-full transition-all">
                   <CardContent className="p-6 space-y-3">
                     <div className={`h-10 w-10 rounded-lg ${bg} flex items-center justify-center`}>
                       <Icon className={`w-5 h-5 ${color}`} />
@@ -134,7 +134,7 @@ export default function PlatformPage() {
           <p className="text-muted-foreground">
             See what you can issue and trade today.
           </p>
-          <Button asChild size="lg">
+          <Button asChild variant="gradient-fill" className="from-brand-rose to-brand-purple" size="lg">
             <Link href="/services">
               View Launchpad services
               <ArrowRight className="w-4 h-4 ml-2" />

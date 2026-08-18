@@ -41,7 +41,7 @@ export default function InfrastructurePage() {
           <Badge className="bg-primary/10 text-primary border-primary/30 px-4 py-1.5 text-sm">
             Infrastructure
           </Badge>
-          <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight text-foreground">
+          <h1 className="font-display text-4xl md:text-6xl font-extrabold tracking-tight text-foreground">
             Power your product with Medialane&apos;s tokenization platform
           </h1>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">

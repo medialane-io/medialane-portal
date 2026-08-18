@@ -91,7 +91,7 @@ export default function EnterprisePage() {
           <Badge className="bg-primary/10 text-primary border-primary/30 px-4 py-1.5 text-sm">
             Enterprise
           </Badge>
-          <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight text-foreground">
+          <h1 className="font-display text-4xl md:text-6xl font-extrabold tracking-tight text-foreground">
             Tokenization and monetization, at enterprise scale
           </h1>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
@@ -117,12 +117,12 @@ export default function EnterprisePage() {
           <div className="grid md:grid-cols-2 gap-6">
             {UMBRELLAS.map(({ icon: Icon, title, description, href, color, bg }) => (
               <Link key={href} href={href} className="group">
-                <Card className="border-border bg-foreground/5 backdrop-blur-sm h-full transition-all group-hover:border-foreground/20">
+                <Card className="bg-foreground/5 backdrop-blur-sm h-full transition-all">
                   <CardContent className="p-8 space-y-4">
                     <div className={`h-10 w-10 rounded-lg ${bg} flex items-center justify-center`}>
                       <Icon className={`w-5 h-5 ${color}`} />
                     </div>
-                    <h2 className="text-xl font-bold text-foreground">{title}</h2>
+                    <h2 className="font-display text-xl font-bold text-foreground">{title}</h2>
                     <p className="text-sm text-muted-foreground">{description}</p>
                     <div className="flex items-center text-sm font-medium text-foreground/80 group-hover:text-foreground transition-colors">
                       Explore
@@ -136,7 +136,7 @@ export default function EnterprisePage() {
         </section>
 
         <section className="container mx-auto px-4 pb-16 max-w-4xl">
-          <h2 className="text-2xl font-bold text-foreground text-center mb-2">Why enterprises tokenize with Medialane</h2>
+          <h2 className="font-display text-2xl font-bold text-foreground text-center mb-2">Why enterprises tokenize with Medialane</h2>
           <p className="text-sm text-muted-foreground text-center mb-6">
             The same operating properties every asset on Medialane gets, applied to your business.
           </p>
@@ -144,11 +144,11 @@ export default function EnterprisePage() {
         </section>
 
         <section className="container mx-auto px-4 pb-16 max-w-5xl">
-          <h2 className="text-xl font-bold text-foreground text-center mb-6">Monetization services</h2>
+          <h2 className="font-display text-xl font-bold text-foreground text-center mb-6">Monetization services</h2>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {MONETIZATION.map(({ icon: Icon, title, description, href, color, bg }) => (
               <Link key={href} href={href} className="group">
-                <Card className="border-border bg-foreground/5 backdrop-blur-sm h-full transition-all group-hover:border-foreground/20">
+                <Card className="bg-foreground/5 backdrop-blur-sm h-full transition-all">
                   <CardContent className="p-6 space-y-3">
                     <div className={`h-10 w-10 rounded-lg ${bg} flex items-center justify-center`}>
                       <Icon className={`w-5 h-5 ${color}`} />
@@ -167,7 +167,7 @@ export default function EnterprisePage() {
         </section>
 
         <section className="container mx-auto px-4 pb-24 max-w-5xl">
-          <h2 className="text-xl font-bold text-foreground text-center mb-6">More ways to build value</h2>
+          <h2 className="font-display text-xl font-bold text-foreground text-center mb-6">More ways to build value</h2>
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {MORE_CAPABILITIES.map(({ icon: Icon, title, description }) => (
               <div key={title} className="space-y-2">

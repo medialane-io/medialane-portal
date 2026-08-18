@@ -95,7 +95,7 @@ export default function IpProtectionPage() {
           <Badge className="bg-primary/10 text-primary border-primary/30 px-4 py-1.5 text-sm">
             Tokenization for IP
           </Badge>
-          <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight text-foreground">
+          <h1 className="font-display text-4xl md:text-6xl font-extrabold tracking-tight text-foreground">
             Protecting Your Creative Work Worldwide
           </h1>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
@@ -110,10 +110,10 @@ export default function IpProtectionPage() {
         </section>
 
         <section className="container mx-auto px-4 pb-16 max-w-5xl">
-          <h2 className="text-2xl font-bold text-foreground text-center mb-6">Use Cases Built for Your Industry</h2>
+          <h2 className="font-display text-2xl font-bold text-foreground text-center mb-6">Use Cases Built for Your Industry</h2>
           <div className="grid md:grid-cols-3 gap-6">
             {USE_CASES.map(({ icon: Icon, title, description, color, bg }) => (
-              <Card key={title} className="border-border bg-foreground/5 backdrop-blur-sm">
+              <Card key={title} className="bg-foreground/5 backdrop-blur-sm">
                 <CardContent className="p-6 space-y-3">
                   <div className={`h-10 w-10 rounded-lg ${bg} flex items-center justify-center`}>
                     <Icon className={`w-5 h-5 ${color}`} />
@@ -127,7 +127,7 @@ export default function IpProtectionPage() {
         </section>
 
         <section className="container mx-auto px-4 pb-16 max-w-4xl">
-          <h2 className="text-2xl font-bold text-foreground text-center mb-2">What Can You Protect on Medialane.io?</h2>
+          <h2 className="font-display text-2xl font-bold text-foreground text-center mb-2">What Can You Protect on Medialane.io?</h2>
           <p className="text-sm text-muted-foreground text-center mb-6">
             You can secure any file format on the blockchain. Key examples include:
           </p>
@@ -142,7 +142,7 @@ export default function IpProtectionPage() {
         </section>
 
         <section className="container mx-auto px-4 pb-16 max-w-2xl">
-          <h2 className="text-2xl font-bold text-foreground text-center mb-6">How It Works in 3 Simple Steps</h2>
+          <h2 className="font-display text-2xl font-bold text-foreground text-center mb-6">How It Works in 3 Simple Steps</h2>
           <div className="relative">
             {STEPS.map(({ title, description }, i) => (
               <div key={title} className="relative flex gap-5 pb-10 last:pb-0">
@@ -177,7 +177,7 @@ export default function IpProtectionPage() {
         </section>
 
         <section className="container mx-auto px-4 pb-16 max-w-3xl">
-          <h2 className="text-2xl font-bold text-foreground text-center mb-6">Client Area</h2>
+          <h2 className="font-display text-2xl font-bold text-foreground text-center mb-6">Client Area</h2>
           <div className="grid sm:grid-cols-2 gap-6 mb-8">
             <div className="flex items-start gap-4">
               <div className="h-10 w-10 shrink-0 rounded-lg bg-brand-blue/10 flex items-center justify-center">
@@ -211,7 +211,7 @@ export default function IpProtectionPage() {
             <Link href="/enterprise"><ArrowLeft className="w-4 h-4 mr-1.5" />All Enterprise services</Link>
           </Button>
           <div>
-            <Button asChild size="lg">
+            <Button asChild variant="gradient-fill" className="from-brand-blue to-brand-maeve" size="lg">
               <a href="mailto:dao@medialane.org"><Mail className="w-4 h-4 mr-2" />dao@medialane.org</a>
             </Button>
           </div>

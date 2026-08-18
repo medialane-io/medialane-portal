@@ -29,7 +29,7 @@ export default function TokenizeEnterprisePage() {
           <Badge className="bg-primary/10 text-primary border-primary/30 px-4 py-1.5 text-sm">
             Tokenization for Enterprise
           </Badge>
-          <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight text-foreground">
+          <h1 className="font-display text-4xl md:text-6xl font-extrabold tracking-tight text-foreground">
             Credentials people can trust
           </h1>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
@@ -47,7 +47,7 @@ export default function TokenizeEnterprisePage() {
             <Link href="/enterprise"><ArrowLeft className="w-4 h-4 mr-1.5" />All Enterprise services</Link>
           </Button>
           <div>
-            <Button asChild size="lg">
+            <Button asChild variant="gradient-fill" className="from-brand-blue to-brand-maeve" size="lg">
               <a href="mailto:dao@medialane.org"><Mail className="w-4 h-4 mr-2" />dao@medialane.org</a>
             </Button>
           </div>

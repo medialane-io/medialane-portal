@@ -1,6 +1,6 @@
 import type React from "react"
 import "@/src/app/globals.css"
-import { Inter } from "next/font/google"
+import { Inter, Urbanist } from "next/font/google"
 import { Toaster } from "@/src/components/ui/toaster"
 import { SonnerToaster } from "@/src/components/ui/sonner"
 import FloatingNav from "@/src/components/floating-nav"
@@ -9,6 +9,7 @@ import FramerMotionProvider from "@/src/lib/framer-motion-provider"
 import { Providers } from "./providers";
 
 const inter = Inter({ subsets: ["latin"], display: "swap" })
+const urbanist = Urbanist({ subsets: ["latin"], display: "swap", variable: "--font-display" })
 
 import type { Metadata } from "next"
 
@@ -79,7 +80,7 @@ export default function RootLayout({
   return (
       <Providers>
         <html lang="en" suppressHydrationWarning>
-          <body className={`${inter.className} bg-background text-foreground`}>
+          <body className={`${inter.className} ${urbanist.variable} bg-background text-foreground`}>
             <FramerMotionProvider>
               <div className="relative min-h-screen flex flex-col">
                 <FloatingNav />

@@ -157,7 +157,7 @@ export default function Home() {
             Tokenization for business
           </Badge>
 
-          <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight text-foreground leading-tight">
+          <h1 className="font-display text-5xl md:text-7xl font-extrabold tracking-tight text-foreground leading-tight">
             Medialane
           </h1>
 
@@ -166,19 +166,19 @@ export default function Home() {
           </p>
 
           <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
-            <Button asChild variant="outline" size="sm">
+            <Button asChild variant="gradient-border" className="pair-blue-maeve" size="sm">
               <Link href="/platform">
                 <ShieldCheck className="w-3.5 h-3.5 mr-1.5" />
                 How it works
               </Link>
             </Button>
-            <Button asChild variant="outline" size="sm">
+            <Button asChild variant="gradient-fill" className="from-brand-blue to-brand-maeve" size="sm">
               <Link href="/services">
                 <LayoutGrid className="w-3.5 h-3.5 mr-1.5" />
                 Launchpad services
               </Link>
             </Button>
-            <Button asChild variant="outline" size="sm">
+            <Button asChild variant="gradient-border" className="pair-blue-maeve" size="sm">
               <Link href="/enterprise/ip">
                 <Globe className="w-3.5 h-3.5 mr-1.5" />
                 Protect your IP worldwide
@@ -236,7 +236,7 @@ export default function Home() {
                   </div>
                 ))}
               </div>
-              <Button asChild variant="outline" size="sm">
+              <Button asChild variant="gradient-border" className="pair-blue-maeve" size="sm">
                 <Link href="/enterprise/ai-data">
                   See how AI data compliance works
                   <ArrowRight className="w-3.5 h-3.5 ml-1.5" />
@@ -247,7 +247,7 @@ export default function Home() {
         </section>
 
         <section className="container mx-auto px-4 pb-16 max-w-5xl">
-          <h2 className="text-2xl font-bold text-foreground text-center mb-2">What can be registered and tokenized?</h2>
+          <h2 className="font-display text-2xl font-bold text-foreground text-center mb-2">What can be registered and tokenized?</h2>
           <p className="text-sm text-muted-foreground text-center mb-6">
             Any IP type can be registered and protected. Here&apos;s what Medialane supports
             today, with an example use case for each.
@@ -264,7 +264,7 @@ export default function Home() {
             ))}
           </div>
           <div className="text-center mt-8">
-            <Button asChild variant="outline" size="sm">
+            <Button asChild variant="gradient-border" className="pair-blue-maeve" size="sm">
               <Link href="/enterprise/ip">
                 See how IP protection works
                 <ArrowRight className="w-3.5 h-3.5 ml-1.5" />

@@ -43,7 +43,7 @@ export default function AiDataPage() {
           <Badge className="bg-primary/10 text-primary border-primary/30 px-4 py-1.5 text-sm">
             AI Data & Training
           </Badge>
-          <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight text-foreground">
+          <h1 className="font-display text-4xl md:text-6xl font-extrabold tracking-tight text-foreground">
             License your catalog for AI, and get paid per use
           </h1>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
@@ -62,10 +62,10 @@ export default function AiDataPage() {
             <Link href="/enterprise"><ArrowLeft className="w-4 h-4 mr-1.5" />All Enterprise services</Link>
           </Button>
           <div className="flex flex-wrap justify-center gap-3">
-            <Button asChild size="lg">
+            <Button asChild variant="gradient-fill" className="from-brand-blue to-brand-maeve" size="lg">
               <a href="mailto:dao@medialane.org"><Mail className="w-4 h-4 mr-2" />dao@medialane.org</a>
             </Button>
-            <Button asChild variant="outline" size="lg">
+            <Button asChild variant="gradient-border" className="pair-blue-maeve" size="lg">
               <Link href="/agents">See the agent side<ArrowRight className="w-4 h-4 ml-2" /></Link>
             </Button>
           </div>
