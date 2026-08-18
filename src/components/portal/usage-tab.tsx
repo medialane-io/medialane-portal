@@ -1,10 +1,9 @@
 "use client";
 
 import useSWR from "swr";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/src/components/ui/card";
 import { Skeleton } from "@/src/components/ui/skeleton";
 import { Badge } from "@/src/components/ui/badge";
-import { BarChart2, AlertCircle, Key } from "lucide-react";
+import { BarChart2, AlertCircle, Key, Coins, ArrowRight } from "lucide-react";
 import { portalFetcher } from "@/src/lib/portal/fetcher";
 
 interface KeyUsage {
@@ -31,9 +30,10 @@ function relativeTime(iso: string): string {
 
 interface UsageTabProps {
   address: string;
+  onViewCredits?: () => void;
 }
 
-export function UsageTab({ address }: UsageTabProps) {
+export function UsageTab({ address, onViewCredits }: UsageTabProps) {
   const { data, error, isLoading } = useSWR<UsageData>(
     `/api/portal/usage?address=${address}`,
     portalFetcher
@@ -50,7 +50,7 @@ export function UsageTab({ address }: UsageTabProps) {
 
   if (error) {
     return (
-      <div className="flex items-center gap-2 text-destructive p-4 rounded-xl border border-destructive/20 bg-destructive/5">
+      <div className="flex items-center gap-2 text-destructive p-4 rounded-xl bg-destructive/5">
         <AlertCircle className="w-4 h-4 shrink-0" />
         <span className="text-sm">Failed to load usage data. Make sure the backend is running.</span>
       </div>
@@ -61,65 +61,69 @@ export function UsageTab({ address }: UsageTabProps) {
   const activeKeys = keys.filter((k) => k.status === "ACTIVE");
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-10">
+      <div>
+        <h2 className="text-lg font-semibold flex items-center gap-2">
+          <BarChart2 className="w-5 h-5 text-primary" />
+          API Usage
+        </h2>
+        <p className="text-sm text-muted-foreground mt-1 max-w-md">
+          There&apos;s no monthly request cap — every call is metered by credits instead, drawn from the same
+          balance no matter which key made it.
+        </p>
+        <button
+          type="button"
+          onClick={onViewCredits}
+          className="inline-flex items-center gap-1 text-sm text-primary hover:underline mt-3"
+        >
+          <Coins className="w-3.5 h-3.5" />
+          View your balance and spend history
+          <ArrowRight className="w-3.5 h-3.5" />
+        </button>
+      </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-lg flex items-center gap-2">
-            <BarChart2 className="w-5 h-5 text-primary" />
-            API Usage
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-xs text-muted-foreground">
-            Every call is metered by credits, not a request cap — see the Credits tab for your balance and
-            spend history.
-          </p>
-        </CardContent>
-      </Card>
+      <div>
+        <h3 className="text-sm font-semibold text-muted-foreground mb-1">Your API keys</h3>
+        <p className="text-xs text-muted-foreground mb-5">Status and last activity for each key.</p>
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base">Your API Keys</CardTitle>
-          <CardDescription>Status and last activity for each key</CardDescription>
-        </CardHeader>
-        <CardContent>
-          {keys.length === 0 ? (
-            <div className="text-center py-8 text-muted-foreground text-sm">
-              No API keys yet. Create one in the API Keys tab to start making requests.
-            </div>
-          ) : (
-            <div className="space-y-3">
-              {keys.map((k) => (
-                <div key={k.prefix} className="flex items-center justify-between gap-2 text-sm">
-                  <div className="flex items-center gap-2 min-w-0">
-                    <Key className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
-                    <code className="font-mono text-xs text-primary">{k.prefix}***</code>
-                    {k.label && <span className="text-xs text-muted-foreground truncate">({k.label})</span>}
-                    <Badge
-                      className={
-                        k.status === "ACTIVE"
-                          ? "bg-primary/15 text-primary border-primary/30 text-xs"
-                          : "bg-muted text-muted-foreground text-xs"
-                      }
-                    >
-                      {k.status}
-                    </Badge>
-                  </div>
-                  <span className="text-xs text-muted-foreground shrink-0">
-                    {k.lastUsedAt ? `Last used ${relativeTime(k.lastUsedAt)}` : "Never used"}
-                  </span>
-                </div>
-              ))}
-            </div>
-          )}
-          {keys.length > 0 && activeKeys.length === 0 && (
-            <p className="mt-4 text-xs text-muted-foreground">
-              All your keys are revoked. Create a new key to resume making requests.
+        {keys.length === 0 ? (
+          <div className="flex flex-col items-center text-center py-12 gap-3">
+            <Key className="w-8 h-8 text-primary" />
+            <p className="text-sm text-muted-foreground max-w-xs">
+              No API keys yet — create one in the API Keys tab to start making requests.
             </p>
-          )}
-        </CardContent>
-      </Card>
+          </div>
+        ) : (
+          <div className="space-y-4">
+            {keys.map((k) => (
+              <div key={k.prefix} className="flex items-center justify-between gap-2 text-sm">
+                <div className="flex items-center gap-2 min-w-0">
+                  <Key className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
+                  <code className="font-mono text-xs text-primary">{k.prefix}***</code>
+                  {k.label && <span className="text-xs text-muted-foreground truncate">({k.label})</span>}
+                  <Badge
+                    className={
+                      k.status === "ACTIVE"
+                        ? "bg-primary/15 text-primary border-transparent text-xs"
+                        : "bg-muted text-muted-foreground border-transparent text-xs"
+                    }
+                  >
+                    {k.status}
+                  </Badge>
+                </div>
+                <span className="text-xs text-muted-foreground shrink-0">
+                  {k.lastUsedAt ? `Last used ${relativeTime(k.lastUsedAt)}` : "Never used"}
+                </span>
+              </div>
+            ))}
+          </div>
+        )}
+        {keys.length > 0 && activeKeys.length === 0 && (
+          <p className="mt-4 text-xs text-muted-foreground">
+            All your keys are revoked. Create a new key to resume making requests.
+          </p>
+        )}
+      </div>
     </div>
   );
 }

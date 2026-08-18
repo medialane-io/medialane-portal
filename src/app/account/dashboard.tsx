@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/src/components/ui/tabs";
 import { ApiKeysTab } from "@/src/components/portal/api-keys-tab";
 import { UsageTab } from "@/src/components/portal/usage-tab";
@@ -15,6 +16,7 @@ interface Props {
 }
 
 export function AccountDashboard({ address }: Props) {
+  const [tab, setTab] = useState("keys");
   const router = useRouter();
   const { disconnect } = useWallet();
   const { signOut } = usePortalAuth();
@@ -27,59 +29,53 @@ export function AccountDashboard({ address }: Props) {
 
   return (
     <div className="min-h-screen">
-      <div className="border-b border-border bg-background/60 backdrop-blur-sm">
-        <div className="container mx-auto px-4 max-w-5xl pt-28 pb-8">
-          <div className="flex flex-col sm:flex-row sm:items-center gap-5">
-            <div className="flex-1 flex flex-col gap-1 min-w-0">
-              <div className="flex flex-wrap items-center gap-2 mb-0.5">
-                <h1 className="text-lg font-mono font-bold truncate text-foreground">
-                  {address.slice(0, 8)}&hellip;{address.slice(-6)}
-                </h1>
-              </div>
-              <p className="text-xs text-muted-foreground">Starknet Wallet</p>
-            </div>
-            <div className="flex items-center gap-3">
-              <div className="hidden sm:block text-right shrink-0">
-                <p className="text-xs text-muted-foreground uppercase tracking-widest font-medium">API Portal</p>
-                <p className="text-xs text-muted-foreground/60 mt-0.5">Manage keys, usage &amp; credits</p>
-              </div>
-              <Button variant="ghost" size="sm" className="text-muted-foreground" onClick={handleSignOut}>
-                Sign out
-              </Button>
-            </div>
+      <div className="container mx-auto px-4 max-w-5xl pt-28 pb-10">
+        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-6">
+          <div className="flex-1 min-w-0">
+            <p className="text-xs font-semibold text-primary uppercase tracking-widest mb-2">Developer Portal</p>
+            <h1 className="text-2xl sm:text-3xl font-bold text-foreground mb-2">Your API account</h1>
+            <p className="text-sm text-muted-foreground max-w-lg">
+              Manage the keys, credits, and usage that power your integration with the Medialane API.
+            </p>
+            <p className="text-xs font-mono text-muted-foreground mt-4">
+              Signed in as {address.slice(0, 8)}&hellip;{address.slice(-6)} · Starknet Wallet
+            </p>
           </div>
+          <Button variant="ghost" size="sm" className="text-muted-foreground shrink-0" onClick={handleSignOut}>
+            Sign out
+          </Button>
         </div>
       </div>
 
-      <div className="container mx-auto px-4 max-w-5xl py-8">
-        <Tabs defaultValue="keys" className="space-y-6">
-          <TabsList className="w-full h-auto p-1 gap-1 bg-muted border border-border rounded-xl grid grid-cols-3">
+      <div className="container mx-auto px-4 max-w-5xl pb-8">
+        <Tabs value={tab} onValueChange={setTab} className="space-y-8">
+          <TabsList className="h-auto p-0 bg-transparent gap-6 justify-start w-full">
             <TabsTrigger
               value="keys"
-              className="flex items-center gap-1.5 py-2.5 text-xs sm:text-sm rounded-lg data-[state=active]:bg-primary/20 data-[state=active]:text-primary data-[state=active]:shadow-none"
+              className="flex items-center gap-1.5 px-0 py-2 text-sm font-medium rounded-none border-b-2 border-transparent text-muted-foreground data-[state=active]:border-primary data-[state=active]:text-foreground data-[state=active]:bg-transparent data-[state=active]:shadow-none"
             >
-              <Key className="w-3.5 h-3.5 shrink-0" />
-              <span className="hidden sm:inline">API Keys</span>
+              <Key className="w-4 h-4 shrink-0" />
+              API Keys
             </TabsTrigger>
             <TabsTrigger
               value="credits"
-              className="flex items-center gap-1.5 py-2.5 text-xs sm:text-sm rounded-lg data-[state=active]:bg-primary/20 data-[state=active]:text-primary data-[state=active]:shadow-none"
+              className="flex items-center gap-1.5 px-0 py-2 text-sm font-medium rounded-none border-b-2 border-transparent text-muted-foreground data-[state=active]:border-primary data-[state=active]:text-foreground data-[state=active]:bg-transparent data-[state=active]:shadow-none"
             >
-              <Coins className="w-3.5 h-3.5 shrink-0" />
-              <span className="hidden sm:inline">Credits</span>
+              <Coins className="w-4 h-4 shrink-0" />
+              Credits
             </TabsTrigger>
             <TabsTrigger
               value="usage"
-              className="flex items-center gap-1.5 py-2.5 text-xs sm:text-sm rounded-lg data-[state=active]:bg-primary/20 data-[state=active]:text-primary data-[state=active]:shadow-none"
+              className="flex items-center gap-1.5 px-0 py-2 text-sm font-medium rounded-none border-b-2 border-transparent text-muted-foreground data-[state=active]:border-primary data-[state=active]:text-foreground data-[state=active]:bg-transparent data-[state=active]:shadow-none"
             >
-              <BarChart2 className="w-3.5 h-3.5 shrink-0" />
-              <span className="hidden sm:inline">Usage</span>
+              <BarChart2 className="w-4 h-4 shrink-0" />
+              Usage
             </TabsTrigger>
           </TabsList>
 
           <TabsContent value="keys"><ApiKeysTab address={address} /></TabsContent>
           <TabsContent value="credits"><CreditsTab address={address} /></TabsContent>
-          <TabsContent value="usage"><UsageTab address={address} /></TabsContent>
+          <TabsContent value="usage"><UsageTab address={address} onViewCredits={() => setTab("credits")} /></TabsContent>
         </Tabs>
       </div>
     </div>
