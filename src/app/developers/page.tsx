@@ -85,7 +85,7 @@ export default function DevelopersPage() {
             <Code2 className="w-3.5 h-3.5 mr-1.5 inline" />
             Developers
           </Badge>
-          <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight text-foreground">
+          <h1 className="font-display text-4xl md:text-6xl font-extrabold tracking-tight text-foreground">
             One API for the whole protocol
           </h1>
           <p className="text-lg text-muted-foreground max-w-xl mx-auto">
@@ -94,17 +94,17 @@ export default function DevelopersPage() {
             building. Paid over x402, per call, the same rail enterprises and AI agents both use.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
-            <Button asChild size="lg" className="px-10">
+            <Button asChild variant="gradient-fill" className="from-brand-orange to-brand-maeve px-10" size="lg">
               <Link href="/account">Connect Wallet &amp; Get Access</Link>
             </Button>
-            <Button asChild variant="outline" size="lg" className="px-10">
+            <Button asChild variant="gradient-border" className="pair-orange-maeve px-10" size="lg">
               <Link href="/pricing">See pricing</Link>
             </Button>
           </div>
         </section>
 
         <section className="container mx-auto px-4 pb-16 max-w-2xl">
-          <h2 className="text-xl font-bold text-foreground text-center mb-6">Get building in three steps</h2>
+          <h2 className="font-display text-xl font-bold text-foreground text-center mb-6">Get building in three steps</h2>
           <FeatureRowList items={QUICKSTART} />
         </section>
 
@@ -123,7 +123,7 @@ export default function DevelopersPage() {
         </section>
 
         <section className="container mx-auto px-4 pb-16 max-w-5xl">
-          <h2 className="text-xl font-bold text-foreground text-center mb-6">Every live service, one API</h2>
+          <h2 className="font-display text-xl font-bold text-foreground text-center mb-6">Every live service, one API</h2>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {API_CARDS.map(({ icon: Icon, title, description, color, bg }) => (
               <Card key={title} className="border-border bg-foreground/5 backdrop-blur-sm">
@@ -140,7 +140,7 @@ export default function DevelopersPage() {
         </section>
 
         <section className="container mx-auto px-4 pb-16 max-w-5xl">
-          <h2 className="text-xl font-bold text-foreground text-center mb-2">Built for every caller</h2>
+          <h2 className="font-display text-xl font-bold text-foreground text-center mb-2">Built for every caller</h2>
           <p className="text-sm text-muted-foreground text-center mb-6">
             The same registry and the same API, three different ways in.
           </p>
@@ -166,10 +166,10 @@ export default function DevelopersPage() {
         </section>
 
         <section className="container mx-auto px-4 pb-24 max-w-2xl text-center space-y-4">
-          <h2 className="text-xl font-bold text-foreground">Resources</h2>
+          <h2 className="font-display text-xl font-bold text-foreground">Resources</h2>
           <div className="flex flex-wrap justify-center gap-3">
             {RESOURCES.map(({ title, href }) => (
-              <Button key={title} asChild variant="outline" size="sm">
+              <Button key={title} asChild variant="gradient-border" className="pair-orange-maeve" size="sm">
                 {href.startsWith("http") ? (
                   <a href={href} target="_blank" rel="noopener noreferrer">{title}</a>
                 ) : (
