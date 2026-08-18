@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import { z } from "zod"
 import { sendContactEmail } from "@/src/lib/mailer"
+import { createRateLimiter, clientIp } from "@/src/lib/rate-limit"
 
 const schema = z.object({
   name: z.string().min(1, "Name is required").max(100),
@@ -10,7 +11,13 @@ const schema = z.object({
   _hp: z.string().optional(),
 })
 
+const checkRateLimit = createRateLimiter(60_000, 5)
+
 export async function POST(req: NextRequest) {
+  if (!checkRateLimit(clientIp(req))) {
+    return NextResponse.json({ error: "Too many requests" }, { status: 429 })
+  }
+
   try {
     const body = await req.json()
 

@@ -3,12 +3,15 @@ import { z } from "zod";
 import { createSession, setSessionCookie } from "@/src/lib/portal-session";
 import { isAdminAddress } from "@/src/lib/admin-allowlist";
 import { normalizeStarknetAddress } from "@/src/lib/starknet-address";
+import { createRateLimiter, clientIp } from "@/src/lib/rate-limit";
 
 const bodySchema = z.object({
   address: z.string().min(3),
   nonce: z.string().min(1),
   signature: z.array(z.string()).min(1),
 });
+
+const checkRateLimit = createRateLimiter(60_000, 20);
 
 /** Every signed-in account gets developer access — find its ApiClient, provisioning one on first sign-in. */
 async function resolveApiClientId(apiUrl: string, apiSecret: string, accountId: string): Promise<string | null> {
@@ -37,6 +40,10 @@ async function resolveApiClientId(apiUrl: string, apiSecret: string, accountId: 
 }
 
 export async function POST(req: NextRequest) {
+  if (!checkRateLimit(clientIp(req))) {
+    return NextResponse.json({ error: "Too many requests" }, { status: 429 });
+  }
+
   const parsed = bodySchema.safeParse(await req.json().catch(() => null));
   if (!parsed.success) return NextResponse.json({ error: "Invalid body" }, { status: 400 });
 

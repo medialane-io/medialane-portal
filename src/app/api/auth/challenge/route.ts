@@ -1,6 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
+import { createRateLimiter, clientIp } from "@/src/lib/rate-limit";
+
+const checkRateLimit = createRateLimiter(60_000, 20);
 
 export async function GET(req: NextRequest) {
+  if (!checkRateLimit(clientIp(req))) {
+    return NextResponse.json({ error: "Too many requests" }, { status: 429 });
+  }
+
   const address = req.nextUrl.searchParams.get("address");
   if (!address) return NextResponse.json({ error: "Missing address" }, { status: 400 });
 
