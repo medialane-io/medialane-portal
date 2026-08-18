@@ -59,7 +59,7 @@ function QuickstartCard() {
   };
 
   return (
-    <Collapsible open={open} onOpenChange={setOpen} className="rounded-2xl bg-brand-blue/5 px-5">
+    <Collapsible open={open} onOpenChange={setOpen} className="rounded-2xl border border-brand-blue px-5">
       <CollapsibleTrigger asChild>
         <button className="w-full flex items-center justify-between gap-3 py-4 text-left group">
           <span className="flex items-center gap-2.5">

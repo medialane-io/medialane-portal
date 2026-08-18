@@ -29,7 +29,7 @@ interface CreditsData {
 function StatLink({
   href,
   icon: Icon,
-  bg,
+  border,
   fg,
   value,
   label,
@@ -37,7 +37,7 @@ function StatLink({
 }: {
   href: string;
   icon: typeof Key;
-  bg: string;
+  border: string;
   fg: string;
   value: string | number;
   label: string;
@@ -46,11 +46,11 @@ function StatLink({
   return (
     <Link
       href={href}
-      className={`group flex flex-col gap-6 rounded-2xl p-6 ${bg} transition-transform hover:-translate-y-0.5`}
+      className={`group flex flex-col gap-6 rounded-2xl border p-6 ${border} transition-transform hover:-translate-y-0.5`}
     >
       <div className="flex items-center justify-between">
         <Icon className={`w-5 h-5 ${fg}`} />
-        <ArrowRight className={`w-4 h-4 ${fg} opacity-60 transition-transform group-hover:translate-x-1 group-hover:opacity-100`} />
+        <ArrowRight className={`w-4 h-4 ${fg} transition-transform group-hover:translate-x-1`} />
       </div>
       <div>
         <p className="text-3xl font-bold text-foreground tabular-nums">{value}</p>
@@ -103,10 +103,12 @@ export function AccountDashboard({ address }: Props) {
       </div>
 
       <div className="container mx-auto px-4 max-w-5xl pb-16 space-y-4">
-        <div className="rounded-2xl bg-brand-purple/10 p-8">
+        <div className="rounded-2xl border border-brand-purple p-8">
           <p className="text-xs text-muted-foreground uppercase tracking-wider mb-2">Credits balance</p>
-          <p className="text-5xl sm:text-6xl font-bold text-foreground tabular-nums">{balance.toLocaleString()}</p>
-          <p className="text-sm text-muted-foreground mt-1 mb-6">credits remaining</p>
+          <p className="text-5xl sm:text-6xl font-bold text-foreground tabular-nums mb-6">
+            {balance.toLocaleString()}
+            <span className="text-lg font-medium text-muted-foreground ml-2">credits</span>
+          </p>
           <Button
             variant="gradient-fill"
             onClick={() => setDepositOpen(true)}
@@ -121,7 +123,7 @@ export function AccountDashboard({ address }: Props) {
           <StatLink
             href="/account/keys"
             icon={Key}
-            bg="bg-brand-blue/10"
+            border="border-brand-blue"
             fg="text-brand-blue"
             value={activeKeys.length}
             label="API Keys"
@@ -130,7 +132,7 @@ export function AccountDashboard({ address }: Props) {
           <StatLink
             href="/account/credits"
             icon={Coins}
-            bg="bg-brand-rose/10"
+            border="border-brand-rose"
             fg="text-brand-rose"
             value={balance.toLocaleString()}
             label="Credits"
@@ -139,7 +141,7 @@ export function AccountDashboard({ address }: Props) {
           <StatLink
             href="/account/usage"
             icon={BarChart2}
-            bg="bg-brand-orange/10"
+            border="border-brand-orange"
             fg="text-brand-orange"
             value={topUps}
             label="Top-ups"

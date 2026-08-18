@@ -55,10 +55,12 @@ export function CreditsTab({ address }: Props) {
           </div>
         </div>
 
-        <div className="mt-6 rounded-2xl bg-brand-rose/10 p-8">
-          <p className="text-xs text-muted-foreground uppercase tracking-wider mb-1">Balance</p>
-          <p className="text-5xl sm:text-6xl font-bold text-foreground tabular-nums">{balance.toLocaleString()}</p>
-          <p className="text-sm text-muted-foreground mt-1 mb-6">credits remaining</p>
+        <div className="mt-6 rounded-2xl border border-brand-rose p-8">
+          <p className="text-xs text-muted-foreground uppercase tracking-wider mb-2">Balance</p>
+          <p className="text-5xl sm:text-6xl font-bold text-foreground tabular-nums mb-6">
+            {balance.toLocaleString()}
+            <span className="text-lg font-medium text-muted-foreground ml-2">credits</span>
+          </p>
           <Button
             variant="gradient-fill"
             onClick={() => setDepositOpen(true)}
