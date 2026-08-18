@@ -3,24 +3,19 @@
 import useSWR from "swr";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/src/components/ui/card";
 import { Skeleton } from "@/src/components/ui/skeleton";
-import { Progress } from "@/src/components/ui/progress";
 import { Badge } from "@/src/components/ui/badge";
 import { BarChart2, AlertCircle, Key } from "lucide-react";
 import { portalFetcher } from "@/src/lib/portal/fetcher";
-
-const FREE_MONTHLY_LIMIT = 50;
 
 interface KeyUsage {
   prefix: string;
   label: string | null;
   status: "ACTIVE" | "REVOKED";
   lastUsedAt: string | null;
-  monthlyRequestCount: number;
-  monthlyResetAt: string | null;
 }
 
 interface UsageData {
-  data?: { totalMonthlyRequests?: number; keys?: KeyUsage[] };
+  data?: { keys?: KeyUsage[] };
 }
 
 function relativeTime(iso: string): string {
@@ -32,13 +27,6 @@ function relativeTime(iso: string): string {
   const hrs = Math.floor(mins / 60);
   if (hrs < 24) return `${hrs}h ago`;
   return `${Math.floor(hrs / 24)}d ago`;
-}
-
-function formatResetDate(iso: string | null): string | null {
-  if (!iso) return null;
-  const d = new Date(iso);
-  if (isNaN(d.getTime())) return null;
-  return d.toLocaleDateString("en-US", { month: "long", day: "numeric" });
 }
 
 interface UsageTabProps {
@@ -69,7 +57,6 @@ export function UsageTab({ address }: UsageTabProps) {
     );
   }
 
-  const totalMonthlyRequests = data?.data?.totalMonthlyRequests ?? 0;
   const keys = data?.data?.keys ?? [];
   const activeKeys = keys.filter((k) => k.status === "ACTIVE");
 
@@ -80,25 +67,21 @@ export function UsageTab({ address }: UsageTabProps) {
         <CardHeader>
           <CardTitle className="text-lg flex items-center gap-2">
             <BarChart2 className="w-5 h-5 text-primary" />
-            API Usage — This Month
+            API Usage
           </CardTitle>
-          <CardDescription>
-            Total requests across all your keys:{" "}
-            <span className="text-foreground font-semibold">{totalMonthlyRequests.toLocaleString()}</span>
-          </CardDescription>
         </CardHeader>
         <CardContent>
           <p className="text-xs text-muted-foreground">
-            The FREE tier allows {FREE_MONTHLY_LIMIT} requests per key each calendar month. Add credits to
-            keep calling once a key is exhausted.
+            Every call is metered by credits, not a request cap — see the Credits tab for your balance and
+            spend history.
           </p>
         </CardContent>
       </Card>
 
       <Card className="border-primary/20 bg-background/50 backdrop-blur-sm">
         <CardHeader>
-          <CardTitle className="text-base">Per-Key Usage</CardTitle>
-          <CardDescription>Monthly requests for each of your API keys</CardDescription>
+          <CardTitle className="text-base">Your API Keys</CardTitle>
+          <CardDescription>Status and last activity for each key</CardDescription>
         </CardHeader>
         <CardContent>
           {keys.length === 0 ? (
@@ -106,40 +89,28 @@ export function UsageTab({ address }: UsageTabProps) {
               No API keys yet. Create one in the API Keys tab to start making requests.
             </div>
           ) : (
-            <div className="space-y-4">
-              {keys.map((k) => {
-                const pct = Math.min((k.monthlyRequestCount / FREE_MONTHLY_LIMIT) * 100, 100);
-                const warn = k.status === "ACTIVE" && k.monthlyRequestCount / FREE_MONTHLY_LIMIT > 0.8;
-                const reset = formatResetDate(k.monthlyResetAt);
-                return (
-                  <div key={k.prefix} className="space-y-1.5">
-                    <div className="flex items-center justify-between gap-2 text-sm">
-                      <div className="flex items-center gap-2 min-w-0">
-                        <Key className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
-                        <code className="font-mono text-xs text-primary">{k.prefix}***</code>
-                        {k.label && <span className="text-xs text-muted-foreground truncate">({k.label})</span>}
-                        <Badge
-                          className={
-                            k.status === "ACTIVE"
-                              ? "bg-green-500/15 text-green-400 border-green-500/30 text-xs"
-                              : "bg-muted text-muted-foreground text-xs"
-                          }
-                        >
-                          {k.status}
-                        </Badge>
-                      </div>
-                      <span className={warn ? "text-orange-400 font-semibold shrink-0" : "text-muted-foreground shrink-0"}>
-                        {k.monthlyRequestCount} / {FREE_MONTHLY_LIMIT}
-                      </span>
-                    </div>
-                    <Progress value={pct} className={warn ? "[&>div]:bg-orange-400" : undefined} />
-                    <p className="text-xs text-muted-foreground">
-                      {k.lastUsedAt ? `Last used ${relativeTime(k.lastUsedAt)}` : "Never used"}
-                      {reset ? ` · Resets ${reset}` : ""}
-                    </p>
+            <div className="space-y-3">
+              {keys.map((k) => (
+                <div key={k.prefix} className="flex items-center justify-between gap-2 text-sm">
+                  <div className="flex items-center gap-2 min-w-0">
+                    <Key className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
+                    <code className="font-mono text-xs text-primary">{k.prefix}***</code>
+                    {k.label && <span className="text-xs text-muted-foreground truncate">({k.label})</span>}
+                    <Badge
+                      className={
+                        k.status === "ACTIVE"
+                          ? "bg-green-500/15 text-green-400 border-green-500/30 text-xs"
+                          : "bg-muted text-muted-foreground text-xs"
+                      }
+                    >
+                      {k.status}
+                    </Badge>
                   </div>
-                );
-              })}
+                  <span className="text-xs text-muted-foreground shrink-0">
+                    {k.lastUsedAt ? `Last used ${relativeTime(k.lastUsedAt)}` : "Never used"}
+                  </span>
+                </div>
+              ))}
             </div>
           )}
           {keys.length > 0 && activeKeys.length === 0 && (
