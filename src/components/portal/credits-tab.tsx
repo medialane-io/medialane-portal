@@ -9,7 +9,7 @@ import { Input } from "@/src/components/ui/input";
 import { Label } from "@/src/components/ui/label";
 import { Coins, Zap, ExternalLink, Loader2 } from "lucide-react";
 import { portalFetcher } from "@/src/lib/portal/fetcher";
-import { CREDITS_PER_USDC } from "@/src/lib/constants";
+import { CREDITS_PER_USDC, EXPLORER_URL } from "@/src/lib/constants";
 
 const USDC_CONTRACT = "0x033068f6539f8e6e6b131e6b2b814e6c34a5224bc66947c47dab9dfee93b35fb";
 
@@ -151,7 +151,7 @@ export function CreditsTab({ address }: Props) {
                   Confirm credit
                 </Button>
                 <a
-                  href={`https://starkscan.co/tx/${pendingTx}`}
+                  href={`${EXPLORER_URL}/tx/${pendingTx}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="underline flex items-center gap-1"
@@ -189,7 +189,7 @@ export function CreditsTab({ address }: Props) {
                     </p>
                   </div>
                   <a
-                    href={`https://starkscan.co/tx/${p.txHash}`}
+                    href={`${EXPLORER_URL}/tx/${p.txHash}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-xs text-muted-foreground hover:text-foreground flex items-center gap-1"
