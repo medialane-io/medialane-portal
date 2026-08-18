@@ -137,7 +137,7 @@ export default function ServicesPage() {
           <Badge className="bg-primary/10 text-primary border-primary/30 px-4 py-1.5 text-sm">
             Launchpad
           </Badge>
-          <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight text-foreground">
+          <h1 className="font-display text-4xl md:text-6xl font-extrabold tracking-tight text-foreground">
             One Launchpad for everything you issue
           </h1>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
@@ -149,12 +149,12 @@ export default function ServicesPage() {
         {GROUPS.map((group) => (
           <section key={group.key} className="container mx-auto px-4 pb-16 max-w-5xl">
             <div className="mb-6">
-              <h2 className="text-2xl font-bold text-foreground">{group.title}</h2>
+              <h2 className="font-display text-2xl font-bold text-foreground">{group.title}</h2>
               <p className="text-sm text-muted-foreground mt-1">{group.tagline}</p>
             </div>
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
               {group.services.map(({ icon: Icon, title, description, color, bg }) => (
-                <Card key={title} className="border-border bg-foreground/5 backdrop-blur-sm">
+                <Card key={title} className="bg-foreground/5 backdrop-blur-sm">
                   <CardContent className="p-6 space-y-3">
                     <div className={`h-10 w-10 rounded-lg ${bg} flex items-center justify-center`}>
                       <Icon className={`w-5 h-5 ${color}`} />
@@ -170,14 +170,14 @@ export default function ServicesPage() {
 
         <section className="container mx-auto px-4 pb-16 max-w-5xl">
           <div className="mb-6 text-center">
-            <h2 className="text-2xl font-bold text-foreground">How teams put this to work</h2>
+            <h2 className="font-display text-2xl font-bold text-foreground">How teams put this to work</h2>
             <p className="text-sm text-muted-foreground mt-1">
               A few of the services above, combined for a real deployment.
             </p>
           </div>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {USE_CASES.map(({ icon: Icon, eyebrow, title, description, services, color, bg }) => (
-              <Card key={title} className="border-border bg-foreground/5 backdrop-blur-sm">
+              <Card key={title} className="bg-foreground/5 backdrop-blur-sm">
                 <CardContent className="p-6 space-y-3">
                   <div className={`h-10 w-10 rounded-lg ${bg} flex items-center justify-center`}>
                     <Icon className={`w-5 h-5 ${color}`} />
@@ -189,7 +189,7 @@ export default function ServicesPage() {
                     {services.map((service) => (
                       <span
                         key={service}
-                        className="text-xs font-medium text-foreground/70 bg-foreground/5 border border-border rounded-full px-2.5 py-1"
+                        className="text-xs font-medium text-foreground/70 bg-foreground/5 rounded-full px-2.5 py-1"
                       >
                         {service}
                       </span>
@@ -202,18 +202,18 @@ export default function ServicesPage() {
         </section>
 
         <section className="container mx-auto px-4 pb-24 max-w-4xl">
-          <Card className="border-border bg-foreground/5 backdrop-blur-sm overflow-hidden">
+          <Card className="bg-foreground/5 backdrop-blur-sm overflow-hidden">
             <CardContent className="p-8 grid md:grid-cols-2 gap-8 items-center">
               <div className="space-y-3">
                 <div className="h-10 w-10 rounded-lg bg-brand-rose/10 flex items-center justify-center">
                   <ShoppingBag className="w-5 h-5 text-brand-rose" />
                 </div>
-                <h2 className="text-2xl font-bold text-foreground">Marketplace</h2>
+                <h2 className="font-display text-2xl font-bold text-foreground">Marketplace</h2>
                 <p className="text-sm text-muted-foreground">
                   Every asset issued through the Launchpad can trade here. Payment and asset move
                   in one transaction, or neither moves. There&apos;s no escrow holding funds in between.
                 </p>
-                <Button asChild variant="outline">
+                <Button asChild variant="gradient-fill" className="from-brand-blue to-brand-orange">
                   <Link href="/developers">
                     See the API
                     <ArrowRight className="w-4 h-4 ml-2" />
