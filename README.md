@@ -32,7 +32,7 @@ The platform operates through two integrated products:
 - **Agent quickstart** — SIWS auth flow, credit top-up, autonomous agent patterns at `/docs/agents`
 
 ### For Creators
-- **Starknet wallet auth** — Sign in with Starknet (SIWS) — no password, no Clerk, no custodial key
+- **Starknet wallet auth** — Sign in with Starknet (SIWS)
 - **Credit system** — Pay-as-you-go credits, MDLN token multipliers (up to 2×)
 - **Contact form** — Reach the team at `/connect`
 
