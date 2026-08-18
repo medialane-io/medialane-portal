@@ -69,7 +69,7 @@ export default function InfrastructurePage() {
                   <Icon className={`w-5 h-5 ${color}`} />
                 </div>
                 <div className="pt-1.5">
-                  <p className="text-xs font-mono text-muted-foreground mb-1">Step {i + 1}</p>
+                  <p className="text-xs text-muted-foreground mb-1">Step {i + 1}</p>
                   <h3 className="text-lg font-bold text-foreground">{title}</h3>
                   <p className="text-sm text-muted-foreground mt-1">{description}</p>
                 </div>

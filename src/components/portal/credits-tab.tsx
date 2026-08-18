@@ -56,7 +56,7 @@ export function CreditsTab({ address }: Props) {
         </div>
 
         <div className="mt-6 rounded-2xl border border-brand-rose p-8">
-          <p className="text-xs text-muted-foreground uppercase tracking-wider mb-2">Balance</p>
+          <p className="text-xs text-muted-foreground mb-2">Balance</p>
           <p className="text-5xl sm:text-6xl font-bold text-foreground tabular-nums mb-6">
             {balance.toLocaleString()}
             <span className="text-lg font-medium text-muted-foreground ml-2">credits</span>

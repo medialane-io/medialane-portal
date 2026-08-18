@@ -64,7 +64,7 @@ function ActionsCard() {
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="text-xs text-muted-foreground uppercase tracking-wider border-b border-border">
+              <tr className="text-xs text-muted-foreground border-b border-border">
                 <th className="text-left pb-2 pr-3">Action</th>
                 <th className="text-left pb-2 pr-3">XP</th>
                 <th className="text-left pb-2 pr-3">Daily cap</th>
@@ -77,7 +77,7 @@ function ActionsCard() {
                 <tr key={a.type} className={a.enabled ? "" : "opacity-50"}>
                   <td className="py-2 pr-3">
                     <p className="text-xs font-medium">{a.label}</p>
-                    <p className="text-[10px] text-muted-foreground font-mono">{a.type}</p>
+                    <p className="text-[10px] text-muted-foreground">{a.type}</p>
                   </td>
                   {editing === a.type ? (
                     <>
@@ -86,8 +86,8 @@ function ActionsCard() {
                     </>
                   ) : (
                     <>
-                      <td className="py-2 pr-3 font-mono text-xs">{a.xp}</td>
-                      <td className="py-2 pr-3 font-mono text-xs">{a.dailyCap ?? "—"}</td>
+                      <td className="py-2 pr-3 text-xs">{a.xp}</td>
+                      <td className="py-2 pr-3 text-xs">{a.dailyCap ?? "—"}</td>
                     </>
                   )}
                   <td className="py-2 pr-3">
@@ -153,7 +153,7 @@ function MultipliersCard() {
                 </>
               ) : (
                 <>
-                  <span className="font-mono text-xs">{m.factor}×</span>
+                  <span className="text-xs">{m.factor}×</span>
                   <Button size="sm" variant="ghost" className="h-6 px-2 text-xs" onClick={() => { setEditing(m.id); setFactor(String(m.factor)); }}>Edit</Button>
                 </>
               )}
@@ -214,11 +214,11 @@ function BadgesCard() {
         </div>
       )}
       <div className="border-t border-border pt-3 space-y-2">
-        <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Manually award a badge</p>
+        <p className="text-xs font-medium text-muted-foreground">Manually award a badge</p>
         <div className="flex flex-wrap items-end gap-2">
           <div className="space-y-1 flex-1 min-w-[200px]">
             <Label className="text-xs">Wallet address</Label>
-            <Input value={address} onChange={(e) => setAddress(e.target.value)} placeholder="0x…" className="h-8 text-xs font-mono" />
+            <Input value={address} onChange={(e) => setAddress(e.target.value)} placeholder="0x…" className="h-8 text-xs" />
           </div>
           <div className="space-y-1">
             <Label className="text-xs">Badge</Label>

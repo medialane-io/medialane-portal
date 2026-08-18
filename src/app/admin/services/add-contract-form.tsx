@@ -61,7 +61,7 @@ export function AddContractForm({ serviceId }: Props) {
 
   return (
     <form onSubmit={handleSubmit} className="border border-border rounded-lg p-4 space-y-3 mt-2">
-      <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Add contract</p>
+      <p className="text-xs font-medium text-muted-foreground">Add contract</p>
 
       <div className="grid grid-cols-2 gap-3">
         <div className="space-y-1">
@@ -85,7 +85,7 @@ export function AddContractForm({ serviceId }: Props) {
             value={form.startBlock}
             onChange={(e) => setForm((f) => ({ ...f, startBlock: e.target.value }))}
             required
-            className="w-full bg-background border border-border rounded px-2 py-1.5 text-sm font-mono focus:outline-none focus:ring-1 focus:ring-ring"
+            className="w-full bg-background border border-border rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-ring"
           />
         </div>
       </div>
@@ -98,7 +98,7 @@ export function AddContractForm({ serviceId }: Props) {
           value={form.contractAddress}
           onChange={(e) => setForm((f) => ({ ...f, contractAddress: e.target.value }))}
           required
-          className="w-full bg-background border border-border rounded px-2 py-1.5 text-sm font-mono focus:outline-none focus:ring-1 focus:ring-ring"
+          className="w-full bg-background border border-border rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-ring"
         />
       </div>
 

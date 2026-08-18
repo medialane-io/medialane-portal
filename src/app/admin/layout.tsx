@@ -107,7 +107,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     <div className="container mx-auto px-4 py-6 pt-28">
       <div className="mb-6">
         <div className="flex items-center justify-between gap-4">
-          <p className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">Admin Panel</p>
+          <p className="text-sm font-semibold text-muted-foreground">Admin Panel</p>
           <Button variant="ghost" size="sm" className="text-muted-foreground" onClick={signOutAdmin}>
             End admin session
           </Button>

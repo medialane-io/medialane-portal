@@ -89,14 +89,14 @@ export default function AdminCreatorsPage() {
                 href={`/creator/${c.username}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="font-mono text-sm font-medium hover:text-primary transition-colors flex items-center gap-1"
+                className="text-sm font-medium hover:text-primary transition-colors flex items-center gap-1"
               >
                 @{c.username}
                 <ExternalLink className="h-3 w-3 opacity-50" />
               </a>
             </div>
             <div className="flex-1 min-w-0">
-              <p className="font-mono text-xs text-muted-foreground truncate">{c.walletAddress}</p>
+              <p className="text-xs text-muted-foreground truncate">{c.walletAddress}</p>
             </div>
             <div className="w-24 hidden sm:block">
               <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${STATUS_STYLE[c.status] ?? ""}`}>
@@ -130,7 +130,7 @@ export default function AdminCreatorsPage() {
           <div className="space-y-3 py-2">
             <div className="space-y-1">
               <Label className="text-xs text-muted-foreground">Current (wrong) address</Label>
-              <p className="font-mono text-xs break-all bg-muted rounded p-2">{fixCreator?.walletAddress}</p>
+              <p className="text-xs break-all bg-muted rounded p-2">{fixCreator?.walletAddress}</p>
             </div>
             <div className="space-y-1.5">
               <Label>Correct wallet address</Label>

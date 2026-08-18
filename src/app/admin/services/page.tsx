@@ -71,7 +71,7 @@ export default async function ServicesPage() {
               <div className="flex items-center gap-3">
                 <div>
                   <p className="font-semibold">{service.displayName}</p>
-                  <p className="text-xs text-muted-foreground font-mono">{service.id}</p>
+                  <p className="text-xs text-muted-foreground">{service.id}</p>
                 </div>
                 <span className="ml-auto text-xs text-muted-foreground border border-border rounded px-2 py-0.5">
                   {service.standard}
@@ -82,7 +82,7 @@ export default async function ServicesPage() {
                 <div className="overflow-x-auto">
                   <table className="w-full text-sm">
                     <thead>
-                      <tr className="text-xs text-muted-foreground uppercase tracking-wider border-b border-border">
+                      <tr className="text-xs text-muted-foreground border-b border-border">
                         <th className="text-left pb-2 pr-4">Chain</th>
                         <th className="text-left pb-2 pr-4">Address</th>
                         <th className="text-left pb-2 pr-4">Start Block</th>
@@ -96,8 +96,8 @@ export default async function ServicesPage() {
                       {serviceContracts.map((contract) => (
                         <tr key={contract.id} className={contract.active ? "" : "opacity-50"}>
                           <td className="py-2 pr-4 text-muted-foreground">{contract.chain}</td>
-                          <td className="py-2 pr-4 font-mono text-xs">{truncateAddress(contract.contractAddress)}</td>
-                          <td className="py-2 pr-4 font-mono text-xs">{contract.startBlock}</td>
+                          <td className="py-2 pr-4 text-xs">{truncateAddress(contract.contractAddress)}</td>
+                          <td className="py-2 pr-4 text-xs">{contract.startBlock}</td>
                           <td className="py-2 pr-4 text-muted-foreground text-xs">
                             {new Date(contract.createdAt).toLocaleDateString()}
                           </td>

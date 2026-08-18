@@ -66,11 +66,11 @@ function CollectionClaimsTab() {
             <div key={claim.id} className="glass rounded-lg p-4 flex items-start justify-between gap-4">
               <div className="space-y-1 min-w-0">
                 <div className="flex items-center gap-2 flex-wrap">
-                  <span className="font-mono text-sm truncate max-w-xs">{claim.contractAddress}</span>
+                  <span className="text-sm truncate max-w-xs">{claim.contractAddress}</span>
                   <Badge variant="outline" className={STATUS_STYLE[claim.status]}>{claim.status}</Badge>
                   <Badge variant="outline" className={METHOD_STYLE[claim.verificationMethod]}>{claim.verificationMethod}</Badge>
                 </div>
-                {claim.claimantAddress && <p className="text-xs text-muted-foreground font-mono">{claim.claimantAddress.slice(0, 16)}…</p>}
+                {claim.claimantAddress && <p className="text-xs text-muted-foreground">{claim.claimantAddress.slice(0, 16)}…</p>}
                 {claim.claimantEmail && <p className="text-xs text-muted-foreground">{claim.claimantEmail}</p>}
                 {claim.notes && <p className="text-xs text-foreground/60 italic">&ldquo;{claim.notes}&rdquo;</p>}
                 <p className="text-xs text-muted-foreground">{formatDistanceToNow(new Date(claim.createdAt), { addSuffix: true })}</p>
@@ -88,7 +88,7 @@ function CollectionClaimsTab() {
         <DialogContent>
           <DialogHeader><DialogTitle>Review Collection Claim</DialogTitle></DialogHeader>
           <div className="space-y-3 py-2 text-sm">
-            <p className="font-mono break-all">{selected?.contractAddress}</p>
+            <p className="break-all">{selected?.contractAddress}</p>
             {selected?.claimantEmail && <p className="text-muted-foreground">{selected.claimantEmail}</p>}
             {selected?.notes && <p className="italic text-foreground/70">&ldquo;{selected.notes}&rdquo;</p>}
             <div className="space-y-1">
@@ -147,10 +147,10 @@ function UsernameClaimsTab() {
             <div key={claim.id} className="glass rounded-lg p-4 flex items-start justify-between gap-4">
               <div className="space-y-1 min-w-0">
                 <div className="flex items-center gap-2 flex-wrap">
-                  <span className="font-mono text-sm font-medium">@{claim.username}</span>
+                  <span className="text-sm font-medium">@{claim.username}</span>
                   <Badge variant="outline" className={STATUS_STYLE[claim.status]}>{claim.status}</Badge>
                 </div>
-                <p className="text-xs text-muted-foreground font-mono">{claim.walletAddress.slice(0, 16)}…</p>
+                <p className="text-xs text-muted-foreground">{claim.walletAddress.slice(0, 16)}…</p>
                 {claim.adminNotes && <p className="text-xs text-foreground/60 italic">&ldquo;{claim.adminNotes}&rdquo;</p>}
                 <p className="text-xs text-muted-foreground">{formatDistanceToNow(new Date(claim.createdAt), { addSuffix: true })}</p>
               </div>
@@ -169,11 +169,11 @@ function UsernameClaimsTab() {
           <div className="space-y-3 py-2 text-sm">
             <div>
               <p className="text-xs text-muted-foreground uppercase tracking-wide mb-1">Requested username</p>
-              <p className="font-mono text-lg font-bold">@{selected?.username}</p>
+              <p className="text-lg font-bold">@{selected?.username}</p>
             </div>
             <div>
               <p className="text-xs text-muted-foreground uppercase tracking-wide mb-1">Wallet</p>
-              <p className="font-mono text-xs break-all">{selected?.walletAddress}</p>
+              <p className="text-xs break-all">{selected?.walletAddress}</p>
             </div>
             <div>
               <p className="text-xs text-muted-foreground uppercase tracking-wide mb-1">Creator profile</p>

@@ -120,7 +120,7 @@ export default function CoinSettingsPage() {
           <ArrowLeft className="h-4 w-4 mr-1.5" /> Back to coins
         </Button>
         <p className="text-sm text-muted-foreground">
-          Coin not found for <span className="font-mono break-all">{contract}</span>.
+          Coin not found for <span className="break-all">{contract}</span>.
         </p>
       </div>
     );
@@ -153,7 +153,7 @@ export default function CoinSettingsPage() {
             href={`${EXPLORER_URL}/contract/${coin.contractAddress}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-xs font-mono text-muted-foreground hover:text-foreground inline-flex items-center gap-1 mt-0.5 break-all"
+            className="text-xs text-muted-foreground hover:text-foreground inline-flex items-center gap-1 mt-0.5 break-all"
           >
             {coin.contractAddress} <ExternalLink className="h-3 w-3 shrink-0" />
           </a>

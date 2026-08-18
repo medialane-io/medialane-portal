@@ -92,7 +92,7 @@ export function AccountDashboard({ address }: Props) {
             <p className="text-sm text-muted-foreground max-w-lg">
               Manage the keys, credits, and usage behind everything you build and run on Medialane.
             </p>
-            <p className="text-xs font-mono text-muted-foreground mt-4">
+            <p className="text-xs text-muted-foreground mt-4">
               Signed in as {address.slice(0, 8)}&hellip;{address.slice(-6)} · Starknet Wallet
             </p>
           </div>
@@ -104,7 +104,7 @@ export function AccountDashboard({ address }: Props) {
 
       <div className="container mx-auto px-4 max-w-5xl pb-16 space-y-4">
         <div className="rounded-2xl border border-brand-purple p-8">
-          <p className="text-xs text-muted-foreground uppercase tracking-wider mb-2">Credits balance</p>
+          <p className="text-xs text-muted-foreground mb-2">Credits balance</p>
           <p className="text-5xl sm:text-6xl font-bold text-foreground tabular-nums mb-6">
             {balance.toLocaleString()}
             <span className="text-lg font-medium text-muted-foreground ml-2">credits</span>

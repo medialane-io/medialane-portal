@@ -107,7 +107,7 @@ export function UsageTab({ address, onViewCredits }: UsageTabProps) {
                   <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-brand-orange/10 text-brand-orange">
                     <Key className="w-3 h-3" />
                   </span>
-                  <code className="font-mono text-xs text-foreground">{k.prefix}***</code>
+                  <code className="text-xs text-foreground">{k.prefix}***</code>
                   {k.label && <span className="text-xs text-muted-foreground truncate">({k.label})</span>}
                   <Badge
                     className={

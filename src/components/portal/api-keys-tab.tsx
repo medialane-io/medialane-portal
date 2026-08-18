@@ -269,7 +269,7 @@ export function ApiKeysTab({ address }: { address: string }) {
                   </span>
                   <div className="min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
-                      <code className="font-mono text-sm text-foreground">{k.prefix}***</code>
+                      <code className="text-sm text-foreground">{k.prefix}***</code>
                       {k.label && (
                         <span className="text-xs text-muted-foreground">({k.label})</span>
                       )}
@@ -330,7 +330,7 @@ export function ApiKeysTab({ address }: { address: string }) {
                 Copy your key now. It won&apos;t be shown again, so keep it somewhere safe. If you lose it, revoke it and create a new one.
               </p>
               <div className="flex items-center gap-2">
-                <code className="flex-1 text-xs font-mono bg-primary/5 px-3 py-2 rounded-lg break-all">
+                <code className="flex-1 text-xs bg-primary/5 px-3 py-2 rounded-lg break-all">
                   {newKey.plaintext}
                 </code>
                 <Button variant="outline" size="icon" onClick={handleCopy} className="shrink-0">

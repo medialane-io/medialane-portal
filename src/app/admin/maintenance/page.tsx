@@ -154,8 +154,8 @@ export default function AdminMaintenancePage() {
               { label: "Lag",        value: lagBlocks !== null ? `${lagBlocks} blocks` : "—", color: lagColor },
             ].map(item => (
               <div key={item.label}>
-                <p className="text-xs text-muted-foreground uppercase tracking-wider mb-0.5">{item.label}</p>
-                <p className={`font-semibold font-mono text-sm ${item.color}`}>{item.value}</p>
+                <p className="text-xs text-muted-foreground mb-0.5">{item.label}</p>
+                <p className={`font-semibold text-sm ${item.color}`}>{item.value}</p>
               </div>
             ))}
           </div>
@@ -164,7 +164,7 @@ export default function AdminMaintenancePage() {
       </div>
 
       <div className="space-y-3">
-        <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">Operations</h2>
+        <h2 className="text-sm font-semibold text-muted-foreground">Operations</h2>
 
         <div className="glass rounded-xl p-5 flex items-start justify-between gap-4">
           <div className="flex items-start gap-3">
@@ -184,7 +184,7 @@ export default function AdminMaintenancePage() {
                     {coverage.byService.map(b => `${b.service ?? "∅"}: ${b.count}`).join("  ·  ")}
                   </p>
                   {coverage.sampleMissing.length > 0 && (
-                    <p className="text-destructive/80 font-mono break-all">
+                    <p className="text-destructive/80 break-all">
                       {coverage.sampleMissing.map(s => `${s.contractAddress.slice(0, 10)}…(${s.source ?? "null"})`).join(", ")}
                     </p>
                   )}
@@ -254,7 +254,7 @@ export default function AdminMaintenancePage() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-3">
                 <div className="space-y-1">
                   <Label className="text-xs">Contract address</Label>
-                  <Input placeholder="0x…" value={transferContract} onChange={e => setTransferContract(e.target.value)} className="h-8 text-xs font-mono" />
+                  <Input placeholder="0x…" value={transferContract} onChange={e => setTransferContract(e.target.value)} className="h-8 text-xs" />
                 </div>
                 <div className="space-y-1">
                   <Label className="text-xs">Deployment block (from Voyager)</Label>
@@ -296,7 +296,7 @@ function MarketplaceOps() {
 
   return (
     <div className="space-y-3">
-      <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-2">
+      <h2 className="text-sm font-semibold text-muted-foreground flex items-center gap-2">
         <ShoppingCart className="h-3.5 w-3.5" />Marketplace Ops
       </h2>
 
@@ -311,7 +311,7 @@ function MarketplaceOps() {
         <div className="flex flex-wrap items-end gap-2">
           <div className="space-y-1 flex-1 min-w-[260px]">
             <Label className="text-xs">Order hash</Label>
-            <Input placeholder="0x…" value={orderHash} onChange={e => setOrderHash(e.target.value)} className="h-8 text-xs font-mono" />
+            <Input placeholder="0x…" value={orderHash} onChange={e => setOrderHash(e.target.value)} className="h-8 text-xs" />
           </div>
           <Button size="sm" variant="outline" disabled={!orderHash.trim() || !!busy}
             onClick={() => run("Resync", `/admin/orders/${orderHash.trim()}/resync`)}>
@@ -335,7 +335,7 @@ function MarketplaceOps() {
         <div className="flex flex-wrap items-end gap-2">
           <div className="space-y-1 flex-1 min-w-[260px]">
             <Label className="text-xs">Transaction hash</Label>
-            <Input placeholder="0x…" value={txHash} onChange={e => setTxHash(e.target.value)} className="h-8 text-xs font-mono" />
+            <Input placeholder="0x…" value={txHash} onChange={e => setTxHash(e.target.value)} className="h-8 text-xs" />
           </div>
           <Button size="sm" variant="outline" disabled={!txHash.trim() || !!busy}
             onClick={() => run("Order hydrate", `/admin/marketplace/tx/${txHash.trim()}/hydrate`)}>
@@ -385,7 +385,7 @@ function PopAllowlist() {
 
   return (
     <div className="space-y-3">
-      <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-2">
+      <h2 className="text-sm font-semibold text-muted-foreground flex items-center gap-2">
         <ListChecks className="h-3.5 w-3.5" />POP / Drop Allowlist
       </h2>
       <div className="glass rounded-xl p-5 space-y-3">
@@ -395,11 +395,11 @@ function PopAllowlist() {
         </p>
         <div className="space-y-1">
           <Label className="text-xs">Collection address</Label>
-          <Input placeholder="0x…" value={collection} onChange={e => setCollection(e.target.value)} className="h-8 text-xs font-mono" />
+          <Input placeholder="0x…" value={collection} onChange={e => setCollection(e.target.value)} className="h-8 text-xs" />
         </div>
         <div className="space-y-1">
           <Label className="text-xs">Wallet addresses</Label>
-          <Textarea placeholder={"0x…\n0x…"} value={addresses} onChange={e => setAddresses(e.target.value)} className="text-xs font-mono h-28 resize-y" />
+          <Textarea placeholder={"0x…\n0x…"} value={addresses} onChange={e => setAddresses(e.target.value)} className="text-xs h-28 resize-y" />
           <p className="text-[10px] text-muted-foreground">{parseAddresses().length} address(es) detected</p>
         </div>
         <div className="flex gap-2">

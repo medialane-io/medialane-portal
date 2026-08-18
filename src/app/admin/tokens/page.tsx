@@ -133,7 +133,7 @@ export default function AdminTokensPage() {
                 className="group flex items-center gap-2 px-3 py-1.5 rounded-lg border border-border bg-muted/30 hover:bg-muted/60 transition-colors text-xs text-left">
                 <div className="min-w-0">
                   <p className="font-medium truncate max-w-[160px]">{r.name ?? `#${r.tokenId}`}</p>
-                  <p className="text-muted-foreground font-mono truncate max-w-[160px]">{r.contract.slice(0, 10)}…{r.contract.slice(-4)}</p>
+                  <p className="text-muted-foreground truncate max-w-[160px]">{r.contract.slice(0, 10)}…{r.contract.slice(-4)}</p>
                 </div>
                 <span className="text-muted-foreground shrink-0 flex items-center gap-0.5"><Clock className="h-3 w-3" />{timeAgo(new Date(r.ts).toISOString())}</span>
               </button>
@@ -163,12 +163,12 @@ export default function AdminTokensPage() {
                 {token.standard && <Badge variant="outline" className="text-muted-foreground">{token.standard}</Badge>}
               </div>
               <div className="space-y-1">
-                <div className="flex items-center gap-1.5"><span className="text-xs text-muted-foreground w-16 shrink-0">Contract</span><span className="text-xs font-mono truncate flex-1">{contract}</span><CopyButton text={contract} /></div>
-                <div className="flex items-center gap-1.5"><span className="text-xs text-muted-foreground w-16 shrink-0">Token ID</span><span className="text-xs font-mono">{tokenId}</span><CopyButton text={tokenId} /></div>
+                <div className="flex items-center gap-1.5"><span className="text-xs text-muted-foreground w-16 shrink-0">Contract</span><span className="text-xs truncate flex-1">{contract}</span><CopyButton text={contract} /></div>
+                <div className="flex items-center gap-1.5"><span className="text-xs text-muted-foreground w-16 shrink-0">Token ID</span><span className="text-xs">{tokenId}</span><CopyButton text={tokenId} /></div>
                 {token.owner && (
                   <div className="flex items-center gap-1.5">
                     <span className="text-xs text-muted-foreground w-16 shrink-0">Owner</span>
-                    <span className="text-xs font-mono truncate flex-1">{token.owner.slice(0, 12)}…{token.owner.slice(-6)}</span>
+                    <span className="text-xs truncate flex-1">{token.owner.slice(0, 12)}…{token.owner.slice(-6)}</span>
                     <CopyButton text={token.owner} />
                   </div>
                 )}
@@ -179,7 +179,7 @@ export default function AdminTokensPage() {
             <div className="px-5 pb-3">
               <div className="flex items-center gap-1.5 p-2.5 rounded-lg bg-muted/50 border border-border">
                 <span className="text-xs text-muted-foreground shrink-0">URI</span>
-                <span className="text-xs font-mono truncate flex-1 text-muted-foreground">{token.tokenUri}</span>
+                <span className="text-xs truncate flex-1 text-muted-foreground">{token.tokenUri}</span>
                 <CopyButton text={token.tokenUri} />
               </div>
             </div>

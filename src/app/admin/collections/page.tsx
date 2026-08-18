@@ -356,7 +356,7 @@ export default function AdminCollectionsPage() {
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Backfill Transfers</DialogTitle>
-            <DialogDescription className="font-mono text-xs break-all">{backfillContract}</DialogDescription>
+            <DialogDescription className="text-xs break-all">{backfillContract}</DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-2">
             <p className="text-sm text-muted-foreground">Scans onchain Transfer events and creates Token records for any tokens missed by the indexer.</p>
@@ -377,7 +377,7 @@ export default function AdminCollectionsPage() {
         <DialogContent className="sm:max-w-sm">
           <DialogHeader>
             <DialogTitle>Edit Collection</DialogTitle>
-            <DialogDescription className="font-mono text-xs break-all">{editCol?.contractAddress}</DialogDescription>
+            <DialogDescription className="text-xs break-all">{editCol?.contractAddress}</DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-2">
             <div className="space-y-2">
@@ -426,7 +426,7 @@ export default function AdminCollectionsPage() {
             </DialogDescription>
           </DialogHeader>
           <div className="rounded-lg bg-muted/50 border border-border px-3 py-2 mt-1">
-            <p className="text-xs font-mono text-muted-foreground break-all">{deleteCol?.contractAddress}</p>
+            <p className="text-xs text-muted-foreground break-all">{deleteCol?.contractAddress}</p>
           </div>
           <DialogFooter className="gap-2 mt-2">
             <Button variant="outline" onClick={() => setDeleteOpen(false)}>Cancel</Button>
@@ -467,7 +467,7 @@ function CollectionRow({
             <Badge variant="outline" className="bg-destructive/20 text-destructive border-destructive/30">Hidden</Badge>
           )}
         </div>
-        <p className="text-xs text-muted-foreground font-mono truncate">{col.contractAddress}</p>
+        <p className="text-xs text-muted-foreground truncate">{col.contractAddress}</p>
         <div className="flex items-center gap-1.5 flex-wrap">
           <Badge variant="outline" className={`text-[10px] px-1.5 py-0 h-4 ${serviceStyle(col.service)}`}>
             {serviceLabel(col.service)}

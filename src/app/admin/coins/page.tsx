@@ -114,7 +114,7 @@ export default function AdminCoinsPage() {
                   {coin.symbol && <Badge variant="outline" className="text-[10px] px-1.5 py-0 h-4">{coin.symbol}</Badge>}
                   {coin.isHidden && <Badge variant="outline" className="bg-destructive/20 text-destructive border-destructive/30">Hidden</Badge>}
                 </div>
-                <p className="text-xs text-muted-foreground font-mono truncate">{coin.contractAddress}</p>
+                <p className="text-xs text-muted-foreground truncate">{coin.contractAddress}</p>
                 <Badge variant="outline" className="text-[10px] px-1.5 py-0 h-4">{coin.service}</Badge>
               </div>
               <div className="flex items-center gap-1.5 shrink-0 justify-end">

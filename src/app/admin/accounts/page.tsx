@@ -51,7 +51,7 @@ function PlaintextKeyDialog({ plaintext, onClose }: { plaintext: string | null; 
           This key is shown <strong>once</strong> and is not stored. Copy it now.
         </p>
         <div className="flex items-center gap-2 bg-muted rounded-lg p-3">
-          <code className="text-xs font-mono break-all flex-1">{plaintext}</code>
+          <code className="text-xs break-all flex-1">{plaintext}</code>
           <Button size="sm" variant="outline" onClick={() => plaintext && copy(plaintext)}>
             <Copy className="h-3.5 w-3.5" />
           </Button>
@@ -96,7 +96,7 @@ function ApiClientKeys({ apiClient, onPlaintext }: { apiClient: AdminApiClient; 
       ) : (
         <table className="w-full text-sm">
           <thead>
-            <tr className="text-xs text-muted-foreground uppercase tracking-wider border-b border-border">
+            <tr className="text-xs text-muted-foreground border-b border-border">
               <th className="text-left pb-1.5 pr-3">Prefix</th>
               <th className="text-left pb-1.5 pr-3">Label</th>
               <th className="text-left pb-1.5 pr-3">App</th>
@@ -108,7 +108,7 @@ function ApiClientKeys({ apiClient, onPlaintext }: { apiClient: AdminApiClient; 
           <tbody className="divide-y divide-border">
             {keys.map((k) => (
               <tr key={k.id} className={k.status === "REVOKED" ? "opacity-50" : ""}>
-                <td className="py-1.5 pr-3 font-mono text-xs">{k.prefix}…</td>
+                <td className="py-1.5 pr-3 text-xs">{k.prefix}…</td>
                 <td className="py-1.5 pr-3 text-xs">{k.label || "—"}</td>
                 <td className="py-1.5 pr-3 text-xs text-muted-foreground">{k.appSource ?? "generic"}</td>
                 <td className="py-1.5 pr-3 text-xs text-muted-foreground">
@@ -174,7 +174,7 @@ function GrantCreditsDialog({
           <DialogTitle>Adjust credits</DialogTitle>
         </DialogHeader>
         <p className="text-sm text-muted-foreground">
-          Current balance: <span className="font-mono">{apiClient?.creditBalance.toLocaleString()}</span>.
+          Current balance: <span className="">{apiClient?.creditBalance.toLocaleString()}</span>.
           Positive grants, negative deducts (floors at 0).
         </p>
         <Input value={amount} onChange={(e) => setAmount(e.target.value)} placeholder="e.g. 100000 or -5000" />
@@ -255,13 +255,13 @@ export default function AdminAccountsPage() {
               <div key={a.id} className="glass rounded-xl p-4">
                 <div className="flex items-center gap-3 flex-wrap">
                   <div className="min-w-0">
-                    <p className="text-sm font-medium truncate font-mono">{title}</p>
+                    <p className="text-sm font-medium truncate">{title}</p>
                     <p className="text-xs text-muted-foreground truncate">{subtitle}</p>
                   </div>
                   <div className="ml-auto flex items-center gap-2">
                     {a.apiClient ? (
                       <>
-                        <span className="text-xs text-muted-foreground font-mono flex items-center gap-1">
+                        <span className="text-xs text-muted-foreground flex items-center gap-1">
                           <Coins className="h-3 w-3" />{a.apiClient.creditBalance.toLocaleString()}
                         </span>
                         <Badge variant="outline" className={`text-[10px] ${PLAN_STYLE[a.apiClient.plan] ?? ""}`}>{a.apiClient.plan}</Badge>

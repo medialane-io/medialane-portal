@@ -73,7 +73,7 @@ function CommentsTab() {
             <div key={c.id} className={`flex items-start gap-3 p-4 border border-border rounded-lg ${c.isHidden ? "opacity-60" : ""}`}>
               <div className="flex-1 min-w-0">
                 <p className="text-sm break-words">{c.content}</p>
-                <p className="text-xs text-muted-foreground mt-1 font-mono">
+                <p className="text-xs text-muted-foreground mt-1">
                   {short(c.author)} · token {c.tokenId} on {short(c.contractAddress)} · {timeAgo(c.createdAt)}
                 </p>
               </div>
@@ -137,7 +137,7 @@ function SlugClaimsTab() {
             <div key={claim.id} className="flex items-center gap-3 p-4 border border-border rounded-lg">
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium">/{claim.slug}</p>
-                <p className="text-xs text-muted-foreground font-mono">{short(claim.contractAddress)} · {timeAgo(claim.createdAt)}</p>
+                <p className="text-xs text-muted-foreground">{short(claim.contractAddress)} · {timeAgo(claim.createdAt)}</p>
               </div>
               <Badge variant="outline" className={`text-[10px] shrink-0 ${STATUS_STYLE[claim.status] ?? ""}`}>{claim.status}</Badge>
               {claim.status === "PENDING" && (
@@ -191,11 +191,11 @@ function LicensingFixTab() {
       </div>
       <div className="space-y-1">
         <Label className="text-xs">Offer ID</Label>
-        <Input value={offerId} onChange={(e) => setOfferId(e.target.value)} placeholder="offer id" className="h-8 text-xs font-mono" />
+        <Input value={offerId} onChange={(e) => setOfferId(e.target.value)} placeholder="offer id" className="h-8 text-xs" />
       </div>
       <div className="space-y-1">
         <Label className="text-xs">New creator address</Label>
-        <Input value={creatorAddress} onChange={(e) => setCreatorAddress(e.target.value)} placeholder="0x…" className="h-8 text-xs font-mono" />
+        <Input value={creatorAddress} onChange={(e) => setCreatorAddress(e.target.value)} placeholder="0x…" className="h-8 text-xs" />
       </div>
       <Button size="sm" disabled={busy} onClick={submit}>{busy ? "Updating…" : "Update offer"}</Button>
     </div>
