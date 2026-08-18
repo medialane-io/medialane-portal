@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Image from "next/image";
 import { adminFetch, runAdminAction } from "@/src/lib/admin-fetch";
 import { Button } from "@/src/components/ui/button";
 import { Input } from "@/src/components/ui/input";
@@ -149,7 +150,7 @@ export default function AdminTokensPage() {
         <div className="glass rounded-xl overflow-hidden">
           <div className="flex items-start gap-5 p-5">
             <div className="relative h-24 w-24 rounded-xl overflow-hidden bg-muted shrink-0 border border-border">
-              {imgUrl ? <img src={imgUrl} alt="" className="h-full w-full object-cover" /> : <div className="h-full w-full bg-gradient-to-br from-muted to-muted-foreground/20" />}
+              {imgUrl ? <Image src={imgUrl} alt="" fill sizes="96px" className="object-cover" /> : <div className="h-full w-full bg-gradient-to-br from-muted to-muted-foreground/20" />}
             </div>
             <div className="flex-1 min-w-0 space-y-2">
               <div className="flex items-start justify-between gap-2">

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Image from "next/image";
 import { useParams, useRouter } from "next/navigation";
 import { useAdminCoins } from "@/src/hooks/use-admin";
 import { adminFetch } from "@/src/lib/admin-fetch";
@@ -133,8 +134,9 @@ export default function CoinSettingsPage() {
 
       <div className="flex items-center gap-4 rounded-xl border border-border bg-muted/20 p-4">
         {coin.image ? (
-
-          <img src={ipfsToHttp(coin.image)} alt={coin.name ?? ""} className="h-14 w-14 rounded-lg object-cover border border-border" />
+          <div className="relative h-14 w-14 rounded-lg overflow-hidden border border-border shrink-0">
+            <Image src={ipfsToHttp(coin.image)} alt={coin.name ?? ""} fill sizes="56px" className="object-cover" />
+          </div>
         ) : (
           <div className="h-14 w-14 rounded-lg bg-muted flex items-center justify-center text-xs font-bold">
             {(coin.symbol ?? coin.name ?? "?").slice(0, 3).toUpperCase()}

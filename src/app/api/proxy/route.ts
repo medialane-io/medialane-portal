@@ -49,6 +49,11 @@ export async function GET(req: NextRequest) {
       return new NextResponse(`Upstream error: ${response.statusText}`, { status: response.status });
     }
 
+    const contentLength = Number(response.headers.get("Content-Length") ?? 0);
+    if (contentLength > MAX_BYTES) {
+      return new NextResponse("Upstream content too large", { status: 413 });
+    }
+
     const upstreamContentType = response.headers.get("Content-Type") ?? "";
     const SAFE_CONTENT_TYPES = [
       "image/", "video/", "audio/", "application/json", "application/octet-stream",
@@ -58,7 +63,21 @@ export async function GET(req: NextRequest) {
       ? upstreamContentType
       : "application/octet-stream";
 
-    return new NextResponse(response.body, {
+    let total = 0;
+    const cappedBody = response.body?.pipeThrough(
+      new TransformStream<Uint8Array, Uint8Array>({
+        transform(chunk, controller) {
+          total += chunk.byteLength;
+          if (total > MAX_BYTES) {
+            controller.error(new Error("Upstream content exceeded size cap"));
+            return;
+          }
+          controller.enqueue(chunk);
+        },
+      }),
+    );
+
+    return new NextResponse(cappedBody, {
       status: 200,
       headers: {
         "Content-Type": safeContentType,

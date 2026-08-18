@@ -2,6 +2,7 @@
 
 import { useState, useRef, useCallback } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { useAdminCoins } from "@/src/hooks/use-admin";
 import { runAdminAction } from "@/src/lib/admin-fetch";
 import { Button } from "@/src/components/ui/button";
@@ -23,7 +24,7 @@ function CoinThumb({ coin }: { coin: AdminCoinRecord }) {
     <div className="relative h-12 w-12 rounded-full overflow-hidden shrink-0 border border-border bg-muted">
       {src ? (
 
-        <img src={src} alt={coin.name ?? ""} className="h-full w-full object-cover" />
+        <Image src={src} alt={coin.name ?? ""} fill sizes="48px" className="object-cover" />
       ) : (
         <div className="h-full w-full flex items-center justify-center text-[10px] font-bold uppercase text-muted-foreground">
           {(coin.symbol ?? coin.name ?? "?").slice(0, 2)}

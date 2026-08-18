@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { useAdminReports } from "@/src/hooks/use-admin";
 import { runAdminAction } from "@/src/lib/admin-fetch";
 import {
@@ -133,8 +134,8 @@ export default function ReportsPage() {
               <div key={report.id}
                 className={`flex items-center gap-4 p-4 border rounded-lg hover:bg-muted/30 cursor-pointer transition-colors ${isHigh ? "border-destructive/40" : "border-border"}`}
                 onClick={() => openReport(report)}>
-                <div className="h-12 w-12 rounded-lg overflow-hidden bg-muted shrink-0 border border-border">
-                  {img ? <img src={img} alt="" className="h-full w-full object-cover" /> :
+                <div className="relative h-12 w-12 rounded-lg overflow-hidden bg-muted shrink-0 border border-border">
+                  {img ? <Image src={img} alt="" fill sizes="48px" className="object-cover" /> :
                     <div className="h-full w-full flex items-center justify-center bg-gradient-to-br from-muted to-muted-foreground/20"><Flag className="h-4 w-4 text-muted-foreground/50" /></div>}
                 </div>
                 <div className="flex-1 min-w-0">
@@ -171,7 +172,7 @@ export default function ReportsPage() {
         <DialogContent className="max-w-lg p-0 overflow-hidden gap-0">
           {selected?.targetImage && (
             <div className="relative h-40 w-full bg-muted overflow-hidden shrink-0">
-              <img src={ipfsToHttp(selected.targetImage)} alt="" className="h-full w-full object-cover" />
+              <Image src={ipfsToHttp(selected.targetImage)} alt="" fill sizes="512px" className="object-cover" />
               <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-transparent" />
               <Badge variant="outline" className={`absolute bottom-3 left-4 text-[10px] ${STATUS_STYLE[selected.status] ?? ""}`}>{selected.status.replace(/_/g, " ")}</Badge>
             </div>

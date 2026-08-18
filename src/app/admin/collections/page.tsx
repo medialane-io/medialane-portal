@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useCallback } from "react";
+import Image from "next/image";
 import { useAdminCollections } from "@/src/hooks/use-admin";
 import { runAdminAction } from "@/src/lib/admin-fetch";
 import { Button } from "@/src/components/ui/button";
@@ -53,7 +54,7 @@ function CollectionThumb({ col }: { col: AdminCollectionRecord }) {
   return (
     <div className="relative h-12 w-12 rounded-lg overflow-hidden shrink-0 border border-border bg-muted">
       {src ? (
-        <img src={src} alt={col.name ?? ""} className="h-full w-full object-cover" />
+        <Image src={src} alt={col.name ?? ""} fill sizes="48px" className="object-cover" />
       ) : (
         <div className={`h-full w-full flex items-center justify-center text-[10px] font-bold uppercase ${style}`}>
           {(col.name ?? serviceLabel(col.service)).slice(0, 2)}
@@ -394,7 +395,7 @@ export default function AdminCollectionsPage() {
               <Label>Image (URL or ipfs://…)</Label>
               <Input value={editImage} onChange={(e) => setEditImage(e.target.value)} placeholder="ipfs://… or https://…" />
               {editImage.trim() && (
-
+                // eslint-disable-next-line @next/next/no-img-element -- arbitrary admin-typed URL, not restricted to next.config's remotePatterns
                 <img
                   src={editImage.trim().startsWith("ipfs://") ? `https://ipfs.io/ipfs/${editImage.trim().slice(7)}` : editImage.trim()}
                   alt=""
