@@ -93,7 +93,7 @@ export function getFriendlyWalletError(error: unknown): FriendlyWalletError {
     return {
       title: "Request not completed",
       message: "Request not completed. Nothing was submitted.",
-      description: "Your wallet didn't complete this request. This usually means you closed or declined it, your wallet needs extra verification (like 2FA) before it can sign, or your wallet hit a temporary network hiccup. Nothing was submitted — try again in a moment.",
+      description: "Your wallet didn't complete this request. This usually means you closed or declined it, your wallet needs extra verification (like 2FA) before it can sign, or your wallet hit a temporary network hiccup. Nothing was submitted. Try again in a moment.",
       isUserRejection: true,
     };
   }
@@ -103,7 +103,7 @@ export function getFriendlyWalletError(error: unknown): FriendlyWalletError {
     return {
       title: "Request not completed",
       message: "Request not completed. Nothing was submitted.",
-      description: "Your wallet didn't complete this request — you may have closed or declined it, or your wallet may require extra verification (like 2FA) before it can sign. Check your wallet for details, then try again.",
+      description: "Your wallet didn't complete this request. You may have closed or declined it, or your wallet may require extra verification (like 2FA) before it can sign. Check your wallet for details, then try again.",
       isUserRejection: true,
     };
   }
@@ -123,7 +123,7 @@ export function getFriendlyWalletError(error: unknown): FriendlyWalletError {
     return {
       title: "Network busy",
       message:
-        "The network is busy right now — nothing was submitted and your asset is safe. Please try again in a moment.",
+        "The network is busy right now. Nothing was submitted, and your asset is safe. Please try again in a moment.",
       isUserRejection: false,
     };
   }
@@ -151,7 +151,7 @@ export function getFriendlyWalletError(error: unknown): FriendlyWalletError {
     return {
       title: "Something went wrong",
       message:
-        "Your wallet couldn't complete this transaction. Nothing was submitted — please try again, or try a different wallet or device if it keeps happening.",
+        "Your wallet couldn't complete this transaction. Nothing was submitted. Try again, or try a different wallet or device if it keeps happening.",
       isUserRejection: false,
     };
   }
@@ -160,7 +160,7 @@ export function getFriendlyWalletError(error: unknown): FriendlyWalletError {
     return {
       title: "Something went wrong",
       message:
-        "We couldn't complete that action. Please try again in a moment — if it keeps happening, try a different wallet or refresh the page.",
+        "We couldn't complete that action. Please try again in a moment. If it keeps happening, try a different wallet or refresh the page.",
       isUserRejection: false,
     };
   }

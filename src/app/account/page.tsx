@@ -23,8 +23,8 @@ export default function AccountPage() {
           <ShieldCheck className="w-10 h-10 text-primary" />
           <h1 className="text-xl font-semibold text-white">Sign in to your account</h1>
           <p className="text-sm text-muted-foreground max-w-sm">
-            Sign a message to prove this wallet is yours. We never store your keys — the
-            signature just unlocks your API keys, credits and usage.
+            Sign a message to prove this wallet is yours. Your keys stay on your device;
+            this signature only unlocks your API keys, credits, and usage.
           </p>
           <Button
             onClick={signIn}

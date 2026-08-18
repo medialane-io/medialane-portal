@@ -122,7 +122,7 @@ export async function POST(req: NextRequest) {
 
   const method = extractMethod(body);
   if (!(await billRpcCall(method))) {
-    return rpcError(-32003, "Insufficient credits or billing unavailable — RPC call not forwarded", 402);
+    return rpcError(-32003, "Insufficient credits or billing unavailable. RPC call not forwarded.", 402);
   }
 
   let lastError = "No RPC upstream configured";

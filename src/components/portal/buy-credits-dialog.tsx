@@ -64,7 +64,7 @@ export function BuyCreditsDialog({ open, onOpenChange, address, treasuryAddress,
       });
       const json = (await res.json().catch(() => ({}))) as { data?: { credited: number }; error?: string };
       if (!res.ok) {
-        setConfirmError(json.error ?? "Still waiting for your transfer to confirm on-chain — try again in a moment.");
+        setConfirmError(json.error ?? "Still waiting for your transfer to confirm on-chain. Try again in a moment.");
         return;
       }
       setCreditedAmount(json.data?.credited ?? 0);
@@ -130,7 +130,7 @@ export function BuyCreditsDialog({ open, onOpenChange, address, treasuryAddress,
         ) : step === "error" ? (
           <ErrorState
             title="Deposit failed"
-            description="Nothing was submitted — your USDC is safe."
+            description="Nothing was submitted. Your USDC is safe."
             error={errorMessage}
             explorerUrl={EXPLORER_URL}
             onRetry={() => setStep("details")}

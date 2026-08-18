@@ -59,13 +59,15 @@ function QuickstartCard() {
   };
 
   return (
-    <Collapsible open={open} onOpenChange={setOpen}>
+    <Collapsible open={open} onOpenChange={setOpen} className="rounded-2xl bg-brand-blue/5 px-5">
       <CollapsibleTrigger asChild>
-        <button className="w-full flex items-center justify-between gap-3 py-3 text-left group">
-          <span className="flex items-center gap-2">
-            <Terminal className="w-4 h-4 text-primary" />
+        <button className="w-full flex items-center justify-between gap-3 py-4 text-left group">
+          <span className="flex items-center gap-2.5">
+            <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-brand-blue/10 text-brand-blue">
+              <Terminal className="w-4 h-4" />
+            </span>
             <span className="font-semibold text-sm">Quickstart</span>
-            <span className="text-xs text-muted-foreground hidden sm:inline">— sample requests to get you started</span>
+            <span className="text-xs text-muted-foreground hidden sm:inline">· sample requests to get you started</span>
           </span>
           {open ? (
             <ChevronUp className="w-4 h-4 text-muted-foreground shrink-0" />
@@ -75,15 +77,15 @@ function QuickstartCard() {
         </button>
       </CollapsibleTrigger>
       <CollapsibleContent>
-        <div className="space-y-4 pb-2">
+        <div className="space-y-4 pb-5">
           <p className="text-xs text-muted-foreground">
-            Replace <code className="bg-primary/10 text-primary px-1 py-0.5 rounded">YOUR_API_KEY</code> with a key from the list above.
+            Replace <code className="bg-brand-blue/10 text-brand-blue px-1 py-0.5 rounded">YOUR_API_KEY</code> with a key from the list above.
           </p>
           {QUICKSTART_SNIPPETS.map((snippet, i) => (
             <div key={i} className="space-y-1.5">
               <p className="text-xs font-medium text-muted-foreground">{snippet.label}</p>
               <div className="relative group">
-                <pre className="bg-primary/5 rounded-lg p-3 text-xs font-mono text-foreground overflow-x-auto whitespace-pre-wrap break-all">
+                <pre className="bg-background/60 rounded-lg p-3 text-xs font-mono text-foreground overflow-x-auto whitespace-pre-wrap break-all">
                   {snippet.code}
                 </pre>
                 <Button
@@ -93,7 +95,7 @@ function QuickstartCard() {
                   onClick={() => handleCopy(snippet.code, i)}
                 >
                   {copiedIndex === i ? (
-                    <Check className="w-3.5 h-3.5 text-primary" />
+                    <Check className="w-3.5 h-3.5 text-brand-blue" />
                   ) : (
                     <Copy className="w-3.5 h-3.5" />
                   )}
@@ -102,7 +104,7 @@ function QuickstartCard() {
             </div>
           ))}
           <p className="text-xs text-muted-foreground">
-            Need more? The full reference is in the <a href="/docs" className="text-primary hover:underline">API docs</a>.
+            Need more? The full reference is in the <a href="/docs" className="text-brand-blue hover:underline">API docs</a>.
           </p>
         </div>
       </CollapsibleContent>
@@ -136,7 +138,7 @@ export function ApiKeysTab({ address }: { address: string }) {
       }
       await mutate();
     } catch {
-      setActionError("Network error — please try again");
+      setActionError("Network error. Please try again.");
     } finally {
       setRevoking(null);
     }
@@ -159,7 +161,7 @@ export function ApiKeysTab({ address }: { address: string }) {
       setNewKey({ prefix: json.data!.prefix, plaintext: json.data!.plaintext });
       await mutate();
     } catch {
-      setActionError("Network error — please try again");
+      setActionError("Network error. Please try again.");
     } finally {
       setCreating(false);
     }
@@ -202,22 +204,24 @@ export function ApiKeysTab({ address }: { address: string }) {
   const activeCount = keys.filter((k) => k.status === "ACTIVE").length;
 
   return (
-    <div className="space-y-10">
+    <div className="space-y-8">
       <div>
-        <div className="flex flex-wrap items-start justify-between gap-4 mb-1">
-          <div>
-            <h2 className="text-lg font-semibold flex items-center gap-2">
-              <Key className="w-5 h-5 text-primary" />
-              API Keys
-            </h2>
-            <p className="text-sm text-muted-foreground mt-1 max-w-md">
-              Use a key to authenticate requests to the Medialane REST API from your app, script, or agent.
-            </p>
+        <div className="flex flex-wrap items-start justify-between gap-4">
+          <div className="flex items-start gap-3">
+            <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-brand-blue/10 text-brand-blue">
+              <Key className="w-5 h-5" />
+            </span>
+            <div>
+              <h2 className="text-lg font-semibold">API Keys</h2>
+              <p className="text-sm text-muted-foreground mt-1 max-w-md">
+                Use a key to authenticate requests to the Medialane REST API from your app, script, or agent.
+              </p>
+            </div>
           </div>
           <Button
             size="sm"
             variant="gradient-fill"
-            className="from-brand-navy to-brand-purple"
+            className="from-brand-navy to-brand-purple shrink-0"
             onClick={() => setCreateOpen(true)}
             disabled={activeCount >= 5}
             title={activeCount >= 5 ? "Maximum 5 active keys reached" : undefined}
@@ -227,41 +231,45 @@ export function ApiKeysTab({ address }: { address: string }) {
           </Button>
         </div>
 
-        <div className="flex flex-col sm:flex-row gap-4 sm:gap-8 mt-5 mb-6 text-xs text-muted-foreground">
-          <span className="flex items-start gap-1.5">
-            <ShieldAlert className="w-3.5 h-3.5 mt-0.5 shrink-0 text-primary" />
-            A new key&apos;s full value is shown once — copy it before closing the dialog.
-          </span>
-          <span className="flex items-start gap-1.5">
-            <KeyRound className="w-3.5 h-3.5 mt-0.5 shrink-0 text-primary" />
-            Lost a key? You can&apos;t recover it — revoke it below and create a new one.
-          </span>
-          <span className="flex items-start gap-1.5">
-            <CoinsIcon className="w-3.5 h-3.5 mt-0.5 shrink-0 text-primary" />
-            Credits belong to your account, not the key — revoking never affects your balance.
-          </span>
+        <div className="grid sm:grid-cols-3 gap-3 mt-6 mb-6">
+          <div className="flex items-start gap-2 rounded-xl bg-muted/40 p-3 text-xs text-muted-foreground">
+            <ShieldAlert className="w-3.5 h-3.5 mt-0.5 shrink-0 text-brand-blue" />
+            A new key&apos;s full value is shown once. Copy it before closing the dialog.
+          </div>
+          <div className="flex items-start gap-2 rounded-xl bg-muted/40 p-3 text-xs text-muted-foreground">
+            <KeyRound className="w-3.5 h-3.5 mt-0.5 shrink-0 text-brand-blue" />
+            Lost a key? Revoke it below and create a new one.
+          </div>
+          <div className="flex items-start gap-2 rounded-xl bg-muted/40 p-3 text-xs text-muted-foreground">
+            <CoinsIcon className="w-3.5 h-3.5 mt-0.5 shrink-0 text-brand-blue" />
+            Credits stay with your account regardless of which key is used, so your balance stays intact when you revoke one.
+          </div>
         </div>
 
         {keys.length === 0 ? (
-          <div className="flex flex-col items-center text-center py-12 gap-3">
-            <Key className="w-8 h-8 text-primary" />
+          <div className="flex flex-col items-center text-center py-14 gap-3 rounded-2xl bg-muted/30">
+            <span className="flex h-14 w-14 items-center justify-center rounded-full bg-brand-blue/10 text-brand-blue">
+              <Key className="w-6 h-6" />
+            </span>
             <p className="text-sm text-muted-foreground max-w-xs">
               You don&apos;t have any API keys yet. Create one to start calling the Medialane API.
             </p>
-            <Button size="sm" className="mt-1" onClick={() => setCreateOpen(true)}>
+            <Button size="sm" variant="gradient-fill" className="from-brand-navy to-brand-purple mt-1" onClick={() => setCreateOpen(true)}>
               <Plus className="w-4 h-4 mr-1" />
               Create your first key
             </Button>
           </div>
         ) : (
-          <div className="space-y-5">
+          <div className="space-y-3">
             {keys.map((k) => (
-              <div key={k.id} className="flex items-center justify-between gap-4">
+              <div key={k.id} className="flex items-center justify-between gap-4 rounded-xl bg-muted/30 p-4">
                 <div className="flex items-start gap-3 min-w-0 flex-1">
-                  <Key className="w-4 h-4 mt-0.5 text-muted-foreground shrink-0" />
+                  <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-brand-blue/10 text-brand-blue">
+                    <Key className="w-3.5 h-3.5" />
+                  </span>
                   <div className="min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
-                      <code className="font-mono text-sm text-primary">{k.prefix}***</code>
+                      <code className="font-mono text-sm text-foreground">{k.prefix}***</code>
                       {k.label && (
                         <span className="text-xs text-muted-foreground">({k.label})</span>
                       )}
@@ -269,7 +277,7 @@ export function ApiKeysTab({ address }: { address: string }) {
                         variant={k.status === "ACTIVE" ? "default" : "secondary"}
                         className={
                           k.status === "ACTIVE"
-                            ? "bg-primary/15 text-primary border-transparent"
+                            ? "bg-brand-blue/15 text-brand-blue border-transparent"
                             : "bg-muted text-muted-foreground border-transparent"
                         }
                       >
@@ -319,7 +327,7 @@ export function ApiKeysTab({ address }: { address: string }) {
           {newKey ? (
             <div className="space-y-4">
               <p className="text-sm text-muted-foreground">
-                Copy your key now — it won&apos;t be shown again. If you lose it, you&apos;ll need to revoke it and create a new one.
+                Copy your key now. It won&apos;t be shown again, so keep it somewhere safe. If you lose it, revoke it and create a new one.
               </p>
               <div className="flex items-center gap-2">
                 <code className="flex-1 text-xs font-mono bg-primary/5 px-3 py-2 rounded-lg break-all">
@@ -344,7 +352,7 @@ export function ApiKeysTab({ address }: { address: string }) {
                   onChange={(e) => setLabelInput(e.target.value)}
                   maxLength={64}
                 />
-                <p className="text-xs text-muted-foreground">A name to help you tell keys apart later — you can use up to 5 at once.</p>
+                <p className="text-xs text-muted-foreground">A name to help you tell keys apart later. You can use up to 5 at once.</p>
               </div>
               <DialogFooter>
                 <DialogClose asChild>

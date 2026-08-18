@@ -41,28 +41,24 @@ export function CreditsTab({ address }: Props) {
   const payments = creditsData?.data?.history ?? [];
 
   return (
-    <div className="space-y-10">
+    <div className="space-y-8">
       <div>
-        <h2 className="text-lg font-semibold flex items-center gap-2">
-          <Coins className="w-5 h-5 text-primary" />
-          API Credits
-        </h2>
-        <p className="text-sm text-muted-foreground mt-1 max-w-md">
-          Every API call is billed per action from this balance. No subscription, no monthly cap — top up with USDC on Starknet whenever you&apos;re running low.
-        </p>
-
-        <div className="mt-8 mb-8">
-          <p className="text-xs text-muted-foreground uppercase tracking-wider mb-1">Balance</p>
-          <p className="text-5xl sm:text-6xl font-bold text-foreground tabular-nums">{balance.toLocaleString()}</p>
-          <p className="text-sm text-muted-foreground mt-1">credits remaining</p>
+        <div className="flex items-start gap-3">
+          <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-brand-rose/10 text-brand-rose">
+            <Coins className="w-5 h-5" />
+          </span>
+          <div>
+            <h2 className="text-lg font-semibold">API Credits</h2>
+            <p className="text-sm text-muted-foreground mt-1 max-w-md">
+              Every API call is billed per action from this balance, pay-as-you-go. Top up with USDC on Starknet whenever you&apos;re running low.
+            </p>
+          </div>
         </div>
 
-        <p className="flex items-start gap-1.5 text-xs text-muted-foreground mb-6 max-w-md">
-          <KeyRound className="w-3.5 h-3.5 mt-0.5 shrink-0 text-primary" />
-          This balance is shared across every API key on your account — revoking or losing a key never affects it.
-        </p>
-
-        <div className="max-w-md">
+        <div className="mt-6 rounded-2xl bg-brand-rose/10 p-8">
+          <p className="text-xs text-muted-foreground uppercase tracking-wider mb-1">Balance</p>
+          <p className="text-5xl sm:text-6xl font-bold text-foreground tabular-nums">{balance.toLocaleString()}</p>
+          <p className="text-sm text-muted-foreground mt-1 mb-6">credits remaining</p>
           <Button
             variant="gradient-fill"
             onClick={() => setDepositOpen(true)}
@@ -71,24 +67,31 @@ export function CreditsTab({ address }: Props) {
             <Coins className="w-4 h-4 mr-1.5" />
             Add credits
           </Button>
-          {!account && <p className="text-xs text-muted-foreground mt-2">Connect your wallet above to add credits.</p>}
+          {!account && <p className="text-xs text-muted-foreground mt-3">Connect your wallet above to add credits.</p>}
           {account && !treasuryAddress && (
-            <p className="flex items-start gap-1.5 text-xs text-muted-foreground mt-2">
+            <p className="flex items-start gap-1.5 text-xs text-muted-foreground mt-3">
               <Info className="w-3.5 h-3.5 mt-0.5 shrink-0" />
-              Deposits aren&apos;t live yet — check back soon, or reach out if you need credits in the meantime.
+              Deposits are launching soon. Check back, or reach out if you need credits in the meantime.
             </p>
           )}
+        </div>
+
+        <div className="flex items-start gap-2 rounded-xl bg-muted/40 p-3 text-xs text-muted-foreground mt-4">
+          <KeyRound className="w-3.5 h-3.5 mt-0.5 shrink-0 text-brand-rose" />
+          This balance is shared across every API key on your account, so it stays intact if you revoke or lose a key.
         </div>
       </div>
 
       {payments.length > 0 && (
         <div>
           <h3 className="text-sm font-semibold text-muted-foreground mb-4">Payment history</h3>
-          <div className="space-y-4">
+          <div className="space-y-3">
             {payments.map((p) => (
-              <div key={p.id} className="flex items-center justify-between text-sm gap-4">
+              <div key={p.id} className="flex items-center justify-between text-sm gap-4 rounded-xl bg-muted/30 p-4">
                 <div className="flex items-start gap-3 min-w-0">
-                  <Zap className="w-4 h-4 mt-0.5 text-primary shrink-0" />
+                  <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-brand-rose/10 text-brand-rose">
+                    <Zap className="w-3.5 h-3.5" />
+                  </span>
                   <div>
                     <p className="text-foreground">+{p.creditedAmount.toLocaleString()} credits</p>
                     <p className="text-xs text-muted-foreground">

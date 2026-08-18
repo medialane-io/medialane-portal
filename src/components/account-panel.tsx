@@ -88,7 +88,7 @@ export function AccountPanel() {
             <ChipIcon>
               <LayoutDashboard className="h-4 w-4" />
             </ChipIcon>
-            <span className="min-w-0 flex-1 truncate text-sm font-medium">Developer Portal</span>
+            <span className="min-w-0 flex-1 truncate text-sm font-medium">Account</span>
             <ChevronRight className="h-4 w-4 shrink-0 text-muted-foreground/50" />
           </Link>
           <NavThemeToggle />

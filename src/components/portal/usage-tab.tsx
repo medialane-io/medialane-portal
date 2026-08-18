@@ -61,20 +61,24 @@ export function UsageTab({ address, onViewCredits }: UsageTabProps) {
   const activeKeys = keys.filter((k) => k.status === "ACTIVE");
 
   return (
-    <div className="space-y-10">
+    <div className="space-y-8">
       <div>
-        <h2 className="text-lg font-semibold flex items-center gap-2">
-          <BarChart2 className="w-5 h-5 text-primary" />
-          API Usage
-        </h2>
-        <p className="text-sm text-muted-foreground mt-1 max-w-md">
-          There&apos;s no monthly request cap — every call is metered by credits instead, drawn from the same
-          balance no matter which key made it.
-        </p>
+        <div className="flex items-start gap-3">
+          <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-brand-orange/10 text-brand-orange">
+            <BarChart2 className="w-5 h-5" />
+          </span>
+          <div>
+            <h2 className="text-lg font-semibold">API Usage</h2>
+            <p className="text-sm text-muted-foreground mt-1 max-w-md">
+              Every call is credit-metered, drawn from the same
+              balance no matter which key made it.
+            </p>
+          </div>
+        </div>
         <button
           type="button"
           onClick={onViewCredits}
-          className="inline-flex items-center gap-1 text-sm text-primary hover:underline mt-3"
+          className="inline-flex items-center gap-1.5 text-sm text-brand-rose hover:underline mt-4 rounded-xl bg-brand-rose/10 px-3 py-2"
         >
           <Coins className="w-3.5 h-3.5" />
           View your balance and top-up history
@@ -87,24 +91,28 @@ export function UsageTab({ address, onViewCredits }: UsageTabProps) {
         <p className="text-xs text-muted-foreground mb-5">Status and last activity for each key.</p>
 
         {keys.length === 0 ? (
-          <div className="flex flex-col items-center text-center py-12 gap-3">
-            <Key className="w-8 h-8 text-primary" />
+          <div className="flex flex-col items-center text-center py-14 gap-3 rounded-2xl bg-muted/30">
+            <span className="flex h-14 w-14 items-center justify-center rounded-full bg-brand-orange/10 text-brand-orange">
+              <Key className="w-6 h-6" />
+            </span>
             <p className="text-sm text-muted-foreground max-w-xs">
-              No API keys yet — create one in the API Keys tab to start making requests.
+              Create your first API key in the API Keys tab to start making requests.
             </p>
           </div>
         ) : (
-          <div className="space-y-4">
+          <div className="space-y-3">
             {keys.map((k) => (
-              <div key={k.prefix} className="flex items-center justify-between gap-2 text-sm">
+              <div key={k.prefix} className="flex items-center justify-between gap-2 text-sm rounded-xl bg-muted/30 p-4">
                 <div className="flex items-center gap-2 min-w-0">
-                  <Key className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
-                  <code className="font-mono text-xs text-primary">{k.prefix}***</code>
+                  <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-brand-orange/10 text-brand-orange">
+                    <Key className="w-3 h-3" />
+                  </span>
+                  <code className="font-mono text-xs text-foreground">{k.prefix}***</code>
                   {k.label && <span className="text-xs text-muted-foreground truncate">({k.label})</span>}
                   <Badge
                     className={
                       k.status === "ACTIVE"
-                        ? "bg-primary/15 text-primary border-transparent text-xs"
+                        ? "bg-brand-orange/15 text-brand-orange border-transparent text-xs"
                         : "bg-muted text-muted-foreground border-transparent text-xs"
                     }
                   >

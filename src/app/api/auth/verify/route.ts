@@ -68,7 +68,7 @@ export async function POST(req: NextRequest) {
     const err = await verifyRes.json().catch(() => ({}));
     if (err?.error === "account_not_deployed") {
       return NextResponse.json(
-        { error: err.message ?? "Your wallet isn't deployed on Starknet yet — make one transaction first, then sign in." },
+        { error: err.message ?? "Your wallet isn't deployed on Starknet yet. Make one transaction first, then sign in." },
         { status: 400 },
       );
     }
