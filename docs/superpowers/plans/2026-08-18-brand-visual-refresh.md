@@ -110,9 +110,6 @@ git commit -m "feat(brand): wire Urbanist as the display font, matching the dapp
 
 In `src/app/globals.css`, after the `:root { ... }` block that defines `--brand-*` (ends at line 37), add:
 ```css
-/* Named brand-color pairings for the gradient button system.
-   Each sets --pair-a/--pair-b, consumed by .btn-gradient-border
-   and by bg-gradient-to-r utilities via the matching from-brand-*/to-brand-* classes. */
 .pair-blue-maeve   { --pair-a: var(--brand-blue);   --pair-b: var(--brand-maeve); }
 .pair-orange-maeve { --pair-a: var(--brand-orange); --pair-b: var(--brand-maeve); }
 .pair-blue-orange  { --pair-a: var(--brand-blue);   --pair-b: var(--brand-orange); }
@@ -126,10 +123,6 @@ In `src/app/globals.css`, after the `:root { ... }` block that defines `--brand-
 
 Immediately after the pairing classes from Step 1, add:
 ```css
-/* Gradient-border button: a single element (no wrapper div) using the
-   double-background-layer technique so the border-radius is respected
-   (unlike border-image, which ignores radius). Requires a .pair-* class
-   alongside it to set --pair-a/--pair-b. */
 .btn-gradient-border {
   border: 1.5px solid transparent;
   background-image:
@@ -138,13 +131,8 @@ Immediately after the pairing classes from Step 1, add:
   background-origin: border-box;
   background-clip: padding-box, border-box;
 }
-.dark .btn-gradient-border {
-  background-image:
-    linear-gradient(var(--background), var(--background)),
-    linear-gradient(135deg, var(--pair-a, var(--primary)), var(--pair-b, var(--primary)));
-}
 ```
-(The `.dark` block exists because `--background` itself is redefined under `.dark` elsewhere in this file — this rule just re-asserts the same gradient using whichever `--background` is active; no different values needed, but keeps the intent explicit for the next reader.)
+`--background` already resolves to the correct value under `.dark` automatically via the custom-property cascade — no separate `.dark` override is needed.
 
 - [ ] **Step 3: Add the two Button variants**
 
@@ -170,11 +158,7 @@ variant: {
   "gradient-fill": "bg-gradient-to-r text-white hover:opacity-90 border-0",
 },
 ```
-Note `gradient-fill` intentionally does NOT set `from-*`/`to-*` — callers supply those via the `.pair-*` companion... but `.pair-*` only sets `--pair-a`/`--pair-b` custom properties, which Tailwind's `from-*`/`to-*` utilities don't read. For `gradient-fill`, callers instead pass the matching Tailwind gradient-stop utilities directly, e.g. `className="from-brand-blue to-brand-maeve"`. Document this by adding a comment directly above the `variant` object in `button.tsx`:
-```ts
-// gradient-border: pair with a `.pair-*` class (globals.css) for the border colors.
-// gradient-fill: pair with Tailwind `from-brand-* to-brand-*` classes directly.
-```
+Note `gradient-fill` intentionally does NOT set `from-*`/`to-*` — `.pair-*` only sets `--pair-a`/`--pair-b` custom properties, which Tailwind's `from-*`/`to-*` utilities don't read. For `gradient-fill`, callers instead pass the matching Tailwind gradient-stop utilities directly, e.g. `className="from-brand-blue to-brand-maeve"`. Do not add a code comment explaining this in `button.tsx` — this plan document is the reference for that convention; the codebase itself carries no comments.
 
 - [ ] **Step 4: Verify**
 
