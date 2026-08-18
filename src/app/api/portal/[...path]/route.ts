@@ -19,7 +19,7 @@ async function handler(req: NextRequest, context: { params: Promise<{ path: stri
   }
 
   const subpath = path.join("/");
-  const upstreamUrl = `${apiUrl}/admin/accounts/${session.accountId}/${subpath}${req.nextUrl.search}`;
+  const upstreamUrl = `${apiUrl}/admin/api-clients/${session.apiClientId}/${subpath}${req.nextUrl.search}`;
 
   let body: string | undefined;
   if (req.method !== "GET" && req.method !== "HEAD") {
