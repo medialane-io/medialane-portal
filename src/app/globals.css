@@ -36,23 +36,6 @@
   --brand-maeve: oklch(0.686 0.157 346.0);
 }
 
-.pair-blue-maeve   { --pair-a: var(--brand-blue);   --pair-b: var(--brand-maeve); }
-.pair-orange-maeve { --pair-a: var(--brand-orange); --pair-b: var(--brand-maeve); }
-.pair-blue-orange  { --pair-a: var(--brand-blue);   --pair-b: var(--brand-orange); }
-.pair-rose-orange  { --pair-a: var(--brand-rose);   --pair-b: var(--brand-orange); }
-.pair-navy-purple  { --pair-a: var(--brand-navy);   --pair-b: var(--brand-purple); }
-.pair-rose-purple  { --pair-a: var(--brand-rose);   --pair-b: var(--brand-purple); }
-.pair-blue-navy    { --pair-a: var(--brand-blue);   --pair-b: var(--brand-navy); }
-
-.btn-gradient-border {
-  border: 1.5px solid transparent;
-  background-image:
-    linear-gradient(var(--background), var(--background)),
-    linear-gradient(135deg, var(--pair-a, var(--primary)), var(--pair-b, var(--primary)));
-  background-origin: border-box;
-  background-clip: padding-box, border-box;
-}
-
 .dark {
   --background: oklch(0.08 0.02 248);
   --foreground: oklch(0.94 0.012 248);

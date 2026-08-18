@@ -2,10 +2,9 @@ import Link from "next/link"
 import { Badge } from "@/src/components/ui/badge"
 import { Button } from "@/src/components/ui/button"
 import { Card, CardContent } from "@/src/components/ui/card"
-import { FeatureRowList, type FeatureRowItem } from "@/src/components/marketing/feature-row-list"
 import {
-  Code2, ArrowRight, Sparkles, Bot, Building2, Blocks, ShieldCheck, LayoutGrid, Globe,
-  ImagePlus, Layers, Users, Coins, ShoppingBag, KeyRound, Banknote, Repeat,
+  Code2, ArrowRight, Bot, Building2, Blocks, ShieldCheck, LayoutGrid, Globe,
+  ImagePlus, Layers, Users, Coins, ShoppingBag,
   Music, Palette, Film, Camera, Gem, Award, FileText, BookOpen, File, Building,
   Fingerprint, BadgeCheck, Ticket, Scale, GitBranch, Handshake,
 } from "lucide-react"
@@ -70,37 +69,6 @@ const HUBS = [
   },
 ]
 
-const WHY: FeatureRowItem[] = [
-  {
-    icon: ShieldCheck,
-    eyebrow: "Immutable by design",
-    color: "bg-brand-blue",
-    title: "Compliance you can point to",
-    description: "Rules and royalty terms are secured by immutable contracts the moment you launch, including for Medialane itself. Any later change requires your sign-off.",
-  },
-  {
-    icon: KeyRound,
-    eyebrow: "Direct ownership",
-    color: "bg-brand-orange",
-    title: "Your audience owns it directly",
-    description: "Every asset, ticket, and membership card is owned directly by the holder. No account system for your team to maintain or reconcile.",
-  },
-  {
-    icon: Banknote,
-    eyebrow: "Instant settlement",
-    color: "bg-brand-rose",
-    title: "Paid the moment a deal completes",
-    description: "Sales, licenses, and sponsorships pay out the instant a transaction completes, worldwide, directly between the two parties.",
-  },
-  {
-    icon: Repeat,
-    eyebrow: "Usage-based payments",
-    color: "bg-brand-maeve",
-    title: "Pay for use, get paid for use",
-    description: "Access is metered automatically. You pay only for what you use, and get paid the same way when others, including AI systems, use your catalog.",
-  },
-]
-
 const DATA_COMPLIANCE = [
   { value: "Immutable", label: "Provenance and license terms, secured on-chain the moment you register" },
   { value: "181 Countries", label: "Automatic copyright protection under the Berne Convention" },
@@ -151,34 +119,29 @@ export default function Home() {
     <div className="relative w-full overflow-hidden">
       <div className="relative z-10">
 
-        <section className="container mx-auto px-4 pt-24 pb-16 max-w-5xl text-center space-y-8">
-          <Badge className="bg-primary/10 text-primary border-primary/30 px-4 py-1.5 text-sm">
-            <Sparkles className="w-3.5 h-3.5 mr-1.5 inline" />
-            Tokenization for business
-          </Badge>
-
+        <section className="container mx-auto px-4 pt-28 pb-24 max-w-5xl text-center space-y-8">
           <h1 className="font-display text-5xl md:text-7xl font-extrabold tracking-tight text-foreground leading-tight">
-            Medialane
+            Tokenization and monetization
           </h1>
 
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-            Turn what you own into digital assets you can license, sell, and track.
+            Fast and scalable infrastructure for the creative economy
           </p>
 
           <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
-            <Button asChild variant="gradient-border" className="pair-blue-maeve" size="sm">
+            <Button asChild variant="gradient-border" size="sm">
               <Link href="/platform">
                 <ShieldCheck className="w-3.5 h-3.5 mr-1.5" />
                 How it works
               </Link>
             </Button>
-            <Button asChild variant="gradient-fill" className="from-brand-blue to-brand-maeve" size="sm">
+            <Button asChild variant="gradient-border" size="sm">
               <Link href="/services">
                 <LayoutGrid className="w-3.5 h-3.5 mr-1.5" />
                 Launchpad services
               </Link>
             </Button>
-            <Button asChild variant="gradient-border" className="pair-blue-maeve" size="sm">
+            <Button asChild variant="gradient-border" size="sm">
               <Link href="/enterprise/ip">
                 <Globe className="w-3.5 h-3.5 mr-1.5" />
                 Protect your IP worldwide
@@ -187,7 +150,7 @@ export default function Home() {
           </div>
         </section>
 
-        <section className="container mx-auto px-4 pb-16 max-w-5xl">
+        <section className="container mx-auto px-4 pb-24 max-w-5xl">
           <div className="grid sm:grid-cols-2 lg:grid-cols-5 gap-4">
             {HUBS.map(({ icon: Icon, title, description, color, bg }) => (
               <div key={title} className="space-y-3">
@@ -201,12 +164,7 @@ export default function Home() {
           </div>
         </section>
 
-        <section className="container mx-auto px-4 pb-16 max-w-2xl">
-          <h2 className="text-2xl font-bold text-foreground text-center mb-6">Why businesses tokenize with Medialane</h2>
-          <FeatureRowList items={WHY} />
-        </section>
-
-        <section className="container mx-auto px-4 pb-16 max-w-4xl">
+        <section className="container mx-auto px-4 pb-24 max-w-4xl">
           <Card className="border-border bg-foreground/5 backdrop-blur-sm overflow-hidden">
             <CardContent className="p-8 md:p-10 space-y-8">
               <div className="flex items-start gap-4">
@@ -236,7 +194,7 @@ export default function Home() {
                   </div>
                 ))}
               </div>
-              <Button asChild variant="gradient-border" className="pair-blue-maeve" size="sm">
+              <Button asChild variant="gradient-border" size="sm">
                 <Link href="/enterprise/ai-data">
                   See how AI data compliance works
                   <ArrowRight className="w-3.5 h-3.5 ml-1.5" />
@@ -246,7 +204,7 @@ export default function Home() {
           </Card>
         </section>
 
-        <section className="container mx-auto px-4 pb-16 max-w-5xl">
+        <section className="container mx-auto px-4 pb-24 max-w-5xl">
           <h2 className="font-display text-2xl font-bold text-foreground text-center mb-2">What can be registered and tokenized?</h2>
           <p className="text-sm text-muted-foreground text-center mb-6">
             Any IP type can be registered and protected. Here&apos;s what Medialane supports
@@ -264,7 +222,7 @@ export default function Home() {
             ))}
           </div>
           <div className="text-center mt-8">
-            <Button asChild variant="gradient-border" className="pair-blue-maeve" size="sm">
+            <Button asChild variant="gradient-border" size="sm">
               <Link href="/enterprise/ip">
                 See how IP protection works
                 <ArrowRight className="w-3.5 h-3.5 ml-1.5" />
