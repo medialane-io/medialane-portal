@@ -58,9 +58,9 @@ export default function ProgrammableIPDemo() {
   }
 
   return (
-    <div className="glass-effect border border-white/10 rounded-xl overflow-hidden">
+    <div className="glass-effect border border-border rounded-xl overflow-hidden">
       <Tabs defaultValue="visual" className="w-full">
-        <div className="flex justify-between items-center p-4 border-b border-white/10">
+        <div className="flex justify-between items-center p-4 border-b border-border">
           <h3 className="font-bold text-lg">Programmable IP Demo</h3>
           <TabsList className="bg-background/20">
             <TabsTrigger value="visual" className="text-xs">
@@ -77,7 +77,7 @@ export default function ProgrammableIPDemo() {
 
         <TabsContent value="visual" className="p-0 m-0">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-0">
-            <div className="p-6 border-r border-white/10">
+            <div className="p-6 border-r border-border">
               <h4 className="font-medium mb-6">Define Your IP Rules</h4>
 
               <div className="space-y-6">
@@ -86,7 +86,7 @@ export default function ProgrammableIPDemo() {
                     <Label htmlFor="commercial-use" className="font-medium">
                       Commercial Use
                     </Label>
-                    <p className="text-xs text-zinc-400">Allow others to use your IP commercially</p>
+                    <p className="text-xs text-muted-foreground">Allow others to use your IP commercially</p>
                   </div>
                   <Switch
                     id="commercial-use"
@@ -100,7 +100,7 @@ export default function ProgrammableIPDemo() {
                     <Label htmlFor="derivative-works" className="font-medium">
                       Derivative Works
                     </Label>
-                    <p className="text-xs text-zinc-400">Allow others to create derivatives</p>
+                    <p className="text-xs text-muted-foreground">Allow others to create derivatives</p>
                   </div>
                   <Switch
                     id="derivative-works"
@@ -114,7 +114,7 @@ export default function ProgrammableIPDemo() {
                     <Label htmlFor="attribution" className="font-medium">
                       Attribution Required
                     </Label>
-                    <p className="text-xs text-zinc-400">Users must credit you as the creator</p>
+                    <p className="text-xs text-muted-foreground">Users must credit you as the creator</p>
                   </div>
                   <Switch
                     id="attribution"
@@ -138,7 +138,7 @@ export default function ProgrammableIPDemo() {
                     value={[settings.royaltyPercentage]}
                     onValueChange={(value) => handleSettingChange("royaltyPercentage", value[0])}
                   />
-                  <p className="text-xs text-zinc-400">Percentage of revenue you receive from commercial use</p>
+                  <p className="text-xs text-muted-foreground">Percentage of revenue you receive from commercial use</p>
                 </div>
 
                 <div className="space-y-2">
@@ -156,7 +156,7 @@ export default function ProgrammableIPDemo() {
                     value={[settings.licenseDuration]}
                     onValueChange={(value) => handleSettingChange("licenseDuration", value[0])}
                   />
-                  <p className="text-xs text-zinc-400">How long the license remains valid</p>
+                  <p className="text-xs text-muted-foreground">How long the license remains valid</p>
                 </div>
 
                 <div className="flex items-center justify-between">
@@ -164,7 +164,7 @@ export default function ProgrammableIPDemo() {
                     <Label htmlFor="territory-restriction" className="font-medium">
                       Territory Restriction
                     </Label>
-                    <p className="text-xs text-zinc-400">Limit usage to specific regions</p>
+                    <p className="text-xs text-muted-foreground">Limit usage to specific regions</p>
                   </div>
                   <Switch
                     id="territory-restriction"
@@ -178,7 +178,7 @@ export default function ProgrammableIPDemo() {
                     <Label htmlFor="auto-renewal" className="font-medium">
                       Auto Renewal
                     </Label>
-                    <p className="text-xs text-zinc-400">Automatically renew licenses upon expiration</p>
+                    <p className="text-xs text-muted-foreground">Automatically renew licenses upon expiration</p>
                   </div>
                   <Switch
                     id="auto-renewal"
@@ -189,10 +189,10 @@ export default function ProgrammableIPDemo() {
               </div>
             </div>
 
-            <div className="p-6 bg-black/30">
+            <div className="p-6 bg-muted/30">
               <h4 className="font-medium mb-6">Revenue Projection</h4>
 
-              <Card className="bg-white/5 border-white/10">
+              <Card className="bg-muted/20 border-border">
                 <CardContent className="p-6">
                   <div className="flex items-center justify-between mb-6">
                     <div className="flex items-center">
@@ -201,7 +201,7 @@ export default function ProgrammableIPDemo() {
                       </div>
                       <div>
                         <h3 className="font-bold text-xl">{calculateEstimatedRevenue()}</h3>
-                        <p className="text-xs text-zinc-400">Estimated annual revenue</p>
+                        <p className="text-xs text-muted-foreground">Estimated annual revenue</p>
                       </div>
                     </div>
                     <Button size="sm" variant="outline" className="rounded-full">
@@ -212,7 +212,7 @@ export default function ProgrammableIPDemo() {
                   <div className="space-y-4">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center">
-                        <Users className="h-4 w-4 mr-2 text-zinc-400" />
+                        <Users className="h-4 w-4 mr-2 text-muted-foreground" />
                         <span className="text-sm">Potential Licensees</span>
                       </div>
                       <span className="font-medium">120+</span>
@@ -220,7 +220,7 @@ export default function ProgrammableIPDemo() {
 
                     <div className="flex items-center justify-between">
                       <div className="flex items-center">
-                        <Zap className="h-4 w-4 mr-2 text-zinc-400" />
+                        <Zap className="h-4 w-4 mr-2 text-muted-foreground" />
                         <span className="text-sm">Automated Transactions</span>
                       </div>
                       <span className="font-medium">100%</span>
@@ -228,7 +228,7 @@ export default function ProgrammableIPDemo() {
 
                     <div className="flex items-center justify-between">
                       <div className="flex items-center">
-                        <DollarSign className="h-4 w-4 mr-2 text-zinc-400" />
+                        <DollarSign className="h-4 w-4 mr-2 text-muted-foreground" />
                         <span className="text-sm">Revenue Streams</span>
                       </div>
                       <span className="font-medium">Multiple</span>
@@ -250,7 +250,7 @@ export default function ProgrammableIPDemo() {
               {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
             </Button>
 
-            <pre className="p-6 overflow-auto bg-black/30 text-sm font-mono text-zinc-300 max-h-[500px]">
+            <pre className="p-6 overflow-auto bg-muted/30 text-sm font-mono text-foreground max-h-[500px]">
               <code>{`pragma solidity ^0.8.17;
 
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
@@ -366,48 +366,48 @@ contract MediaLaneProgrammableIP is ERC721URIStorage, Ownable {
         </TabsContent>
 
         <TabsContent value="preview" className="p-0 m-0">
-          <div className="p-6 bg-black/30">
-            <div className="glass-effect border border-white/10 rounded-xl p-6 mb-6">
+          <div className="p-6 bg-muted/30">
+            <div className="glass-effect border border-border rounded-xl p-6 mb-6">
               <div className="flex items-center mb-4">
-                <div className="h-10 w-10 rounded-full bg-gradient-to-br from-purple-600 to-primary mr-3" />
+                <div className="h-10 w-10 rounded-full bg-gradient-to-br from-brand-purple to-primary mr-3" />
                 <div>
                   <h3 className="font-bold">Digital Art Collection License</h3>
-                  <p className="text-xs text-zinc-400">Powered by MediaLane Programmable IP</p>
+                  <p className="text-xs text-muted-foreground">Powered by MediaLane Programmable IP</p>
                 </div>
               </div>
 
               <div className="space-y-4 mt-6">
-                <div className="flex justify-between items-center py-2 border-b border-white/10">
+                <div className="flex justify-between items-center py-2 border-b border-border">
                   <span className="text-sm">Commercial Use</span>
                   <span className="text-sm font-medium">{settings.commercialUse ? "Allowed" : "Not Allowed"}</span>
                 </div>
 
-                <div className="flex justify-between items-center py-2 border-b border-white/10">
+                <div className="flex justify-between items-center py-2 border-b border-border">
                   <span className="text-sm">Derivative Works</span>
                   <span className="text-sm font-medium">{settings.derivativeWorks ? "Allowed" : "Not Allowed"}</span>
                 </div>
 
-                <div className="flex justify-between items-center py-2 border-b border-white/10">
+                <div className="flex justify-between items-center py-2 border-b border-border">
                   <span className="text-sm">Attribution Required</span>
                   <span className="text-sm font-medium">{settings.attribution ? "Yes" : "No"}</span>
                 </div>
 
-                <div className="flex justify-between items-center py-2 border-b border-white/10">
+                <div className="flex justify-between items-center py-2 border-b border-border">
                   <span className="text-sm">Royalty Percentage</span>
                   <span className="text-sm font-medium">{settings.royaltyPercentage}%</span>
                 </div>
 
-                <div className="flex justify-between items-center py-2 border-b border-white/10">
+                <div className="flex justify-between items-center py-2 border-b border-border">
                   <span className="text-sm">License Duration</span>
                   <span className="text-sm font-medium">{settings.licenseDuration} months</span>
                 </div>
 
-                <div className="flex justify-between items-center py-2 border-b border-white/10">
+                <div className="flex justify-between items-center py-2 border-b border-border">
                   <span className="text-sm">Territory Restriction</span>
                   <span className="text-sm font-medium">{settings.territoryRestriction ? "Yes" : "No"}</span>
                 </div>
 
-                <div className="flex justify-between items-center py-2 border-b border-white/10">
+                <div className="flex justify-between items-center py-2 border-b border-border">
                   <span className="text-sm">Auto Renewal</span>
                   <span className="text-sm font-medium">{settings.autoRenewal ? "Enabled" : "Disabled"}</span>
                 </div>
@@ -419,8 +419,8 @@ contract MediaLaneProgrammableIP is ERC721URIStorage, Ownable {
             </div>
 
             <div className="text-center">
-              <p className="text-sm text-zinc-400 mb-2">This license is automatically enforced by smart contracts</p>
-              <p className="text-xs text-zinc-500">No lawyers or intermediaries required</p>
+              <p className="text-sm text-muted-foreground mb-2">This license is automatically enforced by smart contracts</p>
+              <p className="text-xs text-muted-foreground">No lawyers or intermediaries required</p>
             </div>
           </div>
         </TabsContent>

@@ -59,7 +59,7 @@ export function ContractActions({ contractId, active, notes }: Props) {
   return (
     <span className="flex items-center gap-2">
       <button onClick={toggleActive} disabled={busy}
-        className={`text-xs transition-colors disabled:opacity-50 ${active ? "text-muted-foreground hover:text-destructive" : "text-muted-foreground hover:text-green-400"}`}>
+        className={`text-xs transition-colors disabled:opacity-50 ${active ? "text-muted-foreground hover:text-destructive" : "text-muted-foreground hover:text-primary"}`}>
         {active ? "Deactivate" : "Activate"}
       </button>
       <button onClick={() => { setNoteDraft(notes ?? ""); setEditingNotes(true); }} disabled={busy}

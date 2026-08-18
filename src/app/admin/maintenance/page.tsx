@@ -120,8 +120,8 @@ export default function AdminMaintenancePage() {
   const lagBlocks = health?.indexer?.lagBlocks ?? null;
   const lagColor = lagBlocks === null ? "text-muted-foreground"
     : lagBlocks > 100 ? "text-destructive"
-    : lagBlocks > 20  ? "text-yellow-500"
-    : "text-green-500";
+    : lagBlocks > 20  ? "text-brand-orange"
+    : "text-primary";
 
   return (
     <div className="space-y-6">
@@ -148,8 +148,8 @@ export default function AdminMaintenancePage() {
         ) : (
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
             {[
-              { label: "Status",     value: health.status,                    color: health.status === "ok" ? "text-green-500" : "text-destructive" },
-              { label: "Database",   value: health.database,                  color: health.database === "ok" ? "text-green-500" : "text-destructive" },
+              { label: "Status",     value: health.status,                    color: health.status === "ok" ? "text-primary" : "text-destructive" },
+              { label: "Database",   value: health.database,                  color: health.database === "ok" ? "text-primary" : "text-destructive" },
               { label: "Last block", value: health.indexer?.lastBlock ?? "—", color: "text-foreground" },
               { label: "Lag",        value: lagBlocks !== null ? `${lagBlocks} blocks` : "—", color: lagColor },
             ].map(item => (
@@ -177,7 +177,7 @@ export default function AdminMaintenancePage() {
               </p>
               {coverage && (
                 <div className="text-xs mt-1 space-y-0.5">
-                  <p className={coverage.safeToDropSourceColumn ? "text-green-500 font-medium" : "text-destructive font-medium"}>
+                  <p className={coverage.safeToDropSourceColumn ? "text-primary font-medium" : "text-destructive font-medium"}>
                     {coverage.safeToDropSourceColumn ? "✓ Safe to drop" : "✗ Not safe"} — missingService = {coverage.missingService}
                   </p>
                   <p className="text-muted-foreground">
@@ -207,7 +207,7 @@ export default function AdminMaintenancePage() {
                 Run this when collections were created but never indexed.
               </p>
               {registryResult && (
-                <p className="text-xs text-green-500 mt-1 font-medium">
+                <p className="text-xs text-primary mt-1 font-medium">
                   ✓ {registryResult.inserted} inserted, {registryResult.skipped} skipped
                 </p>
               )}
@@ -228,7 +228,7 @@ export default function AdminMaintenancePage() {
                 PENDING, FAILED, missing a name, or missing an owner. Run when collection images are missing.
               </p>
               {metaResult && (
-                <p className="text-xs text-green-500 mt-1 font-medium">✓ {metaResult.enqueued} jobs enqueued</p>
+                <p className="text-xs text-primary mt-1 font-medium">✓ {metaResult.enqueued} jobs enqueued</p>
               )}
             </div>
           </div>
@@ -247,7 +247,7 @@ export default function AdminMaintenancePage() {
                 Use when a collection was registered after its mints already happened. Get the deployment block from Voyager.
               </p>
               {transferResult && (
-                <p className="text-xs text-green-500 mt-1 font-medium">
+                <p className="text-xs text-primary mt-1 font-medium">
                   ✓ {transferResult.inserted} tokens inserted, {transferResult.skipped} skipped, {transferResult.metadataJobsEnqueued} metadata jobs queued
                 </p>
               )}

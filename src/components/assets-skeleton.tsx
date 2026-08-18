@@ -15,7 +15,7 @@ export function AssetsSkeleton() {
             </div>
 
             <div className="max-w-7xl mx-auto mb-4 md:mb-6">
-                <div className="flex flex-col gap-3 p-3 md:p-4 rounded-xl border border-white/10 bg-zinc-900/50">
+                <div className="flex flex-col gap-3 p-3 md:p-4 rounded-xl border border-border bg-muted/30">
                     <div className="flex flex-col md:flex-row gap-3 md:items-center md:justify-between">
 
                         <Skeleton className="h-10 w-full md:w-[420px] rounded-md" />

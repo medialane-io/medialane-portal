@@ -14,15 +14,15 @@ import type { AdminCollectionClaimRecord, AdminUsernameClaimRecord } from "@/src
 import { SERVICE_IDS } from "@/src/lib/services";
 
 const STATUS_STYLE: Record<string, string> = {
-  PENDING:       "bg-yellow-500/20 text-yellow-400 border-yellow-500/30",
-  AUTO_APPROVED: "bg-green-500/20  text-green-400  border-green-500/30",
-  APPROVED:      "bg-green-500/20  text-green-400  border-green-500/30",
-  REJECTED:      "bg-red-500/20    text-red-400    border-red-500/30",
+  PENDING:       "bg-brand-orange/20 text-brand-orange border-brand-orange/30",
+  AUTO_APPROVED: "bg-primary/15      text-primary      border-primary/30",
+  APPROVED:      "bg-primary/15      text-primary      border-primary/30",
+  REJECTED:      "bg-destructive/15  text-destructive  border-destructive/30",
 };
 const METHOD_STYLE: Record<string, string> = {
-  ONCHAIN:   "bg-blue-500/20   text-blue-400   border-blue-500/30",
-  SIGNATURE: "bg-purple-500/20 text-purple-400 border-purple-500/30",
-  MANUAL:    "bg-orange-500/20 text-orange-400 border-orange-500/30",
+  ONCHAIN:   "bg-brand-blue/20   text-brand-blue   border-brand-blue/30",
+  SIGNATURE: "bg-brand-purple/20 text-brand-purple border-brand-purple/30",
+  MANUAL:    "bg-brand-maeve/20  text-brand-maeve  border-brand-maeve/30",
 };
 const SERVICES = SERVICE_IDS;
 const FILTERS = ["", "PENDING", "APPROVED", "REJECTED"];

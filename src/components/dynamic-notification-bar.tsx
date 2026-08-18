@@ -94,7 +94,7 @@ export default function DynamicNotificationBar({ interval = 30000 }: Notificatio
 
             <div className="flex-1 min-w-0">
               <h4 className="font-medium text-sm truncate">{currentNotification.title}</h4>
-              <p className="text-xs text-zinc-400 truncate">{currentNotification.description}</p>
+              <p className="text-xs text-muted-foreground truncate">{currentNotification.description}</p>
             </div>
 
             <div className="flex items-center ml-2 space-x-2">

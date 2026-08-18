@@ -51,13 +51,13 @@ export default async function AdminDashboardPage() {
         </div>
         <div>
           <p className="text-muted-foreground text-xs uppercase tracking-wider mb-0.5">Lag</p>
-          <p className={`font-semibold ${Number(stats.indexer.lagBlocks) > 50 ? "text-destructive" : "text-green-500"}`}>
+          <p className={`font-semibold ${Number(stats.indexer.lagBlocks) > 50 ? "text-destructive" : "text-primary"}`}>
             {stats.indexer.lagBlocks} blocks
           </p>
         </div>
         <div>
           <p className="text-muted-foreground text-xs uppercase tracking-wider mb-0.5">Database</p>
-          <p className={`font-semibold ${stats.indexer.database === "ok" ? "text-green-500" : "text-destructive"}`}>
+          <p className={`font-semibold ${stats.indexer.database === "ok" ? "text-primary" : "text-destructive"}`}>
             {stats.indexer.database}
           </p>
         </div>

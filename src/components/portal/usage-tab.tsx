@@ -63,7 +63,7 @@ export function UsageTab({ address }: UsageTabProps) {
   return (
     <div className="space-y-4">
 
-      <Card className="border-primary/20 bg-background/50 backdrop-blur-sm">
+      <Card>
         <CardHeader>
           <CardTitle className="text-lg flex items-center gap-2">
             <BarChart2 className="w-5 h-5 text-primary" />
@@ -78,7 +78,7 @@ export function UsageTab({ address }: UsageTabProps) {
         </CardContent>
       </Card>
 
-      <Card className="border-primary/20 bg-background/50 backdrop-blur-sm">
+      <Card>
         <CardHeader>
           <CardTitle className="text-base">Your API Keys</CardTitle>
           <CardDescription>Status and last activity for each key</CardDescription>
@@ -99,7 +99,7 @@ export function UsageTab({ address }: UsageTabProps) {
                     <Badge
                       className={
                         k.status === "ACTIVE"
-                          ? "bg-green-500/15 text-green-400 border-green-500/30 text-xs"
+                          ? "bg-primary/15 text-primary border-primary/30 text-xs"
                           : "bg-muted text-muted-foreground text-xs"
                       }
                     >

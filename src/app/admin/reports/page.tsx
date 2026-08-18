@@ -28,11 +28,11 @@ const STATUS_TABS: { label: string; value: string }[] = [
 ];
 
 const STATUS_STYLE: Record<string, string> = {
-  PENDING:      "bg-yellow-500/20 text-yellow-400 border-yellow-500/30",
-  UNDER_REVIEW: "bg-blue-500/20 text-blue-400 border-blue-500/30",
-  HIDDEN:       "bg-red-500/20 text-red-400 border-red-500/30",
-  DISMISSED:    "bg-gray-500/20 text-gray-400 border-gray-500/30",
-  RESTORED:     "bg-green-500/20 text-green-400 border-green-500/30",
+  PENDING:      "bg-brand-orange/20 text-brand-orange border-brand-orange/30",
+  UNDER_REVIEW: "bg-brand-blue/20 text-brand-blue border-brand-blue/30",
+  HIDDEN:       "bg-destructive/15 text-destructive border-destructive/30",
+  DISMISSED:    "bg-muted text-muted-foreground border-border",
+  RESTORED:     "bg-primary/15 text-primary border-primary/30",
 };
 
 const CATEGORY_LABELS: Record<string, string> = {
@@ -131,7 +131,7 @@ export default function ReportsPage() {
             const isHigh = report.categories.some(c => HIGH_SEVERITY.has(c));
             return (
               <div key={report.id}
-                className={`flex items-center gap-4 p-4 border rounded-lg hover:bg-muted/30 cursor-pointer transition-colors ${isHigh ? "border-red-500/40" : "border-border"}`}
+                className={`flex items-center gap-4 p-4 border rounded-lg hover:bg-muted/30 cursor-pointer transition-colors ${isHigh ? "border-destructive/40" : "border-border"}`}
                 onClick={() => openReport(report)}>
                 <div className="h-12 w-12 rounded-lg overflow-hidden bg-muted shrink-0 border border-border">
                   {img ? <img src={img} alt="" className="h-full w-full object-cover" /> :
@@ -225,7 +225,7 @@ export default function ReportsPage() {
               <Button variant="ghost" size="sm" disabled={acting} onClick={() => handleAction("DISMISSED")}><XCircle className="h-3.5 w-3.5 mr-1.5" />Dismiss</Button>
             )}
             {selected?.status === "HIDDEN" ? (
-              <Button size="sm" variant="outline" className="border-emerald-500/50 text-emerald-500 hover:bg-emerald-500/10" disabled={acting} onClick={() => handleAction("RESTORED")}><RotateCcw className="h-3.5 w-3.5 mr-1.5" />Restore</Button>
+              <Button size="sm" variant="outline" className="border-primary/50 text-primary hover:bg-primary/10" disabled={acting} onClick={() => handleAction("RESTORED")}><RotateCcw className="h-3.5 w-3.5 mr-1.5" />Restore</Button>
             ) : (
               <Button variant="destructive" size="sm" disabled={acting} onClick={() => handleAction("HIDDEN")}><EyeOff className="h-3.5 w-3.5 mr-1.5" />Hide from Platform</Button>
             )}

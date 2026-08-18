@@ -143,13 +143,13 @@ export default function UserCard({ user }: { user: MarketplaceUser }) {
 
         <div className="absolute top-3 right-3 flex gap-2">
           {user.isActive && (
-            <Badge className="bg-green-500/90 text-white">
+            <Badge className="bg-primary/90 text-primary-foreground">
               <Zap className="h-3 w-3 mr-1" />
               Active
             </Badge>
           )}
           {user.trending && (
-            <Badge className="bg-gradient-to-r from-orange-500 to-red-500 text-white">
+            <Badge className="bg-gradient-to-r from-brand-rose to-brand-orange text-primary-foreground">
               <TrendingUp className="h-3 w-3 mr-1" />
               Trending
             </Badge>
@@ -157,13 +157,13 @@ export default function UserCard({ user }: { user: MarketplaceUser }) {
         </div>
 
         <div className="absolute top-3 left-3 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-          <Button variant="secondary" size="sm" className="h-8 w-8 p-0 bg-white/90 hover:bg-white" onClick={handleLike}>
-            <Heart className={`h-3 w-3 ${isLiked ? "fill-red-500 text-red-500" : ""}`} />
+          <Button variant="secondary" size="sm" className="h-8 w-8 p-0 bg-background/90 hover:bg-background" onClick={handleLike}>
+            <Heart className={`h-3 w-3 ${isLiked ? "fill-brand-rose text-brand-rose" : ""}`} />
           </Button>
           <Button
             variant="secondary"
             size="sm"
-            className="h-8 w-8 p-0 bg-white/90 hover:bg-white"
+            className="h-8 w-8 p-0 bg-background/90 hover:bg-background"
             onClick={handleShare}
           >
             <Share2 className="h-3 w-3" />
@@ -190,7 +190,7 @@ export default function UserCard({ user }: { user: MarketplaceUser }) {
         <div className="mb-2">
           <div className="flex items-center gap-1 mb-1">
             <h4 className="font-semibold truncate text-lg">{name}</h4>
-            {isVerified && <CheckCircle2 className="h-4 w-4 text-green-500 flex-shrink-0" />}
+            {isVerified && <CheckCircle2 className="h-4 w-4 text-primary flex-shrink-0" />}
           </div>
           <p className="text-sm text-muted-foreground">@{username}</p>
         </div>

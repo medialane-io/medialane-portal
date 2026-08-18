@@ -184,7 +184,7 @@ export default function CoinSettingsPage() {
           className={`flex items-start gap-2 rounded-lg border p-3 text-sm ${
             status.type === "error"
               ? "border-destructive/30 bg-destructive/10 text-destructive"
-              : "border-green-500/30 bg-green-500/10 text-green-500"
+              : "border-primary/30 bg-primary/10 text-primary"
           }`}
           role="status"
         >

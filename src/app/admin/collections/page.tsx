@@ -25,24 +25,24 @@ import type { AdminCollectionRecord } from "@/src/types/admin";
 const PAGE_SIZE = 20;
 
 const SERVICE_STYLE: Record<string, string> = {
-  "mip-erc721":      "bg-blue-500/20 text-blue-400 border-blue-500/30",
-  "mip-erc1155":     "bg-teal-500/20 text-teal-400 border-teal-500/30",
-  "pop-protocol":    "bg-cyan-500/20 text-cyan-400 border-cyan-500/30",
-  "drop-collection": "bg-yellow-500/20 text-yellow-400 border-yellow-500/30",
+  "mip-erc721":      "bg-brand-blue/20 text-brand-blue border-brand-blue/30",
+  "mip-erc1155":     "bg-brand-purple/20 text-brand-purple border-brand-purple/30",
+  "pop-protocol":    "bg-brand-rose/20 text-brand-rose border-brand-rose/30",
+  "drop-collection": "bg-brand-orange/20 text-brand-orange border-brand-orange/30",
 };
-const SERVICE_FALLBACK = "bg-gray-500/20 text-gray-400 border-gray-500/30";
+const SERVICE_FALLBACK = "bg-muted text-muted-foreground border-border";
 const serviceStyle = (s?: string | null) => SERVICE_STYLE[s ?? ""] ?? SERVICE_FALLBACK;
 const serviceLabel = (s?: string | null) => s ?? "external";
 
 const STATUS_STYLE: Record<string, string> = {
-  FETCHED:  "bg-green-500/20 text-green-400 border-green-500/30",
-  PENDING:  "bg-yellow-500/20 text-yellow-400 border-yellow-500/30",
-  FETCHING: "bg-blue-500/20 text-blue-400 border-blue-500/30",
-  FAILED:   "bg-red-500/20 text-red-400 border-red-500/30",
+  FETCHED:  "bg-primary/15 text-primary border-primary/30",
+  PENDING:  "bg-brand-orange/20 text-brand-orange border-brand-orange/30",
+  FETCHING: "bg-brand-blue/20 text-brand-blue border-brand-blue/30",
+  FAILED:   "bg-destructive/15 text-destructive border-destructive/30",
 };
 const STANDARD_STYLE: Record<string, string> = {
-  ERC721:  "bg-indigo-500/20 text-indigo-400 border-indigo-500/30",
-  ERC1155: "bg-teal-500/20 text-teal-400 border-teal-500/30",
+  ERC721:  "bg-brand-blue/20 text-brand-blue border-brand-blue/30",
+  ERC1155: "bg-brand-purple/20 text-brand-purple border-brand-purple/30",
   UNKNOWN: "bg-muted/50 text-muted-foreground",
 };
 const SERVICES = SERVICE_IDS;
@@ -458,7 +458,7 @@ function CollectionRow({
         <div className="flex items-center gap-2 flex-wrap">
           <span className="font-semibold truncate max-w-[220px]">{col.name ?? "Unnamed"}</span>
           {col.isFeatured && (
-            <Badge variant="outline" className="bg-yellow-500/20 text-yellow-400 border-yellow-500/30 gap-1">
+            <Badge variant="outline" className="bg-brand-maeve/20 text-brand-maeve border-brand-maeve/30 gap-1">
               <Star className="h-2.5 w-2.5" />Featured
             </Badge>
           )}

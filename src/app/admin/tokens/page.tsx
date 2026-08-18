@@ -12,11 +12,11 @@ import { ipfsToHttp, timeAgo } from "@/src/lib/utils";
 import { EXPLORER_URL } from "@/src/lib/constants";
 
 const STATUS_STYLE: Record<string, string> = {
-  FETCHED:  "bg-green-500/20 text-green-400 border-green-500/30",
-  DONE:     "bg-green-500/20 text-green-400 border-green-500/30",
-  PENDING:  "bg-yellow-500/20 text-yellow-400 border-yellow-500/30",
-  FAILED:   "bg-red-500/20 text-red-400 border-red-500/30",
-  FETCHING: "bg-blue-500/20 text-blue-400 border-blue-500/30",
+  FETCHED:  "bg-primary/15 text-primary border-primary/30",
+  DONE:     "bg-primary/15 text-primary border-primary/30",
+  PENDING:  "bg-brand-orange/20 text-brand-orange border-brand-orange/30",
+  FAILED:   "bg-destructive/15 text-destructive border-destructive/30",
+  FETCHING: "bg-brand-blue/20 text-brand-blue border-brand-blue/30",
 };
 
 const RECENT_KEY = "admin-token-lookups";
@@ -39,7 +39,7 @@ function CopyButton({ text }: { text: string }) {
   }
   return (
     <button onClick={copy} className="inline-flex items-center justify-center h-6 w-6 rounded hover:bg-muted transition-colors shrink-0" title="Copy">
-      {copied ? <Check className="h-3.5 w-3.5 text-emerald-500" /> : <Copy className="h-3.5 w-3.5 text-muted-foreground" />}
+      {copied ? <Check className="h-3.5 w-3.5 text-primary" /> : <Copy className="h-3.5 w-3.5 text-muted-foreground" />}
     </button>
   );
 }

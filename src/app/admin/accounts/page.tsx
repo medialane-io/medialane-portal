@@ -14,12 +14,12 @@ import { KeyRound, Copy, Ban, ChevronDown, ChevronUp, Users, Coins, Search, Plug
 import type { AdminAccount, AdminApiClient } from "@/src/types/admin";
 
 const PLAN_STYLE: Record<string, string> = {
-  FREE:    "bg-gray-500/20 text-gray-400 border-gray-500/30",
-  PREMIUM: "bg-purple-500/20 text-purple-400 border-purple-500/30",
+  FREE:    "bg-muted text-muted-foreground border-border",
+  PREMIUM: "bg-brand-purple/20 text-brand-purple border-brand-purple/30",
 };
 const STATUS_STYLE: Record<string, string> = {
-  ACTIVE:    "bg-green-500/20 text-green-400 border-green-500/30",
-  SUSPENDED: "bg-red-500/20 text-red-400 border-red-500/30",
+  ACTIVE:    "bg-primary/15 text-primary border-primary/30",
+  SUSPENDED: "bg-destructive/15 text-destructive border-destructive/30",
 };
 
 function copy(text: string) {
@@ -286,7 +286,7 @@ export default function AdminAccountsPage() {
                     )}
                     <Button
                       size="sm" variant="ghost"
-                      className={`h-7 px-2 text-xs ${a.status === "ACTIVE" ? "text-destructive" : "text-green-500"}`}
+                      className={`h-7 px-2 text-xs ${a.status === "ACTIVE" ? "text-destructive" : "text-primary"}`}
                       onClick={() => {
                         const next = a.status === "ACTIVE" ? "SUSPENDED" : "ACTIVE";
                         if (next === "SUSPENDED" && !confirm(`Suspend this account? All its keys stop working immediately.`)) return;

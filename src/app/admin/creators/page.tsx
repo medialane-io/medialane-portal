@@ -11,9 +11,9 @@ import { ExternalLink, Wrench } from "lucide-react";
 import type { AdminUsernameClaimRecord } from "@/src/types/admin";
 
 const STATUS_STYLE: Record<string, string> = {
-  APPROVED: "bg-green-500/20 text-green-400",
-  PENDING:  "bg-yellow-500/20 text-yellow-400",
-  REJECTED: "bg-red-500/20 text-red-400",
+  APPROVED: "bg-primary/15 text-primary",
+  PENDING:  "bg-brand-orange/20 text-brand-orange",
+  REJECTED: "bg-destructive/15 text-destructive",
 };
 
 export default function AdminCreatorsPage() {

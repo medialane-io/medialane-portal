@@ -102,7 +102,7 @@ export default async function ServicesPage() {
                             {new Date(contract.createdAt).toLocaleDateString()}
                           </td>
                           <td className="py-2 pr-4">
-                            <span className={`text-xs font-medium ${contract.active ? "text-green-400" : "text-muted-foreground"}`}>
+                            <span className={`text-xs font-medium ${contract.active ? "text-primary" : "text-muted-foreground"}`}>
                               {contract.active ? "● Active" : "○ Inactive"}
                             </span>
                           </td>

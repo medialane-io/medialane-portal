@@ -77,7 +77,7 @@ function CommentsTab() {
                   {short(c.author)} · token {c.tokenId} on {short(c.contractAddress)} · {timeAgo(c.createdAt)}
                 </p>
               </div>
-              {c.isHidden && <Badge variant="outline" className="text-[10px] bg-red-500/20 text-red-400 border-red-500/30 shrink-0">HIDDEN</Badge>}
+              {c.isHidden && <Badge variant="outline" className="text-[10px] bg-destructive/15 text-destructive border-destructive/30 shrink-0">HIDDEN</Badge>}
               <Button
                 size="sm" variant="outline" className="shrink-0"
                 disabled={busy === c.id}
@@ -110,9 +110,9 @@ function SlugClaimsTab() {
   }
 
   const STATUS_STYLE: Record<string, string> = {
-    APPROVED: "bg-green-500/20 text-green-400 border-green-500/30",
-    PENDING:  "bg-yellow-500/20 text-yellow-400 border-yellow-500/30",
-    REJECTED: "bg-red-500/20 text-red-400 border-red-500/30",
+    APPROVED: "bg-primary/15 text-primary border-primary/30",
+    PENDING:  "bg-brand-orange/20 text-brand-orange border-brand-orange/30",
+    REJECTED: "bg-destructive/15 text-destructive border-destructive/30",
   };
 
   return (
@@ -142,7 +142,7 @@ function SlugClaimsTab() {
               <Badge variant="outline" className={`text-[10px] shrink-0 ${STATUS_STYLE[claim.status] ?? ""}`}>{claim.status}</Badge>
               {claim.status === "PENDING" && (
                 <div className="flex gap-2 shrink-0">
-                  <Button size="sm" variant="outline" className="border-emerald-500/50 text-emerald-500 hover:bg-emerald-500/10"
+                  <Button size="sm" variant="outline" className="border-primary/50 text-primary hover:bg-primary/10"
                     disabled={busy === claim.id} onClick={() => review(claim.id, "APPROVED")}>
                     <Check className="h-3.5 w-3.5 mr-1" />Approve
                   </Button>

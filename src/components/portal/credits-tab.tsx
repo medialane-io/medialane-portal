@@ -102,7 +102,7 @@ export function CreditsTab({ address }: Props) {
 
   return (
     <div className="space-y-6">
-      <Card className="border-primary/20 bg-background/50 backdrop-blur-sm">
+      <Card>
         <CardHeader>
           <CardTitle className="text-lg flex items-center gap-2">
             <Coins className="w-5 h-5 text-primary" />
@@ -127,7 +127,6 @@ export function CreditsTab({ address }: Props) {
                 placeholder="10"
                 value={usdcAmount}
                 onChange={(e) => setUsdcAmount(e.target.value)}
-                className="bg-white/5 border-white/10 text-white"
               />
               <Button onClick={handleDeposit} disabled={depositing || !account || !usdcAmount || !treasuryAddress}>
                 {depositing ? <Loader2 className="w-4 h-4 animate-spin" /> : "Deposit"}
@@ -141,7 +140,7 @@ export function CreditsTab({ address }: Props) {
               </p>
             )}
             {credited !== null && (
-              <p className="text-xs text-green-400 flex items-center gap-1">
+              <p className="text-xs text-primary flex items-center gap-1">
                 <Zap className="w-3 h-3" />+{credited.toLocaleString()} credits added.
               </p>
             )}
@@ -171,7 +170,7 @@ export function CreditsTab({ address }: Props) {
       </Card>
 
       {payments.length > 0 && (
-        <Card className="border-white/10 bg-background/50">
+        <Card>
           <CardHeader>
             <CardTitle className="text-sm text-muted-foreground">Payment History</CardTitle>
           </CardHeader>
@@ -180,10 +179,10 @@ export function CreditsTab({ address }: Props) {
               {payments.map((p) => (
                 <div
                   key={p.id}
-                  className="flex items-center justify-between text-sm border-b border-white/5 pb-2 last:border-0 last:pb-0"
+                  className="flex items-center justify-between text-sm border-b border-border pb-2 last:border-0 last:pb-0"
                 >
                   <div>
-                    <p className="text-white">+{p.creditedAmount.toLocaleString()} credits</p>
+                    <p className="text-foreground">+{p.creditedAmount.toLocaleString()} credits</p>
                     <p className="text-xs text-muted-foreground">
                       ${(Number(p.amountAtomic) / 1_000_000).toFixed(2)} USDC
                       {p.mdlnMultiplier > 1 ? ` · ${p.mdlnMultiplier}× MDLN` : ""}
@@ -193,7 +192,7 @@ export function CreditsTab({ address }: Props) {
                     href={`https://starkscan.co/tx/${p.txHash}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-xs text-muted-foreground hover:text-white flex items-center gap-1"
+                    className="text-xs text-muted-foreground hover:text-foreground flex items-center gap-1"
                   >
                     {new Date(p.createdAt).toLocaleDateString()}
                     <ExternalLink className="w-3 h-3" />

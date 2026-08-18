@@ -27,12 +27,12 @@ export function AccountDashboard({ address }: Props) {
 
   return (
     <div className="min-h-screen">
-      <div className="border-b border-white/5 bg-black/30 backdrop-blur-sm">
+      <div className="border-b border-border bg-background/60 backdrop-blur-sm">
         <div className="container mx-auto px-4 max-w-5xl pt-28 pb-8">
           <div className="flex flex-col sm:flex-row sm:items-center gap-5">
             <div className="flex-1 flex flex-col gap-1 min-w-0">
               <div className="flex flex-wrap items-center gap-2 mb-0.5">
-                <h1 className="text-lg font-mono font-bold truncate text-white">
+                <h1 className="text-lg font-mono font-bold truncate text-foreground">
                   {address.slice(0, 8)}&hellip;{address.slice(-6)}
                 </h1>
               </div>
@@ -53,7 +53,7 @@ export function AccountDashboard({ address }: Props) {
 
       <div className="container mx-auto px-4 max-w-5xl py-8">
         <Tabs defaultValue="keys" className="space-y-6">
-          <TabsList className="w-full h-auto p-1 gap-1 bg-black/40 border border-white/10 rounded-xl grid grid-cols-3">
+          <TabsList className="w-full h-auto p-1 gap-1 bg-muted border border-border rounded-xl grid grid-cols-3">
             <TabsTrigger
               value="keys"
               className="flex items-center gap-1.5 py-2.5 text-xs sm:text-sm rounded-lg data-[state=active]:bg-primary/20 data-[state=active]:text-primary data-[state=active]:shadow-none"

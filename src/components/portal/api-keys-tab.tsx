@@ -57,7 +57,7 @@ function QuickstartCard() {
   };
 
   return (
-    <Card className="border-primary/20 bg-background/50 backdrop-blur-sm">
+    <Card>
       <Collapsible open={open} onOpenChange={setOpen}>
         <CollapsibleTrigger asChild>
           <CardHeader className="cursor-pointer select-none hover:bg-muted/10 transition-colors rounded-t-xl">
@@ -94,7 +94,7 @@ function QuickstartCard() {
                     onClick={() => handleCopy(snippet.code, i)}
                   >
                     {copiedIndex === i ? (
-                      <Check className="w-3.5 h-3.5 text-green-500" />
+                      <Check className="w-3.5 h-3.5 text-primary" />
                     ) : (
                       <Copy className="w-3.5 h-3.5" />
                     )}
@@ -202,7 +202,7 @@ export function ApiKeysTab({ address }: { address: string }) {
 
   return (
     <div className="space-y-4">
-      <Card className="border-primary/20 bg-background/50 backdrop-blur-sm">
+      <Card>
         <CardHeader className="flex flex-row items-start justify-between gap-4">
           <div>
             <CardTitle className="text-lg flex items-center gap-2">
@@ -245,7 +245,7 @@ export function ApiKeysTab({ address }: { address: string }) {
                         variant={k.status === "ACTIVE" ? "default" : "secondary"}
                         className={
                           k.status === "ACTIVE"
-                            ? "bg-green-500/15 text-green-600 border-green-500/30"
+                            ? "bg-primary/15 text-primary border-primary/30"
                             : "bg-muted text-muted-foreground"
                         }
                       >
@@ -300,7 +300,7 @@ export function ApiKeysTab({ address }: { address: string }) {
                   {newKey.plaintext}
                 </code>
                 <Button variant="outline" size="icon" onClick={handleCopy} className="shrink-0">
-                  {copied ? <Check className="w-4 h-4 text-green-500" /> : <Copy className="w-4 h-4" />}
+                  {copied ? <Check className="w-4 h-4 text-primary" /> : <Copy className="w-4 h-4" />}
                 </Button>
               </div>
               <DialogFooter>

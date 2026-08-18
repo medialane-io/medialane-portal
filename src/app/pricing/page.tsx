@@ -55,7 +55,7 @@ const FEATURES = [
 ]
 
 function Cell({ value }: { value: boolean | string }) {
-  if (value === true) return <Check className="w-5 h-5 text-green-400 mx-auto" />
+  if (value === true) return <Check className="w-5 h-5 text-primary mx-auto" />
   if (value === "n/a") return <span className="text-muted-foreground text-sm">n/a</span>
   return <span className="text-sm text-foreground font-medium">{value}</span>
 }
