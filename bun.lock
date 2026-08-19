@@ -5,7 +5,7 @@
     "": {
       "name": "medialane-xyz",
       "dependencies": {
-        "@medialane/sdk": "0.85.5",
+        "@medialane/sdk": "0.85.11",
         "@medialane/ui": "0.126.8",
         "@radix-ui/react-avatar": "1.1.2",
         "@radix-ui/react-progress": "latest",
@@ -281,7 +281,7 @@
 
     "@lit/reactive-element": ["@lit/reactive-element@2.1.2", "", { "dependencies": { "@lit-labs/ssr-dom-shim": "^1.5.0" } }, "sha512-pbCDiVMnne1lYUIaYNN5wrwQXDtHaYtg7YEFPeW+hws6U47WeFvISGUWekPGKWOP1ygrs0ef0o1VJMk1exos5A=="],
 
-    "@medialane/sdk": ["@medialane/sdk@0.85.5", "", { "dependencies": { "@noble/hashes": "^2.2.0", "@scure/base": "^2.2.0", "zod": "^3.23.8" }, "peerDependencies": { "@solana/web3.js": ">=1.90.0", "@stellar/stellar-sdk": ">=13.0.0", "starknet": ">=6.0.0", "viem": ">=2.0.0" }, "optionalPeers": ["@solana/web3.js", "@stellar/stellar-sdk", "starknet", "viem"] }, "sha512-KuFeDhqWAK70VaTkRBy2b9YU9WVwqpJ+6yOhYCMD0hQ5yAFln5zNrU4eXOXFH4Os4I6rmciyzGGrvl8m80zbGw=="],
+    "@medialane/sdk": ["@medialane/sdk@0.85.11", "", { "dependencies": { "@noble/hashes": "^2.2.0", "@scure/base": "^2.2.0", "zod": "^3.23.8" }, "peerDependencies": { "@solana/web3.js": ">=1.90.0", "@stellar/stellar-sdk": ">=13.0.0", "starknet": ">=6.0.0", "viem": ">=2.0.0" }, "optionalPeers": ["@solana/web3.js", "@stellar/stellar-sdk", "starknet", "viem"] }, "sha512-5Z9EuZntfbsYl80ZCGo5Z+lIM/vlCI0VZc0OqghW3X7YlFZA8q0mGidjZSVqg9QfE0yo4dALx/a2HPShDDMBmw=="],
 
     "@medialane/ui": ["@medialane/ui@0.126.8", "", { "peerDependencies": { "@medialane/sdk": ">=0.73.0", "@radix-ui/react-checkbox": ">=1.1.0", "@radix-ui/react-collapsible": ">=1.1.0", "@radix-ui/react-dialog": ">=1.1.0", "@radix-ui/react-dropdown-menu": ">=2.1.0", "@radix-ui/react-label": ">=2.1.0", "@radix-ui/react-popover": ">=1.1.0", "@radix-ui/react-select": ">=2.1.0", "@radix-ui/react-slot": ">=1.1.0", "@radix-ui/react-switch": ">=1.1.0", "@radix-ui/react-tabs": ">=1.1.0", "class-variance-authority": ">=0.7.0", "clsx": ">=2.0.0", "cmdk": ">=1.0.0", "framer-motion": ">=10.0.0", "lucide-react": ">=0.400.0", "next": ">=14.0.0", "next-themes": ">=0.3.0", "react": ">=18.0.0", "react-dom": ">=18.0.0", "react-hook-form": ">=7.50.0", "recharts": ">=2.0.0", "sonner": ">=1.0.0", "swr": ">=2.0.0", "tailwind-merge": ">=2.0.0" } }, "sha512-HHGzFy6D/NSHJYhriBYLWA7HB3PoyT7N0OIrPrLLrSJ5ZjexzRfxY0/LNnAdfmMi90VYI7FfxDI+endJ/1KX3Q=="],
 
