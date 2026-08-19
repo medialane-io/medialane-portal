@@ -10,7 +10,6 @@ export type PortalSessionView = {
   accountId: string;
   address: string;
   chain: string;
-  is_admin: boolean;
 };
 
 const fetcher = (url: string) => fetch(url).then((r) => r.json());

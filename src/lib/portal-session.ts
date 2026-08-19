@@ -6,7 +6,7 @@ export type PortalSession = {
   apiClientId: string;
   chain: string;
   address: string;
-  is_admin: boolean;
+  apiKey: string;
 };
 
 const SESSION_COOKIE = "portal-session";
@@ -25,7 +25,7 @@ export async function createSession(payload: PortalSession): Promise<string> {
     api_client_id: payload.apiClientId,
     chain: payload.chain,
     address: payload.address,
-    is_admin: payload.is_admin,
+    api_key: payload.apiKey,
   })
     .setProtectedHeader({ alg: "HS256" })
     .setIssuedAt()
@@ -38,13 +38,13 @@ export async function getPortalSession(): Promise<PortalSession | null> {
   if (!token) return null;
   try {
     const { payload } = await jwtVerify(token, getSecret());
-    if (typeof payload.api_client_id !== "string") return null;
+    if (typeof payload.api_client_id !== "string" || typeof payload.api_key !== "string") return null;
     return {
       accountId: payload.sub as string,
       apiClientId: payload.api_client_id,
       chain: (payload.chain as string) ?? "STARKNET",
       address: payload.address as string,
-      is_admin: payload.is_admin === true,
+      apiKey: payload.api_key,
     };
   } catch {
     return null;

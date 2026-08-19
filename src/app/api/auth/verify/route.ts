@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { createSession, setSessionCookie } from "@/src/lib/portal-session";
-import { isAdminAddress } from "@/src/lib/admin-allowlist";
 import { normalizeStarknetAddress } from "@/src/lib/starknet-address";
 import { createRateLimiter, clientIp } from "@/src/lib/rate-limit";
 
@@ -13,32 +12,6 @@ const bodySchema = z.object({
 
 const checkRateLimit = createRateLimiter(60_000, 20);
 
-/** Every signed-in account gets developer access — find its ApiClient, provisioning one on first sign-in. */
-async function resolveApiClientId(apiUrl: string, apiSecret: string, accountId: string): Promise<string | null> {
-  const headers = { "x-api-key": apiSecret, "Content-Type": "application/json" };
-
-  const lookup = await fetch(`${apiUrl}/admin/accounts?q=${encodeURIComponent(accountId)}`, { headers });
-  const lookupJson = await lookup.json().catch(() => null);
-  const existing = lookupJson?.data?.find((a: { id: string }) => a.id === accountId)?.apiClient?.id as
-    | string
-    | undefined;
-  if (existing) return existing;
-
-  const created = await fetch(`${apiUrl}/admin/api-clients`, {
-    method: "POST",
-    headers,
-    body: JSON.stringify({ accountId }),
-  });
-  const createdJson = await created.json().catch(() => null);
-  if (created.status === 201) return (createdJson?.data?.id as string | undefined) ?? null;
-  if (created.status !== 409) return null;
-
-  // Lost a create race — someone else provisioned it between our lookup and our create.
-  const retry = await fetch(`${apiUrl}/admin/accounts?q=${encodeURIComponent(accountId)}`, { headers });
-  const retryJson = await retry.json().catch(() => null);
-  return (retryJson?.data?.find((a: { id: string }) => a.id === accountId)?.apiClient?.id as string | undefined) ?? null;
-}
-
 export async function POST(req: NextRequest) {
   if (!checkRateLimit(clientIp(req))) {
     return NextResponse.json({ error: "Too many requests" }, { status: 429 });
@@ -48,9 +21,8 @@ export async function POST(req: NextRequest) {
   if (!parsed.success) return NextResponse.json({ error: "Invalid body" }, { status: 400 });
 
   const apiUrl = process.env.MEDIALANE_API_URL;
-  const apiSecret = process.env.MEDIALANE_API_SECRET;
   const apiKey = process.env.MEDIALANE_API_KEY;
-  if (!apiUrl || !apiSecret || !apiKey) return NextResponse.json({ error: "Backend not configured" }, { status: 500 });
+  if (!apiUrl || !apiKey) return NextResponse.json({ error: "Backend not configured" }, { status: 500 });
 
   let address: string;
   try {
@@ -59,40 +31,51 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Invalid address" }, { status: 400 });
   }
 
+  // Wallet signature is the only proof required — the backend self-provisions
+  // this wallet's Account + ApiClient, no admin credential involved.
   const verifyRes = await fetch(`${apiUrl}/v1/auth/siws/verify`, {
     method: "POST",
     headers: { "Content-Type": "application/json", "x-api-key": apiKey },
-    body: JSON.stringify({ walletAddress: address, nonce: parsed.data.nonce, signature: parsed.data.signature }),
+    body: JSON.stringify({
+      walletAddress: address,
+      nonce: parsed.data.nonce,
+      signature: parsed.data.signature,
+      appSource: "MEDIALANE_PORTAL",
+    }),
   });
-  if (!verifyRes.ok) {
-    const err = await verifyRes.json().catch(() => ({}));
-    if (err?.error === "account_not_deployed") {
+  const verifyJson = await verifyRes.json().catch(() => null) as
+    | { token?: string; accountId?: string; apiClientId?: string; error?: string; message?: string }
+    | null;
+  if (!verifyRes.ok || !verifyJson?.token || !verifyJson.accountId || !verifyJson.apiClientId) {
+    if (verifyJson?.error === "account_not_deployed") {
       return NextResponse.json(
-        { error: err.message ?? "Your wallet isn't deployed on Starknet yet. Make one transaction first, then sign in." },
+        { error: verifyJson.message ?? "Your wallet isn't deployed on Starknet yet. Make one transaction first, then sign in." },
         { status: 400 },
       );
     }
     return NextResponse.json({ error: "Signature verification failed" }, { status: 401 });
   }
+  const { token, accountId, apiClientId } = verifyJson;
 
-  const resolveRes = await fetch(`${apiUrl}/admin/accounts/resolve`, {
+  // Mint a fresh session-scoped API key, proven only by the SIWS bearer token
+  // we just earned by signing — still no shared/admin secret.
+  const keyRes = await fetch(`${apiUrl}/v1/auth/siws/keys`, {
     method: "POST",
-    headers: { "x-api-key": apiSecret, "Content-Type": "application/json" },
-    body: JSON.stringify({ chain: "STARKNET", address }),
+    headers: { "Content-Type": "application/json", "x-api-key": apiKey, Authorization: `Bearer ${token}` },
   });
-  const resolveJson = await resolveRes.json().catch(() => null);
-  const accountId = resolveJson?.data?.accountId as string | undefined;
-  if (!resolveRes.ok || !accountId) {
-    return NextResponse.json({ error: "Could not resolve account" }, { status: 502 });
-  }
-
-  const apiClientId = await resolveApiClientId(apiUrl, apiSecret, accountId);
-  if (!apiClientId) {
+  const keyJson = await keyRes.json().catch(() => null) as { data?: { plaintext?: string } } | null;
+  if (!keyRes.ok || !keyJson?.data?.plaintext) {
     return NextResponse.json({ error: "Could not provision developer access for this account" }, { status: 502 });
   }
 
-  const token = await createSession({ accountId, apiClientId, chain: "STARKNET", address, is_admin: isAdminAddress(address) });
+  const sessionToken = await createSession({
+    accountId,
+    apiClientId,
+    chain: "STARKNET",
+    address,
+    apiKey: keyJson.data.plaintext,
+  });
   const response = NextResponse.json({ data: { accountId, address, chain: "STARKNET" } });
-  setSessionCookie(response, token);
+  setSessionCookie(response, sessionToken);
   return response;
 }
