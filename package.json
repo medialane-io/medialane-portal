@@ -33,7 +33,6 @@
     "next": "^15.5.23",
     "next-themes": "latest",
     "nodemailer": "^8.0.1",
-    "pinata": "^2.4.9",
     "radix-ui": "^1.4.3",
     "react": "19.2.0",
     "react-dom": "19.2.0",
