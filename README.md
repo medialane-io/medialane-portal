@@ -146,8 +146,9 @@ Contributions are welcome. If you have a feature or improvement to suggest:
 
 | Repo | Description |
 |---|---|
-| [medialane-io](https://github.com/medialane-io/medialane-io) | Consumer dApp — creator launchpad + NFT marketplace |
-| [@medialane/sdk](https://github.com/medialane-io/sdk) | TypeScript SDK — `npm install @medialane/sdk` |
+| [medialane-io](https://github.com/medialane-io/medialane-io) | Consumer app — Media Wallet, email login, sponsored transactions |
+| [medialane-starknet](https://github.com/medialane-io/medialane-starknet) | Wallet-sovereign Starknet app — creator launchpad + NFT marketplace |
+| [@medialane/sdk](https://github.com/medialane-io/medialane-sdk) | TypeScript SDK — `npm install @medialane/sdk` |
 
 ---
 
