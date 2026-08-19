@@ -1,10 +1,10 @@
 # Medialane Portal 
 
-**Developer and Business Portal for Programmable IP — [portal.medialane.io](https://portal.medialane.io)**
+**Developer and Business Portal for Programmable IP: [portal.medialane.io](https://portal.medialane.io)**
 
-[portal.medialane.io](https://portal.medialane.io) is the enterprise, developer and ai agent facing gateway to tokenization and monetization of digital assets onchain — Launchpad services, API access, SDK documentation, API key management, webhooks, usage analytics.
+[portal.medialane.io](https://portal.medialane.io) is the enterprise, developer and ai agent facing gateway to tokenization and monetization of digital assets onchain: Launchpad services, API access, SDK documentation, API key management, webhooks, usage analytics.
 
-Everything you need to build Programmable IP onchain. One REST API. All the data.
+Everything you need to build Programmable IP onchain, in one REST API.
 
 ---
 
@@ -12,35 +12,35 @@ Everything you need to build Programmable IP onchain. One REST API. All the data
 
 Medialane is infrastructure for the **creative economy onchain**. It enables creators, businesses, and AI agents to own, license, and trade intellectual property as digital assets with programmable licensing terms embedded immutably in IPFS metadata, compliant with 181 countries worldwide.
 
-The platform operates through two integrated products:
+The platform operates through three integrated products:
 
-- **[medialane.io](https://medialane.io)** — Creator launchpad and nft marketplace with frictionless user experience. Mint IP assets, trade NFTs, manage collections.
-- **[starknet.medialane.io](https://starknet.medialane.io)** — Creator launchpad and nft marketplace for Starknet users.
-- **[portal.medialane.io](https://portal.medialane.io)** — Enterprise and Developer portal. API keys, REST endpoint docs, SDK quickstart, webhooks, usage analytics.
+- **[medialane.io](https://medialane.io)**: Creator launchpad and nft marketplace with frictionless user experience. Mint IP assets, trade NFTs, manage collections.
+- **[starknet.medialane.io](https://starknet.medialane.io)**: Creator launchpad and nft marketplace for Starknet users.
+- **[portal.medialane.io](https://portal.medialane.io)**: Enterprise and Developer portal. API keys, REST endpoint docs, SDK quickstart, webhooks, usage analytics.
 
 ---
 
 ## Features
 
 ### For Developers
-- **REST API access** — Query orders, tokens, collections, activities, search. One API key, all the data.
-- **API key management** — Create, view, and revoke keys from the `/account` dashboard
-- **Webhooks** — Subscribe to `ORDER_CREATED`, `ORDER_FULFILLED`, `ORDER_CANCELLED`, `TRANSFER` events (PREMIUM)
-- **Usage analytics** — 30-day request history by day
-- **SDK documentation** — `@medialane/sdk` quickstart, full method reference
-- **Full API reference** — Every endpoint, parameter, and response shape documented at `/docs/api`
-- **Agent quickstart** — SIWS auth flow, credit top-up, autonomous agent patterns at `/docs/agents`
+- **REST API access**: query orders, tokens, collections, activities, search, all from one API key
+- **API key management**: create, view, and revoke keys from the `/account` dashboard
+- **Webhooks**: subscribe to `ORDER_CREATED`, `ORDER_FULFILLED`, `ORDER_CANCELLED`, `TRANSFER` events (PREMIUM)
+- **Usage analytics**: 30-day request history by day
+- **SDK documentation**: `@medialane/sdk` quickstart, full method reference
+- **Full API reference**: every endpoint, parameter, and response shape documented at `/docs/api`
+- **Agent quickstart**: SIWS auth flow, credit top-up, autonomous agent patterns at `/docs/agents`
 
 ### For Creators
-- **Starknet wallet auth** — Sign in with Starknet (SIWS)
-- **Credit system** — Pay-as-you-go credits, MDLN token multipliers (up to 2×)
-- **Contact form** — Reach the team at `/connect`
+- **Starknet wallet auth**: sign in with Starknet (SIWS)
+- **Credit system**: pay-as-you-go credits, MDLN token multipliers (up to 2×)
+- **Contact form**: reach the team at `/connect`
 
 ### Platform
-- **Pricing** — Pay-as-you-go credits with MDLN multipliers
-- **IP Protection** — Compliance with the Berne Convention for the Protection of Literary and Artistic Works
-- **Changelog** — Release timeline at `/changelog`
-- **Dark-theme UI** — Glass navigation, gradient backgrounds, Framer Motion animations
+- **Pricing**: pay-as-you-go credits with MDLN multipliers
+- **IP Protection**: compliance with the Berne Convention for the Protection of Literary and Artistic Works
+- **Changelog**: release timeline at `/changelog`
+- **Dark-theme UI**: glass navigation, gradient backgrounds, Framer Motion animations
 
 ---
 
@@ -53,10 +53,10 @@ The Medialane REST API indexes Starknet in real time and exposes structured data
 | **Orders & Listings** | Open orders, bids, fulfilled listings. Filter by NFT, collection, user, currency, price. |
 | **Tokens & Metadata** | On-chain + IPFS metadata for any token. Upload and pin your own metadata. |
 | **Collections** | Floor price, total volume, holder count, token inventory for any collection. |
-| **Activities** | Mints, transfers, sales, offers, cancellations — indexed in real time. |
+| **Activities** | Mints, transfers, sales, offers, cancellations, indexed in real time. |
 | **Intents (SNIP-12)** | Create, sign, and submit structured trade intents using the SNIP-12 typed data standard. |
 | **Search** | Full-text search across tokens, collections, and creators. |
-| **Portal** | API keys, webhooks, usage — self-service from `/account`. |
+| **Portal** | API keys, webhooks, usage, self-service from `/account`. |
 
 Get your API key at [portal.medialane.io/account](https://portal.medialane.io/account). Full reference at [portal.medialane.io/docs/api](https://portal.medialane.io/docs/api).
 
@@ -92,7 +92,7 @@ Open [http://localhost:3000](http://localhost:3000).
 
 ```bash
 bun dev          # Development server (localhost:3000)
-bun run build    # Production build — must pass clean before deploy
+bun run build    # Production build, must pass clean before deploy
 bun lint         # ESLint
 ```
 
@@ -146,9 +146,9 @@ Contributions are welcome. If you have a feature or improvement to suggest:
 
 | Repo | Description |
 |---|---|
-| [medialane-io](https://github.com/medialane-io/medialane-io) | Consumer app — Media Wallet, email login, sponsored transactions |
-| [medialane-starknet](https://github.com/medialane-io/medialane-starknet) | Wallet-sovereign Starknet app — creator launchpad + NFT marketplace |
-| [@medialane/sdk](https://github.com/medialane-io/medialane-sdk) | TypeScript SDK — `npm install @medialane/sdk` |
+| [medialane-io](https://github.com/medialane-io/medialane-io) | Consumer app: Media Wallet, email login, sponsored transactions |
+| [medialane-starknet](https://github.com/medialane-io/medialane-starknet) | Wallet-sovereign Starknet app: creator launchpad + NFT marketplace |
+| [medialane-sdk](https://github.com/medialane-io/medialane-sdk) | TypeScript SDK (`@medialane/sdk`): `npm install @medialane/sdk` |
 
 ---
 
