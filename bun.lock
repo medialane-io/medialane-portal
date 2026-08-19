@@ -6,14 +6,10 @@
       "name": "medialane-xyz",
       "dependencies": {
         "@medialane/sdk": "0.85.5",
-        "@medialane/ui": "0.125.7",
+        "@medialane/ui": "^0.126.6",
         "@radix-ui/react-avatar": "1.1.2",
-        "@radix-ui/react-collapsible": "latest",
         "@radix-ui/react-progress": "latest",
-        "@radix-ui/react-select": "latest",
         "@radix-ui/react-slider": "latest",
-        "@radix-ui/react-switch": "latest",
-        "@radix-ui/react-tabs": "latest",
         "@radix-ui/react-toast": "latest",
         "@starknet-react/chains": "^5.0.3",
         "@starknet-react/core": "^5.0.3",
@@ -287,7 +283,7 @@
 
     "@medialane/sdk": ["@medialane/sdk@0.85.5", "", { "dependencies": { "@noble/hashes": "^2.2.0", "@scure/base": "^2.2.0", "zod": "^3.23.8" }, "peerDependencies": { "@solana/web3.js": ">=1.90.0", "@stellar/stellar-sdk": ">=13.0.0", "starknet": ">=6.0.0", "viem": ">=2.0.0" }, "optionalPeers": ["@solana/web3.js", "@stellar/stellar-sdk", "starknet", "viem"] }, "sha512-KuFeDhqWAK70VaTkRBy2b9YU9WVwqpJ+6yOhYCMD0hQ5yAFln5zNrU4eXOXFH4Os4I6rmciyzGGrvl8m80zbGw=="],
 
-    "@medialane/ui": ["@medialane/ui@0.125.7", "", { "peerDependencies": { "@medialane/sdk": ">=0.73.0", "@radix-ui/react-checkbox": ">=1.1.0", "@radix-ui/react-collapsible": ">=1.1.0", "@radix-ui/react-dialog": ">=1.1.0", "@radix-ui/react-dropdown-menu": ">=2.1.0", "@radix-ui/react-label": ">=2.1.0", "@radix-ui/react-popover": ">=1.1.0", "@radix-ui/react-select": ">=2.1.0", "@radix-ui/react-slot": ">=1.1.0", "@radix-ui/react-switch": ">=1.1.0", "@radix-ui/react-tabs": ">=1.1.0", "class-variance-authority": ">=0.7.0", "clsx": ">=2.0.0", "cmdk": ">=1.0.0", "framer-motion": ">=10.0.0", "lucide-react": ">=0.400.0", "next": ">=14.0.0", "next-themes": ">=0.3.0", "react": ">=18.0.0", "react-dom": ">=18.0.0", "react-hook-form": ">=7.50.0", "recharts": ">=2.0.0", "sonner": ">=1.0.0", "swr": ">=2.0.0", "tailwind-merge": ">=2.0.0" } }, "sha512-POQh6TXSLt79KiGP5Xw0owDD6wZ0eHtX643C9uDkHX6FywrLbPVU8dx+LDFK+qXsJP4+qBR3gngGsI8U+UxUYQ=="],
+    "@medialane/ui": ["@medialane/ui@0.126.6", "", { "peerDependencies": { "@medialane/sdk": ">=0.73.0", "@radix-ui/react-checkbox": ">=1.1.0", "@radix-ui/react-collapsible": ">=1.1.0", "@radix-ui/react-dialog": ">=1.1.0", "@radix-ui/react-dropdown-menu": ">=2.1.0", "@radix-ui/react-label": ">=2.1.0", "@radix-ui/react-popover": ">=1.1.0", "@radix-ui/react-select": ">=2.1.0", "@radix-ui/react-slot": ">=1.1.0", "@radix-ui/react-switch": ">=1.1.0", "@radix-ui/react-tabs": ">=1.1.0", "class-variance-authority": ">=0.7.0", "clsx": ">=2.0.0", "cmdk": ">=1.0.0", "framer-motion": ">=10.0.0", "lucide-react": ">=0.400.0", "next": ">=14.0.0", "next-themes": ">=0.3.0", "react": ">=18.0.0", "react-dom": ">=18.0.0", "react-hook-form": ">=7.50.0", "recharts": ">=2.0.0", "sonner": ">=1.0.0", "swr": ">=2.0.0", "tailwind-merge": ">=2.0.0" } }, "sha512-MbhOvsbEcrYnCHJ4qAdmVBOv7wA4mqFunRqcuc7Y2Cu8aLwVhxpKf/6YRxS5U8KD+X6lxHZ8807/AJs3VCbvAg=="],
 
     "@module-federation/runtime": ["@module-federation/runtime@0.1.21", "", { "dependencies": { "@module-federation/sdk": "0.1.21" } }, "sha512-/p4BhZ0SnjJuiL0wwu+FebFgIUJ9vM+oCY7CyprUHImyi/Y23ulI61WNWMVrKQGgdMoXQDQCL8RH4EnrVP2ZFw=="],
 
