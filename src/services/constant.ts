@@ -10,5 +10,3 @@ export const CONTRACTS = {
     process.env.NEXT_PUBLIC_COLLECTION_CONTRACT_ADDRESS ||
     "0x05e73b7be06d82beeb390a0e0d655f2c9e7cf519658e04f05d9c690ccc41da03",
 };
-
-export const IPFS_URL = process.env.NEXT_PUBLIC_PINATA_HOST!;

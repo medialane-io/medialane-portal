@@ -28,16 +28,6 @@ export function formatDisplayPrice(price: string | number | null | undefined): s
   return currencyPart ? `${formatted} ${currencyPart}` : formatted;
 }
 
-export function ipfsToHttp(uri: string | null | undefined): string {
-  if (!uri) return "/placeholder.svg";
-  if (uri.startsWith("ipfs://")) {
-    const host = process.env.NEXT_PUBLIC_PINATA_HOST ?? "https://ipfs.io/ipfs";
-    return `${host}/${uri.slice(7)}`;
-  }
-  if (uri.startsWith("https://") || uri.startsWith("http://")) return uri;
-  return "/placeholder.svg";
-}
-
 export function timeAgo(dateStr: string): string {
   const diff = Date.now() - new Date(dateStr).getTime();
   const seconds = Math.floor(diff / 1000);
