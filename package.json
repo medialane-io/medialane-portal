@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "@medialane/sdk": "0.85.11",
-    "@medialane/ui": "0.126.8",
+    "@medialane/ui": "0.126.9",
     "@radix-ui/react-avatar": "1.1.2",
     "@radix-ui/react-progress": "latest",
     "@radix-ui/react-slider": "latest",
@@ -29,7 +29,6 @@
     "next": "^15.5.23",
     "next-themes": "latest",
     "nodemailer": "^8.0.1",
-    "radix-ui": "^1.4.3",
     "react": "19.2.0",
     "react-dom": "19.2.0",
     "sonner": "^1.7.4",
