@@ -44,3 +44,6 @@ next-env.d.ts
 # worktrees
 .worktrees/
 .worktrees/
+
+# Internal planning/spec documents must never be committed to a public repo.
+docs/
