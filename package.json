@@ -6,10 +6,12 @@
     "build": "next build",
     "dev": "next dev",
     "lint": "eslint .",
-    "start": "next start"
+    "start": "next start",
+    "typecheck": "tsc --noEmit",
+    "test": "bun test"
   },
   "dependencies": {
-    "@medialane/sdk": "0.85.12",
+    "@medialane/sdk": "0.106.0",
     "@medialane/ui": "0.126.9",
     "@radix-ui/react-avatar": "1.1.2",
     "@radix-ui/react-progress": "latest",
