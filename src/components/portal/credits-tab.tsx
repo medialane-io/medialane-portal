@@ -46,38 +46,36 @@ export function CreditsTab({ address }: Props) {
           </span>
           <div>
             <h2 className="text-lg font-semibold">API Credits</h2>
-            <p className="text-sm text-muted-foreground mt-1 max-w-md">
+            <p className="text-muted-foreground mt-1 max-w-md">
               Every API call is billed per action from this balance, pay-as-you-go. Top up with USDC on Starknet whenever you&apos;re running low.
             </p>
           </div>
         </div>
 
         <div className="mt-6 rounded-2xl border border-brand-rose p-8">
-          <p className="text-xs text-muted-foreground mb-2">Balance</p>
-          <p className="text-5xl sm:text-6xl font-bold text-foreground tabular-nums mb-6">
+          <p className="text-muted-foreground mb-2">Balance</p>
+          <p className="text-5xl sm:text-6xl font-bold text-foreground tabular-nums mb-8">
             {balance.toLocaleString()}
             <span className="text-lg font-medium text-muted-foreground ml-2">credits</span>
           </p>
           {!account ? (
-            <p className="text-xs text-muted-foreground">Connect your wallet above to add credits.</p>
+            <p className="text-muted-foreground">Connect your wallet above to add credits.</p>
           ) : !treasuryAddress ? (
-            <p className="flex items-start gap-1.5 text-xs text-muted-foreground">
+            <p className="flex items-start gap-1.5 text-muted-foreground">
               <Info className="w-3.5 h-3.5 mt-0.5 shrink-0" />
               Deposits are launching soon. Check back, or reach out if you need credits in the meantime.
             </p>
           ) : (
-            <div className="border-t border-border/60 pt-6">
-              <AddCredits
-                address={address}
-                treasuryAddress={treasuryAddress}
-                balance={balance}
-                onCredited={() => mutateCredits()}
-              />
-            </div>
+            <AddCredits
+              address={address}
+              treasuryAddress={treasuryAddress}
+              balance={balance}
+              onCredited={() => mutateCredits()}
+            />
           )}
         </div>
 
-        <div className="flex items-start gap-2 rounded-xl bg-muted/40 p-3 text-xs text-muted-foreground mt-4">
+        <div className="flex items-start gap-2 rounded-xl bg-muted/40 p-4 text-muted-foreground mt-4">
           <KeyRound className="w-3.5 h-3.5 mt-0.5 shrink-0 text-brand-rose" />
           This balance is shared across every API key on your account, so it stays intact if you revoke or lose a key.
         </div>
@@ -95,7 +93,7 @@ export function CreditsTab({ address }: Props) {
                   </span>
                   <div>
                     <p className="text-foreground">+{p.creditedAmount.toLocaleString()} credits</p>
-                    <p className="text-xs text-muted-foreground">
+                    <p className="text-muted-foreground">
                       ${(Number(p.amountAtomic) / 1_000_000).toFixed(2)} USDC
                       {p.mdlnMultiplier > 1 ? ` · ${p.mdlnMultiplier}× MDLN` : ""}
                     </p>
@@ -105,7 +103,7 @@ export function CreditsTab({ address }: Props) {
                   href={`${EXPLORER_URL}/tx/${p.txHash}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-xs text-muted-foreground hover:text-foreground flex items-center gap-1 shrink-0"
+                  className="text-muted-foreground hover:text-foreground flex items-center gap-1 shrink-0"
                 >
                   {new Date(p.createdAt).toLocaleDateString()}
                   <ExternalLink className="w-3 h-3" />

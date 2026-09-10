@@ -19,6 +19,7 @@ import { CREDIT_PRESETS, creditsFor } from "@/src/lib/issuance-form";
 import useSWR from "swr";
 import { portalFetcher } from "@/src/lib/portal/fetcher";
 import { SUPPORTED_TOKENS } from "@medialane/sdk";
+import { CurrencyIcon } from "@medialane/ui";
 import {
   readTokenBalances,
   formatBalance,
@@ -91,6 +92,7 @@ export function AddCredits({ open = true, onOpenChange, address, treasuryAddress
   const token = SUPPORTED_TOKENS.find((t) => t.symbol === symbol) ?? SUPPORTED_TOKENS[0];
   const tokenBalance = balances[token.symbol];
   const enough = hasEnough(tokenBalance, usdcAmount, token.decimals);
+  const inDialog = onOpenChange !== undefined;
   const unitPrice = usd?.[token.symbol];
 
   const parsedUsdc = parseFloat(usdcAmount);
@@ -206,37 +208,28 @@ export function AddCredits({ open = true, onOpenChange, address, treasuryAddress
             )}
           </div>
         ) : (
-          <div className="p-6 space-y-4">
-            <div className="flex items-center gap-2">
-              <Coins className="w-5 h-5 text-primary" />
-              <p className="font-semibold">Add credits</p>
-            </div>
-            {balance !== undefined && (
-              <div className="rounded-xl bg-muted/50 px-4 py-3">
-                <p className="text-xs text-muted-foreground">Balance now</p>
-                <p className="text-2xl font-bold tabular-nums">
-                  {balance.toLocaleString()}
-                  <span className="ml-1.5 text-sm font-medium text-muted-foreground">credits</span>
-                </p>
+          <div className={inDialog ? "p-6 space-y-5" : "space-y-5"}>
+            {inDialog ? (
+              <div className="flex items-center gap-2">
+                <Coins className="w-5 h-5 text-primary" />
+                <p className="font-semibold">Add credits</p>
               </div>
-            )}
+            ) : null}
 
-            <div className="space-y-2">
-              <Label className="text-sm font-medium">Pay with</Label>
+            <div className="space-y-3">
+              <Label>Pay with</Label>
               <div className="flex gap-2">
                 <Select value={symbol} onValueChange={(v) => { setSymbol(v); setUsdcAmount(""); }}>
-                  <SelectTrigger className="w-32">
+                  <SelectTrigger className="w-40 h-12">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
                     {tokensByHoldings.map((t) => (
                       <SelectItem key={t.symbol} value={t.symbol}>
-                        {t.symbol}
-                        {balances[t.symbol] !== undefined && balances[t.symbol] > 0n ? (
-                          <span className="ml-2 text-xs text-muted-foreground">
-                            {formatBalance(balances[t.symbol], t.decimals, 3)}
-                          </span>
-                        ) : null}
+                        <span className="flex items-center gap-2">
+                          <CurrencyIcon symbol={t.symbol} size={18} />
+                          {t.symbol}
+                        </span>
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -249,58 +242,56 @@ export function AddCredits({ open = true, onOpenChange, address, treasuryAddress
                   autoFocus
                   value={usdcAmount}
                   onChange={(e) => setUsdcAmount(e.target.value)}
+                  className="h-12 text-base"
                 />
               </div>
-              <div className="flex items-center justify-between gap-2">
-                <div className="flex gap-2">
-                  {token.symbol === "USDC" || token.symbol === "USDT"
-                    ? CREDIT_PRESETS.map((preset) => (
-                        <Button
-                          key={preset}
-                          type="button"
-                          size="sm"
-                          variant={parsedUsdc === preset ? "default" : "outline"}
-                          onClick={() => setUsdcAmount(String(preset))}
-                        >
-                          {preset}
-                        </Button>
-                      ))
-                    : null}
-                </div>
+
+              <div className="flex flex-wrap items-center gap-2">
+                {token.symbol === "USDC" || token.symbol === "USDT"
+                  ? CREDIT_PRESETS.map((preset) => (
+                      <Button
+                        key={preset}
+                        type="button"
+                        variant={parsedUsdc === preset ? "default" : "outline"}
+                        onClick={() => setUsdcAmount(String(preset))}
+                      >
+                        {preset}
+                      </Button>
+                    ))
+                  : null}
                 {tokenBalance !== undefined ? (
                   <button
                     type="button"
                     onClick={() => setUsdcAmount(formatBalance(tokenBalance, token.decimals, 6))}
-                    className="text-xs text-muted-foreground hover:text-foreground transition-colors"
+                    className="ml-auto text-muted-foreground hover:text-foreground transition-colors"
                   >
                     You have {formatBalance(tokenBalance, token.decimals, 4)} {token.symbol} · Max
                   </button>
                 ) : null}
               </div>
-              {previewCredits !== null ? (
-                <div className="rounded-xl border border-border px-4 py-3">
-                  <p className="text-xs text-muted-foreground">You receive</p>
-                  <p className="text-2xl font-bold tabular-nums text-primary">
-                    {previewCredits.toLocaleString()}
-                    <span className="ml-1.5 text-sm font-medium text-muted-foreground">credits</span>
-                  </p>
-                  {balance !== undefined && (
-                    <p className="mt-1 text-xs text-muted-foreground">
-                      Taking you to {(balance + previewCredits).toLocaleString()}
-                    </p>
-                  )}
-                </div>
-              ) : (
-                <p className="text-xs text-muted-foreground">
-                  {unitPrice !== undefined
-                    ? `1 ${token.symbol} is about $${unitPrice.toLocaleString(undefined, { maximumFractionDigits: 2 })}, and $1 buys ${CREDITS_PER_USDC} credits.`
-                    : `$1 buys ${CREDITS_PER_USDC} credits.`}
-                </p>
-              )}
-
             </div>
+
+            {previewCredits !== null ? (
+              <p className="text-lg">
+                <span className="font-bold tabular-nums text-primary">
+                  {previewCredits.toLocaleString()} credits
+                </span>
+                {balance !== undefined ? (
+                  <span className="text-muted-foreground">
+                    {" "}· taking you to {(balance + previewCredits).toLocaleString()}
+                  </span>
+                ) : null}
+              </p>
+            ) : (
+              <p className="text-muted-foreground">
+                {unitPrice !== undefined
+                  ? `1 ${token.symbol} is about $${unitPrice.toLocaleString(undefined, { maximumFractionDigits: 2 })}, and $1 buys ${CREDITS_PER_USDC} credits.`
+                  : `$1 buys ${CREDITS_PER_USDC} credits.`}
+              </p>
+            )}
+
             <Button
-              className="w-full h-11"
+              className="w-full h-12 text-base"
               variant="gradient-fill"
               onClick={handleDeposit}
               disabled={!account || !usdcAmount || parsedUsdc <= 0 || !enough}
