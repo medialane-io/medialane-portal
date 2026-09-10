@@ -16,9 +16,18 @@ import { Label } from "@/src/components/ui/label";
 import { getFriendlyWalletError } from "@/src/lib/wallet-error";
 import { CREDITS_PER_USDC, EXPLORER_URL } from "@/src/lib/constants";
 import { CREDIT_PRESETS, creditsFor } from "@/src/lib/issuance-form";
+import useSWR from "swr";
+import { portalFetcher } from "@/src/lib/portal/fetcher";
+import { SUPPORTED_TOKENS } from "@medialane/sdk";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/src/components/ui/select";
 import { ProcessingState, SuccessState, ErrorState, TxLink } from "@/src/components/portal/credits-dialog-primitives";
 
-const USDC_CONTRACT = "0x033068f6539f8e6e6b131e6b2b814e6c34a5224bc66947c47dab9dfee93b35fb";
 
 type Step = "details" | "processing" | "confirming" | "success" | "error";
 
@@ -37,6 +46,7 @@ export function BuyCreditsDialog({ open, onOpenChange, address, treasuryAddress,
   const [usdcAmount, setUsdcAmount] = useState("");
   const [txHash, setTxHash] = useState<string | null>(null);
   const [creditedAmount, setCreditedAmount] = useState<number | null>(null);
+  const [symbol, setSymbol] = useState("USDC");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [confirmError, setConfirmError] = useState<string | null>(null);
   const [confirming, setConfirming] = useState(false);
@@ -44,6 +54,7 @@ export function BuyCreditsDialog({ open, onOpenChange, address, treasuryAddress,
   useEffect(() => {
     if (open) {
       setStep("details");
+      setSymbol("USDC");
       setUsdcAmount("");
       setTxHash(null);
       setCreditedAmount(null);
@@ -52,8 +63,19 @@ export function BuyCreditsDialog({ open, onOpenChange, address, treasuryAddress,
     }
   }, [open]);
 
+  const { data: pricesData } = useSWR<{ data?: { usd?: Record<string, number> } }>(
+    open ? "/api/portal/prices" : null,
+    portalFetcher,
+    { revalidateOnFocus: false, shouldRetryOnError: false },
+  );
+  const usd = pricesData?.data?.usd;
+
+  const token = SUPPORTED_TOKENS.find((t) => t.symbol === symbol) ?? SUPPORTED_TOKENS[0];
+  const unitPrice = usd?.[token.symbol];
+
   const parsedUsdc = parseFloat(usdcAmount);
-  const previewCredits = creditsFor(parsedUsdc, CREDITS_PER_USDC);
+  const dollars = unitPrice !== undefined && !isNaN(parsedUsdc) ? parsedUsdc * unitPrice : NaN;
+  const previewCredits = creditsFor(dollars, CREDITS_PER_USDC);
 
   async function confirmCredit(hash: string) {
     setConfirming(true);
@@ -79,15 +101,15 @@ export function BuyCreditsDialog({ open, onOpenChange, address, treasuryAddress,
 
   async function handleDeposit() {
     if (!account || !treasuryAddress) return;
-    const usdc = parseFloat(usdcAmount);
-    if (isNaN(usdc) || usdc <= 0) return;
+    const entered = parseFloat(usdcAmount);
+    if (isNaN(entered) || entered <= 0) return;
 
     setStep("processing");
     try {
-      const amount = BigInt(Math.round(usdc * 1_000_000));
+      const amount = BigInt(Math.round(entered * 10 ** token.decimals));
       const result = await account.execute([
         {
-          contractAddress: USDC_CONTRACT,
+          contractAddress: token.address,
           entrypoint: "transfer",
           calldata: [treasuryAddress, amount.toString(), "0"],
         },
@@ -179,29 +201,45 @@ export function BuyCreditsDialog({ open, onOpenChange, address, treasuryAddress,
             )}
 
             <div className="space-y-2">
-              <Label className="text-sm font-medium">USDC on Starknet</Label>
+              <Label className="text-sm font-medium">Pay with</Label>
               <div className="flex gap-2">
-                {CREDIT_PRESETS.map((preset) => (
-                  <Button
-                    key={preset}
-                    type="button"
-                    size="sm"
-                    variant={parsedUsdc === preset ? "default" : "outline"}
-                    onClick={() => setUsdcAmount(String(preset))}
-                  >
-                    {preset} USDC
-                  </Button>
-                ))}
+                <Select value={symbol} onValueChange={(v) => { setSymbol(v); setUsdcAmount(""); }}>
+                  <SelectTrigger className="w-32">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {SUPPORTED_TOKENS.map((t) => (
+                      <SelectItem key={t.symbol} value={t.symbol}>
+                        {t.symbol}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <Input
+                  type="number"
+                  min="0"
+                  step="any"
+                  placeholder="10"
+                  autoFocus
+                  value={usdcAmount}
+                  onChange={(e) => setUsdcAmount(e.target.value)}
+                />
               </div>
-              <Input
-                type="number"
-                min="1"
-                step="1"
-                placeholder="10"
-                autoFocus
-                value={usdcAmount}
-                onChange={(e) => setUsdcAmount(e.target.value)}
-              />
+              {token.symbol === "USDC" || token.symbol === "USDT" ? (
+                <div className="flex gap-2">
+                  {CREDIT_PRESETS.map((preset) => (
+                    <Button
+                      key={preset}
+                      type="button"
+                      size="sm"
+                      variant={parsedUsdc === preset ? "default" : "outline"}
+                      onClick={() => setUsdcAmount(String(preset))}
+                    >
+                      {preset}
+                    </Button>
+                  ))}
+                </div>
+              ) : null}
               {previewCredits !== null ? (
                 <div className="rounded-xl border border-border px-4 py-3">
                   <p className="text-xs text-muted-foreground">You receive</p>
@@ -217,12 +255,15 @@ export function BuyCreditsDialog({ open, onOpenChange, address, treasuryAddress,
                 </div>
               ) : (
                 <p className="text-xs text-muted-foreground">
-                  1 USDC = {CREDITS_PER_USDC} credits.
+                  {unitPrice !== undefined
+                    ? `1 ${token.symbol} is about $${unitPrice.toLocaleString(undefined, { maximumFractionDigits: 2 })}, and $1 buys ${CREDITS_PER_USDC} credits.`
+                    : `$1 buys ${CREDITS_PER_USDC} credits.`}
                 </p>
               )}
               <p className="text-xs text-muted-foreground">
                 Credits pay for issuing, wallet deployment and storage. Reading your own data is free.
-                They land automatically once the transfer confirms, and any MDLN bonus is applied then.
+                You are credited for what your transfer is worth when it confirms on-chain, and any
+                MDLN bonus is applied then.
               </p>
             </div>
             <Button

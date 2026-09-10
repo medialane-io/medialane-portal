@@ -82,6 +82,11 @@ async function route(req: NextRequest, context: { params: Promise<{ path: string
     return NextResponse.json(upstream.json ?? {}, { status: upstream.status });
   }
 
+  if (resource === "prices" && req.method === "GET") {
+    const upstream = await rawFetch("/v1/prices", portalApiKey ?? session.apiKey);
+    return NextResponse.json(upstream.json ?? {}, { status: upstream.status });
+  }
+
   if (resource === "collections" && req.method === "GET") {
     const qs = new URLSearchParams({ chain: "STARKNET", owner: session.address, limit: "100" });
     const service = req.nextUrl.searchParams.get("service");
