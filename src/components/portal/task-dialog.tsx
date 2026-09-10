@@ -1,9 +1,15 @@
 "use client";
 
 import Link from "next/link";
-import { ActionDialog } from "@medialane/ui";
-import { Check, Coins, Loader2, X } from "lucide-react";
+import { Check, Coins, Loader2 } from "lucide-react";
 import { Button } from "@/src/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/src/components/ui/dialog";
 import { type TaskPhase } from "@/src/lib/task-progress";
 
 export function TaskDialog({
@@ -27,35 +33,20 @@ export function TaskDialog({
   onClose: () => void;
   onDone?: () => void;
 }) {
-  const dismissable = phase !== "running";
+  const running = phase === "running";
 
   return (
-    <ActionDialog open={open} onClose={dismissable ? onClose : () => {}}>
-      <div className="rounded-2xl bg-background p-6 space-y-5">
-        {dismissable ? (
-          <div className="flex justify-end">
-            <button
-              type="button"
-              onClick={onClose}
-              className="text-muted-foreground hover:text-foreground transition-colors"
-              aria-label="Close"
-            >
-              <X className="h-4 w-4" />
-            </button>
-          </div>
-        ) : null}
-
+    <Dialog open={open} onOpenChange={(next) => { if (!next && !running) onClose(); }}>
+      <DialogContent className="sm:max-w-md" hideClose={running}>
         {outOfCredits ? (
-          <div className="space-y-4">
-            <span className="flex h-10 w-10 items-center justify-center rounded-full bg-muted">
-              <Coins className="h-5 w-5" />
-            </span>
-            <div className="space-y-1">
-              <p className="text-lg font-semibold">You are out of credits</p>
-              <p className="text-sm text-muted-foreground">
-                Top up and this will go straight through.
-              </p>
-            </div>
+          <>
+            <DialogHeader>
+              <span className="mb-2 flex h-10 w-10 items-center justify-center rounded-full bg-muted">
+                <Coins className="h-5 w-5" />
+              </span>
+              <DialogTitle>You are out of credits</DialogTitle>
+              <DialogDescription>Top up and this will go straight through.</DialogDescription>
+            </DialogHeader>
             <div className="flex gap-2">
               <Button asChild size="sm">
                 <Link href="/account/credits">Add credits</Link>
@@ -64,35 +55,41 @@ export function TaskDialog({
                 Not now
               </Button>
             </div>
-          </div>
-        ) : phase === "running" ? (
-          <div className="flex items-center gap-4">
+          </>
+        ) : running ? (
+          <div className="flex items-center gap-4 py-2">
             <Loader2 className="h-5 w-5 shrink-0 animate-spin text-primary" />
             <div className="min-w-0">
-              <p className="font-semibold">{title}</p>
-              {detail ? <p className="text-sm text-muted-foreground">{detail}</p> : null}
+              <DialogTitle className="text-base">{title}</DialogTitle>
+              {detail ? (
+                <DialogDescription className="mt-0.5">{detail}</DialogDescription>
+              ) : null}
             </div>
           </div>
         ) : phase === "success" ? (
-          <div className="space-y-4">
-            <span className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10">
-              <Check className="h-5 w-5 text-primary" />
-            </span>
-            <p className="text-lg font-semibold">{successLine ?? "Done"}</p>
-            <Button size="sm" onClick={onDone ?? onClose}>
+          <>
+            <DialogHeader>
+              <span className="mb-2 flex h-10 w-10 items-center justify-center rounded-full bg-primary/10">
+                <Check className="h-5 w-5 text-primary" />
+              </span>
+              <DialogTitle>{successLine ?? "Done"}</DialogTitle>
+            </DialogHeader>
+            <Button size="sm" className="w-fit" onClick={onDone ?? onClose}>
               Done
             </Button>
-          </div>
+          </>
         ) : (
-          <div className="space-y-4">
-            <p className="text-lg font-semibold">{title} did not finish</p>
-            {error ? <p className="text-sm text-destructive">{error}</p> : null}
-            <Button size="sm" variant="outline" onClick={onClose}>
+          <>
+            <DialogHeader>
+              <DialogTitle>{title} did not finish</DialogTitle>
+              {error ? <DialogDescription>{error}</DialogDescription> : null}
+            </DialogHeader>
+            <Button size="sm" variant="outline" className="w-fit" onClick={onClose}>
               Close
             </Button>
-          </div>
+          </>
         )}
-      </div>
-    </ActionDialog>
+      </DialogContent>
+    </Dialog>
   );
 }
