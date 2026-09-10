@@ -122,6 +122,7 @@ export function CreditsTab({ address }: Props) {
         onOpenChange={setDepositOpen}
         address={address}
         treasuryAddress={treasuryAddress}
+        balance={balance}
         onCredited={() => mutateCredits()}
       />
     </div>

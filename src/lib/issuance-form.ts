@@ -85,3 +85,10 @@ export function termsSummary(values: Pick<IssuanceValues, "licenseType" | "aiPol
   const ai = values.aiPolicy === "Not Allowed" ? "No AI use" : `AI ${values.aiPolicy.toLowerCase()}`;
   return `${values.licenseType} · ${ai}`;
 }
+
+export const CREDIT_PRESETS = [10, 25, 100] as const;
+
+export function creditsFor(usdc: number, creditsPerUsdc: number): number | null {
+  if (!Number.isFinite(usdc) || usdc <= 0) return null;
+  return Math.floor(usdc * creditsPerUsdc);
+}

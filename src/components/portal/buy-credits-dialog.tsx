@@ -15,6 +15,7 @@ import { Input } from "@/src/components/ui/input";
 import { Label } from "@/src/components/ui/label";
 import { getFriendlyWalletError } from "@/src/lib/wallet-error";
 import { CREDITS_PER_USDC, EXPLORER_URL } from "@/src/lib/constants";
+import { CREDIT_PRESETS, creditsFor } from "@/src/lib/issuance-form";
 import { ProcessingState, SuccessState, ErrorState, TxLink } from "@/src/components/portal/credits-dialog-primitives";
 
 const USDC_CONTRACT = "0x033068f6539f8e6e6b131e6b2b814e6c34a5224bc66947c47dab9dfee93b35fb";
@@ -26,10 +27,11 @@ interface BuyCreditsDialogProps {
   onOpenChange: (open: boolean) => void;
   address: string;
   treasuryAddress: string;
+  balance?: number;
   onCredited: () => void;
 }
 
-export function BuyCreditsDialog({ open, onOpenChange, address, treasuryAddress, onCredited }: BuyCreditsDialogProps) {
+export function BuyCreditsDialog({ open, onOpenChange, address, treasuryAddress, balance, onCredited }: BuyCreditsDialogProps) {
   const { account } = useAccount();
   const [step, setStep] = useState<Step>("details");
   const [usdcAmount, setUsdcAmount] = useState("");
@@ -51,7 +53,7 @@ export function BuyCreditsDialog({ open, onOpenChange, address, treasuryAddress,
   }, [open]);
 
   const parsedUsdc = parseFloat(usdcAmount);
-  const previewCredits = !isNaN(parsedUsdc) && parsedUsdc > 0 ? Math.floor(parsedUsdc * CREDITS_PER_USDC) : null;
+  const previewCredits = creditsFor(parsedUsdc, CREDITS_PER_USDC);
 
   async function confirmCredit(hash: string) {
     setConfirming(true);
@@ -166,8 +168,31 @@ export function BuyCreditsDialog({ open, onOpenChange, address, treasuryAddress,
               <Coins className="w-5 h-5 text-primary" />
               <p className="font-semibold">Add credits</p>
             </div>
+            {balance !== undefined && (
+              <div className="rounded-xl bg-muted/50 px-4 py-3">
+                <p className="text-xs text-muted-foreground">Balance now</p>
+                <p className="text-2xl font-bold tabular-nums">
+                  {balance.toLocaleString()}
+                  <span className="ml-1.5 text-sm font-medium text-muted-foreground">credits</span>
+                </p>
+              </div>
+            )}
+
             <div className="space-y-2">
               <Label className="text-sm font-medium">USDC on Starknet</Label>
+              <div className="flex gap-2">
+                {CREDIT_PRESETS.map((preset) => (
+                  <Button
+                    key={preset}
+                    type="button"
+                    size="sm"
+                    variant={parsedUsdc === preset ? "default" : "outline"}
+                    onClick={() => setUsdcAmount(String(preset))}
+                  >
+                    {preset} USDC
+                  </Button>
+                ))}
+              </div>
               <Input
                 type="number"
                 min="1"
@@ -177,16 +202,28 @@ export function BuyCreditsDialog({ open, onOpenChange, address, treasuryAddress,
                 value={usdcAmount}
                 onChange={(e) => setUsdcAmount(e.target.value)}
               />
-              <p className="text-xs text-muted-foreground">
-                1 USDC = {CREDITS_PER_USDC} credits, credited automatically once your transfer confirms on-chain.
-              </p>
-              {previewCredits !== null && (
+              {previewCredits !== null ? (
+                <div className="rounded-xl border border-border px-4 py-3">
+                  <p className="text-xs text-muted-foreground">You receive</p>
+                  <p className="text-2xl font-bold tabular-nums text-primary">
+                    {previewCredits.toLocaleString()}
+                    <span className="ml-1.5 text-sm font-medium text-muted-foreground">credits</span>
+                  </p>
+                  {balance !== undefined && (
+                    <p className="mt-1 text-xs text-muted-foreground">
+                      Taking you to {(balance + previewCredits).toLocaleString()}
+                    </p>
+                  )}
+                </div>
+              ) : (
                 <p className="text-xs text-muted-foreground">
-                  You&apos;ll receive at least{" "}
-                  <span className="text-primary font-semibold">{previewCredits.toLocaleString()} credits</span> (plus any
-                  MDLN bonus, applied automatically).
+                  1 USDC = {CREDITS_PER_USDC} credits.
                 </p>
               )}
+              <p className="text-xs text-muted-foreground">
+                Credits pay for issuing, wallet deployment and storage. Reading your own data is free.
+                They land automatically once the transfer confirms, and any MDLN bonus is applied then.
+              </p>
             </div>
             <Button
               className="w-full h-11"

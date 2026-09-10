@@ -6,6 +6,8 @@ import {
   LICENSE_PRESETS,
   AI_POLICIES,
   termsSummary,
+  creditsFor,
+  CREDIT_PRESETS,
 } from "./issuance-form";
 
 function valid(overrides: Record<string, unknown> = {}) {
@@ -80,4 +82,23 @@ test("the panel summary shows the licence and the AI stance", () => {
 test("granting AI use reads as granted", () => {
   expect(termsSummary({ licenseType: "CC BY", aiPolicy: "Training Only" }))
     .toBe("CC BY · AI training only");
+});
+
+test("a deposit converts to whole credits", () => {
+  expect(creditsFor(10, 100)).toBe(1000);
+  expect(creditsFor(2.5, 100)).toBe(250);
+});
+
+test("fractions of a credit are not granted", () => {
+  expect(creditsFor(0.005, 100)).toBe(0);
+});
+
+test("a meaningless amount buys nothing", () => {
+  expect(creditsFor(0, 100)).toBeNull();
+  expect(creditsFor(-5, 100)).toBeNull();
+  expect(creditsFor(NaN, 100)).toBeNull();
+});
+
+test("the presets climb", () => {
+  expect([...CREDIT_PRESETS]).toEqual([...CREDIT_PRESETS].sort((a, b) => a - b));
 });

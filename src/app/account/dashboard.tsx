@@ -180,6 +180,7 @@ export function AccountDashboard({ address }: Props) {
         onOpenChange={setDepositOpen}
         address={address}
         treasuryAddress={treasuryAddress}
+        balance={balance}
         onCredited={() => mutateCredits()}
       />
     </div>
