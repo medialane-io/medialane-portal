@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
 import useSWR from "swr";
 import { useAccount } from "@starknet-react/core";
 import { Popover, PopoverContent, PopoverTrigger } from "@medialane/ui";
@@ -11,6 +10,8 @@ import { Input } from "@/src/components/ui/input";
 import { Label } from "@/src/components/ui/label";
 import { Skeleton } from "@/src/components/ui/skeleton";
 import { portalFetcher } from "@/src/lib/portal/fetcher";
+import { TaskDialog } from "@/src/components/portal/task-dialog";
+import { type TaskPhase } from "@/src/lib/task-progress";
 
 export interface CollectionOption {
   collectionId: string | null;
@@ -60,6 +61,9 @@ export function CollectionPicker({
   const [symbol, setSymbol] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [outOfCredits, setOutOfCredits] = useState(false);
+  const [phase, setPhase] = useState<TaskPhase>("idle");
+  const [activeIndex, setActiveIndex] = useState(0);
+  const [detail, setDetail] = useState<string | null>(null);
 
   const collections = (data?.collections ?? data?.data ?? []).filter((c) => c.collectionId);
   const selected = collections.find((c) => c.collectionId === value) ?? null;
@@ -72,6 +76,10 @@ export function CollectionPicker({
     if (!account) return;
     setBusy(true);
     setError(null);
+    setOutOfCredits(false);
+    setPhase("running");
+    setActiveIndex(0);
+    setDetail("Confirm in your wallet");
     try {
       const res = await fetch("/api/portal/intents/build", {
         method: "POST",
@@ -88,25 +96,48 @@ export function CollectionPicker({
       const body = await res.json().catch(() => ({}));
       if (res.status === 402) {
         setOutOfCredits(true);
+        setPhase("error");
         return;
       }
       if (!res.ok) throw new Error(body?.error ?? "Could not prepare the collection");
 
+      setActiveIndex(1);
+      setDetail("Waiting for the transaction");
       const tx = await account.execute(body.data.calls);
       await account.waitForTransaction(tx.transaction_hash);
 
+      setActiveIndex(2);
+      setDetail("Waiting for it to be indexed");
       const created = await waitForCollection(collections.length, mutate);
       if (created?.collectionId) onChange(created.collectionId);
 
+      setPhase("success");
       setCreating(false);
       setName("");
       setSymbol("");
     } catch (e) {
       setError(e instanceof Error ? e.message : "Could not create the collection.");
+      setPhase("error");
     } finally {
       setBusy(false);
+      setDetail(null);
     }
   }
+
+  const dialog = (
+    <TaskDialog
+      open={phase !== "idle"}
+      title="Creating your collection"
+      labels={["Prepare it", "Confirm onchain", "Make it available"]}
+      activeIndex={activeIndex}
+      phase={phase}
+      detail={detail}
+      error={error}
+      outOfCredits={outOfCredits}
+      successLine="Your collection is ready"
+      onClose={() => setPhase("idle")}
+    />
+  );
 
   if (isLoading) {
     return (
@@ -136,6 +167,7 @@ export function CollectionPicker({
   if (creating) {
     return (
       <div className="space-y-2">
+        {dialog}
         <Label>New collection</Label>
         <div className="space-y-3 rounded-xl border border-border p-4">
           <div className="grid gap-3 sm:grid-cols-2">
@@ -164,20 +196,6 @@ export function CollectionPicker({
           <p className="text-xs text-muted-foreground">
             You own this collection, and you are the only one who can issue into it.
           </p>
-
-          {outOfCredits ? (
-            <div className="rounded-lg border border-border bg-muted/40 p-3 space-y-2">
-              <p className="text-sm font-medium">You are out of credits</p>
-              <p className="text-xs text-muted-foreground">
-                Deploying a collection uses credits. Top up and this will go through.
-              </p>
-              <Link href="/account/credits" className="inline-flex text-sm text-primary hover:underline">
-                Add credits
-              </Link>
-            </div>
-          ) : null}
-
-          {error ? <p className="text-sm text-destructive">{error}</p> : null}
 
           <div className="flex gap-2">
             <Button onClick={create} disabled={busy || !name.trim() || !symbol.trim()} size="sm">
@@ -212,6 +230,7 @@ export function CollectionPicker({
 
   return (
     <div className="space-y-2">
+      {dialog}
       <Label>Collection *</Label>
       <div className="flex gap-2">
         <Popover

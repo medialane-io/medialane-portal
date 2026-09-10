@@ -7,7 +7,6 @@ import { ServiceFormShell, ClaimRail, MedialaneCollectionCard, CollapsibleSectio
 import { buildAssetMetadata } from "@medialane/sdk";
 import {
   ArrowLeft,
-  Check,
   Database,
   FileCheck2,
   Loader2,
@@ -29,6 +28,8 @@ import {
   SelectValue,
 } from "@/src/components/ui/select";
 import { CollectionPicker } from "@/src/components/portal/collection-picker";
+import { TaskDialog } from "@/src/components/portal/task-dialog";
+import { issuedSummary, OUT_OF_CREDITS, type TaskPhase } from "@/src/lib/task-progress";
 import {
   parseRecipients,
   invalidRecipients,
@@ -62,10 +63,13 @@ export function IssuanceTask({ serviceId, address }: { serviceId: string; addres
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [imageError, setImageError] = useState<string | null>(null);
 
-  const [busy, setBusy] = useState(false);
+  const [phase, setPhase] = useState<TaskPhase>("idle");
+  const [activeIndex, setActiveIndex] = useState(0);
   const [progress, setProgress] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [outOfCredits, setOutOfCredits] = useState(false);
   const [issued, setIssued] = useState<number | null>(null);
+  const busy = phase === "running";
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [termsOpen, setTermsOpen] = useState(false);
   const [detailsOpen, setDetailsOpen] = useState(false);
@@ -100,8 +104,10 @@ export function IssuanceTask({ serviceId, address }: { serviceId: string; addres
       return;
     }
     setFieldErrors({});
-    setBusy(true);
+    setPhase("running");
+    setActiveIndex(0);
     setError(null);
+    setOutOfCredits(false);
     setIssued(null);
 
     try {
@@ -126,10 +132,11 @@ export function IssuanceTask({ serviceId, address }: { serviceId: string; addres
       );
 
       for (const [index, recipient] of recipients.entries()) {
-        setProgress(`Preparing recipient ${index + 1} of ${recipients.length}`);
+        setProgress(`Recipient ${index + 1} of ${recipients.length}`);
         await provisionOne(secret, recipient, address);
       }
 
+      setActiveIndex(1);
       let imageUri: string | null = null;
       if (imageFile) {
         setProgress("Uploading the cover image");
@@ -154,6 +161,7 @@ export function IssuanceTask({ serviceId, address }: { serviceId: string; addres
       });
       const tokenUri = await pinMetadata(metadata);
 
+      setActiveIndex(2);
       setProgress("Preparing the issuance");
       const batches = await fetchMintCalls({
         service: serviceId,
@@ -171,15 +179,34 @@ export function IssuanceTask({ serviceId, address }: { serviceId: string; addres
 
       setIssued(recipients.length);
       setValues((v) => ({ ...v, recipients: "" }));
+      setPhase("success");
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Could not finish issuing.");
+      const message = e instanceof Error ? e.message : String(e);
+      if (message === OUT_OF_CREDITS) {
+        setOutOfCredits(true);
+      } else {
+        setError(message || "Could not finish issuing.");
+      }
+      setPhase("error");
     } finally {
-      setBusy(false);
       setProgress(null);
     }
   }
 
   return (
+    <>
+      <TaskDialog
+        open={phase !== "idle"}
+        title="Issuing"
+        labels={["Prepare recipients", "Prepare the asset", "Sign and issue"]}
+        activeIndex={activeIndex}
+        phase={phase}
+        detail={progress}
+        error={error}
+        outOfCredits={outOfCredits}
+        successLine={issued !== null ? issuedSummary(issued) : undefined}
+        onClose={() => setPhase("idle")}
+      />
     <ServiceFormShell
       icon={<Database className="h-4 w-4 text-white" />}
       title="Data Tokenization"
@@ -426,21 +453,12 @@ export function IssuanceTask({ serviceId, address }: { serviceId: string; addres
           ) : null}
         </section>
 
-        {error ? <p className="text-sm text-destructive">{error}</p> : null}
-
-        {issued !== null ? (
-          <p className="inline-flex items-center gap-2 text-sm text-primary">
-            <Check className="h-4 w-4" />
-            Issued to {issued} {issued === 1 ? "recipient" : "recipients"}
-          </p>
-        ) : null}
-
         <div className="flex items-center gap-3">
           <Button onClick={run} disabled={busy || !account} size="lg">
             {busy ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                {progress ?? "Working"}
+                Working
               </>
             ) : (
               "Issue"
@@ -452,6 +470,7 @@ export function IssuanceTask({ serviceId, address }: { serviceId: string; addres
         </div>
       </div>
     </ServiceFormShell>
+    </>
   );
 }
 
@@ -522,6 +541,7 @@ async function provisionOne(secret: Uint8Array, recipient: Recipient, address: s
     }),
   });
 
+  if (res.status === 402) throw new Error(OUT_OF_CREDITS);
   if (!res.ok) {
     const body = await res.json().catch(() => ({}));
     throw new Error(body?.message ?? body?.error ?? `Could not prepare ${recipient.value}`);
@@ -533,6 +553,7 @@ async function uploadImage(file: File): Promise<string> {
   form.set("file", file);
   const res = await fetch("/api/portal/metadata/upload-file", { method: "POST", body: form });
   const body = await res.json().catch(() => ({}));
+  if (res.status === 402) throw new Error(OUT_OF_CREDITS);
   if (!res.ok) throw new Error(body?.error ?? "Could not upload the image");
   return (body.data?.url ?? body.data?.uri) as string;
 }
@@ -544,6 +565,7 @@ async function pinMetadata(metadata: unknown): Promise<string> {
     body: JSON.stringify(metadata),
   });
   const body = await res.json().catch(() => ({}));
+  if (res.status === 402) throw new Error(OUT_OF_CREDITS);
   if (!res.ok) throw new Error(body?.error ?? "Could not prepare the asset");
   return body.data.url as string;
 }
@@ -561,6 +583,7 @@ async function fetchMintCalls(input: {
     body: JSON.stringify(input),
   });
   const body = await res.json().catch(() => ({}));
+  if (res.status === 402) throw new Error(OUT_OF_CREDITS);
   if (!res.ok) {
     if (body?.error === "recipients_not_provisioned") {
       throw new Error(`No wallet yet for ${(body.recipients ?? []).join(", ")}`);
