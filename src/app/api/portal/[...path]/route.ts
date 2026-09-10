@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getPortalSession } from "@/src/lib/portal-session";
 
 const apiUrl = process.env.MEDIALANE_API_URL;
+const portalApiKey = process.env.MEDIALANE_API_KEY;
 
 async function backendFetch(subpath: string, apiKey: string, init?: RequestInit) {
   return rawFetch(`/v1/portal/${subpath}`, apiKey, init);
@@ -85,7 +86,7 @@ async function route(req: NextRequest, context: { params: Promise<{ path: string
     const qs = new URLSearchParams({ chain: "STARKNET", owner: session.address, limit: "100" });
     const service = req.nextUrl.searchParams.get("service");
     if (service) qs.set("service", service);
-    const upstream = await rawFetch(`/v1/collections?${qs.toString()}`, session.apiKey);
+    const upstream = await rawFetch(`/v1/collections?${qs.toString()}`, portalApiKey ?? session.apiKey);
     return NextResponse.json(upstream.json ?? {}, { status: upstream.status });
   }
 
