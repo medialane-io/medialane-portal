@@ -20,6 +20,13 @@ import useSWR from "swr";
 import { portalFetcher } from "@/src/lib/portal/fetcher";
 import { SUPPORTED_TOKENS } from "@medialane/sdk";
 import {
+  readTokenBalances,
+  formatBalance,
+  hasEnough,
+  sortByHoldings,
+  type Balances,
+} from "@/src/lib/token-balances";
+import {
   Select,
   SelectContent,
   SelectItem,
@@ -47,6 +54,7 @@ export function BuyCreditsDialog({ open, onOpenChange, address, treasuryAddress,
   const [txHash, setTxHash] = useState<string | null>(null);
   const [creditedAmount, setCreditedAmount] = useState<number | null>(null);
   const [symbol, setSymbol] = useState("USDC");
+  const [balances, setBalances] = useState<Balances>({});
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [confirmError, setConfirmError] = useState<string | null>(null);
   const [confirming, setConfirming] = useState(false);
@@ -70,7 +78,19 @@ export function BuyCreditsDialog({ open, onOpenChange, address, treasuryAddress,
   );
   const usd = pricesData?.data?.usd;
 
+  useEffect(() => {
+    if (!open || !address) return;
+    let live = true;
+    readTokenBalances(address, `${window.location.origin}/api/rpc`).then((b) => {
+      if (live) setBalances(b);
+    });
+    return () => { live = false; };
+  }, [open, address]);
+
+  const tokensByHoldings = sortByHoldings(balances);
   const token = SUPPORTED_TOKENS.find((t) => t.symbol === symbol) ?? SUPPORTED_TOKENS[0];
+  const tokenBalance = balances[token.symbol];
+  const enough = hasEnough(tokenBalance, usdcAmount, token.decimals);
   const unitPrice = usd?.[token.symbol];
 
   const parsedUsdc = parseFloat(usdcAmount);
@@ -208,9 +228,14 @@ export function BuyCreditsDialog({ open, onOpenChange, address, treasuryAddress,
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    {SUPPORTED_TOKENS.map((t) => (
+                    {tokensByHoldings.map((t) => (
                       <SelectItem key={t.symbol} value={t.symbol}>
                         {t.symbol}
+                        {balances[t.symbol] !== undefined && balances[t.symbol] > 0n ? (
+                          <span className="ml-2 text-xs text-muted-foreground">
+                            {formatBalance(balances[t.symbol], t.decimals, 3)}
+                          </span>
+                        ) : null}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -225,21 +250,32 @@ export function BuyCreditsDialog({ open, onOpenChange, address, treasuryAddress,
                   onChange={(e) => setUsdcAmount(e.target.value)}
                 />
               </div>
-              {token.symbol === "USDC" || token.symbol === "USDT" ? (
+              <div className="flex items-center justify-between gap-2">
                 <div className="flex gap-2">
-                  {CREDIT_PRESETS.map((preset) => (
-                    <Button
-                      key={preset}
-                      type="button"
-                      size="sm"
-                      variant={parsedUsdc === preset ? "default" : "outline"}
-                      onClick={() => setUsdcAmount(String(preset))}
-                    >
-                      {preset}
-                    </Button>
-                  ))}
+                  {token.symbol === "USDC" || token.symbol === "USDT"
+                    ? CREDIT_PRESETS.map((preset) => (
+                        <Button
+                          key={preset}
+                          type="button"
+                          size="sm"
+                          variant={parsedUsdc === preset ? "default" : "outline"}
+                          onClick={() => setUsdcAmount(String(preset))}
+                        >
+                          {preset}
+                        </Button>
+                      ))
+                    : null}
                 </div>
-              ) : null}
+                {tokenBalance !== undefined ? (
+                  <button
+                    type="button"
+                    onClick={() => setUsdcAmount(formatBalance(tokenBalance, token.decimals, 6))}
+                    className="text-xs text-muted-foreground hover:text-foreground transition-colors"
+                  >
+                    You have {formatBalance(tokenBalance, token.decimals, 4)} {token.symbol} · Max
+                  </button>
+                ) : null}
+              </div>
               {previewCredits !== null ? (
                 <div className="rounded-xl border border-border px-4 py-3">
                   <p className="text-xs text-muted-foreground">You receive</p>
@@ -260,19 +296,23 @@ export function BuyCreditsDialog({ open, onOpenChange, address, treasuryAddress,
                     : `$1 buys ${CREDITS_PER_USDC} credits.`}
                 </p>
               )}
-              <p className="text-xs text-muted-foreground">
-                Credits pay for issuing, wallet deployment and storage. Reading your own data is free.
-                You are credited for what your transfer is worth when it confirms on-chain, and any
-                MDLN bonus is applied then.
-              </p>
+
             </div>
             <Button
               className="w-full h-11"
               variant="gradient-fill"
               onClick={handleDeposit}
-              disabled={!account || !usdcAmount || parsedUsdc <= 0}
+              disabled={!account || !usdcAmount || parsedUsdc <= 0 || !enough}
             >
-              Deposit
+              {!account
+                ? "Connect your wallet"
+                : !usdcAmount || parsedUsdc <= 0
+                  ? "Enter an amount"
+                  : !enough
+                    ? `You have ${formatBalance(tokenBalance ?? 0n, token.decimals, 4)} ${token.symbol}`
+                    : previewCredits !== null
+                      ? `Deposit for ${previewCredits.toLocaleString()} credits`
+                      : "Deposit"}
             </Button>
           </div>
         )}
