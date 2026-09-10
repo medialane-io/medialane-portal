@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import useSWR from "swr";
 import Link from "next/link";
 import { useAccount } from "@starknet-react/core";
 import { ServiceFormShell, ClaimRail, MedialaneCollectionCard, CollapsibleSection } from "@medialane/ui";
@@ -29,6 +30,8 @@ import {
 } from "@/src/components/ui/select";
 import { CollectionPicker } from "@/src/components/portal/collection-picker";
 import { TaskDialog } from "@/src/components/portal/task-dialog";
+import { portalFetcher } from "@/src/lib/portal/fetcher";
+import { estimateIssuance, shortfall, type PricingTable } from "@/src/lib/issuance-cost";
 import { issuedSummary, OUT_OF_CREDITS, type TaskPhase } from "@/src/lib/task-progress";
 import {
   parseRecipients,
@@ -78,6 +81,24 @@ export function IssuanceTask({ serviceId, address }: { serviceId: string; addres
 
   const recipients = parseRecipients(values.recipients);
   const invalid = invalidRecipients(recipients);
+
+  const { data: pricingData } = useSWR<{ pricing?: PricingTable }>(
+    "/api/portal/pricing",
+    portalFetcher,
+    { revalidateOnFocus: false, shouldRetryOnError: false },
+  );
+  const { data: creditsData } = useSWR<{ data?: { balance?: number } }>(
+    "/api/portal/credits",
+    portalFetcher,
+    { revalidateOnFocus: false, shouldRetryOnError: false },
+  );
+  const balance = creditsData?.data?.balance;
+  const estimate = estimateIssuance(pricingData?.pricing, {
+    recipients: recipients.length,
+    hasImage: Boolean(imageFile),
+    service: serviceId,
+  });
+  const missing = shortfall(estimate.total, balance);
 
   function chooseImage(file: File | undefined) {
     if (!file) return;
@@ -446,6 +467,45 @@ export function IssuanceTask({ serviceId, address }: { serviceId: string; addres
             </p>
           ) : null}
         </section>
+
+        {estimate.total > 0 ? (
+          <div className="rounded-xl border border-border p-4 space-y-3">
+            <div className="flex items-baseline justify-between gap-4">
+              <p className="text-sm font-medium">This run costs</p>
+              <p className="text-xl font-bold tabular-nums">
+                {estimate.total.toLocaleString()}
+                <span className="ml-1.5 text-sm font-medium text-muted-foreground">credits</span>
+              </p>
+            </div>
+
+            <ul className="space-y-1">
+              {estimate.lines.map((line) => (
+                <li key={line.label} className="flex justify-between gap-4 text-xs text-muted-foreground">
+                  <span>{line.label}</span>
+                  <span className="tabular-nums">{line.credits.toLocaleString()}</span>
+                </li>
+              ))}
+            </ul>
+
+            {balance !== undefined ? (
+              <div className="flex justify-between gap-4 border-t border-border pt-2 text-xs">
+                <span className="text-muted-foreground">You have</span>
+                <span className="tabular-nums font-medium">{balance.toLocaleString()} credits</span>
+              </div>
+            ) : null}
+
+            {missing > 0 ? (
+              <div className="flex items-center justify-between gap-3 rounded-lg bg-muted/50 p-3">
+                <p className="text-sm">
+                  You need {missing.toLocaleString()} more before this will go through.
+                </p>
+                <Button asChild size="sm" variant="outline">
+                  <Link href="/account/credits">Add credits</Link>
+                </Button>
+              </div>
+            ) : null}
+          </div>
+        ) : null}
 
         <div className="flex items-center gap-3">
           <Button onClick={run} disabled={busy || !account} size="lg">

@@ -82,6 +82,11 @@ async function route(req: NextRequest, context: { params: Promise<{ path: string
     return NextResponse.json(upstream.json ?? {}, { status: upstream.status });
   }
 
+  if (resource === "pricing" && req.method === "GET") {
+    const upstream = await rawFetch("/.well-known/x402", portalApiKey ?? session.apiKey);
+    return NextResponse.json(upstream.json ?? {}, { status: upstream.status });
+  }
+
   if (resource === "prices" && req.method === "GET") {
     const upstream = await rawFetch("/v1/prices", portalApiKey ?? session.apiKey);
     return NextResponse.json(upstream.json ?? {}, { status: upstream.status });
