@@ -33,13 +33,33 @@ export function hasEnough(balance: bigint | undefined, human: string, decimals: 
   return wanted <= balance;
 }
 
-export function sortByHoldings(balances: Balances) {
+export function usdValueOf(
+  balance: bigint | undefined,
+  decimals: number,
+  priceUsd: number | undefined,
+): number {
+  if (!balance || priceUsd === undefined) return 0;
+  return (Number(balance) / 10 ** decimals) * priceUsd;
+}
+
+export function sortByHoldings(balances: Balances, prices?: Record<string, number>) {
   return [...SUPPORTED_TOKENS].sort((a, b) => {
-    const av = balances[a.symbol] ?? 0n;
-    const bv = balances[b.symbol] ?? 0n;
-    if (av === bv) return 0;
-    return av > bv ? -1 : 1;
+    const av = usdValueOf(balances[a.symbol], a.decimals, prices?.[a.symbol]);
+    const bv = usdValueOf(balances[b.symbol], b.decimals, prices?.[b.symbol]);
+    if (av !== bv) return bv - av;
+    return a.symbol.localeCompare(b.symbol);
   });
+}
+
+export function bestTokenToPayWith(
+  balances: Balances,
+  prices?: Record<string, number>,
+): string | null {
+  const [best] = sortByHoldings(balances, prices);
+  if (!best) return null;
+  return usdValueOf(balances[best.symbol], best.decimals, prices?.[best.symbol]) > 0
+    ? best.symbol
+    : null;
 }
 
 export async function readTokenBalances(owner: string, rpcUrl: string): Promise<Balances> {

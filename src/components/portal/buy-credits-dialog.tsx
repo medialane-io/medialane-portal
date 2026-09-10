@@ -25,6 +25,7 @@ import {
   formatBalance,
   hasEnough,
   sortByHoldings,
+  bestTokenToPayWith,
   type Balances,
 } from "@/src/lib/token-balances";
 import {
@@ -55,6 +56,7 @@ export function AddCredits({ open = true, onOpenChange, address, treasuryAddress
   const [txHash, setTxHash] = useState<string | null>(null);
   const [creditedAmount, setCreditedAmount] = useState<number | null>(null);
   const [symbol, setSymbol] = useState("USDC");
+  const [chosen, setChosen] = useState(false);
   const [balances, setBalances] = useState<Balances>({});
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [confirmError, setConfirmError] = useState<string | null>(null);
@@ -64,6 +66,7 @@ export function AddCredits({ open = true, onOpenChange, address, treasuryAddress
     if (open) {
       setStep("details");
       setSymbol("USDC");
+      setChosen(false);
       setUsdcAmount("");
       setTxHash(null);
       setCreditedAmount(null);
@@ -88,11 +91,17 @@ export function AddCredits({ open = true, onOpenChange, address, treasuryAddress
     return () => { live = false; };
   }, [open, address]);
 
-  const tokensByHoldings = sortByHoldings(balances);
+  const tokensByHoldings = sortByHoldings(balances, usd);
   const token = SUPPORTED_TOKENS.find((t) => t.symbol === symbol) ?? SUPPORTED_TOKENS[0];
   const tokenBalance = balances[token.symbol];
   const enough = hasEnough(tokenBalance, usdcAmount, token.decimals);
   const inDialog = onOpenChange !== undefined;
+
+  useEffect(() => {
+    if (chosen || !usd || Object.keys(balances).length === 0) return;
+    const best = bestTokenToPayWith(balances, usd);
+    if (best) setSymbol(best);
+  }, [chosen, usd, balances]);
   const unitPrice = usd?.[token.symbol];
 
   const parsedUsdc = parseFloat(usdcAmount);
@@ -219,7 +228,7 @@ export function AddCredits({ open = true, onOpenChange, address, treasuryAddress
             <div className="space-y-3">
               <Label>Pay with</Label>
               <div className="flex gap-2">
-                <Select value={symbol} onValueChange={(v) => { setSymbol(v); setUsdcAmount(""); }}>
+                <Select value={symbol} onValueChange={(v) => { setSymbol(v); setChosen(true); setUsdcAmount(""); }}>
                   <SelectTrigger className="w-40 h-12">
                     <SelectValue />
                   </SelectTrigger>
@@ -229,6 +238,11 @@ export function AddCredits({ open = true, onOpenChange, address, treasuryAddress
                         <span className="flex items-center gap-2">
                           <CurrencyIcon symbol={t.symbol} size={18} />
                           {t.symbol}
+                          {balances[t.symbol] ? (
+                            <span className="text-muted-foreground">
+                              {formatBalance(balances[t.symbol], t.decimals, 3)}
+                            </span>
+                          ) : null}
                         </span>
                       </SelectItem>
                     ))}

@@ -1,5 +1,5 @@
 import { test, expect } from "bun:test";
-import { formatBalance, toAtomic, hasEnough, sortByHoldings } from "./token-balances";
+import { formatBalance, toAtomic, hasEnough, sortByHoldings, bestTokenToPayWith, usdValueOf } from "./token-balances";
 
 test("a whole balance reads without a decimal point", () => {
   expect(formatBalance(10n ** 18n, 18)).toBe("1");
@@ -52,10 +52,42 @@ test("an unknown balance does not block the user", () => {
 });
 
 test("tokens are ordered by what you hold", () => {
-  const order = sortByHoldings({ STRK: 28n * 10n ** 18n, ETH: 0n, USDC: 0n }).map((t) => t.symbol);
+  const order = sortByHoldings(
+    { STRK: 28n * 10n ** 18n, ETH: 0n, USDC: 0n },
+    { STRK: 0.029, ETH: 2458, USDC: 1 },
+  ).map((t) => t.symbol);
   expect(order[0]).toBe("STRK");
 });
 
 test("holding nothing keeps a stable order", () => {
-  expect(sortByHoldings({}).length).toBeGreaterThan(0);
+  expect(sortByHoldings({}).map((t) => t.symbol)).toEqual(sortByHoldings({}).map((t) => t.symbol));
+});
+
+const PRICES = { STRK: 0.029, ETH: 2458, USDC: 1, USDT: 1, WBTC: 60000 };
+
+test("holdings are ranked by what they are worth, not by raw amount", () => {
+  const balances = { STRK: 28628000000000000000n, ETH: 1000000000000000n };
+  expect(sortByHoldings(balances, PRICES)[0].symbol).toBe("ETH");
+});
+
+test("a large holding of a cheap token still wins when it is worth more", () => {
+  const balances = { STRK: 28628000000000000000n, ETH: 100000000000n };
+  expect(sortByHoldings(balances, PRICES)[0].symbol).toBe("STRK");
+});
+
+test("the token you hold most of in dollars is chosen to pay with", () => {
+  expect(bestTokenToPayWith({ STRK: 28628000000000000000n }, PRICES)).toBe("STRK");
+});
+
+test("holding nothing chooses nothing rather than guessing", () => {
+  expect(bestTokenToPayWith({}, PRICES)).toBeNull();
+  expect(bestTokenToPayWith({ STRK: 0n }, PRICES)).toBeNull();
+});
+
+test("without prices no token is chosen", () => {
+  expect(bestTokenToPayWith({ STRK: 28628000000000000000n }, undefined)).toBeNull();
+});
+
+test("a dollar value is computed from decimals and price", () => {
+  expect(usdValueOf(28628000000000000000n, 18, 0.029)).toBeCloseTo(0.830, 2);
 });
