@@ -64,7 +64,6 @@ export function IssuanceTask({ serviceId, address }: { serviceId: string; addres
   const [imageError, setImageError] = useState<string | null>(null);
 
   const [phase, setPhase] = useState<TaskPhase>("idle");
-  const [activeIndex, setActiveIndex] = useState(0);
   const [progress, setProgress] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [outOfCredits, setOutOfCredits] = useState(false);
@@ -105,7 +104,6 @@ export function IssuanceTask({ serviceId, address }: { serviceId: string; addres
     }
     setFieldErrors({});
     setPhase("running");
-    setActiveIndex(0);
     setError(null);
     setOutOfCredits(false);
     setIssued(null);
@@ -136,7 +134,6 @@ export function IssuanceTask({ serviceId, address }: { serviceId: string; addres
         await provisionOne(secret, recipient, address);
       }
 
-      setActiveIndex(1);
       let imageUri: string | null = null;
       if (imageFile) {
         setProgress("Uploading the cover image");
@@ -161,7 +158,6 @@ export function IssuanceTask({ serviceId, address }: { serviceId: string; addres
       });
       const tokenUri = await pinMetadata(metadata);
 
-      setActiveIndex(2);
       setProgress("Preparing the issuance");
       const batches = await fetchMintCalls({
         service: serviceId,
@@ -198,8 +194,6 @@ export function IssuanceTask({ serviceId, address }: { serviceId: string; addres
       <TaskDialog
         open={phase !== "idle"}
         title="Issuing"
-        labels={["Prepare recipients", "Prepare the asset", "Sign and issue"]}
-        activeIndex={activeIndex}
         phase={phase}
         detail={progress}
         error={error}

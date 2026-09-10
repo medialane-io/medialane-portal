@@ -62,7 +62,6 @@ export function CollectionPicker({
   const [error, setError] = useState<string | null>(null);
   const [outOfCredits, setOutOfCredits] = useState(false);
   const [phase, setPhase] = useState<TaskPhase>("idle");
-  const [activeIndex, setActiveIndex] = useState(0);
   const [detail, setDetail] = useState<string | null>(null);
 
   const collections = (data?.collections ?? data?.data ?? []).filter((c) => c.collectionId);
@@ -78,7 +77,6 @@ export function CollectionPicker({
     setError(null);
     setOutOfCredits(false);
     setPhase("running");
-    setActiveIndex(0);
     setDetail("Confirm in your wallet");
     try {
       const res = await fetch("/api/portal/intents/build", {
@@ -101,12 +99,10 @@ export function CollectionPicker({
       }
       if (!res.ok) throw new Error(body?.error ?? "Could not prepare the collection");
 
-      setActiveIndex(1);
       setDetail("Waiting for the transaction");
       const tx = await account.execute(body.data.calls);
       await account.waitForTransaction(tx.transaction_hash);
 
-      setActiveIndex(2);
       setDetail("Waiting for it to be indexed");
       const created = await waitForCollection(collections.length, mutate);
       if (created?.collectionId) onChange(created.collectionId);
@@ -128,8 +124,6 @@ export function CollectionPicker({
     <TaskDialog
       open={phase !== "idle"}
       title="Creating your collection"
-      labels={["Prepare it", "Confirm onchain", "Make it available"]}
-      activeIndex={activeIndex}
       phase={phase}
       detail={detail}
       error={error}
