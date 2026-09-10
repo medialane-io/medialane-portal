@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import useSWR from "swr";
 import { useAccount } from "@starknet-react/core";
 import { Popover, PopoverContent, PopoverTrigger } from "@medialane/ui";
@@ -58,6 +59,7 @@ export function CollectionPicker({
   const [name, setName] = useState("");
   const [symbol, setSymbol] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [outOfCredits, setOutOfCredits] = useState(false);
 
   const collections = (data?.collections ?? data?.data ?? []).filter((c) => c.collectionId);
   const selected = collections.find((c) => c.collectionId === value) ?? null;
@@ -84,6 +86,10 @@ export function CollectionPicker({
         }),
       });
       const body = await res.json().catch(() => ({}));
+      if (res.status === 402) {
+        setOutOfCredits(true);
+        return;
+      }
       if (!res.ok) throw new Error(body?.error ?? "Could not prepare the collection");
 
       const tx = await account.execute(body.data.calls);
@@ -158,6 +164,18 @@ export function CollectionPicker({
           <p className="text-xs text-muted-foreground">
             You own this collection, and you are the only one who can issue into it.
           </p>
+
+          {outOfCredits ? (
+            <div className="rounded-lg border border-border bg-muted/40 p-3 space-y-2">
+              <p className="text-sm font-medium">You are out of credits</p>
+              <p className="text-xs text-muted-foreground">
+                Deploying a collection uses credits. Top up and this will go through.
+              </p>
+              <Link href="/account/credits" className="inline-flex text-sm text-primary hover:underline">
+                Add credits
+              </Link>
+            </div>
+          ) : null}
 
           {error ? <p className="text-sm text-destructive">{error}</p> : null}
 
