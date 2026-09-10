@@ -108,17 +108,28 @@ export function AddCredits({ open = true, onOpenChange, address, treasuryAddress
   const dollars = unitPrice !== undefined && !isNaN(parsedUsdc) ? parsedUsdc * unitPrice : NaN;
   const previewCredits = creditsFor(dollars, CREDITS_PER_USDC);
 
-  async function confirmCredit(hash: string) {
+  async function confirmCredit(hash: string, attempts = 10) {
     setConfirming(true);
     setConfirmError(null);
     try {
-      const res = await fetch(`/api/portal/credits/fund?address=${address}`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ txHash: hash }),
-      });
-      const json = (await res.json().catch(() => ({}))) as { data?: { credited: number }; error?: string };
-      if (!res.ok) {
+      let json: { data?: { credited: number }; error?: string } = {};
+      let ok = false;
+
+      for (let attempt = 0; attempt < attempts; attempt++) {
+        const res = await fetch(`/api/portal/credits/fund?address=${address}`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ txHash: hash }),
+        });
+        json = (await res.json().catch(() => ({}))) as { data?: { credited: number }; error?: string };
+        if (res.ok) {
+          ok = true;
+          break;
+        }
+        if (attempt < attempts - 1) await new Promise((r) => setTimeout(r, 4000));
+      }
+
+      if (!ok) {
         setConfirmError(json.error ?? "Still waiting for your transfer to confirm on-chain. Try again in a moment.");
         return;
       }
@@ -148,6 +159,7 @@ export function AddCredits({ open = true, onOpenChange, address, treasuryAddress
       const hash = result.transaction_hash;
       setTxHash(hash);
       setStep("confirming");
+      await account.waitForTransaction(hash).catch(() => {});
       await confirmCredit(hash);
     } catch (err) {
       const friendly = getFriendlyWalletError(err);
