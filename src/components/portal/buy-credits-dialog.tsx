@@ -290,7 +290,7 @@ export function AddCredits({ open = true, onOpenChange, address, treasuryAddress
                 <span className="font-bold tabular-nums text-primary">
                   {previewCredits.toLocaleString()} credits
                 </span>
-                {balance !== undefined ? (
+                {balance ? (
                   <span className="text-muted-foreground">
                     {" "}· taking you to {(balance + previewCredits).toLocaleString()}
                   </span>
