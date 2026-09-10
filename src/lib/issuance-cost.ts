@@ -31,7 +31,7 @@ export function estimateIssuance(
 
   const lines: CostLine[] = [];
 
-  const perRecipient = costOf(pricing, "read");
+  const perRecipient = costOf(pricing, "wallet:deploy");
   lines.push({
     label: `Prepare ${input.recipients} ${input.recipients === 1 ? "recipient" : "recipients"}`,
     credits: perRecipient * input.recipients,

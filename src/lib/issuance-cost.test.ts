@@ -5,6 +5,7 @@ const pricing: PricingTable = {
   default: 1,
   rules: [
     { actionKey: "read", chain: "ALL", service: "ALL", credits: 1 },
+    { actionKey: "wallet:deploy", chain: "ALL", service: "ALL", credits: 10 },
     { actionKey: "metadata:upload-file", chain: "ALL", service: "ALL", credits: 15 },
     { actionKey: "metadata:upload-json", chain: "ALL", service: "ALL", credits: 5 },
     { actionKey: "intent:create-tier", chain: "ALL", service: "ip-club", credits: 50 },
@@ -25,21 +26,21 @@ test("no pricing yet costs nothing rather than guessing", () => {
 
 test("a single recipient with an image is itemised", () => {
   const { lines, total } = estimateIssuance(pricing, { recipients: 1, hasImage: true, service: "x" });
-  expect(lines.map((l) => l.credits)).toEqual([1, 15, 5, 1]);
-  expect(total).toBe(22);
+  expect(lines.map((l) => l.credits)).toEqual([10, 15, 5, 1]);
+  expect(total).toBe(31);
 });
 
 test("without an image the storage line disappears", () => {
   const { lines, total } = estimateIssuance(pricing, { recipients: 1, hasImage: false, service: "x" });
   expect(lines.length).toBe(3);
-  expect(total).toBe(7);
+  expect(total).toBe(16);
 });
 
 test("cost grows with the number of recipients", () => {
   const ten = estimateIssuance(pricing, { recipients: 10, hasImage: true, service: "x" });
   const hundred = estimateIssuance(pricing, { recipients: 100, hasImage: true, service: "x" });
-  expect(ten.total).toBe(31);
-  expect(hundred.total).toBe(121);
+  expect(ten.total).toBe(121);
+  expect(hundred.total).toBe(1021);
 });
 
 test("the recipient line reads naturally for one and for many", () => {
@@ -55,6 +56,11 @@ test("no recipients means nothing to estimate", () => {
 
 test("a shortfall is what you still need", () => {
   expect(shortfall(120, 83)).toBe(37);
+});
+
+test("preparing a recipient is priced as a wallet deployment", () => {
+  const one = estimateIssuance(pricing, { recipients: 1, hasImage: false, service: "x" });
+  expect(one.lines[0].credits).toBe(10);
 });
 
 test("enough credits leaves no shortfall", () => {
