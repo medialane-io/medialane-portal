@@ -39,15 +39,15 @@ import { ProcessingState, SuccessState, ErrorState, TxLink } from "@/src/compone
 type Step = "details" | "processing" | "confirming" | "success" | "error";
 
 interface BuyCreditsDialogProps {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
   address: string;
   treasuryAddress: string;
   balance?: number;
   onCredited: () => void;
 }
 
-export function BuyCreditsDialog({ open, onOpenChange, address, treasuryAddress, balance, onCredited }: BuyCreditsDialogProps) {
+export function AddCredits({ open = true, onOpenChange, address, treasuryAddress, balance, onCredited }: BuyCreditsDialogProps) {
   const { account } = useAccount();
   const [step, setStep] = useState<Step>("details");
   const [usdcAmount, setUsdcAmount] = useState("");
@@ -150,26 +150,27 @@ export function BuyCreditsDialog({ open, onOpenChange, address, treasuryAddress,
     }
   }
 
-  const handleClose = (nextOpen: boolean) => {
-    if (step === "processing") return;
-    onOpenChange(nextOpen);
+  const dismiss = () => {
+    if (onOpenChange) {
+      onOpenChange(false);
+      return;
+    }
+    setStep("details");
+    setUsdcAmount("");
+    setTxHash(null);
+    setCreditedAmount(null);
+    setErrorMessage(null);
   };
 
   return (
-    <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className="sm:max-w-md p-0 overflow-hidden gap-0 rounded-2xl">
-        <DialogTitle className="sr-only">Add credits</DialogTitle>
-        <DialogDescription className="sr-only">
-          Deposit USDC on Starknet to add API credits to your account.
-        </DialogDescription>
-
+    <>
         {step === "success" ? (
           <SuccessState
             title={`+${(creditedAmount ?? 0).toLocaleString()} credits added`}
             description="Your balance is updated and ready to use."
             txHash={txHash}
             explorerUrl={EXPLORER_URL}
-            onDone={() => onOpenChange(false)}
+            onDone={dismiss}
           />
         ) : step === "error" ? (
           <ErrorState
@@ -178,7 +179,7 @@ export function BuyCreditsDialog({ open, onOpenChange, address, treasuryAddress,
             error={errorMessage}
             explorerUrl={EXPLORER_URL}
             onRetry={() => setStep("details")}
-            onDone={() => onOpenChange(false)}
+            onDone={dismiss}
           />
         ) : step === "processing" ? (
           <ProcessingState
@@ -316,6 +317,19 @@ export function BuyCreditsDialog({ open, onOpenChange, address, treasuryAddress,
             </Button>
           </div>
         )}
+    </>
+  );
+}
+
+export function BuyCreditsDialog(props: BuyCreditsDialogProps) {
+  return (
+    <Dialog open={props.open} onOpenChange={props.onOpenChange}>
+      <DialogContent className="sm:max-w-md p-0 overflow-hidden gap-0 rounded-2xl">
+        <DialogTitle className="sr-only">Add credits</DialogTitle>
+        <DialogDescription className="sr-only">
+          Add API credits to your account.
+        </DialogDescription>
+        <AddCredits {...props} />
       </DialogContent>
     </Dialog>
   );

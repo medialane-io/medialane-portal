@@ -1,13 +1,11 @@
 "use client";
 
-import { useState } from "react";
 import useSWR from "swr";
 import { useAccount } from "@starknet-react/core";
-import { Button } from "@/src/components/ui/button";
 import { Coins, Zap, ExternalLink, Info, KeyRound } from "lucide-react";
 import { portalFetcher } from "@/src/lib/portal/fetcher";
 import { EXPLORER_URL } from "@/src/lib/constants";
-import { BuyCreditsDialog } from "@/src/components/portal/buy-credits-dialog";
+import { AddCredits } from "@/src/components/portal/buy-credits-dialog";
 
 interface Props {
   address: string;
@@ -29,7 +27,6 @@ interface CreditsData {
 
 export function CreditsTab({ address }: Props) {
   const { account } = useAccount();
-  const [depositOpen, setDepositOpen] = useState(false);
 
   const { data: creditsData, mutate: mutateCredits } = useSWR<CreditsData>(
     `/api/portal/credits?address=${address}`,
@@ -61,20 +58,22 @@ export function CreditsTab({ address }: Props) {
             {balance.toLocaleString()}
             <span className="text-lg font-medium text-muted-foreground ml-2">credits</span>
           </p>
-          <Button
-            variant="gradient-fill"
-            onClick={() => setDepositOpen(true)}
-            disabled={!account || !treasuryAddress}
-          >
-            <Coins className="w-4 h-4 mr-1.5" />
-            Add credits
-          </Button>
-          {!account && <p className="text-xs text-muted-foreground mt-3">Connect your wallet above to add credits.</p>}
-          {account && !treasuryAddress && (
-            <p className="flex items-start gap-1.5 text-xs text-muted-foreground mt-3">
+          {!account ? (
+            <p className="text-xs text-muted-foreground">Connect your wallet above to add credits.</p>
+          ) : !treasuryAddress ? (
+            <p className="flex items-start gap-1.5 text-xs text-muted-foreground">
               <Info className="w-3.5 h-3.5 mt-0.5 shrink-0" />
               Deposits are launching soon. Check back, or reach out if you need credits in the meantime.
             </p>
+          ) : (
+            <div className="border-t border-border/60 pt-6">
+              <AddCredits
+                address={address}
+                treasuryAddress={treasuryAddress}
+                balance={balance}
+                onCredited={() => mutateCredits()}
+              />
+            </div>
           )}
         </div>
 
@@ -117,14 +116,6 @@ export function CreditsTab({ address }: Props) {
         </div>
       )}
 
-      <BuyCreditsDialog
-        open={depositOpen}
-        onOpenChange={setDepositOpen}
-        address={address}
-        treasuryAddress={treasuryAddress}
-        balance={balance}
-        onCredited={() => mutateCredits()}
-      />
     </div>
   );
 }
