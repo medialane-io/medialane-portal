@@ -11,6 +11,7 @@ import { Button } from "@/src/components/ui/button";
 import { Skeleton } from "@/src/components/ui/skeleton";
 import { portalFetcher } from "@/src/lib/portal/fetcher";
 import { BuyCreditsDialog } from "@/src/components/portal/buy-credits-dialog";
+import { SpendPanel } from "@/src/components/portal/spend-panel";
 import { EXPLORER_URL } from "@/src/lib/constants";
 import { getTokenByAddress } from "@medialane/sdk";
 
@@ -155,6 +156,11 @@ export function AccountDashboard({ address }: Props) {
               ))}
             </ul>
           )}
+        </section>
+
+        <section className="space-y-4">
+          <h2 className="text-lg font-semibold">Where your credits went</h2>
+          <SpendPanel />
         </section>
 
         <section className="space-y-4">
