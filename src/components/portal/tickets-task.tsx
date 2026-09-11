@@ -101,6 +101,7 @@ export function TicketsTask({ serviceId, address }: { serviceId: string; address
   });
   const missing = shortfall(estimate.total, balance);
   const room = capacity(supply, recipients.length);
+  const hasRun = recipients.length > 0;
   const rows = guestRows(guests);
   const repeats = repeatsIn(guests);
   const setupCost = fixedCost(pricingData?.pricing, {
@@ -269,8 +270,10 @@ export function TicketsTask({ serviceId, address }: { serviceId: string; address
             </div>
           </div>
           <p className="text-muted-foreground">
-            {validitySentence(validFrom, validUntil)} · {room.exists.toLocaleString()} exist ·{" "}
-            {room.issuingNow.toLocaleString()} going out
+            {validitySentence(validFrom, validUntil)}
+            {hasRun
+              ? ` · ${room.exists.toLocaleString()} exist · ${room.issuingNow.toLocaleString()} going out`
+              : ""}
           </p>
         </div>
 
@@ -378,15 +381,19 @@ export function TicketsTask({ serviceId, address }: { serviceId: string; address
                   className="h-11"
                   disabled={busy}
                 />
-                {room.shortBy > 0 ? (
+                {!hasRun ? (
+                  <p className="text-muted-foreground">
+                    Leave it empty to make exactly as many as there are guests.
+                  </p>
+                ) : room.shortBy > 0 ? (
                   <p className="text-destructive">
                     {room.shortBy.toLocaleString()} more {room.shortBy === 1 ? "ticket" : "tickets"}{" "}
                     needed to cover the list.
                   </p>
                 ) : (
                   <p className="text-muted-foreground">
-                    {room.issuingNow.toLocaleString()} going out now,{" "}
-                    {room.remaining.toLocaleString()} left to issue later.
+                    {room.issuingNow.toLocaleString()} of {room.exists.toLocaleString()} going out
+                    now.
                   </p>
                 )}
               </div>
@@ -486,12 +493,14 @@ export function TicketsTask({ serviceId, address }: { serviceId: string; address
             <section className="space-y-4 border-t border-border pt-6">
               <div className="flex items-baseline justify-between gap-4">
                 <h2 className="font-semibold uppercase tracking-wide text-muted-foreground">
-                  What this run costs
+                  {hasRun ? "What this run costs" : "What a run costs"}
                 </h2>
-                <p className="text-xl font-bold tabular-nums">
-                  {(estimate.total > 0 ? estimate.total : setupCost).toLocaleString()}
-                  <span className="ml-1.5 font-medium text-muted-foreground">credits</span>
-                </p>
+                {hasRun ? (
+                  <p className="text-xl font-bold tabular-nums">
+                    {estimate.total.toLocaleString()}
+                    <span className="ml-1.5 font-medium text-muted-foreground">credits</span>
+                  </p>
+                ) : null}
               </div>
 
               {estimate.total > 0 ? (
@@ -517,9 +526,9 @@ export function TicketsTask({ serviceId, address }: { serviceId: string; address
                     <Link href="/account/credits" className="text-primary hover:underline">
                       Add {missing.toLocaleString()} more
                     </Link>
-                  ) : (
+                  ) : hasRun ? (
                     "Enough for this run."
-                  )}
+                  ) : null}
                 </p>
               ) : null}
 
