@@ -114,7 +114,9 @@ export default async function PricingPage() {
                     className="flex items-center justify-between px-2 py-3 text-sm"
                   >
                     <span className="text-muted-foreground">{row.label}</span>
-                    <span className="text-foreground font-medium">{row.credits} credits</span>
+                    <span className="text-foreground font-medium">
+                      {row.credits} {row.credits === 1 ? "credit" : "credits"}
+                    </span>
                   </div>
                 ))}
               </div>
