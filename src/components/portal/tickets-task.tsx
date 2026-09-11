@@ -485,29 +485,54 @@ export function TicketsTask({ serviceId, address }: { serviceId: string; address
             <section className="space-y-4">
               <div className="flex items-baseline justify-between gap-4">
                 <h2 className="font-semibold">Cost</h2>
-                {balance !== undefined ? (
-                  <p className="text-muted-foreground">
-                    {balance.toLocaleString()} available
-                  </p>
-                ) : null}
               </div>
 
-              {hasRun ? (
-                <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
-                  <p className="text-4xl font-bold tabular-nums">
-                    {estimate.total.toLocaleString()}
-                  </p>
-                  <p className="text-muted-foreground">
-                    credits to issue {room.issuingNow.toLocaleString()}{" "}
-                    {room.issuingNow === 1 ? "ticket" : "tickets"}
-                  </p>
-                  {missing > 0 ? (
-                    <Link href="/account/credits" className="text-primary hover:underline">
-                      Add {missing.toLocaleString()} more
-                    </Link>
-                  ) : null}
+              <dl className="space-y-2.5">
+                {hasRun ? (
+                  <div className="flex items-baseline justify-between gap-4">
+                    <dt className="truncate">
+                      {name.trim() || "Ticket"}
+                      <span className="ml-2 text-muted-foreground">
+                        × {room.issuingNow.toLocaleString()}
+                      </span>
+                    </dt>
+                    <dd className="tabular-nums">{estimate.total.toLocaleString()}</dd>
+                  </div>
+                ) : (
+                  <div className="flex items-baseline justify-between gap-4 text-muted-foreground">
+                    <dt>Nothing to issue yet</dt>
+                    <dd className="tabular-nums">0</dd>
+                  </div>
+                )}
+
+                <div className="flex items-baseline justify-between gap-4 border-t border-border pt-2.5">
+                  <dt className="font-semibold">Total</dt>
+                  <dd className="text-2xl font-bold tabular-nums">
+                    {hasRun ? estimate.total.toLocaleString() : 0}
+                    <span className="ml-1.5 text-base font-medium text-muted-foreground">
+                      credits
+                    </span>
+                  </dd>
                 </div>
-              ) : null}
+
+                {balance !== undefined ? (
+                  <div className="flex items-baseline justify-between gap-4 text-muted-foreground">
+                    <dt>Balance</dt>
+                    <dd className="tabular-nums">{balance.toLocaleString()}</dd>
+                  </div>
+                ) : null}
+
+                {missing > 0 ? (
+                  <div className="flex items-baseline justify-between gap-4">
+                    <dt className="text-destructive">Short by {missing.toLocaleString()}</dt>
+                    <dd>
+                      <Link href="/account/credits" className="text-primary hover:underline">
+                        Add credits
+                      </Link>
+                    </dd>
+                  </div>
+                ) : null}
+              </dl>
 
               <div className="flex flex-wrap items-center gap-3 pt-1">
                 <Button onClick={run} disabled={!ready || busy} size="lg" className="h-12">
