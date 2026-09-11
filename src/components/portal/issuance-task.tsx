@@ -16,7 +16,6 @@ import {
   Upload,
   Users,
   Layers,
-  Ticket,
 } from "lucide-react";
 import { Button } from "@/src/components/ui/button";
 import { Input } from "@/src/components/ui/input";
@@ -31,18 +30,19 @@ import {
 } from "@/src/components/ui/select";
 import { CollectionPicker } from "@/src/components/portal/collection-picker";
 import { TaskDialog } from "@/src/components/portal/task-dialog";
+import {
+  provisionOne,
+  uploadImage,
+  pinMetadata,
+  fetchMintCalls,
+} from "@/src/lib/issue";
 import { portalFetcher } from "@/src/lib/portal/fetcher";
-import { ticketIdFromReceipt } from "@/src/lib/ticket-events";
 import { estimateIssuance, shortfall, type PricingTable } from "@/src/lib/issuance-cost";
 import { issuedSummary, OUT_OF_CREDITS, type TaskPhase } from "@/src/lib/task-progress";
 import {
   parseRecipients,
   invalidRecipients,
-  interimKeyFor,
-  newDerivationSalt,
-  buildAndSignDeployment,
   PROVISIONING_SECRET_MESSAGE,
-  type Recipient,
 } from "@/src/lib/provisioning";
 import {
   issuanceSchema,
@@ -53,14 +53,8 @@ import {
   TERRITORIES,
   IP_TYPES,
   termsSummary,
-  isTicketService,
-  maxSupplyFor,
-  toUnixSeconds,
-  validityError,
   type IssuanceValues,
 } from "@/src/lib/issuance-form";
-
-type Call = { contractAddress: string; entrypoint: string; calldata: string[] };
 
 const short = (a: string) => `${a.slice(0, 6)}…${a.slice(-4)}`;
 
@@ -81,10 +75,6 @@ export function IssuanceTask({ serviceId, address }: { serviceId: string; addres
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [termsOpen, setTermsOpen] = useState(false);
   const [detailsOpen, setDetailsOpen] = useState(false);
-  const [maxSupply, setMaxSupply] = useState("");
-  const [validFrom, setValidFrom] = useState("");
-  const [validUntil, setValidUntil] = useState("");
-  const isTickets = isTicketService(serviceId);
 
   const set = <K extends keyof IssuanceValues>(key: K, value: IssuanceValues[K]) =>
     setValues((v) => ({ ...v, [key]: value }));
@@ -190,40 +180,12 @@ export function IssuanceTask({ serviceId, address }: { serviceId: string; addres
       const tokenUri = await pinMetadata(metadata);
 
       setProgress("Preparing the issuance");
-      let mintInput: Record<string, unknown> = { tokenUri, collectionId: values.collectionId };
-
-      if (isTickets) {
-        const supply = maxSupplyFor(recipients.length, maxSupply);
-        if (!supply) throw new Error("Set how many tickets exist, at least as many as recipients.");
-
-        setProgress("Confirm the ticket in your wallet");
-        const windowError = validityError(validFrom, validUntil);
-        if (windowError) throw new Error(windowError);
-
-        const built = await buildTicketType({
-          owner: address,
-          collection: values.collectionId,
-          maxSupply: supply,
-          royaltyBps: Math.round(values.royalty * 100),
-          metadataUri: tokenUri,
-          startTime: toUnixSeconds(validFrom) ?? undefined,
-          endTime: toUnixSeconds(validUntil) ?? undefined,
-        });
-        const tx = await account.execute(built.calls);
-        const receipt = await account.waitForTransaction(tx.transaction_hash);
-        const ticketId = ticketIdFromReceipt(
-          (receipt as { events?: { from_address?: string; keys?: string[] }[] }).events,
-          values.collectionId,
-        );
-        if (!ticketId) throw new Error("The ticket was created but its id could not be read.");
-        mintInput = { collectionContract: values.collectionId, tokenId: ticketId, amount: "1" };
-      }
-
       const batches = await fetchMintCalls({
         service: serviceId,
         owner: address,
         recipients: recipients.map((r) => r.value),
-        ...mintInput,
+        tokenUri,
+        collectionId: values.collectionId,
       });
 
       for (const [index, batch] of batches.entries()) {
@@ -261,13 +223,9 @@ export function IssuanceTask({ serviceId, address }: { serviceId: string; addres
         onClose={() => setPhase("idle")}
       />
     <ServiceFormShell
-      icon={isTickets ? <Ticket className="h-4 w-4 text-white" /> : <Database className="h-4 w-4 text-white" />}
-      title={isTickets ? "IP Tickets" : "Data Tokenization"}
-      subtitle={
-        isTickets
-          ? "Create a ticket and give it to everyone on your list. Each one is theirs, and it can be redeemed or passed on."
-          : "Establish verifiable ownership of your data, with licensing terms that hold up wherever it travels."
-      }
+      icon={<Database className="h-4 w-4 text-white" />}
+      title="Data Tokenization"
+      subtitle="Establish verifiable ownership of your data, with licensing terms that hold up wherever it travels."
       backSlot={
         <Link
           href="/launchpad"
@@ -282,63 +240,35 @@ export function IssuanceTask({ serviceId, address }: { serviceId: string; addres
           <MedialaneCollectionCard
             image={imagePreview}
             name={values.name || "Untitled"}
-            collection={isTickets ? "IP Tickets" : "Data Tokenization"}
+            collection="Data Tokenization"
             creator={short(address)}
           />
           <ClaimRail
-            included={
-              isTickets
-                ? [
-                    {
-                      icon: Ticket,
-                      title: "Theirs to keep",
-                      desc: "Each ticket is held by the person it went to.",
-                    },
-                    {
-                      icon: Users,
-                      title: "Redeem or pass on",
-                      desc: "Admit someone, or let them trade or gift it.",
-                    },
-                    {
-                      icon: Scale,
-                      title: "Terms travel with it",
-                      desc: "Whatever you set stays attached if it changes hands.",
-                    },
-                  ]
-                : [
-                    {
-                      icon: FileCheck2,
-                      title: "Proof of ownership",
-                      desc: "Authorship and date are recorded permanently.",
-                    },
-                    {
-                      icon: Scale,
-                      title: "Terms that travel",
-                      desc: "Licensing is carried by the asset wherever it goes.",
-                    },
-                    {
-                      icon: Users,
-                      title: "Held by the right people",
-                      desc: "Each recipient owns their copy outright.",
-                    },
-                  ]
-            }
-            steps={
-              isTickets
-                ? ["Describe the ticket", "Say when it is valid", "Add who gets one"]
-                : [
-                    "Describe what you are tokenizing",
-                    "Set the terms it can be used under",
-                    "Add the people who receive it",
-                  ]
-            }
+            included={[
+              {
+                icon: FileCheck2,
+                title: "Proof of ownership",
+                desc: "Authorship and date are recorded permanently.",
+              },
+              {
+                icon: Scale,
+                title: "Terms that travel",
+                desc: "Licensing is carried by the asset wherever it goes.",
+              },
+              {
+                icon: Users,
+                title: "Held by the right people",
+                desc: "Each recipient owns their copy outright.",
+              },
+            ]}
+            steps={[
+              "Describe what you are tokenizing",
+              "Set the terms it can be used under",
+              "Add the people who receive it",
+            ]}
             trustIcon={ShieldCheck}
-            trustLead={isTickets ? "Yours to run." : "You stay in control."}
-            trust={
-              isTickets
-                ? "Medialane never takes custody, and every ticket stays with whoever holds it."
-                : "Medialane never takes custody, and the terms you set are recorded with the asset."
-            }
+            trustLead="You stay in control."
+            trust="Medialane never takes custody, and the terms you set are recorded with the asset."
           />
         </>
       }
@@ -357,7 +287,7 @@ export function IssuanceTask({ serviceId, address }: { serviceId: string; addres
           ) : null}
 
           <div className="space-y-2">
-            <Label>{isTickets ? "Ticket artwork" : "Cover image"}</Label>
+            <Label>Cover image</Label>
             <label
               className="flex flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed border-border p-8 text-center cursor-pointer transition-colors hover:border-primary/50"
               onDragOver={(e) => e.preventDefault()}
@@ -387,55 +317,15 @@ export function IssuanceTask({ serviceId, address }: { serviceId: string; addres
             {imageError ? <p className="text-sm text-destructive">{imageError}</p> : null}
           </div>
 
-          <Field label={isTickets ? "Ticket name" : "Name"} required error={fieldErrors.name}>
+          <Field label="Name" required error={fieldErrors.name}>
             <Input
               value={values.name}
               onChange={(e) => set("name", e.target.value)}
-              placeholder={isTickets ? "General admission" : "Q3 research dataset"}
+              placeholder="Q3 research dataset"
               disabled={busy}
             />
           </Field>
 
-          {isTickets ? (
-            <>
-              <Field label="How many to make">
-                <Input
-                  type="number"
-                  min={recipients.length || 1}
-                  value={maxSupply}
-                  onChange={(e) => setMaxSupply(e.target.value)}
-                  placeholder={recipients.length ? String(recipients.length) : "100"}
-                  disabled={busy}
-                />
-                <p className="text-muted-foreground">
-                  Leave empty to make exactly as many as there are recipients. More leaves room to
-                  hand out the same ticket again later.
-                </p>
-              </Field>
-
-              <div className="grid gap-4 sm:grid-cols-2">
-                <Field label="Valid from">
-                  <Input
-                    type="datetime-local"
-                    value={validFrom}
-                    onChange={(e) => setValidFrom(e.target.value)}
-                    disabled={busy}
-                  />
-                </Field>
-                <Field label="Valid until" error={validityError(validFrom, validUntil) ?? undefined}>
-                  <Input
-                    type="datetime-local"
-                    value={validUntil}
-                    onChange={(e) => setValidUntil(e.target.value)}
-                    disabled={busy}
-                  />
-                </Field>
-              </div>
-              <p className="text-muted-foreground">
-                Leave both empty and the ticket is valid whenever.
-              </p>
-            </>
-          ) : null}
 
           <Field label="Description" error={fieldErrors.description}>
             <Textarea
@@ -487,9 +377,7 @@ export function IssuanceTask({ serviceId, address }: { serviceId: string; addres
           hint={termsSummary(values)}
         >
           <p className="text-xs text-muted-foreground">
-            {isTickets
-              ? "Tickets are assets, so they can be traded and collected. These terms travel with them."
-              : "These travel with the asset and are recorded alongside it as proof of the terms you set."}
+            These travel with the asset and are recorded alongside it as proof of the terms you set.
           </p>
 
           <Field label="AI and data mining" error={fieldErrors.aiPolicy}>
@@ -689,96 +577,4 @@ function Choice({
       </SelectContent>
     </Select>
   );
-}
-
-async function provisionOne(secret: Uint8Array, recipient: Recipient, address: string) {
-  const derivationSalt = newDerivationSalt();
-  const interim = interimKeyFor(secret, recipient, derivationSalt);
-  const deployment = await buildAndSignDeployment(address, interim);
-
-  const res = await fetch(`/api/portal/provisioning?address=${address}`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      recipientScheme: recipient.scheme,
-      recipientValue: recipient.value,
-      interimOwnerPubkey: interim.publicKey,
-      derivationSalt,
-      deployment,
-    }),
-  });
-
-  if (res.status === 402) throw new Error(OUT_OF_CREDITS);
-  if (!res.ok) {
-    const body = await res.json().catch(() => ({}));
-    throw new Error(body?.message ?? body?.error ?? `Could not prepare ${recipient.value}`);
-  }
-}
-
-async function uploadImage(file: File): Promise<string> {
-  const form = new FormData();
-  form.set("file", file);
-  const res = await fetch("/api/portal/metadata/upload-file", { method: "POST", body: form });
-  const body = await res.json().catch(() => ({}));
-  if (res.status === 402) throw new Error(OUT_OF_CREDITS);
-  if (!res.ok) throw new Error(body?.error ?? "Could not upload the image");
-  return (body.data?.url ?? body.data?.uri) as string;
-}
-
-async function pinMetadata(metadata: unknown): Promise<string> {
-  const res = await fetch("/api/portal/metadata/upload", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(metadata),
-  });
-  const body = await res.json().catch(() => ({}));
-  if (res.status === 402) throw new Error(OUT_OF_CREDITS);
-  if (!res.ok) throw new Error(body?.error ?? "Could not prepare the asset");
-  return body.data.url as string;
-}
-
-async function buildTicketType(input: {
-  owner: string;
-  collection: string;
-  maxSupply: string;
-  royaltyBps: number;
-  metadataUri: string;
-  startTime?: number;
-  endTime?: number;
-}): Promise<{ calls: Call[] }> {
-  const res = await fetch("/api/portal/intents/build", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ type: "CREATE_TIER", service: "ip-tickets", ...input }),
-  });
-  const body = await res.json().catch(() => ({}));
-  if (res.status === 402) throw new Error(OUT_OF_CREDITS);
-  if (!res.ok) throw new Error(body?.error ?? "Could not prepare the ticket");
-  return { calls: body.data.calls as Call[] };
-}
-
-async function fetchMintCalls(input: {
-  service: string;
-  owner: string;
-  recipients: string[];
-  tokenUri?: string;
-  collectionId?: string;
-  collectionContract?: string;
-  tokenId?: string;
-  amount?: string;
-}): Promise<Call[][]> {
-  const res = await fetch("/api/portal/issuance/mint-calls", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(input),
-  });
-  const body = await res.json().catch(() => ({}));
-  if (res.status === 402) throw new Error(OUT_OF_CREDITS);
-  if (!res.ok) {
-    if (body?.error === "recipients_not_provisioned") {
-      throw new Error(`No wallet yet for ${(body.recipients ?? []).join(", ")}`);
-    }
-    throw new Error(body?.error ?? "Could not prepare the issuance");
-  }
-  return body.data.batches as Call[][];
 }

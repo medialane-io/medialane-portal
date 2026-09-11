@@ -6,6 +6,8 @@ import { notFound } from "next/navigation";
 import { usePortalAuth } from "@/src/hooks/use-portal-auth";
 import { launchpadService } from "@/src/lib/services";
 import { IssuanceTask } from "@/src/components/portal/issuance-task";
+import { TicketsTask } from "@/src/components/portal/tickets-task";
+import { isTicketService } from "@/src/lib/issuance-form";
 
 export default function LaunchpadServicePage({ params }: { params: Promise<{ service: string }> }) {
   const { service: serviceId } = use(params);
@@ -28,7 +30,11 @@ export default function LaunchpadServicePage({ params }: { params: Promise<{ ser
 
   return (
     <div className="pt-20">
-      <IssuanceTask serviceId={service.id} address={session.address} />
+      {isTicketService(service.id) ? (
+        <TicketsTask serviceId={service.id} address={session.address} />
+      ) : (
+        <IssuanceTask serviceId={service.id} address={session.address} />
+      )}
     </div>
   );
 }
