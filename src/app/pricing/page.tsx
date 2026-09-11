@@ -4,6 +4,7 @@ import { Button } from "@/src/components/ui/button"
 import { Badge } from "@/src/components/ui/badge"
 import { Check, Coins } from "lucide-react"
 import { pageMetadata } from "@/src/lib/seo"
+import { tierRows, type MdlnTier } from "@/src/lib/mdln-tiers"
 
 export const metadata: Metadata = pageMetadata({
   title: "Pricing",
@@ -31,7 +32,11 @@ const ACTION_LABELS: Record<string, string> = {
 }
 
 interface PricingRule { actionKey: string; chain: string; service: string; credits: number }
-interface PricingResponse { creditsPerUsdc: number; pricing: { default: number; rules: PricingRule[] } }
+interface PricingResponse {
+  creditsPerUsdc: number
+  mdln?: { contract: string | null; tiers: MdlnTier[] }
+  pricing: { default: number; rules: PricingRule[] }
+}
 
 async function getLivePricing(): Promise<PricingResponse | null> {
   try {
@@ -42,13 +47,6 @@ async function getLivePricing(): Promise<PricingResponse | null> {
     return null
   }
 }
-
-const MDLN_TIERS = [
-  { range: "0 MDLN", multiplier: "1.0×", rate: "$0.010 / credit" },
-  { range: "100,000+ MDLN", multiplier: "1.2×", rate: "$0.0083 / credit" },
-  { range: "200,000+ MDLN", multiplier: "1.5×", rate: "$0.0067 / credit" },
-  { range: "500,000+ MDLN", multiplier: "2.0×", rate: "$0.005 / credit" },
-]
 
 const FEATURES = [
   { label: "Webhooks", free: true, paid: true },
@@ -70,6 +68,7 @@ function Cell({ value }: { value: boolean | string }) {
 
 export default async function PricingPage() {
   const pricing = await getLivePricing()
+  const mdlnRows = tierRows(pricing?.mdln?.tiers, pricing?.creditsPerUsdc ?? 100)
   const defaultRules = pricing?.pricing.rules.filter((r) => r.chain === "ALL" && r.service === "ALL") ?? []
   const knownKeys = Object.keys(ACTION_LABELS)
   const orderedActionKeys = [
@@ -138,7 +137,7 @@ export default async function PricingPage() {
                 <div className="text-center text-foreground">Multiplier</div>
                 <div className="text-center text-primary">Rate</div>
               </div>
-              {MDLN_TIERS.map((tier) => (
+              {mdlnRows.map((tier) => (
                 <div
                   key={tier.range}
                   className="grid grid-cols-3 px-2 py-4 items-center text-sm"
