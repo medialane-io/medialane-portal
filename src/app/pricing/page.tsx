@@ -173,10 +173,7 @@ export default async function PricingPage() {
           </div>
         </section>
 
-        <section className="container mx-auto px-4 pb-24 max-w-2xl text-center space-y-4">
-          <p className="text-muted-foreground">
-            Some services carry their own price. Tickets and club memberships are priced per service.
-          </p>
+        <section className="container mx-auto px-4 pb-24 max-w-2xl text-center">
           <Button asChild variant="outline" size="lg">
             <Link href="/services">See all services</Link>
           </Button>
