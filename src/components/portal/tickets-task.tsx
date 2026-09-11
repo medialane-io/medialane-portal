@@ -20,7 +20,6 @@ import {
 } from "@/src/components/ui/select";
 import { CollectionPicker } from "@/src/components/portal/collection-picker";
 import { TaskDialog } from "@/src/components/portal/task-dialog";
-import { TicketPreview } from "@/src/components/portal/ticket-preview";
 import { portalFetcher } from "@/src/lib/portal/fetcher";
 import { ticketIdFromReceipt } from "@/src/lib/ticket-events";
 import { parseRecipients, invalidRecipients, PROVISIONING_SECRET_MESSAGE } from "@/src/lib/provisioning";
@@ -133,7 +132,7 @@ export function TicketsTask({ serviceId, address }: { serviceId: string; address
       );
 
       for (const [i, recipient] of recipients.entries()) {
-        setProgress(`Preparing guest ${i + 1} of ${recipients.length}`);
+        setProgress(`Preparing recipient ${i + 1} of ${recipients.length}`);
         await provisionOne(secret, recipient, address);
       }
 
@@ -162,7 +161,7 @@ export function TicketsTask({ serviceId, address }: { serviceId: string; address
       );
 
       const made = maxSupplyFor(recipients.length, supply);
-      if (!made) throw new Error("Make at least as many tickets as there are guests.");
+      if (!made) throw new Error("Create at least as many tickets as there are recipients.");
 
       setProgress("Confirm the ticket in your wallet");
       const built = await buildTicketType({
@@ -182,7 +181,7 @@ export function TicketsTask({ serviceId, address }: { serviceId: string; address
       );
       if (!ticketId) throw new Error("The ticket was made but its id could not be read.");
 
-      setProgress("Preparing to hand them out");
+      setProgress("Preparing to issue");
       const batches = await fetchMintCalls({
         service: serviceId,
         owner: address,
@@ -204,7 +203,7 @@ export function TicketsTask({ serviceId, address }: { serviceId: string; address
     } catch (e) {
       const message = e instanceof Error ? e.message : String(e);
       if (message === OUT_OF_CREDITS) setOutOfCredits(true);
-      else setError(message || "Could not finish handing out tickets.");
+      else setError(message || "Could not finish issuing.");
       setPhase("error");
     } finally {
       setProgress(null);
@@ -215,7 +214,7 @@ export function TicketsTask({ serviceId, address }: { serviceId: string; address
     <>
       <TaskDialog
         open={phase !== "idle"}
-        title="Handing out tickets"
+        title="Issuing tickets"
         phase={phase}
         detail={progress}
         error={error}
@@ -227,7 +226,7 @@ export function TicketsTask({ serviceId, address }: { serviceId: string; address
       <ServiceFormShell
         icon={<Ticket className="h-4 w-4 text-white" />}
         title="IP Tickets"
-        subtitle="Make a ticket and hand it to everyone on your list. Each one is theirs to keep, redeem or pass on."
+        subtitle="Issue tickets to a list. You set how many exist, when they are valid, and the terms they carry."
         backSlot={
           <Link
             href="/launchpad"
@@ -237,20 +236,10 @@ export function TicketsTask({ serviceId, address }: { serviceId: string; address
             Launchpad
           </Link>
         }
-        aside={
-          <TicketPreview
-            artwork={artworkPreview}
-            name={name}
-            group={null}
-            validFrom={validFrom}
-            validUntil={validUntil}
-            supply={supply || String(recipients.length || "")}
-          />
-        }
       >
         <div className="space-y-8">
           <section className="space-y-4">
-            <h2 className="text-lg font-semibold">The ticket</h2>
+            <h2 className="text-lg font-semibold">Ticket</h2>
 
             <div className="space-y-2">
               <Label>Artwork</Label>
@@ -307,7 +296,7 @@ export function TicketsTask({ serviceId, address }: { serviceId: string; address
           </section>
 
           <section className="space-y-4">
-            <h2 className="text-lg font-semibold">When and how many</h2>
+            <h2 className="text-lg font-semibold">Validity and supply</h2>
 
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="space-y-2">
@@ -335,7 +324,7 @@ export function TicketsTask({ serviceId, address }: { serviceId: string; address
             <p className="text-muted-foreground">Leave both empty and it is valid whenever.</p>
 
             <div className="space-y-2">
-              <Label>How many to make</Label>
+              <Label>Total supply</Label>
               <Input
                 type="number"
                 min={recipients.length || 1}
@@ -346,16 +335,16 @@ export function TicketsTask({ serviceId, address }: { serviceId: string; address
                 disabled={busy}
               />
               <p className="text-muted-foreground">
-                Leave empty to make exactly as many as there are guests. More leaves room to hand
-                out the same ticket again later.
+                Leave empty to create exactly as many as there are recipients. A higher number
+                leaves supply to issue the same ticket again later.
               </p>
             </div>
           </section>
 
           <section className="space-y-4">
             <div>
-              <h2 className="text-lg font-semibold">Who gets one</h2>
-              <p className="text-muted-foreground">One email per line.</p>
+              <h2 className="text-lg font-semibold">Recipients</h2>
+              <p className="text-muted-foreground">One email address per line.</p>
             </div>
 
             <Textarea
@@ -371,7 +360,7 @@ export function TicketsTask({ serviceId, address }: { serviceId: string; address
               <p className="text-destructive">Check these: {invalid.map((r) => r.value).join(", ")}</p>
             ) : recipients.length > 0 ? (
               <p className="text-muted-foreground">
-                {recipients.length} {recipients.length === 1 ? "guest" : "guests"}
+                {recipients.length} {recipients.length === 1 ? "recipient" : "recipients"}
               </p>
             ) : null}
           </section>
@@ -465,7 +454,7 @@ export function TicketsTask({ serviceId, address }: { serviceId: string; address
               ) : (
                 <>
                   <Users className="mr-2 h-4 w-4" />
-                  Hand out {recipients.length > 0 ? recipients.length : ""}{" "}
+                  Issue {recipients.length > 0 ? recipients.length : ""}{" "}
                   {recipients.length === 1 ? "ticket" : "tickets"}
                 </>
               )}
