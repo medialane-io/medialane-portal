@@ -55,6 +55,8 @@ import {
   termsSummary,
   isTicketService,
   maxSupplyFor,
+  toUnixSeconds,
+  validityError,
   type IssuanceValues,
 } from "@/src/lib/issuance-form";
 
@@ -80,6 +82,8 @@ export function IssuanceTask({ serviceId, address }: { serviceId: string; addres
   const [termsOpen, setTermsOpen] = useState(false);
   const [detailsOpen, setDetailsOpen] = useState(false);
   const [maxSupply, setMaxSupply] = useState("");
+  const [validFrom, setValidFrom] = useState("");
+  const [validUntil, setValidUntil] = useState("");
   const isTickets = isTicketService(serviceId);
 
   const set = <K extends keyof IssuanceValues>(key: K, value: IssuanceValues[K]) =>
@@ -193,12 +197,17 @@ export function IssuanceTask({ serviceId, address }: { serviceId: string; addres
         if (!supply) throw new Error("Set how many tickets exist, at least as many as recipients.");
 
         setProgress("Confirm the ticket in your wallet");
+        const windowError = validityError(validFrom, validUntil);
+        if (windowError) throw new Error(windowError);
+
         const built = await buildTicketType({
           owner: address,
           collection: values.collectionId,
           maxSupply: supply,
           royaltyBps: Math.round(values.royalty * 100),
           metadataUri: tokenUri,
+          startTime: toUnixSeconds(validFrom) ?? undefined,
+          endTime: toUnixSeconds(validUntil) ?? undefined,
         });
         const tx = await account.execute(built.calls);
         const receipt = await account.waitForTransaction(tx.transaction_hash);
@@ -277,31 +286,59 @@ export function IssuanceTask({ serviceId, address }: { serviceId: string; addres
             creator={short(address)}
           />
           <ClaimRail
-            included={[
-              {
-                icon: FileCheck2,
-                title: "Proof of ownership",
-                desc: "Authorship and date are recorded permanently.",
-              },
-              {
-                icon: Scale,
-                title: "Terms that travel",
-                desc: "Licensing is carried by the asset wherever it goes.",
-              },
-              {
-                icon: Users,
-                title: "Held by the right people",
-                desc: "Each recipient owns their copy outright.",
-              },
-            ]}
-            steps={[
-              "Describe what you are tokenizing",
-              "Set the terms it can be used under",
-              "Add the people who receive it",
-            ]}
+            included={
+              isTickets
+                ? [
+                    {
+                      icon: Ticket,
+                      title: "Theirs to keep",
+                      desc: "Each ticket is held by the person it went to.",
+                    },
+                    {
+                      icon: Users,
+                      title: "Redeem or pass on",
+                      desc: "Admit someone, or let them trade or gift it.",
+                    },
+                    {
+                      icon: Scale,
+                      title: "Terms travel with it",
+                      desc: "Whatever you set stays attached if it changes hands.",
+                    },
+                  ]
+                : [
+                    {
+                      icon: FileCheck2,
+                      title: "Proof of ownership",
+                      desc: "Authorship and date are recorded permanently.",
+                    },
+                    {
+                      icon: Scale,
+                      title: "Terms that travel",
+                      desc: "Licensing is carried by the asset wherever it goes.",
+                    },
+                    {
+                      icon: Users,
+                      title: "Held by the right people",
+                      desc: "Each recipient owns their copy outright.",
+                    },
+                  ]
+            }
+            steps={
+              isTickets
+                ? ["Describe the ticket", "Say when it is valid", "Add who gets one"]
+                : [
+                    "Describe what you are tokenizing",
+                    "Set the terms it can be used under",
+                    "Add the people who receive it",
+                  ]
+            }
             trustIcon={ShieldCheck}
-            trustLead="You stay in control."
-            trust="Medialane never takes custody, and the terms you set are recorded with the asset."
+            trustLead={isTickets ? "Yours to run." : "You stay in control."}
+            trust={
+              isTickets
+                ? "Medialane never takes custody, and every ticket stays with whoever holds it."
+                : "Medialane never takes custody, and the terms you set are recorded with the asset."
+            }
           />
         </>
       }
@@ -320,7 +357,7 @@ export function IssuanceTask({ serviceId, address }: { serviceId: string; addres
           ) : null}
 
           <div className="space-y-2">
-            <Label>Cover image</Label>
+            <Label>{isTickets ? "Ticket artwork" : "Cover image"}</Label>
             <label
               className="flex flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed border-border p-8 text-center cursor-pointer transition-colors hover:border-primary/50"
               onDragOver={(e) => e.preventDefault()}
@@ -360,20 +397,44 @@ export function IssuanceTask({ serviceId, address }: { serviceId: string; addres
           </Field>
 
           {isTickets ? (
-            <Field label="How many exist">
-              <Input
-                type="number"
-                min={recipients.length || 1}
-                value={maxSupply}
-                onChange={(e) => setMaxSupply(e.target.value)}
-                placeholder={recipients.length ? String(recipients.length) : "100"}
-                disabled={busy}
-              />
+            <>
+              <Field label="How many to make">
+                <Input
+                  type="number"
+                  min={recipients.length || 1}
+                  value={maxSupply}
+                  onChange={(e) => setMaxSupply(e.target.value)}
+                  placeholder={recipients.length ? String(recipients.length) : "100"}
+                  disabled={busy}
+                />
+                <p className="text-muted-foreground">
+                  Leave empty to make exactly as many as there are recipients. More leaves room to
+                  hand out the same ticket again later.
+                </p>
+              </Field>
+
+              <div className="grid gap-4 sm:grid-cols-2">
+                <Field label="Valid from">
+                  <Input
+                    type="datetime-local"
+                    value={validFrom}
+                    onChange={(e) => setValidFrom(e.target.value)}
+                    disabled={busy}
+                  />
+                </Field>
+                <Field label="Valid until" error={validityError(validFrom, validUntil) ?? undefined}>
+                  <Input
+                    type="datetime-local"
+                    value={validUntil}
+                    onChange={(e) => setValidUntil(e.target.value)}
+                    disabled={busy}
+                  />
+                </Field>
+              </div>
               <p className="text-muted-foreground">
-                Leave this empty to create exactly as many as there are recipients. A larger number
-                leaves room to issue more of the same ticket later.
+                Leave both empty and the ticket is valid whenever.
               </p>
-            </Field>
+            </>
           ) : null}
 
           <Field label="Description" error={fieldErrors.description}>
@@ -426,7 +487,9 @@ export function IssuanceTask({ serviceId, address }: { serviceId: string; addres
           hint={termsSummary(values)}
         >
           <p className="text-xs text-muted-foreground">
-            These travel with the asset and are recorded alongside it as proof of the terms you set.
+            {isTickets
+              ? "Tickets are assets, so they can be traded and collected. These terms travel with them."
+              : "These travel with the asset and are recorded alongside it as proof of the terms you set."}
           </p>
 
           <Field label="AI and data mining" error={fieldErrors.aiPolicy}>
@@ -680,6 +743,8 @@ async function buildTicketType(input: {
   maxSupply: string;
   royaltyBps: number;
   metadataUri: string;
+  startTime?: number;
+  endTime?: number;
 }): Promise<{ calls: Call[] }> {
   const res = await fetch("/api/portal/intents/build", {
     method: "POST",

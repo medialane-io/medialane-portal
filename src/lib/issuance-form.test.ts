@@ -10,6 +10,8 @@ import {
   CREDIT_PRESETS,
   isTicketService,
   maxSupplyFor,
+  toUnixSeconds,
+  validityError,
 } from "./issuance-form";
 
 function valid(overrides: Record<string, unknown> = {}) {
@@ -132,4 +134,29 @@ test("a nonsense supply is refused", () => {
 
 test("no recipients and no supply means nothing to issue", () => {
   expect(maxSupplyFor(0, "")).toBeNull();
+});
+
+test("a blank window means no limit", () => {
+  expect(toUnixSeconds("")).toBeNull();
+  expect(validityError("", "")).toBeNull();
+});
+
+test("a date becomes seconds", () => {
+  expect(toUnixSeconds("2026-10-01T18:00")).toBe(Math.floor(new Date("2026-10-01T18:00").getTime() / 1000));
+});
+
+test("ending before starting is refused", () => {
+  expect(validityError("2026-10-02T18:00", "2026-10-01T18:00")).toBe("It has to end after it starts.");
+});
+
+test("a valid window passes", () => {
+  expect(validityError("2026-10-01T18:00", "2026-10-02T18:00")).toBeNull();
+});
+
+test("an open ended window is allowed", () => {
+  expect(validityError("2026-10-01T18:00", "")).toBeNull();
+});
+
+test("an unreadable date is reported", () => {
+  expect(validityError("whenever", "")).toBe("That start date is not readable.");
 });

@@ -107,3 +107,18 @@ export function maxSupplyFor(recipients: number, entered: string): string | null
   if (n < recipients) return null;
   return String(n);
 }
+
+export function toUnixSeconds(local: string): number | null {
+  if (!local.trim()) return null;
+  const ms = new Date(local).getTime();
+  return Number.isFinite(ms) ? Math.floor(ms / 1000) : null;
+}
+
+export function validityError(from: string, until: string): string | null {
+  const start = toUnixSeconds(from);
+  const end = toUnixSeconds(until);
+  if (from.trim() && start === null) return "That start date is not readable.";
+  if (until.trim() && end === null) return "That end date is not readable.";
+  if (start !== null && end !== null && end <= start) return "It has to end after it starts.";
+  return null;
+}

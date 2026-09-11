@@ -3,13 +3,14 @@
 import { useState } from "react";
 import useSWR from "swr";
 import { useAccount } from "@starknet-react/core";
-import { Popover, PopoverContent, PopoverTrigger } from "@medialane/ui";
-import { ChevronDown, Check, ImageIcon, Loader2, Plus } from "lucide-react";
+import { Check, ImageIcon, Loader2, Plus } from "lucide-react";
 import { Button } from "@/src/components/ui/button";
 import { Input } from "@/src/components/ui/input";
 import { Label } from "@/src/components/ui/label";
 import { Skeleton } from "@/src/components/ui/skeleton";
 import { portalFetcher } from "@/src/lib/portal/fetcher";
+import { collectionCopy } from "@/src/lib/collection-copy";
+import { isTicketService } from "@/src/lib/issuance-form";
 import { TaskDialog } from "@/src/components/portal/task-dialog";
 import { type TaskPhase } from "@/src/lib/task-progress";
 
@@ -45,6 +46,8 @@ export function CollectionPicker({
   disabled?: boolean;
 }) {
   const { account } = useAccount();
+  const copy = collectionCopy(serviceId);
+  const isTickets = isTicketService(serviceId);
   const { data, isLoading, error: loadError, mutate } = useSWR<{
     collections?: CollectionOption[];
     data?: CollectionOption[];
@@ -53,8 +56,6 @@ export function CollectionPicker({
     revalidateOnFocus: false,
   });
 
-  const [open, setOpen] = useState(false);
-  const [query, setQuery] = useState("");
   const [creating, setCreating] = useState(false);
   const [busy, setBusy] = useState(false);
   const [name, setName] = useState("");
@@ -65,11 +66,6 @@ export function CollectionPicker({
   const [detail, setDetail] = useState<string | null>(null);
 
   const collections = (data?.collections ?? data?.data ?? []).filter((c) => c.collectionId);
-  const selected = collections.find((c) => c.collectionId === value) ?? null;
-
-  const filtered = query.trim()
-    ? collections.filter((c) => collectionLabel(c).toLowerCase().includes(query.trim().toLowerCase()))
-    : collections;
 
   async function create() {
     if (!account) return;
@@ -136,8 +132,11 @@ export function CollectionPicker({
   if (isLoading) {
     return (
       <div className="space-y-2">
-        <Label>Collection *</Label>
-        <Skeleton className="h-[4.25rem] rounded-xl" />
+        <Label>{copy.label}</Label>
+        <div className="grid gap-3 sm:grid-cols-2">
+          <Skeleton className="h-20 rounded-xl" />
+          <Skeleton className="h-20 rounded-xl" />
+        </div>
       </div>
     );
   }
@@ -145,10 +144,10 @@ export function CollectionPicker({
   if (loadError) {
     return (
       <div className="space-y-2">
-        <Label>Collection *</Label>
+        <Label>{copy.label}</Label>
         <div className="rounded-xl border border-destructive/30 bg-destructive/5 p-4 space-y-3">
-          <p className="text-sm text-destructive">
-            {loadError instanceof Error ? loadError.message : "Could not load your collections."}
+          <p className="text-destructive">
+            {loadError instanceof Error ? loadError.message : "Could not load these."}
           </p>
           <Button size="sm" variant="outline" onClick={() => mutate()}>
             Try again
@@ -162,7 +161,7 @@ export function CollectionPicker({
     return (
       <div className="space-y-2">
         {dialog}
-        <Label>New collection</Label>
+        <Label>{copy.create}</Label>
         <div className="space-y-3 rounded-xl border border-border p-4">
           <div className="grid gap-3 sm:grid-cols-2">
             <div className="space-y-2">
@@ -171,52 +170,37 @@ export function CollectionPicker({
                 id="col-name"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                placeholder="Research archive"
+                placeholder={isTickets ? "Summer series" : "Research archive"}
+                className="h-12"
                 disabled={busy}
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="col-symbol">Symbol</Label>
+              <Label htmlFor="col-symbol">Short code</Label>
               <Input
                 id="col-symbol"
                 value={symbol}
                 onChange={(e) => setSymbol(e.target.value)}
-                placeholder="ARCH"
+                placeholder={isTickets ? "SUMMER" : "ARCH"}
+                className="h-12"
                 disabled={busy}
               />
             </div>
           </div>
 
-          <p className="text-xs text-muted-foreground">
-            You own this collection, and you are the only one who can issue into it.
-          </p>
+          <p className="text-muted-foreground">{copy.hint}</p>
 
           <div className="flex gap-2">
-            <Button onClick={create} disabled={busy || !name.trim() || !symbol.trim()} size="sm">
+            <Button onClick={create} disabled={busy || !name.trim() || !symbol.trim()}>
               {busy ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
               {busy ? "Creating" : "Create"}
             </Button>
-            <Button variant="ghost" size="sm" onClick={() => setCreating(false)} disabled={busy}>
-              Cancel
-            </Button>
+            {collections.length > 0 ? (
+              <Button variant="ghost" onClick={() => setCreating(false)} disabled={busy}>
+                Cancel
+              </Button>
+            ) : null}
           </div>
-        </div>
-      </div>
-    );
-  }
-
-  if (collections.length === 0) {
-    return (
-      <div className="space-y-2">
-        <Label>Collection *</Label>
-        <div className="rounded-xl border border-dashed border-border p-6 text-center space-y-3">
-          <p className="text-sm text-muted-foreground">
-            Everything you tokenize lives in a collection you own.
-          </p>
-          <Button size="sm" onClick={() => setCreating(true)} disabled={disabled}>
-            <Plus className="mr-1.5 h-3.5 w-3.5" />
-            Create your first collection
-          </Button>
         </div>
       </div>
     );
@@ -225,92 +209,52 @@ export function CollectionPicker({
   return (
     <div className="space-y-2">
       {dialog}
-      <Label>Collection *</Label>
-      <div className="flex gap-2">
-        <Popover
-          open={open}
-          onOpenChange={(next) => {
-            setOpen(next);
-            if (!next) setQuery("");
-          }}
-        >
-          <PopoverTrigger asChild>
+      <Label>{copy.label}</Label>
+
+      <div className="grid gap-3 sm:grid-cols-2">
+        {collections.map((c) => {
+          const selected = value === c.collectionId;
+          return (
             <button
+              key={c.collectionId!}
               type="button"
-              aria-expanded={open}
               disabled={disabled}
-              className="flex flex-1 items-center gap-3 rounded-xl border border-border p-3 text-left transition-colors hover:bg-muted/40 disabled:opacity-50"
+              onClick={() => onChange(c.collectionId!)}
+              className={
+                selected
+                  ? "flex items-center gap-3 rounded-xl border-2 border-primary bg-primary/5 p-4 text-left"
+                  : "flex items-center gap-3 rounded-xl border border-border p-4 text-left transition-colors hover:border-foreground/20"
+              }
             >
-              <Thumb image={selected?.image} />
+              <Thumb image={c.image} />
               <div className="min-w-0 flex-1">
-                <p className="text-sm font-semibold truncate">
-                  {selected ? collectionLabel(selected) : "Choose a collection"}
-                </p>
-                <p className="text-xs text-muted-foreground">
-                  {selected ? collectionWorks(selected) : "Where this will live"}
-                </p>
+                <p className="truncate font-semibold">{collectionLabel(c)}</p>
+                <p className="truncate text-muted-foreground">{copy.countOf(c.totalSupply ?? 0)}</p>
               </div>
-              <span className="flex items-center gap-1 text-xs font-medium text-muted-foreground shrink-0">
-                Change
-                <ChevronDown className="h-3.5 w-3.5" />
-              </span>
+              {selected ? <Check className="h-5 w-5 shrink-0 text-primary" /> : null}
             </button>
-          </PopoverTrigger>
-          <PopoverContent className="w-[var(--radix-popover-trigger-width)] p-0" align="start">
-            {collections.length > 5 ? (
-              <div className="border-b border-border p-2">
-                <Input
-                  value={query}
-                  onChange={(e) => setQuery(e.target.value)}
-                  placeholder="Search collections…"
-                  className="h-8"
-                />
-              </div>
-            ) : null}
-            <div className="max-h-64 overflow-y-auto p-1">
-              {filtered.length === 0 ? (
-                <p className="px-3 py-4 text-center text-sm text-muted-foreground">
-                  No collection found.
-                </p>
-              ) : (
-                filtered.map((col) => (
-                  <button
-                    key={col.collectionId!}
-                    type="button"
-                    onClick={() => {
-                      onChange(col.collectionId!);
-                      setOpen(false);
-                    }}
-                    className="flex w-full items-center gap-3 rounded-lg p-2 text-left transition-colors hover:bg-muted/60"
-                  >
-                    <Thumb image={col.image} />
-                    <div className="min-w-0 flex-1">
-                      <p className="text-sm font-medium truncate">{collectionLabel(col)}</p>
-                      <p className="text-xs text-muted-foreground">{collectionWorks(col)}</p>
-                    </div>
-                    {value === col.collectionId ? (
-                      <Check className="h-4 w-4 shrink-0 text-primary" />
-                    ) : null}
-                  </button>
-                ))
-              )}
-            </div>
-            <div className="border-t border-border p-1">
-              <button
-                type="button"
-                onClick={() => {
-                  setOpen(false);
-                  setCreating(true);
-                }}
-                className="flex w-full items-center gap-2 rounded-lg p-2 text-left text-sm font-medium transition-colors hover:bg-muted/60"
-              >
-                <Plus className="h-4 w-4" />
-                New collection
-              </button>
-            </div>
-          </PopoverContent>
-        </Popover>
+          );
+        })}
+
+        <button
+          type="button"
+          disabled={disabled}
+          onClick={() => setCreating(true)}
+          className="flex items-center gap-3 rounded-xl border border-dashed border-border p-4 text-left transition-colors hover:border-foreground/20"
+        >
+          <span className="grid h-11 w-11 shrink-0 place-items-center rounded-lg bg-muted">
+            <Plus className="h-4 w-4" />
+          </span>
+          <div className="min-w-0">
+            <p className="font-semibold">{copy.create}</p>
+            <p className="truncate text-muted-foreground">
+              {collections.length === 0 ? copy.empty : "Keep things separate"}
+            </p>
+          </div>
+        </button>
       </div>
+
+      {collections.length > 0 ? <p className="text-muted-foreground">{copy.hint}</p> : null}
     </div>
   );
 }
