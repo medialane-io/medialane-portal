@@ -35,6 +35,7 @@ import {
   uploadImage,
   pinMetadata,
   fetchMintCalls,
+  executeSponsored,
 } from "@/src/lib/issue";
 import { portalFetcher } from "@/src/lib/portal/fetcher";
 import { estimateIssuance, shortfall, type PricingTable } from "@/src/lib/issuance-cost";
@@ -190,8 +191,11 @@ export function IssuanceTask({ serviceId, address }: { serviceId: string; addres
 
       for (const [index, batch] of batches.entries()) {
         setProgress(`Confirm batch ${index + 1} of ${batches.length} in your wallet`);
-        const tx = await account.execute(batch);
-        await account.waitForTransaction(tx.transaction_hash);
+        const tx = await executeSponsored(
+          { address, signMessage: (td) => account.signMessage(td) },
+          batch,
+        );
+        await account.waitForTransaction(tx);
       }
 
       setIssued(recipients.length);

@@ -9,6 +9,7 @@ import { Input } from "@/src/components/ui/input";
 import { Label } from "@/src/components/ui/label";
 import { Skeleton } from "@/src/components/ui/skeleton";
 import { portalFetcher } from "@/src/lib/portal/fetcher";
+import { executeSponsored } from "@/src/lib/issue";
 import { collectionCopy } from "@/src/lib/collection-copy";
 import { isTicketService } from "@/src/lib/issuance-form";
 import { TaskDialog } from "@/src/components/portal/task-dialog";
@@ -96,8 +97,11 @@ export function CollectionPicker({
       if (!res.ok) throw new Error(body?.error ?? "Could not prepare the collection");
 
       setDetail("Waiting for the transaction");
-      const tx = await account.execute(body.data.calls);
-      await account.waitForTransaction(tx.transaction_hash);
+      const tx = await executeSponsored(
+        { address: owner, signMessage: (td) => account.signMessage(td) },
+        body.data.calls,
+      );
+      await account.waitForTransaction(tx);
 
       setDetail("Waiting for it to be indexed");
       const created = await waitForCollection(collections.length, mutate);

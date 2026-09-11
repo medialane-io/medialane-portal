@@ -99,3 +99,42 @@ export async function fetchMintCalls(input: {
   }
   return body.data.batches as Call[][];
 }
+
+export interface SponsorAccount {
+  address: string;
+  signMessage: (typedData: never) => Promise<unknown>;
+}
+
+export async function executeSponsored(
+  account: SponsorAccount,
+  calls: Call[],
+): Promise<string> {
+  const built = await fetch("/api/portal/paymaster/invoke/build", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ userAddress: account.address, calls }),
+  });
+  const buildBody = await built.json().catch(() => ({}));
+  if (built.status === 402) throw new Error(OUT_OF_CREDITS);
+  if (!built.ok) throw new Error(buildBody?.error ?? "Could not prepare the transaction");
+
+  const signature = await account.signMessage(buildBody.typedData as never);
+
+  const sent = await fetch("/api/portal/paymaster/invoke/execute", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      userAddress: account.address,
+      typedData: buildBody.typedData,
+      signature: Array.isArray(signature) ? signature.map(String) : [String(signature)],
+      calls,
+    }),
+  });
+  const sentBody = await sent.json().catch(() => ({}));
+  if (sent.status === 402) throw new Error(OUT_OF_CREDITS);
+  if (!sent.ok) throw new Error(sentBody?.error ?? "Could not send the transaction");
+
+  const hash = sentBody?.transactionHash ?? sentBody?.data?.transactionHash;
+  if (!hash) throw new Error("The transaction was sent but no hash came back");
+  return hash as string;
+}

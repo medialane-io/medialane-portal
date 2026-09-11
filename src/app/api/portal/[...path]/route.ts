@@ -69,6 +69,11 @@ async function route(req: NextRequest, context: { params: Promise<{ path: string
     return NextResponse.json({ data: { balance, history: historyRows } });
   }
 
+  if (resource === "spend" && !id && req.method === "GET") {
+    const upstream = await backendFetch("credits/spend", keys);
+    return NextResponse.json(upstream.json ?? {}, { status: upstream.status });
+  }
+
   if (resource === "usage" && !id && req.method === "GET") {
     const apiKeys = await backendFetch("keys", keys);
     if (apiKeys.status >= 400) return NextResponse.json(apiKeys.json ?? {}, { status: apiKeys.status });
@@ -77,7 +82,8 @@ async function route(req: NextRequest, context: { params: Promise<{ path: string
 
   if (resource === "paymaster") {
     const rest = path.slice(1).join("/");
-    if (rest !== "deploy/build") {
+    const allowed = ["deploy/build", "deploy/execute", "invoke/build", "invoke/execute"];
+    if (!allowed.includes(rest)) {
       return NextResponse.json({ error: "Not allowed through this proxy" }, { status: 403 });
     }
     const upstream = await rawFetch(`/v1/paymaster/${rest}`, keys, {

@@ -4,9 +4,9 @@ import { useState } from "react";
 import useSWR from "swr";
 import Link from "next/link";
 import { useAccount } from "@starknet-react/core";
-import { ServiceFormShell, CollapsibleSection } from "@medialane/ui";
+import { CollapsibleSection } from "@medialane/ui";
 import { buildAssetMetadata } from "@medialane/sdk";
-import { ArrowLeft, Loader2, ShieldCheck, Ticket, Upload, Users } from "lucide-react";
+import { ArrowLeft, Check, Loader2, ShieldCheck, Ticket, Upload, Users } from "lucide-react";
 import { Button } from "@/src/components/ui/button";
 import { Input } from "@/src/components/ui/input";
 import { Label } from "@/src/components/ui/label";
@@ -23,9 +23,23 @@ import { TaskDialog } from "@/src/components/portal/task-dialog";
 import { portalFetcher } from "@/src/lib/portal/fetcher";
 import { ticketIdFromReceipt } from "@/src/lib/ticket-events";
 import { parseRecipients, invalidRecipients, PROVISIONING_SECRET_MESSAGE } from "@/src/lib/provisioning";
-import { provisionOne, uploadImage, pinMetadata, buildTicketType, fetchMintCalls } from "@/src/lib/issue";
+import {
+  provisionOne,
+  uploadImage,
+  pinMetadata,
+  buildTicketType,
+  fetchMintCalls,
+  executeSponsored,
+} from "@/src/lib/issue";
 import { issuedSummary, OUT_OF_CREDITS, type TaskPhase } from "@/src/lib/task-progress";
-import { estimateIssuance, shortfall, type PricingTable } from "@/src/lib/issuance-cost";
+import {
+  estimateIssuance,
+  shortfall,
+  fixedCost,
+  perRecipientCost,
+  type PricingTable,
+} from "@/src/lib/issuance-cost";
+import { capacity, guestRows, repeatsIn, validitySentence } from "@/src/lib/ticket-event";
 import {
   imageRejectionReason,
   maxSupplyFor,
@@ -86,6 +100,14 @@ export function TicketsTask({ serviceId, address }: { serviceId: string; address
     service: serviceId,
   });
   const missing = shortfall(estimate.total, balance);
+  const room = capacity(supply, recipients.length);
+  const rows = guestRows(guests);
+  const repeats = repeatsIn(guests);
+  const setupCost = fixedCost(pricingData?.pricing, {
+    hasImage: Boolean(artwork),
+    service: serviceId,
+  });
+  const eachCost = perRecipientCost(pricingData?.pricing, serviceId);
 
   function chooseArtwork(file: File | undefined) {
     if (!file) return;
@@ -173,8 +195,11 @@ export function TicketsTask({ serviceId, address }: { serviceId: string; address
         startTime: toUnixSeconds(validFrom) ?? undefined,
         endTime: toUnixSeconds(validUntil) ?? undefined,
       });
-      const tx = await account.execute(built.calls);
-      const receipt = await account.waitForTransaction(tx.transaction_hash);
+      const ticketTx = await executeSponsored(
+        { address, signMessage: (td) => account.signMessage(td) },
+        built.calls,
+      );
+      const receipt = await account.waitForTransaction(ticketTx);
       const ticketId = ticketIdFromReceipt(
         (receipt as { events?: { from_address?: string; keys?: string[] }[] }).events,
         group,
@@ -193,8 +218,11 @@ export function TicketsTask({ serviceId, address }: { serviceId: string; address
 
       for (const [i, batch] of batches.entries()) {
         setProgress(`Confirm batch ${i + 1} of ${batches.length} in your wallet`);
-        const sent = await account.execute(batch);
-        await account.waitForTransaction(sent.transaction_hash);
+        const sent = await executeSponsored(
+          { address, signMessage: (td) => account.signMessage(td) },
+          batch,
+        );
+        await account.waitForTransaction(sent);
       }
 
       setIssued(recipients.length);
@@ -223,246 +251,299 @@ export function TicketsTask({ serviceId, address }: { serviceId: string; address
         onClose={() => setPhase("idle")}
       />
 
-      <ServiceFormShell
-        icon={<Ticket className="h-4 w-4 text-white" />}
-        title="IP Tickets"
-        subtitle="Issue tickets to a list. You set how many exist, when they are valid, and the terms they carry."
-        backSlot={
-          <Link
-            href="/launchpad"
-            className="inline-flex items-center gap-1.5 text-muted-foreground transition-colors hover:text-foreground"
-          >
-            <ArrowLeft className="h-4 w-4" />
-            Launchpad
-          </Link>
-        }
-      >
-        <div className="space-y-8">
-          <section className="space-y-4">
-            <h2 className="text-lg font-semibold">Ticket</h2>
+      <div className="mx-auto max-w-[110rem] px-4 pt-6 pb-16 sm:px-6 lg:px-10">
+        <div className="flex flex-wrap items-end justify-between gap-4 border-b border-border pb-5">
+          <div>
+            <Link
+              href="/launchpad"
+              className="inline-flex items-center gap-1.5 text-muted-foreground transition-colors hover:text-foreground"
+            >
+              <ArrowLeft className="h-4 w-4" />
+              Launchpad
+            </Link>
+            <div className="mt-2 flex items-center gap-2.5">
+              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-primary">
+                <Ticket className="h-4 w-4 text-white" />
+              </span>
+              <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">IP Tickets</h1>
+            </div>
+          </div>
+          <p className="text-muted-foreground">
+            {validitySentence(validFrom, validUntil)} · {room.exists.toLocaleString()} exist ·{" "}
+            {room.issuingNow.toLocaleString()} going out
+          </p>
+        </div>
 
-            <div className="space-y-2">
-              <Label>Artwork</Label>
-              <label
-                className="flex cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed border-border p-8 text-center transition-colors hover:border-primary/50"
-                onDragOver={(e) => e.preventDefault()}
-                onDrop={(e) => {
-                  e.preventDefault();
-                  chooseArtwork(e.dataTransfer.files?.[0]);
-                }}
-              >
-                <input
-                  type="file"
-                  accept="image/*"
-                  className="hidden"
-                  disabled={busy}
-                  onChange={(e) => chooseArtwork(e.target.files?.[0])}
-                />
-                {artworkPreview ? (
-                  <img src={artworkPreview} alt="" className="max-h-40 rounded-lg object-contain" />
-                ) : (
-                  <>
-                    <Upload className="h-5 w-5 text-muted-foreground" />
-                    <span className="text-muted-foreground">
-                      Click to upload (JPG, PNG, GIF, SVG, WebP · max 10 MB)
+        <div className="grid gap-x-10 gap-y-10 pt-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
+          <div className="space-y-8">
+            <section className="space-y-4">
+              <h2 className="font-semibold uppercase tracking-wide text-muted-foreground">
+                The ticket
+              </h2>
+
+              <div className="grid gap-4 sm:grid-cols-[auto_minmax(0,1fr)]">
+                <label
+                  className="flex h-32 w-full cursor-pointer items-center justify-center rounded-xl bg-foreground/[0.04] transition-colors hover:bg-foreground/[0.07] sm:w-32"
+                  onDragOver={(e) => e.preventDefault()}
+                  onDrop={(e) => {
+                    e.preventDefault();
+                    chooseArtwork(e.dataTransfer.files?.[0]);
+                  }}
+                >
+                  <input
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    disabled={busy}
+                    onChange={(e) => chooseArtwork(e.target.files?.[0])}
+                  />
+                  {artworkPreview ? (
+                    <img src={artworkPreview} alt="" className="h-full w-full rounded-xl object-cover" />
+                  ) : (
+                    <span className="flex flex-col items-center gap-1.5 text-muted-foreground">
+                      <Upload className="h-5 w-5" />
+                      Artwork
                     </span>
-                  </>
-                )}
-              </label>
+                  )}
+                </label>
+
+                <div className="space-y-3">
+                  <Input
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    placeholder="General admission"
+                    className="h-11"
+                    disabled={busy}
+                  />
+                  <Textarea
+                    value={description}
+                    onChange={(e) => setDescription(e.target.value)}
+                    placeholder="What it admits you to, when and where, and anything a holder should know…"
+                    rows={3}
+                    disabled={busy}
+                  />
+                </div>
+              </div>
               {artworkError ? <p className="text-destructive">{artworkError}</p> : null}
-            </div>
+            </section>
 
-            <div className="space-y-2">
-              <Label>Name *</Label>
-              <Input
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="General admission"
-                className="h-12"
-                disabled={busy}
-              />
-            </div>
+            <section className="space-y-4">
+              <h2 className="font-semibold uppercase tracking-wide text-muted-foreground">
+                When it is valid
+              </h2>
 
-            <div className="space-y-2">
-              <Label>Description</Label>
-              <Textarea
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                placeholder="What it admits you to, when and where, and anything a holder should know…"
-                rows={3}
-                disabled={busy}
-              />
-            </div>
-          </section>
-
-          <section className="space-y-4">
-            <h2 className="text-lg font-semibold">Validity and supply</h2>
-
-            <div className="grid gap-4 sm:grid-cols-2">
-              <div className="space-y-2">
-                <Label>Valid from</Label>
-                <Input
-                  type="datetime-local"
-                  value={validFrom}
-                  onChange={(e) => setValidFrom(e.target.value)}
-                  className="h-12"
-                  disabled={busy}
-                />
+              <div className="grid gap-3 sm:grid-cols-2">
+                <div className="space-y-1.5">
+                  <Label>From</Label>
+                  <Input
+                    type="datetime-local"
+                    value={validFrom}
+                    onChange={(e) => setValidFrom(e.target.value)}
+                    className="h-11"
+                    disabled={busy}
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <Label>Until</Label>
+                  <Input
+                    type="datetime-local"
+                    value={validUntil}
+                    onChange={(e) => setValidUntil(e.target.value)}
+                    className="h-11"
+                    disabled={busy}
+                  />
+                </div>
               </div>
-              <div className="space-y-2">
-                <Label>Valid until</Label>
-                <Input
-                  type="datetime-local"
-                  value={validUntil}
-                  onChange={(e) => setValidUntil(e.target.value)}
-                  className="h-12"
-                  disabled={busy}
-                />
-                {windowError ? <p className="text-destructive">{windowError}</p> : null}
-              </div>
-            </div>
-            <p className="text-muted-foreground">Leave both empty and it is valid whenever.</p>
+              {windowError ? (
+                <p className="text-destructive">{windowError}</p>
+              ) : (
+                <p className="text-muted-foreground">
+                  {validitySentence(validFrom, validUntil)}. Leave both empty and it stays valid.
+                </p>
+              )}
+            </section>
 
-            <div className="space-y-2">
-              <Label>Total supply</Label>
-              <Input
-                type="number"
-                min={recipients.length || 1}
-                value={supply}
-                onChange={(e) => setSupply(e.target.value)}
-                placeholder={recipients.length ? String(recipients.length) : "100"}
-                className="h-12"
-                disabled={busy}
-              />
-              <p className="text-muted-foreground">
-                Leave empty to create exactly as many as there are recipients. A higher number
-                leaves supply to issue the same ticket again later.
-              </p>
-            </div>
-          </section>
+            <section className="space-y-4">
+              <h2 className="font-semibold uppercase tracking-wide text-muted-foreground">
+                How many exist
+              </h2>
 
-          <section className="space-y-4">
-            <div>
-              <h2 className="text-lg font-semibold">Recipients</h2>
-              <p className="text-muted-foreground">One email address per line.</p>
-            </div>
-
-            <Textarea
-              value={guests}
-              onChange={(e) => setGuests(e.target.value)}
-              placeholder={"one@example.com\ntwo@example.com"}
-              rows={8}
-              className="font-mono"
-              disabled={busy}
-            />
-
-            {invalid.length > 0 ? (
-              <p className="text-destructive">Check these: {invalid.map((r) => r.value).join(", ")}</p>
-            ) : recipients.length > 0 ? (
-              <p className="text-muted-foreground">
-                {recipients.length} {recipients.length === 1 ? "recipient" : "recipients"}
-              </p>
-            ) : null}
-          </section>
-
-          <CollectionPicker
-            serviceId={serviceId}
-            owner={address}
-            value={group}
-            onChange={setGroup}
-            disabled={busy}
-          />
-
-          <CollapsibleSection
-            open={termsOpen}
-            onOpenChange={setTermsOpen}
-            icon={<ShieldCheck className="h-4 w-4 text-primary" />}
-            label="Licensing terms"
-            hint="Optional"
-          >
-            <p className="text-muted-foreground">
-              Tickets are assets, so they can be traded and collected. These terms travel with them.
-            </p>
-
-            <div className="grid gap-4 sm:grid-cols-2">
-              <div className="space-y-2">
-                <Label>Passing on</Label>
-                <Choice value={transferable} options={TRANSFERABLE} onChange={setTransferable} disabled={busy} />
-              </div>
-              <div className="space-y-2">
-                <Label>Resale royalty %</Label>
+              <div className="grid gap-3 sm:grid-cols-[10rem_minmax(0,1fr)] sm:items-center">
                 <Input
                   type="number"
-                  min={0}
-                  max={50}
-                  value={royalty}
-                  onChange={(e) => setRoyalty(e.target.value)}
-                  className="h-12"
+                  min={recipients.length || 1}
+                  value={supply}
+                  onChange={(e) => setSupply(e.target.value)}
+                  placeholder={recipients.length ? String(recipients.length) : "100"}
+                  className="h-11"
                   disabled={busy}
                 />
+                {room.shortBy > 0 ? (
+                  <p className="text-destructive">
+                    {room.shortBy.toLocaleString()} more {room.shortBy === 1 ? "ticket" : "tickets"}{" "}
+                    needed to cover the list.
+                  </p>
+                ) : (
+                  <p className="text-muted-foreground">
+                    {room.issuingNow.toLocaleString()} going out now,{" "}
+                    {room.remaining.toLocaleString()} left to issue later.
+                  </p>
+                )}
               </div>
-              <div className="space-y-2">
-                <Label>License</Label>
-                <Choice value={licenseType} options={LICENSE_PRESETS} onChange={setLicenseType} disabled={busy} />
-              </div>
-              <div className="space-y-2">
-                <Label>AI and data mining</Label>
-                <Choice value={aiPolicy} options={AI_POLICIES} onChange={setAiPolicy} disabled={busy} />
-              </div>
-              <div className="space-y-2">
-                <Label>Territory</Label>
-                <Choice value={territory} options={TERRITORIES} onChange={setTerritory} disabled={busy} />
-              </div>
-            </div>
-          </CollapsibleSection>
+            </section>
 
-          {estimate.total > 0 ? (
-            <div className="rounded-xl border border-border p-4 space-y-3">
+            <CollapsibleSection
+              open={termsOpen}
+              onOpenChange={setTermsOpen}
+              icon={<ShieldCheck className="h-4 w-4 text-primary" />}
+              label="Licensing terms"
+              hint="Optional"
+            >
+              <p className="text-muted-foreground">
+                Tickets are assets, so they can be traded and collected. These terms travel with them.
+              </p>
+
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div className="space-y-2">
+                  <Label>Passing on</Label>
+                  <Choice value={transferable} options={TRANSFERABLE} onChange={setTransferable} disabled={busy} />
+                </div>
+                <div className="space-y-2">
+                  <Label>Resale royalty %</Label>
+                  <Input
+                    type="number"
+                    min={0}
+                    max={50}
+                    value={royalty}
+                    onChange={(e) => setRoyalty(e.target.value)}
+                    className="h-11"
+                    disabled={busy}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>License</Label>
+                  <Choice value={licenseType} options={LICENSE_PRESETS} onChange={setLicenseType} disabled={busy} />
+                </div>
+                <div className="space-y-2">
+                  <Label>AI and data mining</Label>
+                  <Choice value={aiPolicy} options={AI_POLICIES} onChange={setAiPolicy} disabled={busy} />
+                </div>
+                <div className="space-y-2">
+                  <Label>Territory</Label>
+                  <Choice value={territory} options={TERRITORIES} onChange={setTerritory} disabled={busy} />
+                </div>
+              </div>
+            </CollapsibleSection>
+          </div>
+
+          <div className="space-y-8">
+            <section className="space-y-4">
               <div className="flex items-baseline justify-between gap-4">
-                <p className="font-medium">This run costs</p>
+                <h2 className="font-semibold uppercase tracking-wide text-muted-foreground">
+                  Guest list
+                </h2>
+                <p className="text-muted-foreground">
+                  {rows.length.toLocaleString()} {rows.length === 1 ? "guest" : "guests"}
+                  {repeats > 0 ? ` · ${repeats} repeated` : ""}
+                </p>
+              </div>
+
+              <Textarea
+                value={guests}
+                onChange={(e) => setGuests(e.target.value)}
+                placeholder={"Paste a list, or type one address per line\nana@company.com\nbruno@company.com"}
+                rows={6}
+                className="font-mono"
+                disabled={busy}
+              />
+
+              {rows.length > 0 ? (
+                <ul className="divide-y divide-border">
+                  {rows.map((row) => (
+                    <li key={row.value} className="flex items-center justify-between gap-4 py-2.5">
+                      <span className="truncate">{row.value}</span>
+                      {row.valid ? (
+                        <Check className="h-4 w-4 shrink-0 text-primary" />
+                      ) : (
+                        <span className="shrink-0 text-destructive">not an email</span>
+                      )}
+                    </li>
+                  ))}
+                </ul>
+              ) : null}
+            </section>
+
+            <section className="space-y-4">
+              <CollectionPicker
+                serviceId={serviceId}
+                owner={address}
+                value={group}
+                onChange={setGroup}
+                disabled={busy}
+              />
+            </section>
+
+            <section className="space-y-4 border-t border-border pt-6">
+              <div className="flex items-baseline justify-between gap-4">
+                <h2 className="font-semibold uppercase tracking-wide text-muted-foreground">
+                  What this run costs
+                </h2>
                 <p className="text-xl font-bold tabular-nums">
-                  {estimate.total.toLocaleString()}
+                  {(estimate.total > 0 ? estimate.total : setupCost).toLocaleString()}
                   <span className="ml-1.5 font-medium text-muted-foreground">credits</span>
                 </p>
               </div>
-              <ul className="space-y-1">
-                {estimate.lines.map((line) => (
-                  <li key={line.label} className="flex justify-between gap-4 text-muted-foreground">
-                    <span>{line.label}</span>
-                    <span className="tabular-nums">{line.credits.toLocaleString()}</span>
-                  </li>
-                ))}
-              </ul>
-              {missing > 0 ? (
-                <div className="flex items-center justify-between gap-3 rounded-lg bg-muted/50 p-3">
-                  <p>You need {missing.toLocaleString()} more before this will go through.</p>
-                  <Button asChild size="sm" variant="outline">
-                    <Link href="/account/credits">Add credits</Link>
-                  </Button>
-                </div>
-              ) : null}
-            </div>
-          ) : null}
 
-          <div className="flex items-center gap-3">
-            <Button onClick={run} disabled={!ready || busy} size="lg" className="h-12">
-              {busy ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Working
-                </>
+              {estimate.total > 0 ? (
+                <ul className="space-y-1">
+                  {estimate.lines.map((line) => (
+                    <li key={line.label} className="flex justify-between gap-4 text-muted-foreground">
+                      <span>{line.label}</span>
+                      <span className="tabular-nums">{line.credits.toLocaleString()}</span>
+                    </li>
+                  ))}
+                </ul>
               ) : (
-                <>
-                  <Users className="mr-2 h-4 w-4" />
-                  Issue {recipients.length > 0 ? recipients.length : ""}{" "}
-                  {recipients.length === 1 ? "ticket" : "tickets"}
-                </>
+                <p className="text-muted-foreground">
+                  Setting the ticket up costs {setupCost.toLocaleString()}. Each guest adds{" "}
+                  {eachCost.toLocaleString()}.
+                </p>
               )}
-            </Button>
-            {!account ? <span className="text-muted-foreground">Connect your wallet.</span> : null}
+
+              {balance !== undefined ? (
+                <p className="text-muted-foreground">
+                  You have {balance.toLocaleString()}.{" "}
+                  {missing > 0 ? (
+                    <Link href="/account/credits" className="text-primary hover:underline">
+                      Add {missing.toLocaleString()} more
+                    </Link>
+                  ) : (
+                    "Enough for this run."
+                  )}
+                </p>
+              ) : null}
+
+              <div className="flex flex-wrap items-center gap-3 pt-1">
+                <Button onClick={run} disabled={!ready || busy} size="lg" className="h-12">
+                  {busy ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Working
+                    </>
+                  ) : (
+                    <>
+                      <Users className="mr-2 h-4 w-4" />
+                      Issue {recipients.length > 0 ? recipients.length : ""}{" "}
+                      {recipients.length === 1 ? "ticket" : "tickets"}
+                    </>
+                  )}
+                </Button>
+                {!account ? <span className="text-muted-foreground">Connect your wallet.</span> : null}
+              </div>
+            </section>
           </div>
         </div>
-      </ServiceFormShell>
+      </div>
     </>
   );
 }
