@@ -3,7 +3,7 @@
 import { useState } from "react";
 import useSWR from "swr";
 import Link from "next/link";
-import { Key, BarChart2, Coins, Users, ArrowRight, Plus } from "lucide-react";
+import { Key, BarChart2, Coins, ArrowRight, Plus } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useWallet } from "@/src/hooks/use-wallet";
 import { usePortalAuth } from "@/src/hooks/use-portal-auth";
@@ -68,8 +68,6 @@ export function AccountDashboard({ address }: Props) {
   const [depositOpen, setDepositOpen] = useState(false);
 
   const { data: keysData } = useSWR<{ data: ApiKey[] }>(`/api/portal/keys?address=${address}`, portalFetcher);
-  const { data: provisioningData } = useSWR<{ data: unknown[] }>(`/api/portal/provisioning?address=${address}`, portalFetcher);
-  const provisioned = provisioningData?.data ?? [];
   const { data: creditsData, mutate: mutateCredits } = useSWR<CreditsData>(`/api/portal/credits?address=${address}`, portalFetcher);
 
   async function handleSignOut() {
@@ -111,7 +109,7 @@ export function AccountDashboard({ address }: Props) {
         >
           <p className="text-2xl sm:text-3xl font-bold">Launchpad</p>
           <p className="mt-2 max-w-lg text-white/80">
-            Give us a list of people. Everyone gets an account, a wallet, and the asset.
+Issue to a list of people, or tokenize what you own.
           </p>
           <span className="mt-5 inline-flex items-center text-sm font-medium">
             Start
@@ -162,15 +160,6 @@ export function AccountDashboard({ address }: Props) {
             value={topUps}
             label="Top-ups"
             subtitle="See usage metered per call, per key"
-          />
-          <StatLink
-            href="/account/provisioning"
-            icon={Users}
-            border="border-brand-purple"
-            fg="text-brand-purple"
-            value={provisioned.length}
-            label="Accounts"
-            subtitle="Provision accounts and wallets for your users"
           />
         </div>
       </div>

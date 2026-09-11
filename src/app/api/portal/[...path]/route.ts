@@ -1,14 +1,18 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getPortalSession } from "@/src/lib/portal-session";
+import { billTo } from "@/src/lib/portal/billing";
 
 const apiUrl = process.env.MEDIALANE_API_URL;
 const portalApiKey = process.env.MEDIALANE_API_KEY;
 
-async function backendFetch(subpath: string, apiKey: string, init?: RequestInit) {
-  return rawFetch(`/v1/portal/${subpath}`, apiKey, init);
+type Keys = { customer: string; portal: string };
+
+async function backendFetch(subpath: string, keys: Keys, init?: RequestInit) {
+  return rawFetch(`/v1/portal/${subpath}`, keys, init);
 }
 
-async function rawFetch(path: string, apiKey: string, init?: RequestInit) {
+async function rawFetch(path: string, keys: Keys, init?: RequestInit) {
+  const apiKey = billTo(path, init?.method ?? "GET") === "portal" ? keys.portal : keys.customer;
   const res = await fetch(`${apiUrl}${path}`, {
     ...init,
     headers: { "x-api-key": apiKey, "Content-Type": "application/json", ...(init?.headers ?? {}) },
@@ -40,11 +44,12 @@ async function route(req: NextRequest, context: { params: Promise<{ path: string
   if (path.some((seg) => seg === ".." || seg === "." || seg.includes("/"))) {
     return NextResponse.json({ error: "Invalid path" }, { status: 400 });
   }
+  const keys: Keys = { customer: session.apiKey, portal: portalApiKey ?? session.apiKey };
   const [resource, id] = path;
   if (resource === "metadata" && path[1] === "upload-file" && req.method === "POST") {
     const upstream = await fetch(`${apiUrl}/v1/metadata/upload-file`, {
       method: "POST",
-      headers: { "x-api-key": session.apiKey },
+      headers: { "x-api-key": keys.customer },
       body: await req.formData(),
     });
     const uploaded = await upstream.json().catch(() => null);
@@ -55,8 +60,8 @@ async function route(req: NextRequest, context: { params: Promise<{ path: string
 
   if (resource === "credits" && !id && req.method === "GET") {
     const [me, history] = await Promise.all([
-      backendFetch("me", session.apiKey),
-      backendFetch("credits/history", session.apiKey),
+      backendFetch("me", keys),
+      backendFetch("credits/history", keys),
     ]);
     if (me.status >= 400) return NextResponse.json(me.json ?? {}, { status: me.status });
     const balance = (me.json as { data?: { creditBalance?: number } })?.data?.creditBalance ?? 0;
@@ -65,9 +70,9 @@ async function route(req: NextRequest, context: { params: Promise<{ path: string
   }
 
   if (resource === "usage" && !id && req.method === "GET") {
-    const keys = await backendFetch("keys", session.apiKey);
-    if (keys.status >= 400) return NextResponse.json(keys.json ?? {}, { status: keys.status });
-    return NextResponse.json({ data: { keys: (keys.json as { data?: unknown[] })?.data ?? [] } });
+    const apiKeys = await backendFetch("keys", keys);
+    if (apiKeys.status >= 400) return NextResponse.json(apiKeys.json ?? {}, { status: apiKeys.status });
+    return NextResponse.json({ data: { keys: (apiKeys.json as { data?: unknown[] })?.data ?? [] } });
   }
 
   if (resource === "paymaster") {
@@ -75,7 +80,7 @@ async function route(req: NextRequest, context: { params: Promise<{ path: string
     if (rest !== "deploy/build") {
       return NextResponse.json({ error: "Not allowed through this proxy" }, { status: 403 });
     }
-    const upstream = await rawFetch(`/v1/paymaster/${rest}`, session.apiKey, {
+    const upstream = await rawFetch(`/v1/paymaster/${rest}`, keys, {
       method: req.method,
       body,
     });
@@ -83,12 +88,12 @@ async function route(req: NextRequest, context: { params: Promise<{ path: string
   }
 
   if (resource === "pricing" && req.method === "GET") {
-    const upstream = await rawFetch("/.well-known/x402", portalApiKey ?? session.apiKey);
+    const upstream = await rawFetch("/.well-known/x402", keys);
     return NextResponse.json(upstream.json ?? {}, { status: upstream.status });
   }
 
   if (resource === "prices" && req.method === "GET") {
-    const upstream = await rawFetch("/v1/prices", portalApiKey ?? session.apiKey);
+    const upstream = await rawFetch("/v1/prices", keys);
     return NextResponse.json(upstream.json ?? {}, { status: upstream.status });
   }
 
@@ -96,7 +101,7 @@ async function route(req: NextRequest, context: { params: Promise<{ path: string
     const qs = new URLSearchParams({ chain: "STARKNET", owner: session.address, limit: "100" });
     const service = req.nextUrl.searchParams.get("service");
     if (service) qs.set("service", service);
-    const upstream = await rawFetch(`/v1/collections?${qs.toString()}`, portalApiKey ?? session.apiKey);
+    const upstream = await rawFetch(`/v1/collections?${qs.toString()}`, keys);
     return NextResponse.json(upstream.json ?? {}, { status: upstream.status });
   }
 
@@ -105,7 +110,7 @@ async function route(req: NextRequest, context: { params: Promise<{ path: string
     if (rest !== "build") {
       return NextResponse.json({ error: "Not allowed through this proxy" }, { status: 403 });
     }
-    const upstream = await rawFetch("/v1/intents/build", session.apiKey, {
+    const upstream = await rawFetch("/v1/intents/build", keys, {
       method: req.method,
       body,
     });
@@ -117,7 +122,7 @@ async function route(req: NextRequest, context: { params: Promise<{ path: string
     if (rest !== "mint-calls") {
       return NextResponse.json({ error: "Not allowed through this proxy" }, { status: 403 });
     }
-    const upstream = await rawFetch("/v1/business/issuance/mint-calls", session.apiKey, {
+    const upstream = await rawFetch("/v1/business/issuance/mint-calls", keys, {
       method: req.method,
       body,
     });
@@ -129,7 +134,7 @@ async function route(req: NextRequest, context: { params: Promise<{ path: string
     if (rest !== "upload" && rest !== "upload-file") {
       return NextResponse.json({ error: "Not allowed through this proxy" }, { status: 403 });
     }
-    const upstream = await rawFetch("/v1/metadata/upload", session.apiKey, {
+    const upstream = await rawFetch("/v1/metadata/upload", keys, {
       method: req.method,
       body,
     });
@@ -140,14 +145,14 @@ async function route(req: NextRequest, context: { params: Promise<{ path: string
     const rest = path.slice(1).join("/");
     const upstream = await rawFetch(
       `/v1/business/provisioning${rest ? `/${rest}` : ""}`,
-      session.apiKey,
+      keys,
       { method: req.method, body },
     );
     return NextResponse.json(upstream.json ?? {}, { status: upstream.status });
   }
 
   const subpath = path.join("/");
-  const upstream = await backendFetch(subpath, session.apiKey, { method: req.method, body });
+  const upstream = await backendFetch(subpath, keys, { method: req.method, body });
   return NextResponse.json(upstream.json ?? {}, { status: upstream.status });
 }
 
