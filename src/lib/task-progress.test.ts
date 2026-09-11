@@ -14,4 +14,6 @@ test("an ordinary failure is not treated as out of credits", () => {
 test("the summary reads naturally for one and for many", () => {
   expect(issuedSummary(1)).toBe("Issued to 1 recipient");
   expect(issuedSummary(12)).toBe("Issued to 12 recipients");
+  expect(issuedSummary(1, "guest")).toBe("Issued to 1 guest");
+  expect(issuedSummary(12, "guest")).toBe("Issued to 12 guests");
 });

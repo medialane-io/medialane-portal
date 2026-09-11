@@ -7,6 +7,6 @@ export function isOutOfCredits(error: unknown): boolean {
   return error instanceof Error && error.message === OUT_OF_CREDITS;
 }
 
-export function issuedSummary(count: number): string {
-  return `Issued to ${count} ${count === 1 ? "recipient" : "recipients"}`;
+export function issuedSummary(count: number, noun = "recipient"): string {
+  return `Issued to ${count} ${count === 1 ? noun : `${noun}s`}`;
 }

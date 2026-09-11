@@ -4,7 +4,7 @@ import { useState } from "react";
 import useSWR from "swr";
 import Link from "next/link";
 import { useAccount } from "@starknet-react/core";
-import { CollapsibleSection } from "@medialane/ui";
+import { ServiceHeader, CollapsibleSection } from "@medialane/ui";
 import { buildAssetMetadata } from "@medialane/sdk";
 import { ArrowLeft, Check, Loader2, ShieldCheck, Ticket, Upload, Users } from "lucide-react";
 import { Button } from "@/src/components/ui/button";
@@ -135,7 +135,7 @@ export function TicketsTask({ serviceId, address }: { serviceId: string; address
     setIssued(null);
 
     try {
-      setProgress("Confirm in your wallet to begin");
+      setProgress("Confirm in your wallet");
       const signature = await account.signMessage({
         types: {
           StarknetDomain: [
@@ -155,17 +155,17 @@ export function TicketsTask({ serviceId, address }: { serviceId: string; address
       );
 
       for (const [i, recipient] of recipients.entries()) {
-        setProgress(`Preparing recipient ${i + 1} of ${recipients.length}`);
+        setProgress(`Preparing guest ${i + 1} of ${recipients.length}`);
         await provisionOne(secret, recipient, address);
       }
 
       let imageUri: string | null = null;
       if (artwork) {
-        setProgress("Uploading the artwork");
+        setProgress("Uploading artwork");
         imageUri = await uploadImage(artwork);
       }
 
-      setProgress("Preparing the ticket");
+      setProgress("Preparing ticket");
       const tokenUri = await pinMetadata(
         buildAssetMetadata({
           name,
@@ -186,7 +186,7 @@ export function TicketsTask({ serviceId, address }: { serviceId: string; address
       const made = maxSupplyFor(recipients.length, supply);
       if (!made) throw new Error("Create at least as many tickets as there are recipients.");
 
-      setProgress("Confirm the ticket in your wallet");
+      setProgress("Confirm ticket in your wallet");
       const built = await buildTicketType({
         owner: address,
         collection: group,
@@ -207,7 +207,7 @@ export function TicketsTask({ serviceId, address }: { serviceId: string; address
       );
       if (!ticketId) throw new Error("The ticket was made but its id could not be read.");
 
-      setProgress("Preparing to issue");
+      setProgress("Preparing issuance");
       const batches = await fetchMintCalls({
         service: serviceId,
         owner: address,
@@ -248,7 +248,7 @@ export function TicketsTask({ serviceId, address }: { serviceId: string; address
         detail={progress}
         error={error}
         outOfCredits={outOfCredits}
-        successLine={issued !== null ? issuedSummary(issued) : undefined}
+        successLine={issued !== null ? issuedSummary(issued, "guest") : undefined}
         onClose={() => setPhase("idle")}
       />
 
@@ -262,12 +262,13 @@ export function TicketsTask({ serviceId, address }: { serviceId: string; address
               <ArrowLeft className="h-4 w-4" />
               Launchpad
             </Link>
-            <div className="mt-2 flex items-center gap-2.5">
-              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-primary">
-                <Ticket className="h-4 w-4 text-white" />
-              </span>
-              <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">IP Tickets</h1>
-            </div>
+            <ServiceHeader
+              bare
+              className="mt-2"
+              icon={<Ticket className="h-4 w-4 text-white" />}
+              title="IP Tickets"
+              subtitle="Create a ticket and issue it to a guest list."
+            />
           </div>
           <p className="text-muted-foreground">
             {validitySentence(validFrom, validUntil)}
@@ -280,9 +281,7 @@ export function TicketsTask({ serviceId, address }: { serviceId: string; address
         <div className="grid gap-x-10 gap-y-10 pt-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
           <div className="space-y-8">
             <section className="space-y-4">
-              <h2 className="font-semibold uppercase tracking-wide text-muted-foreground">
-                The ticket
-              </h2>
+              <h2 className="font-semibold">Ticket</h2>
 
               <div className="grid gap-4 sm:grid-cols-[auto_minmax(0,1fr)]">
                 <label
@@ -321,7 +320,7 @@ export function TicketsTask({ serviceId, address }: { serviceId: string; address
                   <Textarea
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
-                    placeholder="What it admits you to, when and where, and anything a holder should know…"
+                    placeholder="What it admits, when, and where"
                     rows={3}
                     disabled={busy}
                   />
@@ -331,9 +330,7 @@ export function TicketsTask({ serviceId, address }: { serviceId: string; address
             </section>
 
             <section className="space-y-4">
-              <h2 className="font-semibold uppercase tracking-wide text-muted-foreground">
-                When it is valid
-              </h2>
+              <h2 className="font-semibold">Validity</h2>
 
               <div className="grid gap-3 sm:grid-cols-2">
                 <div className="space-y-1.5">
@@ -361,15 +358,13 @@ export function TicketsTask({ serviceId, address }: { serviceId: string; address
                 <p className="text-destructive">{windowError}</p>
               ) : (
                 <p className="text-muted-foreground">
-                  {validitySentence(validFrom, validUntil)}. Leave both empty and it stays valid.
+                  {validitySentence(validFrom, validUntil)}.
                 </p>
               )}
             </section>
 
             <section className="space-y-4">
-              <h2 className="font-semibold uppercase tracking-wide text-muted-foreground">
-                How many exist
-              </h2>
+              <h2 className="font-semibold">Supply</h2>
 
               <div className="grid gap-3 sm:grid-cols-[10rem_minmax(0,1fr)] sm:items-center">
                 <Input
@@ -383,7 +378,7 @@ export function TicketsTask({ serviceId, address }: { serviceId: string; address
                 />
                 {!hasRun ? (
                   <p className="text-muted-foreground">
-                    Leave it empty to make exactly as many as there are guests.
+                    Empty matches the guest list.
                   </p>
                 ) : room.shortBy > 0 ? (
                   <p className="text-destructive">
@@ -407,7 +402,7 @@ export function TicketsTask({ serviceId, address }: { serviceId: string; address
               hint="Optional"
             >
               <p className="text-muted-foreground">
-                Tickets are assets, so they can be traded and collected. These terms travel with them.
+                Tickets are tradable assets. These terms travel with them.
               </p>
 
               <div className="grid gap-4 sm:grid-cols-2">
@@ -446,9 +441,7 @@ export function TicketsTask({ serviceId, address }: { serviceId: string; address
           <div className="space-y-8">
             <section className="space-y-4">
               <div className="flex items-baseline justify-between gap-4">
-                <h2 className="font-semibold uppercase tracking-wide text-muted-foreground">
-                  Guest list
-                </h2>
+                <h2 className="font-semibold">Guest list</h2>
                 <p className="text-muted-foreground">
                   {rows.length.toLocaleString()} {rows.length === 1 ? "guest" : "guests"}
                   {repeats > 0 ? ` · ${repeats} repeated` : ""}
@@ -492,9 +485,7 @@ export function TicketsTask({ serviceId, address }: { serviceId: string; address
 
             <section className="space-y-4 border-t border-border pt-6">
               <div className="flex items-baseline justify-between gap-4">
-                <h2 className="font-semibold uppercase tracking-wide text-muted-foreground">
-                  {hasRun ? "What this run costs" : "What a run costs"}
-                </h2>
+                <h2 className="font-semibold">Cost</h2>
                 {hasRun ? (
                   <p className="text-xl font-bold tabular-nums">
                     {estimate.total.toLocaleString()}
@@ -514,8 +505,7 @@ export function TicketsTask({ serviceId, address }: { serviceId: string; address
                 </ul>
               ) : (
                 <p className="text-muted-foreground">
-                  Setting the ticket up costs {setupCost.toLocaleString()}. Each guest adds{" "}
-                  {eachCost.toLocaleString()}.
+                  Setup {setupCost.toLocaleString()}, then {eachCost.toLocaleString()} per guest.
                 </p>
               )}
 

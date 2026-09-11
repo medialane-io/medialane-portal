@@ -123,12 +123,12 @@ export function CollectionPicker({
   const dialog = (
     <TaskDialog
       open={phase !== "idle"}
-      title="Creating your collection"
+      title={copy.create}
       phase={phase}
       detail={detail}
       error={error}
       outOfCredits={outOfCredits}
-      successLine="Your collection is ready"
+      successLine="Ready"
       onClose={() => setPhase("idle")}
     />
   );
@@ -252,7 +252,7 @@ export function CollectionPicker({
           <div className="min-w-0">
             <p className="font-semibold">{copy.create}</p>
             <p className="truncate text-muted-foreground">
-              {collections.length === 0 ? copy.empty : "Keep things separate"}
+              {collections.length === 0 ? copy.empty : copy.hint}
             </p>
           </div>
         </button>

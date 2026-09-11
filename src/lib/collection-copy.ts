@@ -11,17 +11,17 @@ export interface CollectionCopy {
 export function collectionCopy(serviceId: string): CollectionCopy {
   if (isTicketService(serviceId)) {
     return {
-      label: "Where these tickets go",
-      hint: "One for each event, or one for everything. However you like to organise them.",
-      empty: "Make a place to keep your tickets.",
+      label: "Group",
+      hint: "One per event, or one for everything.",
+      empty: "No groups yet",
       create: "New group",
       countOf: (n) => (n === 0 ? "Nothing issued yet" : `${n.toLocaleString()} issued`),
     };
   }
   return {
-    label: "Where this goes",
-    hint: "Group your work however suits you.",
-    empty: "Make a place to keep your work.",
+    label: "Collection",
+    hint: "One per project, or one for everything.",
+    empty: "No collections yet",
     create: "New collection",
     countOf: (n) => (n === 0 ? "Nothing in it yet" : `${n.toLocaleString()} ${n === 1 ? "item" : "items"}`),
   };

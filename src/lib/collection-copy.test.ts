@@ -3,12 +3,12 @@ import { collectionCopy } from "./collection-copy";
 
 test("tickets are organised, not collected", () => {
   const copy = collectionCopy("ip-tickets");
-  expect(copy.label).toBe("Where these tickets go");
+  expect(copy.label).toBe("Group");
   expect(copy.create).toBe("New group");
 });
 
 test("the hint leaves the structure to the business", () => {
-  expect(collectionCopy("ip-tickets").hint).toContain("However you like");
+  expect(collectionCopy("ip-tickets").hint).toBe("One per event, or one for everything.");
 });
 
 test("counts read as what has been issued", () => {
@@ -19,7 +19,7 @@ test("counts read as what has been issued", () => {
 
 test("other services keep their own wording", () => {
   const copy = collectionCopy("data-tokenization-erc721");
-  expect(copy.label).toBe("Where this goes");
+  expect(copy.label).toBe("Collection");
   expect(copy.countOf(1)).toBe("1 item");
   expect(copy.countOf(3)).toBe("3 items");
 });
