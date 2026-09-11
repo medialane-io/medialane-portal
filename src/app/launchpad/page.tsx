@@ -4,6 +4,7 @@ import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { usePortalAuth } from "@/src/hooks/use-portal-auth";
 import { launchpadServices } from "@/src/lib/services";
+import { PriceCalculator } from "@/src/components/portal/price-calculator";
 
 export default function LaunchpadPage() {
   const { session, isLoading } = usePortalAuth();
@@ -29,6 +30,10 @@ export default function LaunchpadPage() {
           Pick what you are issuing. You give a list of people, everyone gets an account,
           a wallet, and the asset.
         </p>
+      </div>
+
+      <div className="mb-10">
+        <PriceCalculator />
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">

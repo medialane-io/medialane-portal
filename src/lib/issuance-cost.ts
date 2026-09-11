@@ -59,3 +59,28 @@ export function shortfall(total: number, balance: number | undefined): number {
   if (balance === undefined) return 0;
   return Math.max(0, total - balance);
 }
+
+export function dollarsFor(credits: number, creditsPerUsdc: number): number {
+  if (creditsPerUsdc <= 0) return 0;
+  return credits / creditsPerUsdc;
+}
+
+export function formatDollars(amount: number): string {
+  if (amount === 0) return "$0";
+  if (amount < 0.01) return "under $0.01";
+  return `$${amount.toFixed(2)}`;
+}
+
+export function perRecipientCost(pricing: PricingTable | undefined, service: string): number {
+  if (!pricing) return 0;
+  return costOf(pricing, "wallet:deploy");
+}
+
+export function fixedCost(
+  pricing: PricingTable | undefined,
+  input: { hasImage: boolean; service: string },
+): number {
+  const { lines } = estimateIssuance(pricing, { recipients: 1, ...input });
+  const perRecipient = perRecipientCost(pricing, input.service);
+  return lines.reduce((sum, l) => sum + l.credits, 0) - perRecipient;
+}
