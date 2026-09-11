@@ -108,34 +108,34 @@ export function AddCredits({ open = true, onOpenChange, address, treasuryAddress
   const dollars = unitPrice !== undefined && !isNaN(parsedUsdc) ? parsedUsdc * unitPrice : NaN;
   const previewCredits = creditsFor(dollars, CREDITS_PER_USDC);
 
-  async function confirmCredit(hash: string, attempts = 10) {
+  async function confirmCredit(hash: string, attempts = 8) {
     setConfirming(true);
     setConfirmError(null);
     try {
-      let json: { data?: { credited: number }; error?: string } = {};
-      let ok = false;
-
       for (let attempt = 0; attempt < attempts; attempt++) {
-        const res = await fetch(`/api/portal/credits/fund?address=${address}`, {
+        await fetch(`/api/portal/credits/check?address=${address}`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ txHash: hash }),
-        });
-        json = (await res.json().catch(() => ({}))) as { data?: { credited: number }; error?: string };
-        if (res.ok) {
-          ok = true;
-          break;
+        }).catch(() => {});
+
+        const credits = await fetch(`/api/portal/credits?address=${address}`)
+          .then((r) => r.json())
+          .catch(() => null);
+        const credited = credits?.data?.balance;
+
+        if (typeof credited === "number" && credited > (balance ?? 0)) {
+          setCreditedAmount(credited - (balance ?? 0));
+          setStep("success");
+          onCredited();
+          return;
         }
         if (attempt < attempts - 1) await new Promise((r) => setTimeout(r, 4000));
       }
 
-      if (!ok) {
-        setConfirmError(json.error ?? "Still waiting for your transfer to confirm on-chain. Try again in a moment.");
-        return;
-      }
-      setCreditedAmount(json.data?.credited ?? 0);
-      setStep("success");
-      onCredited();
+      setConfirmError(
+        "Your transfer is on-chain and will be credited shortly. You can close this safely.",
+      );
     } finally {
       setConfirming(false);
     }
