@@ -35,8 +35,6 @@ import { issuedSummary, OUT_OF_CREDITS, type TaskPhase } from "@/src/lib/task-pr
 import {
   estimateIssuance,
   shortfall,
-  fixedCost,
-  perRecipientCost,
   type PricingTable,
 } from "@/src/lib/issuance-cost";
 import { capacity, guestRows, repeatsIn, validitySentence } from "@/src/lib/ticket-event";
@@ -104,11 +102,6 @@ export function TicketsTask({ serviceId, address }: { serviceId: string; address
   const hasRun = recipients.length > 0;
   const rows = guestRows(guests);
   const repeats = repeatsIn(guests);
-  const setupCost = fixedCost(pricingData?.pricing, {
-    hasImage: Boolean(artwork),
-    service: serviceId,
-  });
-  const eachCost = perRecipientCost(pricingData?.pricing, serviceId);
 
   function chooseArtwork(file: File | undefined) {
     if (!file) return;
@@ -283,9 +276,9 @@ export function TicketsTask({ serviceId, address }: { serviceId: string; address
             <section className="space-y-4">
               <h2 className="font-semibold">Ticket</h2>
 
-              <div className="grid gap-4 sm:grid-cols-[auto_minmax(0,1fr)]">
+              <Field label="Artwork" align="start">
                 <label
-                  className="flex h-32 w-full cursor-pointer items-center justify-center rounded-xl bg-foreground/[0.04] transition-colors hover:bg-foreground/[0.07] sm:w-32"
+                  className="flex h-32 w-32 cursor-pointer items-center justify-center rounded-xl bg-foreground/[0.04] transition-colors hover:bg-foreground/[0.07]"
                   onDragOver={(e) => e.preventDefault()}
                   onDrop={(e) => {
                     e.preventDefault();
@@ -309,32 +302,35 @@ export function TicketsTask({ serviceId, address }: { serviceId: string; address
                   )}
                 </label>
 
-                <div className="space-y-3">
-                  <Input
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    placeholder="General admission"
-                    className="h-11"
-                    disabled={busy}
-                  />
-                  <Textarea
-                    value={description}
-                    onChange={(e) => setDescription(e.target.value)}
-                    placeholder="What it admits, when, and where"
-                    rows={3}
-                    disabled={busy}
-                  />
-                </div>
-              </div>
+              </Field>
+
+              <Field label="Name">
+                <Input
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder="General admission"
+                  className="h-11"
+                  disabled={busy}
+                />
+              </Field>
+
+              <Field label="Description" align="start">
+                <Textarea
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                  placeholder="What it admits, when, and where"
+                  rows={3}
+                  disabled={busy}
+                />
+              </Field>
               {artworkError ? <p className="text-destructive">{artworkError}</p> : null}
             </section>
 
             <section className="space-y-4">
               <h2 className="font-semibold">Validity</h2>
 
-              <div className="grid gap-3 sm:grid-cols-2">
-                <div className="space-y-1.5">
-                  <Label>From</Label>
+              <div className="space-y-3">
+                <Field label="From">
                   <Input
                     type="datetime-local"
                     value={validFrom}
@@ -342,9 +338,8 @@ export function TicketsTask({ serviceId, address }: { serviceId: string; address
                     className="h-11"
                     disabled={busy}
                   />
-                </div>
-                <div className="space-y-1.5">
-                  <Label>Until</Label>
+                </Field>
+                <Field label="Until">
                   <Input
                     type="datetime-local"
                     value={validUntil}
@@ -352,7 +347,7 @@ export function TicketsTask({ serviceId, address }: { serviceId: string; address
                     className="h-11"
                     disabled={busy}
                   />
-                </div>
+                </Field>
               </div>
               {windowError ? (
                 <p className="text-destructive">{windowError}</p>
@@ -366,7 +361,7 @@ export function TicketsTask({ serviceId, address }: { serviceId: string; address
             <section className="space-y-4">
               <h2 className="font-semibold">Supply</h2>
 
-              <div className="grid gap-3 sm:grid-cols-[10rem_minmax(0,1fr)] sm:items-center">
+              <Field label="How many">
                 <Input
                   type="number"
                   min={recipients.length || 1}
@@ -376,6 +371,8 @@ export function TicketsTask({ serviceId, address }: { serviceId: string; address
                   className="h-11"
                   disabled={busy}
                 />
+              </Field>
+              <div>
                 {!hasRun ? (
                   <p className="text-muted-foreground">
                     Empty matches the guest list.
@@ -474,7 +471,9 @@ export function TicketsTask({ serviceId, address }: { serviceId: string; address
             </section>
 
             <section className="space-y-4">
+              <h2 className="font-semibold">Group</h2>
               <CollectionPicker
+                hideLabel
                 serviceId={serviceId}
                 owner={address}
                 value={group}
@@ -483,43 +482,31 @@ export function TicketsTask({ serviceId, address }: { serviceId: string; address
               />
             </section>
 
-            <section className="space-y-4 border-t border-border pt-6">
+            <section className="space-y-4">
               <div className="flex items-baseline justify-between gap-4">
                 <h2 className="font-semibold">Cost</h2>
-                {hasRun ? (
-                  <p className="text-xl font-bold tabular-nums">
-                    {estimate.total.toLocaleString()}
-                    <span className="ml-1.5 font-medium text-muted-foreground">credits</span>
+                {balance !== undefined ? (
+                  <p className="text-muted-foreground">
+                    {balance.toLocaleString()} available
                   </p>
                 ) : null}
               </div>
 
-              {estimate.total > 0 ? (
-                <ul className="space-y-1">
-                  {estimate.lines.map((line) => (
-                    <li key={line.label} className="flex justify-between gap-4 text-muted-foreground">
-                      <span>{line.label}</span>
-                      <span className="tabular-nums">{line.credits.toLocaleString()}</span>
-                    </li>
-                  ))}
-                </ul>
-              ) : (
-                <p className="text-muted-foreground">
-                  Setup {setupCost.toLocaleString()}, then {eachCost.toLocaleString()} per guest.
-                </p>
-              )}
-
-              {balance !== undefined ? (
-                <p className="text-muted-foreground">
-                  You have {balance.toLocaleString()}.{" "}
+              {hasRun ? (
+                <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+                  <p className="text-4xl font-bold tabular-nums">
+                    {estimate.total.toLocaleString()}
+                  </p>
+                  <p className="text-muted-foreground">
+                    credits to issue {room.issuingNow.toLocaleString()}{" "}
+                    {room.issuingNow === 1 ? "ticket" : "tickets"}
+                  </p>
                   {missing > 0 ? (
                     <Link href="/account/credits" className="text-primary hover:underline">
                       Add {missing.toLocaleString()} more
                     </Link>
-                  ) : hasRun ? (
-                    "Enough for this run."
                   ) : null}
-                </p>
+                </div>
               ) : null}
 
               <div className="flex flex-wrap items-center gap-3 pt-1">
@@ -544,6 +531,27 @@ export function TicketsTask({ serviceId, address }: { serviceId: string; address
         </div>
       </div>
     </>
+  );
+}
+
+function Field({
+  label,
+  children,
+  align = "center",
+}: {
+  label: string;
+  children: React.ReactNode;
+  align?: "center" | "start";
+}) {
+  return (
+    <div
+      className={`grid gap-1.5 sm:grid-cols-[7rem_minmax(0,1fr)] sm:gap-4 ${
+        align === "center" ? "sm:items-center" : "sm:items-start"
+      }`}
+    >
+      <Label className={align === "start" ? "sm:pt-2.5" : undefined}>{label}</Label>
+      {children}
+    </div>
   );
 }
 

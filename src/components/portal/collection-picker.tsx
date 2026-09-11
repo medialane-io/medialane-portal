@@ -39,12 +39,14 @@ export function CollectionPicker({
   value,
   onChange,
   disabled,
+  hideLabel,
 }: {
   serviceId: string;
   owner: string;
   value: string;
   onChange: (collectionId: string) => void;
   disabled?: boolean;
+  hideLabel?: boolean;
 }) {
   const { account } = useAccount();
   const copy = collectionCopy(serviceId);
@@ -136,7 +138,7 @@ export function CollectionPicker({
   if (isLoading) {
     return (
       <div className="space-y-2">
-        <Label>{copy.label}</Label>
+        {hideLabel ? null : <Label>{copy.label}</Label>}
         <div className="grid gap-3 sm:grid-cols-2">
           <Skeleton className="h-20 rounded-xl" />
           <Skeleton className="h-20 rounded-xl" />
@@ -148,7 +150,7 @@ export function CollectionPicker({
   if (loadError) {
     return (
       <div className="space-y-2">
-        <Label>{copy.label}</Label>
+        {hideLabel ? null : <Label>{copy.label}</Label>}
         <div className="rounded-xl border border-destructive/30 bg-destructive/5 p-4 space-y-3">
           <p className="text-destructive">
             {loadError instanceof Error ? loadError.message : "Could not load these."}
@@ -213,7 +215,7 @@ export function CollectionPicker({
   return (
     <div className="space-y-2">
       {dialog}
-      <Label>{copy.label}</Label>
+      {hideLabel ? null : <Label>{copy.label}</Label>}
 
       <div className="grid gap-3 sm:grid-cols-2">
         {collections.map((c) => {
