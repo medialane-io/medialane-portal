@@ -10,6 +10,8 @@ const pricing: PricingTable = {
     { actionKey: "metadata:upload-json", chain: "ALL", service: "ALL", credits: 5 },
     { actionKey: "intent:create-tier", chain: "ALL", service: "ip-club", credits: 50 },
     { actionKey: "intent:create-tier", chain: "ALL", service: "ip-tickets", credits: 50 },
+    { actionKey: "paymaster:invoke-build", chain: "ALL", service: "ALL", credits: 1 },
+    { actionKey: "paymaster:invoke-execute", chain: "ALL", service: "ALL", credits: 5 },
   ],
 };
 
@@ -27,21 +29,21 @@ test("no pricing yet costs nothing rather than guessing", () => {
 
 test("a single recipient with an image is itemised", () => {
   const { lines, total } = estimateIssuance(pricing, { recipients: 1, hasImage: true, service: "x" });
-  expect(lines.map((l) => l.credits)).toEqual([10, 15, 5, 1]);
-  expect(total).toBe(31);
+  expect(lines.map((l) => l.credits)).toEqual([10, 15, 5, 1, 6]);
+  expect(total).toBe(37);
 });
 
 test("without an image the storage line disappears", () => {
   const { lines, total } = estimateIssuance(pricing, { recipients: 1, hasImage: false, service: "x" });
-  expect(lines.length).toBe(3);
-  expect(total).toBe(16);
+  expect(lines.length).toBe(4);
+  expect(total).toBe(22);
 });
 
 test("cost grows with the number of recipients", () => {
   const ten = estimateIssuance(pricing, { recipients: 10, hasImage: true, service: "x" });
   const hundred = estimateIssuance(pricing, { recipients: 100, hasImage: true, service: "x" });
-  expect(ten.total).toBe(121);
-  expect(hundred.total).toBe(1021);
+  expect(ten.total).toBe(127);
+  expect(hundred.total).toBe(1045);
 });
 
 test("the recipient line reads naturally for one and for many", () => {
@@ -75,7 +77,7 @@ test("an unknown balance is not reported as a shortfall", () => {
 test("issuing tickets includes creating the ticket itself", () => {
   const { lines, total } = estimateIssuance(pricing, { recipients: 2, hasImage: false, service: "ip-tickets" });
   expect(lines.map((l) => l.label)).toContain("Create the ticket");
-  expect(total).toBe(20 + 5 + 50 + 1);
+  expect(total).toBe(20 + 5 + 50 + 1 + 12);
 });
 
 test("tokenizing data has no ticket to create", () => {
@@ -103,6 +105,18 @@ test("the cost of one more recipient is separable from the rest", () => {
 });
 
 test("what a run costs before anyone is added is separable", () => {
-  expect(fixedCost(pricing, { hasImage: true, service: "ip-tickets" })).toBe(15 + 5 + 50 + 1);
-  expect(fixedCost(pricing, { hasImage: false, service: "data-tokenization-erc721" })).toBe(5 + 1);
+  expect(fixedCost(pricing, { hasImage: true, service: "ip-tickets" })).toBe(15 + 5 + 50 + 1 + 12);
+  expect(fixedCost(pricing, { hasImage: false, service: "data-tokenization-erc721" })).toBe(5 + 1 + 6);
+});
+
+test("gas is charged per transaction, and mints batch at twenty five", () => {
+  const one = estimateIssuance(pricing, { recipients: 25, hasImage: false, service: "x" });
+  const two = estimateIssuance(pricing, { recipients: 26, hasImage: false, service: "x" });
+  expect(one.lines.at(-1)).toEqual({ label: "Cover gas on 1 transaction", credits: 6 });
+  expect(two.lines.at(-1)).toEqual({ label: "Cover gas on 2 transactions", credits: 12 });
+});
+
+test("a ticket run pays gas for creating the ticket as well as the mints", () => {
+  const { lines } = estimateIssuance(pricing, { recipients: 25, hasImage: false, service: "ip-tickets" });
+  expect(lines.at(-1)).toEqual({ label: "Cover gas on 2 transactions", credits: 12 });
 });

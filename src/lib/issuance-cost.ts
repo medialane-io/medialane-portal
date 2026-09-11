@@ -15,6 +15,14 @@ export interface CostLine {
   credits: number;
 }
 
+export const MINT_BATCH_SIZE = 25;
+
+export function sponsoredCost(pricing: PricingTable | undefined, transactions: number): number {
+  if (!pricing || transactions < 1) return 0;
+  const perTx = costOf(pricing, "paymaster:invoke-build") + costOf(pricing, "paymaster:invoke-execute");
+  return perTx * transactions;
+}
+
 export function costOf(pricing: PricingTable | undefined, actionKey: string, service?: string): number {
   if (!pricing) return 0;
   const forService = pricing.rules.find((r) => r.actionKey === actionKey && r.service === service);
@@ -51,6 +59,13 @@ export function estimateIssuance(
   }
 
   lines.push({ label: "Prepare the issuance", credits: costOf(pricing, "read") });
+
+  const batches = Math.ceil(input.recipients / MINT_BATCH_SIZE);
+  const transactions = batches + (input.service === "ip-tickets" ? 1 : 0);
+  lines.push({
+    label: `Cover gas on ${transactions} ${transactions === 1 ? "transaction" : "transactions"}`,
+    credits: sponsoredCost(pricing, transactions),
+  });
 
   return { lines, total: lines.reduce((sum, l) => sum + l.credits, 0) };
 }

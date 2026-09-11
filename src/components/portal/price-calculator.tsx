@@ -54,7 +54,7 @@ export function PriceCalculator() {
       <div>
         <h2 className="text-lg font-semibold">What a run costs</h2>
         <p className="text-muted-foreground">
-          Credits are spent per action. Work out a run before you start one.
+          Credits cover every step, gas included. Work out a run before you start one.
         </p>
       </div>
 
