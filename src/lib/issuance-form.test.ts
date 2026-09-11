@@ -8,6 +8,8 @@ import {
   termsSummary,
   creditsFor,
   CREDIT_PRESETS,
+  isTicketService,
+  maxSupplyFor,
 } from "./issuance-form";
 
 function valid(overrides: Record<string, unknown> = {}) {
@@ -101,4 +103,33 @@ test("a meaningless amount buys nothing", () => {
 
 test("the presets climb", () => {
   expect([...CREDIT_PRESETS]).toEqual([...CREDIT_PRESETS].sort((a, b) => a - b));
+});
+
+test("tickets are recognised as their own kind of issuance", () => {
+  expect(isTicketService("ip-tickets")).toBe(true);
+  expect(isTicketService("data-tokenization-erc721")).toBe(false);
+});
+
+test("leaving the supply blank issues exactly as many as there are recipients", () => {
+  expect(maxSupplyFor(12, "")).toBe("12");
+});
+
+test("a larger supply than the list is allowed, leaving room to issue more later", () => {
+  expect(maxSupplyFor(12, "500")).toBe("500");
+});
+
+test("a supply smaller than the list is refused", () => {
+  expect(maxSupplyFor(12, "5")).toBeNull();
+});
+
+test("a supply equal to the list is fine", () => {
+  expect(maxSupplyFor(12, "12")).toBe("12");
+});
+
+test("a nonsense supply is refused", () => {
+  expect(maxSupplyFor(12, "lots")).toBeNull();
+});
+
+test("no recipients and no supply means nothing to issue", () => {
+  expect(maxSupplyFor(0, "")).toBeNull();
 });

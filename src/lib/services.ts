@@ -1,6 +1,6 @@
 import { listServices, getService, type ServiceDefinition } from "@medialane/sdk";
 
-const LAUNCHPAD_SERVICES = new Set(["data-tokenization-erc721"]);
+const LAUNCHPAD_SERVICES = new Set(["data-tokenization-erc721", "ip-tickets"]);
 
 export function isLaunchpadService(service: ServiceDefinition): boolean {
   return LAUNCHPAD_SERVICES.has(service.id) && service.capabilities.includes("mint");

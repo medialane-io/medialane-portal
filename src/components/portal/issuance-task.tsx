@@ -16,6 +16,7 @@ import {
   Upload,
   Users,
   Layers,
+  Ticket,
 } from "lucide-react";
 import { Button } from "@/src/components/ui/button";
 import { Input } from "@/src/components/ui/input";
@@ -31,6 +32,7 @@ import {
 import { CollectionPicker } from "@/src/components/portal/collection-picker";
 import { TaskDialog } from "@/src/components/portal/task-dialog";
 import { portalFetcher } from "@/src/lib/portal/fetcher";
+import { ticketIdFromReceipt } from "@/src/lib/ticket-events";
 import { estimateIssuance, shortfall, type PricingTable } from "@/src/lib/issuance-cost";
 import { issuedSummary, OUT_OF_CREDITS, type TaskPhase } from "@/src/lib/task-progress";
 import {
@@ -51,6 +53,8 @@ import {
   TERRITORIES,
   IP_TYPES,
   termsSummary,
+  isTicketService,
+  maxSupplyFor,
   type IssuanceValues,
 } from "@/src/lib/issuance-form";
 
@@ -75,6 +79,8 @@ export function IssuanceTask({ serviceId, address }: { serviceId: string; addres
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [termsOpen, setTermsOpen] = useState(false);
   const [detailsOpen, setDetailsOpen] = useState(false);
+  const [maxSupply, setMaxSupply] = useState("");
+  const isTickets = isTicketService(serviceId);
 
   const set = <K extends keyof IssuanceValues>(key: K, value: IssuanceValues[K]) =>
     setValues((v) => ({ ...v, [key]: value }));
@@ -180,12 +186,35 @@ export function IssuanceTask({ serviceId, address }: { serviceId: string; addres
       const tokenUri = await pinMetadata(metadata);
 
       setProgress("Preparing the issuance");
+      let mintInput: Record<string, unknown> = { tokenUri, collectionId: values.collectionId };
+
+      if (isTickets) {
+        const supply = maxSupplyFor(recipients.length, maxSupply);
+        if (!supply) throw new Error("Set how many tickets exist, at least as many as recipients.");
+
+        setProgress("Confirm the ticket in your wallet");
+        const built = await buildTicketType({
+          owner: address,
+          collection: values.collectionId,
+          maxSupply: supply,
+          royaltyBps: Math.round(values.royalty * 100),
+          metadataUri: tokenUri,
+        });
+        const tx = await account.execute(built.calls);
+        const receipt = await account.waitForTransaction(tx.transaction_hash);
+        const ticketId = ticketIdFromReceipt(
+          (receipt as { events?: { from_address?: string; keys?: string[] }[] }).events,
+          values.collectionId,
+        );
+        if (!ticketId) throw new Error("The ticket was created but its id could not be read.");
+        mintInput = { collectionContract: values.collectionId, tokenId: ticketId, amount: "1" };
+      }
+
       const batches = await fetchMintCalls({
         service: serviceId,
         owner: address,
         recipients: recipients.map((r) => r.value),
-        tokenUri,
-        collectionId: values.collectionId,
+        ...mintInput,
       });
 
       for (const [index, batch] of batches.entries()) {
@@ -223,9 +252,13 @@ export function IssuanceTask({ serviceId, address }: { serviceId: string; addres
         onClose={() => setPhase("idle")}
       />
     <ServiceFormShell
-      icon={<Database className="h-4 w-4 text-white" />}
-      title="Data Tokenization"
-      subtitle="Establish verifiable ownership of your data, with licensing terms that hold up wherever it travels."
+      icon={isTickets ? <Ticket className="h-4 w-4 text-white" /> : <Database className="h-4 w-4 text-white" />}
+      title={isTickets ? "IP Tickets" : "Data Tokenization"}
+      subtitle={
+        isTickets
+          ? "Create a ticket and give it to everyone on your list. Each one is theirs, and it can be redeemed or passed on."
+          : "Establish verifiable ownership of your data, with licensing terms that hold up wherever it travels."
+      }
       backSlot={
         <Link
           href="/launchpad"
@@ -240,7 +273,7 @@ export function IssuanceTask({ serviceId, address }: { serviceId: string; addres
           <MedialaneCollectionCard
             image={imagePreview}
             name={values.name || "Untitled"}
-            collection="Data Tokenization"
+            collection={isTickets ? "IP Tickets" : "Data Tokenization"}
             creator={short(address)}
           />
           <ClaimRail
@@ -317,14 +350,31 @@ export function IssuanceTask({ serviceId, address }: { serviceId: string; addres
             {imageError ? <p className="text-sm text-destructive">{imageError}</p> : null}
           </div>
 
-          <Field label="Name" required error={fieldErrors.name}>
+          <Field label={isTickets ? "Ticket name" : "Name"} required error={fieldErrors.name}>
             <Input
               value={values.name}
               onChange={(e) => set("name", e.target.value)}
-              placeholder="Q3 research dataset"
+              placeholder={isTickets ? "General admission" : "Q3 research dataset"}
               disabled={busy}
             />
           </Field>
+
+          {isTickets ? (
+            <Field label="How many exist">
+              <Input
+                type="number"
+                min={recipients.length || 1}
+                value={maxSupply}
+                onChange={(e) => setMaxSupply(e.target.value)}
+                placeholder={recipients.length ? String(recipients.length) : "100"}
+                disabled={busy}
+              />
+              <p className="text-muted-foreground">
+                Leave this empty to create exactly as many as there are recipients. A larger number
+                leaves room to issue more of the same ticket later.
+              </p>
+            </Field>
+          ) : null}
 
           <Field label="Description" error={fieldErrors.description}>
             <Textarea
@@ -624,12 +674,33 @@ async function pinMetadata(metadata: unknown): Promise<string> {
   return body.data.url as string;
 }
 
+async function buildTicketType(input: {
+  owner: string;
+  collection: string;
+  maxSupply: string;
+  royaltyBps: number;
+  metadataUri: string;
+}): Promise<{ calls: Call[] }> {
+  const res = await fetch("/api/portal/intents/build", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ type: "CREATE_TIER", service: "ip-tickets", ...input }),
+  });
+  const body = await res.json().catch(() => ({}));
+  if (res.status === 402) throw new Error(OUT_OF_CREDITS);
+  if (!res.ok) throw new Error(body?.error ?? "Could not prepare the ticket");
+  return { calls: body.data.calls as Call[] };
+}
+
 async function fetchMintCalls(input: {
   service: string;
   owner: string;
   recipients: string[];
-  tokenUri: string;
-  collectionId: string;
+  tokenUri?: string;
+  collectionId?: string;
+  collectionContract?: string;
+  tokenId?: string;
+  amount?: string;
 }): Promise<Call[][]> {
   const res = await fetch("/api/portal/issuance/mint-calls", {
     method: "POST",

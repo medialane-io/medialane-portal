@@ -92,3 +92,18 @@ export function creditsFor(usdc: number, creditsPerUsdc: number): number | null 
   if (!Number.isFinite(usdc) || usdc <= 0) return null;
   return Math.floor(usdc * creditsPerUsdc);
 }
+
+export const TICKETS_SERVICE = "ip-tickets";
+
+export function isTicketService(serviceId: string): boolean {
+  return serviceId === TICKETS_SERVICE;
+}
+
+export function maxSupplyFor(recipients: number, entered: string): string | null {
+  const trimmed = entered.trim();
+  if (!trimmed) return recipients > 0 ? String(recipients) : null;
+  if (!/^\d+$/.test(trimmed)) return null;
+  const n = Number(trimmed);
+  if (n < recipients) return null;
+  return String(n);
+}

@@ -2,8 +2,8 @@ import { test, expect } from "bun:test";
 import { launchpadServices, launchpadService, isLaunchpadService } from "./services";
 import { getService } from "@medialane/sdk";
 
-test("the Launchpad offers Data Tokenization", () => {
-  expect(launchpadServices().map((s) => s.id)).toEqual(["data-tokenization-erc721"]);
+test("the Launchpad offers Data Tokenization and IP Tickets", () => {
+  expect(launchpadServices().map((s) => s.id).sort()).toEqual(["data-tokenization-erc721", "ip-tickets"]);
 });
 
 test("it is presented under its business name", () => {
@@ -21,7 +21,7 @@ test("it runs on its own factory, separate from IP Collection", () => {
 });
 
 test("services built for the other apps stay out of the portal", () => {
-  for (const id of ["mip-erc721", "ip-erc721", "ip-tickets", "ip-club", "pop-protocol"]) {
+  for (const id of ["mip-erc721", "ip-erc721", "ip-club", "pop-protocol"]) {
     expect(launchpadService(id)).toBeUndefined();
   }
 });
