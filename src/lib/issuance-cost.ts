@@ -42,6 +42,14 @@ export function estimateIssuance(
   }
 
   lines.push({ label: "Store the details", credits: costOf(pricing, "metadata:upload-json") });
+
+  if (input.service === "ip-tickets") {
+    lines.push({
+      label: "Create the ticket",
+      credits: costOf(pricing, "intent:create-tier", "ip-tickets"),
+    });
+  }
+
   lines.push({ label: "Prepare the issuance", credits: costOf(pricing, "read") });
 
   return { lines, total: lines.reduce((sum, l) => sum + l.credits, 0) };

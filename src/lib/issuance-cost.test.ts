@@ -9,6 +9,7 @@ const pricing: PricingTable = {
     { actionKey: "metadata:upload-file", chain: "ALL", service: "ALL", credits: 15 },
     { actionKey: "metadata:upload-json", chain: "ALL", service: "ALL", credits: 5 },
     { actionKey: "intent:create-tier", chain: "ALL", service: "ip-club", credits: 50 },
+    { actionKey: "intent:create-tier", chain: "ALL", service: "ip-tickets", credits: 50 },
   ],
 };
 
@@ -69,4 +70,15 @@ test("enough credits leaves no shortfall", () => {
 
 test("an unknown balance is not reported as a shortfall", () => {
   expect(shortfall(120, undefined)).toBe(0);
+});
+
+test("issuing tickets includes creating the ticket itself", () => {
+  const { lines, total } = estimateIssuance(pricing, { recipients: 2, hasImage: false, service: "ip-tickets" });
+  expect(lines.map((l) => l.label)).toContain("Create the ticket");
+  expect(total).toBe(20 + 5 + 50 + 1);
+});
+
+test("tokenizing data has no ticket to create", () => {
+  const { lines } = estimateIssuance(pricing, { recipients: 2, hasImage: false, service: "data-tokenization-erc721" });
+  expect(lines.map((l) => l.label)).not.toContain("Create the ticket");
 });
