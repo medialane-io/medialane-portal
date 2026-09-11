@@ -3,11 +3,10 @@
 import Image from "next/image";
 import Link from "next/link";
 import {
-  AlertCircle, ChevronRight, Copy, ExternalLink,
-  LayoutDashboard,
-  Rocket, LogOut, Wallet,
+  AlertCircle, Copy, ExternalLink, LogOut, Wallet,
 } from "lucide-react";
 import { toast } from "sonner";
+import useSWR from "swr";
 import { useAccount } from "@starknet-react/core";
 import { mainnet } from "@starknet-react/chains";
 import { Button } from "@/src/components/ui/button";
@@ -15,24 +14,24 @@ import { useWallet } from "@/src/hooks/use-wallet";
 import { getConnectorIconSrc } from "@/src/lib/wallet-connectors";
 import { isWrongNetwork as computeIsWrongNetwork } from "@/src/lib/wallet-error";
 import { EXPLORER_URL } from "@/src/lib/constants";
+import { portalFetcher } from "@/src/lib/portal/fetcher";
 import { useNavAccountSheet, NavThemeToggle } from "@medialane/ui";
 
 function truncate(addr: string): string {
   return `${addr.slice(0, 6)}...${addr.slice(-4)}`;
 }
 
-function ChipIcon({ children }: { children: React.ReactNode }) {
-  return (
-    <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-foreground/[0.06] text-muted-foreground">
-      {children}
-    </span>
-  );
-}
-
 export function AccountPanel() {
   const { chainId, connector } = useAccount();
   const { address, disconnect } = useWallet();
   const { close } = useNavAccountSheet();
+
+  const { data: creditsData, isLoading: creditsLoading } = useSWR<{ data?: { balance?: number } }>(
+    address ? `/api/portal/credits?address=${address}` : null,
+    portalFetcher,
+    { revalidateOnFocus: false, shouldRetryOnError: false },
+  );
+  const balance = creditsData?.data?.balance ?? 0;
 
   const walletName = connector?.name ?? "Browser Wallet";
   const walletIconSrc = getConnectorIconSrc(connector?.icon);
@@ -83,29 +82,26 @@ export function AccountPanel() {
         </Link>
       </div>
 
-      <div className="space-y-1">
-        <Link
-          href="/launchpad"
-          onClick={close}
-          className="-mx-2 flex items-center gap-3 rounded-lg px-2 py-2 transition-colors hover:bg-muted/40"
-        >
-          <ChipIcon>
-            <Rocket className="h-4 w-4" />
-          </ChipIcon>
-          <span className="min-w-0 flex-1 truncate text-sm font-medium">Launchpad</span>
-          <ChevronRight className="h-4 w-4 shrink-0 text-muted-foreground/50" />
-        </Link>
-
-        <div className="-mx-2 flex items-center gap-3 rounded-lg px-2 py-2 transition-colors hover:bg-muted/40">
-          <Link href="/account" onClick={close} className="flex min-w-0 flex-1 items-center gap-3">
-            <ChipIcon>
-              <LayoutDashboard className="h-4 w-4" />
-            </ChipIcon>
-            <span className="min-w-0 flex-1 truncate text-sm font-medium">Account</span>
-            <ChevronRight className="h-4 w-4 shrink-0 text-muted-foreground/50" />
-          </Link>
+      <div className="rounded-xl bg-foreground/[0.04] p-4">
+        <div className="flex items-start justify-between gap-3">
+          <div className="min-w-0">
+            <p className="text-muted-foreground">Credits</p>
+            {creditsLoading ? (
+              <div className="mt-1 h-8 w-24 animate-pulse rounded bg-foreground/[0.06]" />
+            ) : (
+              <p className="text-3xl font-bold tabular-nums">{balance.toLocaleString()}</p>
+            )}
+          </div>
           <NavThemeToggle />
         </div>
+
+        <Link
+          href="/account/credits"
+          onClick={close}
+          className="mt-3 flex h-10 items-center justify-center rounded-lg bg-foreground/[0.06] font-medium transition-colors hover:bg-foreground/[0.1]"
+        >
+          Add credits
+        </Link>
       </div>
 
       {isWrongNetwork && (
