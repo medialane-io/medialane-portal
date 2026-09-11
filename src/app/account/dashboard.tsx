@@ -11,8 +11,6 @@ import { Button } from "@/src/components/ui/button";
 import { Skeleton } from "@/src/components/ui/skeleton";
 import { portalFetcher } from "@/src/lib/portal/fetcher";
 import { BuyCreditsDialog } from "@/src/components/portal/buy-credits-dialog";
-import { whatItBuys } from "@/src/lib/balance-buys";
-import type { PricingTable } from "@/src/lib/issuance-cost";
 import { EXPLORER_URL } from "@/src/lib/constants";
 import { getTokenByAddress } from "@medialane/sdk";
 
@@ -30,7 +28,7 @@ interface ApiKey {
 
 interface PaymentRow {
   creditedAmount: number;
-  asset: string;
+  asset?: string;
   txHash: string;
   createdAt: string;
 }
@@ -61,11 +59,6 @@ export function AccountDashboard({ address }: Props) {
     `/api/portal/credits?address=${address}`,
     portalFetcher,
   );
-  const { data: pricingData } = useSWR<{ pricing?: PricingTable }>(
-    "/api/portal/pricing",
-    portalFetcher,
-    { revalidateOnFocus: false, shouldRetryOnError: false },
-  );
 
   async function handleSignOut() {
     await signOut();
@@ -77,7 +70,6 @@ export function AccountDashboard({ address }: Props) {
   const activeKeys = keys.filter((k) => k.status === "ACTIVE");
   const balance = creditsData?.data?.balance ?? 0;
   const payments = creditsData?.data?.history ?? [];
-  const buys = whatItBuys(pricingData?.pricing, balance);
   const treasuryAddress = process.env.NEXT_PUBLIC_STARKNET_X402_TREASURY ?? "";
 
   return (
@@ -103,19 +95,7 @@ export function AccountDashboard({ address }: Props) {
             <p className="text-6xl font-bold tabular-nums">{balance.toLocaleString()}</p>
           )}
 
-          {buys.length > 0 ? (
-            <p className="mt-3 text-white/80">
-              Enough for{" "}
-              {buys.map((b, i) => (
-                <span key={b.label}>
-                  {i > 0 ? ", or " : ""}
-                  <span className="font-semibold">{b.count.toLocaleString()}</span> {b.label}
-                </span>
-              ))}
-            </p>
-          ) : (
-            <p className="mt-3 text-white/80">Top up to start issuing.</p>
-          )}
+          <p className="mt-2 text-white/70">Shared across every API key</p>
 
           <Button
             className="mt-6 bg-white text-brand-rose hover:bg-white/90"
@@ -189,7 +169,7 @@ export function AccountDashboard({ address }: Props) {
                   <div className="min-w-0 flex-1">
                     <p className="font-medium">+{p.creditedAmount.toLocaleString()} credits</p>
                     <p className="text-muted-foreground">
-                      {getTokenByAddress(p.asset)?.symbol ?? "token"} ·{" "}
+                      {(p.asset ? getTokenByAddress(p.asset)?.symbol : null) ?? "token"} ·{" "}
                       {new Date(p.createdAt).toLocaleDateString()}
                     </p>
                   </div>
