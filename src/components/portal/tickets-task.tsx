@@ -483,56 +483,39 @@ export function TicketsTask({ serviceId, address }: { serviceId: string; address
             </section>
 
             <section className="space-y-4">
-              <div className="flex items-baseline justify-between gap-4">
-                <h2 className="font-semibold">Cost</h2>
-              </div>
+              <h2 className="font-semibold">Cost</h2>
 
-              <dl className="space-y-2.5">
-                {hasRun ? (
-                  <div className="flex items-baseline justify-between gap-4">
-                    <dt className="truncate">
-                      {name.trim() || "Ticket"}
-                      <span className="ml-2 text-muted-foreground">
-                        × {room.issuingNow.toLocaleString()}
-                      </span>
-                    </dt>
-                    <dd className="tabular-nums">{estimate.total.toLocaleString()}</dd>
-                  </div>
-                ) : (
-                  <div className="flex items-baseline justify-between gap-4 text-muted-foreground">
-                    <dt>Nothing to issue yet</dt>
-                    <dd className="tabular-nums">0</dd>
-                  </div>
-                )}
-
-                <div className="flex items-baseline justify-between gap-4 border-t border-border pt-2.5">
-                  <dt className="font-semibold">Total</dt>
-                  <dd className="text-2xl font-bold tabular-nums">
-                    {hasRun ? estimate.total.toLocaleString() : 0}
+              {hasRun ? (
+                <div className="flex items-baseline justify-between gap-4">
+                  <p className="min-w-0 truncate">
+                    {name.trim() || "Ticket"}
+                    <span className="ml-2 text-muted-foreground">
+                      × {room.issuingNow.toLocaleString()}
+                    </span>
+                  </p>
+                  <p className="shrink-0 text-2xl font-bold tabular-nums">
+                    {estimate.total.toLocaleString()}
                     <span className="ml-1.5 text-base font-medium text-muted-foreground">
                       credits
                     </span>
-                  </dd>
+                  </p>
                 </div>
+              ) : null}
 
-                {balance !== undefined ? (
-                  <div className="flex items-baseline justify-between gap-4 text-muted-foreground">
-                    <dt>Balance</dt>
-                    <dd className="tabular-nums">{balance.toLocaleString()}</dd>
-                  </div>
-                ) : null}
-
-                {missing > 0 ? (
-                  <div className="flex items-baseline justify-between gap-4">
-                    <dt className="text-destructive">Short by {missing.toLocaleString()}</dt>
-                    <dd>
+              {balance !== undefined ? (
+                <p className="text-muted-foreground">
+                  Balance {balance.toLocaleString()}
+                  {missing > 0 ? (
+                    <>
+                      {" · short by "}
+                      {missing.toLocaleString()}{" "}
                       <Link href="/account/credits" className="text-primary hover:underline">
                         Add credits
                       </Link>
-                    </dd>
-                  </div>
-                ) : null}
-              </dl>
+                    </>
+                  ) : null}
+                </p>
+              ) : null}
 
               <div className="flex flex-wrap items-center gap-3 pt-1">
                 <Button onClick={run} disabled={!ready || busy} size="lg" className="h-12">
