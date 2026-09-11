@@ -54,7 +54,6 @@ const FEATURES = [
   { label: "Portal dashboard", free: true, paid: true },
   { label: "MDLN token multipliers", free: true, paid: true },
   { label: "Agent-native 402 responses", free: true, paid: true },
-  { label: "Free quota reset", free: "1st of each month", paid: "n/a" },
   { label: "x402 Payments", free: false, paid: "Pay-as-you-go" },
   { label: "Credit rate", free: false, paid: "$0.01 / credit" },
   { label: "API keys", free: false, paid: true },
@@ -176,7 +175,7 @@ export default async function PricingPage() {
 
         <section className="container mx-auto px-4 pb-24 max-w-2xl text-center space-y-4">
           <p className="text-muted-foreground">
-            Running a bigger deployment? Credentials, tickets, and content licensing are priced separately.
+            Some services carry their own price. Tickets and club memberships are priced per service.
           </p>
           <Button asChild variant="outline" size="lg">
             <Link href="/services">See all services</Link>
