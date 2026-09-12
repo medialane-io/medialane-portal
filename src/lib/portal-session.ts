@@ -3,10 +3,9 @@ import { cookies } from "next/headers";
 
 export type PortalSession = {
   accountId: string;
-  apiClientId: string;
   chain: string;
   address: string;
-  apiKey: string;
+  token: string;
 };
 
 const SESSION_COOKIE = "portal-session";
@@ -22,10 +21,9 @@ function getSecret() {
 export async function createSession(payload: PortalSession): Promise<string> {
   return new SignJWT({
     sub: payload.accountId,
-    api_client_id: payload.apiClientId,
     chain: payload.chain,
     address: payload.address,
-    api_key: payload.apiKey,
+    token: payload.token,
   })
     .setProtectedHeader({ alg: "HS256" })
     .setIssuedAt()
@@ -38,13 +36,12 @@ export async function getPortalSession(): Promise<PortalSession | null> {
   if (!token) return null;
   try {
     const { payload } = await jwtVerify(token, getSecret());
-    if (typeof payload.api_client_id !== "string" || typeof payload.api_key !== "string") return null;
+    if (typeof payload.token !== "string") return null;
     return {
       accountId: payload.sub as string,
-      apiClientId: payload.api_client_id,
       chain: (payload.chain as string) ?? "STARKNET",
       address: payload.address as string,
-      apiKey: payload.api_key,
+      token: payload.token,
     };
   } catch {
     return null;

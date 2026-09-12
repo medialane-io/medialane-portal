@@ -53,23 +53,13 @@ export async function POST(req: NextRequest) {
     }
     return NextResponse.json({ error: "Signature verification failed" }, { status: 401 });
   }
-  const { token, accountId, apiClientId } = verifyJson;
-
-  const keyRes = await fetch(`${apiUrl}/v1/auth/siws/keys`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json", "x-api-key": apiKey, Authorization: `Bearer ${token}` },
-  });
-  const keyJson = await keyRes.json().catch(() => null) as { data?: { plaintext?: string } } | null;
-  if (!keyRes.ok || !keyJson?.data?.plaintext) {
-    return NextResponse.json({ error: "Could not provision developer access for this account" }, { status: 502 });
-  }
+  const { token, accountId } = verifyJson;
 
   const sessionToken = await createSession({
     accountId,
-    apiClientId,
     chain: "STARKNET",
     address,
-    apiKey: keyJson.data.plaintext,
+    token,
   });
   const response = NextResponse.json({ data: { accountId, address, chain: "STARKNET" } });
   setSessionCookie(response, sessionToken);
