@@ -70,7 +70,7 @@ function LinkDeviceForm() {
       const account = parseAccountAddress(address);
       const approved = await isOwnerOf(account, pending.ownerPubKey);
       if (!approved) {
-        setError("This device has not been approved yet. Approve it on your other device, then try again.");
+        setError("Not approved yet. Approve the code on medialane.io, then try again.");
         setStep("share");
         return;
       }
@@ -93,10 +93,11 @@ function LinkDeviceForm() {
     <main className="mx-auto flex min-h-[70vh] max-w-lg items-center px-4">
       <Card className="w-full">
         <CardHeader>
-          <CardTitle>Use this account here</CardTitle>
+          <CardTitle>Use your wallet here</CardTitle>
           <CardDescription>
-            Your wallet stays on the device that created it. Approve this one from a device where you
-            are already signed in, and it will sign for itself from then on.
+            Your wallet was set up in the Medialane app. Each app holds its own keys, even on the
+            same computer, so approve this one where you are already signed in and it will sign for
+            itself from then on.
           </CardDescription>
         </CardHeader>
 
@@ -104,7 +105,9 @@ function LinkDeviceForm() {
           {step === "share" || step === "checking" ? (
             <>
               <div>
-                <p className="mb-2 text-sm font-medium">1. Paste this code on your other device</p>
+                <p className="mb-2 text-sm font-medium">
+                  1. Paste this code into Settings → Devices on medialane.io
+                </p>
                 <div className="rounded-xl bg-muted/50 p-3">
                   <p className="break-all font-mono text-xs text-muted-foreground">{code}</p>
                 </div>
@@ -115,7 +118,7 @@ function LinkDeviceForm() {
               </div>
 
               <div>
-                <p className="mb-2 text-sm font-medium">2. Then enter your account address</p>
+                <p className="mb-2 text-sm font-medium">2. Then confirm your account address</p>
                 <Input
                   value={address}
                   onChange={(e) => setAddress(e.target.value)}
@@ -135,7 +138,7 @@ function LinkDeviceForm() {
             <>
               {error ? <p className="text-sm text-destructive">{error}</p> : null}
               <Button className="w-full" onClick={start} disabled={step === "creating"}>
-                {step === "creating" ? <Loader2 className="h-4 w-4 animate-spin" /> : "Add this device"}
+                {step === "creating" ? <Loader2 className="h-4 w-4 animate-spin" /> : "Get an approval code"}
               </Button>
             </>
           )}
