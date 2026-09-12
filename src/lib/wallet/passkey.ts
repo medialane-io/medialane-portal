@@ -8,6 +8,8 @@ import {
   unsealPrivateKey,
 } from "@medialane/sdk/starknet";
 import { computeWalletAddress } from "./account";
+import { loadAccountEmail } from "./account-wallet";
+import { loadSealedOwner } from "./store";
 
 export { signWithPrivateKey } from "@medialane/sdk/starknet";
 export { InvalidStarkPrivateKeyError };
@@ -74,6 +76,22 @@ interface Registration {
   prfFirst: ArrayBuffer | null;
 }
 
+async function stableUserId(email: string): Promise<Uint8Array<ArrayBuffer>> {
+  const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(email));
+  return new Uint8Array(digest);
+}
+
+async function passkeyUser(): Promise<PublicKeyCredentialUserEntity> {
+  const email = loadAccountEmail();
+  if (!email) return { id: rand(16), name: "Medialane", displayName: "Medialane" };
+  return { id: await stableUserId(email), name: email, displayName: email };
+}
+
+function knownCredentials(): PublicKeyCredentialDescriptor[] {
+  const id = loadSealedOwner()?.credentialId;
+  return id ? [{ type: "public-key", id: unb64(id) }] : [];
+}
+
 async function registerPasskey(): Promise<Registration> {
   let cred: PublicKeyCredential;
   try {
@@ -81,7 +99,8 @@ async function registerPasskey(): Promise<Registration> {
       publicKey: {
         challenge: rand(32),
         rp: { name: RP_NAME, id: relyingPartyId() },
-        user: { id: rand(16), name: "creator@medialane", displayName: "Medialane Creator" },
+        user: await passkeyUser(),
+        excludeCredentials: knownCredentials(),
         pubKeyCredParams: [{ type: "public-key", alg: -7 }, { type: "public-key", alg: -257 }],
         authenticatorSelection: {
           residentKey: "required",

@@ -1,4 +1,5 @@
 const ACCOUNT_ADDRESS_KEY = "medialane.account.address.v1";
+const ACCOUNT_EMAIL_KEY = "medialane.account.email.v1";
 
 export function loadAccountAddress(): string | null {
   if (typeof window === "undefined") return null;
@@ -15,6 +16,21 @@ export function saveAccountAddress(address: string): void {
 
 export function clearAccountAddress(): void {
   localStorage.removeItem(ACCOUNT_ADDRESS_KEY);
+  localStorage.removeItem(ACCOUNT_EMAIL_KEY);
+}
+
+export function loadAccountEmail(): string | null {
+  if (typeof window === "undefined") return null;
+  try {
+    return localStorage.getItem(ACCOUNT_EMAIL_KEY);
+  } catch {
+    return null;
+  }
+}
+
+export function saveAccountEmail(email: string): void {
+  const value = email.trim().toLowerCase();
+  if (value) localStorage.setItem(ACCOUNT_EMAIL_KEY, value);
 }
 
 export async function fetchAccountWalletAddress(): Promise<string | null> {
