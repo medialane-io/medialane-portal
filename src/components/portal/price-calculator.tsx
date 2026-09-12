@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import useSWR from "swr";
 import { Input } from "@/src/components/ui/input";
 import { Label } from "@/src/components/ui/label";
 import {
@@ -11,9 +10,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/src/components/ui/select";
-import { portalFetcher } from "@/src/lib/portal/fetcher";
-import { quoteIssuance, formatUsd, type PricingTable } from "@/src/lib/issuance-cost";
-import { CREDITS_PER_USDC } from "@/src/lib/constants";
+import { useRunQuote, usdFromAtomic, usdFromCredits, formatUsd } from "@/src/lib/quote";
 import { launchpadServices } from "@/src/lib/services";
 
 export function PriceCalculator() {
@@ -21,12 +18,9 @@ export function PriceCalculator() {
   const [serviceId, setServiceId] = useState(services[0]?.id ?? "");
   const [count, setCount] = useState("100");
 
-  const { data: pricingData } = useSWR<{ pricing?: PricingTable }>("/api/portal/pricing", portalFetcher, {
-    revalidateOnFocus: false,
-    shouldRetryOnError: false,
-  });
   const recipients = Math.max(0, Math.floor(Number(count) || 0));
-  const quote = quoteIssuance(pricingData?.pricing, { recipients, service: serviceId }, CREDITS_PER_USDC);
+  const quote = useRunQuote(serviceId, recipients);
+  const quoteTotal = usdFromAtomic(quote?.totalAtomic);
 
   return (
     <section className="rounded-2xl bg-foreground/[0.04] p-6 space-y-5">
@@ -66,15 +60,15 @@ export function PriceCalculator() {
         </div>
       </div>
 
-      {quote.total > 0 ? (
+      {quoteTotal > 0 ? (
         <>
-          <p className="text-3xl font-bold tabular-nums">{formatUsd(quote.total)}</p>
+          <p className="text-3xl font-bold tabular-nums">{formatUsd(quoteTotal)}</p>
 
           <ul className="space-y-1">
-            {quote.lines.map((line) => (
+            {(quote?.lines ?? []).map((line) => (
               <li key={line.label} className="flex justify-between gap-4 text-muted-foreground">
                 <span>{line.label}</span>
-                <span className="tabular-nums">{formatUsd(line.usd)}</span>
+                <span className="tabular-nums">{formatUsd(usdFromCredits(line.credits))}</span>
               </li>
             ))}
           </ul>

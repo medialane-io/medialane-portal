@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import useSWR from "swr";
 import Link from "next/link";
 import { useAccount } from "@starknet-react/core";
 import { ServiceFormShell, ClaimRail, MedialaneCollectionCard, CollapsibleSection } from "@medialane/ui";
@@ -36,10 +35,11 @@ import {
   pinMetadata,
   fetchMintCalls,
   executeSponsored,
+  quoteRun,
+  payForRun,
+  openRun,
 } from "@/src/lib/issue";
-import { portalFetcher } from "@/src/lib/portal/fetcher";
-import { quoteIssuance, formatUsd, type PricingTable } from "@/src/lib/issuance-cost";
-import { CREDITS_PER_USDC } from "@/src/lib/constants";
+import { useRunQuote, usdFromAtomic, usdFromCredits, formatUsd } from "@/src/lib/quote";
 import { issuedSummary, SERVICE_PAUSED, type TaskPhase } from "@/src/lib/task-progress";
 import {
   parseRecipients,
@@ -84,16 +84,8 @@ export function IssuanceTask({ serviceId, address }: { serviceId: string; addres
   const recipients = parseRecipients(values.recipients);
   const invalid = invalidRecipients(recipients);
 
-  const { data: pricingData } = useSWR<{ pricing?: PricingTable }>(
-    "/api/portal/pricing",
-    portalFetcher,
-    { revalidateOnFocus: false, shouldRetryOnError: false },
-  );
-  const quote = quoteIssuance(
-    pricingData?.pricing,
-    { recipients: recipients.length, service: serviceId },
-    CREDITS_PER_USDC,
-  );
+  const quote = useRunQuote(serviceId, recipients.length);
+  const quoteTotal = usdFromAtomic(quote?.totalAtomic);
 
   function chooseImage(file: File | undefined) {
     if (!file) return;
@@ -125,6 +117,11 @@ export function IssuanceTask({ serviceId, address }: { serviceId: string; addres
     setIssued(null);
 
     try {
+      setProgress("Confirm the payment in your wallet");
+      const paid = await quoteRun(serviceId, recipients.length);
+      const txHash = await payForRun(account, paid);
+      await openRun(serviceId, recipients.length, txHash);
+
       setProgress("Confirm in your wallet to begin");
       const signature = await account.signMessage({
         types: {
@@ -467,18 +464,18 @@ export function IssuanceTask({ serviceId, address }: { serviceId: string; addres
           ) : null}
         </section>
 
-        {quote.total > 0 ? (
+        {quoteTotal > 0 ? (
           <div className="rounded-xl border border-border p-4 space-y-3">
             <div className="flex items-baseline justify-between gap-4">
               <p className="text-sm font-medium">This run costs</p>
-              <p className="text-xl font-bold tabular-nums">{formatUsd(quote.total)}</p>
+              <p className="text-xl font-bold tabular-nums">{formatUsd(quoteTotal)}</p>
             </div>
 
             <ul className="space-y-1">
-              {quote.lines.map((line) => (
+              {(quote?.lines ?? []).map((line) => (
                 <li key={line.label} className="flex justify-between gap-4 text-xs text-muted-foreground">
                   <span>{line.label}</span>
-                  <span className="tabular-nums">{formatUsd(line.usd)}</span>
+                  <span className="tabular-nums">{formatUsd(usdFromCredits(line.credits))}</span>
                 </li>
               ))}
             </ul>

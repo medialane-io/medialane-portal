@@ -138,3 +138,58 @@ export async function executeSponsored(
   if (!hash) throw new Error("The transaction was sent but no hash came back");
   return hash as string;
 }
+
+export interface RunQuote {
+  lines: Array<{ label: string; credits: number }>;
+  totalCredits: number;
+  totalAtomic: string;
+  asset: string;
+  payTo: string;
+}
+
+export async function quoteRun(service: string, recipients: number): Promise<RunQuote> {
+  const res = await fetch("/api/portal/launchpad/quote", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ service, recipients }),
+  });
+  const body = await res.json().catch(() => ({}));
+  if (res.status === 402) throw new Error(SERVICE_PAUSED);
+  if (!res.ok) throw new Error(body?.error ?? "Could not work out what this run costs");
+  return body.data as RunQuote;
+}
+
+export interface PayingAccount {
+  execute: (calls: Call[]) => Promise<{ transaction_hash: string }>;
+  waitForTransaction: (hash: string) => Promise<unknown>;
+}
+
+export function paymentCall(quote: RunQuote): Call {
+  const amount = BigInt(quote.totalAtomic);
+  return {
+    contractAddress: quote.asset,
+    entrypoint: "transfer",
+    calldata: [quote.payTo, (amount & ((1n << 128n) - 1n)).toString(), (amount >> 128n).toString()],
+  };
+}
+
+export async function payForRun(account: PayingAccount, quote: RunQuote): Promise<string> {
+  const sent = await account.execute([paymentCall(quote)]);
+  await account.waitForTransaction(sent.transaction_hash);
+  return sent.transaction_hash;
+}
+
+export async function openRun(
+  service: string,
+  recipients: number,
+  txHash: string,
+): Promise<string> {
+  const res = await fetch("/api/portal/launchpad/runs", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ service, recipients, txHash }),
+  });
+  const body = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(body?.error ?? "That payment did not go through");
+  return body.data.id as string;
+}

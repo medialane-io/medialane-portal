@@ -124,6 +124,18 @@ async function route(req: NextRequest, context: { params: Promise<{ path: string
     return NextResponse.json(upstream.json ?? {}, { status: upstream.status });
   }
 
+  if (resource === "launchpad") {
+    const rest = path.slice(1).join("/");
+    if (rest !== "quote" && rest !== "runs") {
+      return NextResponse.json({ error: "Not allowed through this proxy" }, { status: 403 });
+    }
+    const upstream = await rawFetch(`/v1/business/launchpad/${rest}`, token, {
+      method: req.method,
+      body,
+    });
+    return NextResponse.json(upstream.json ?? {}, { status: upstream.status });
+  }
+
   if (resource === "issuance") {
     const rest = path.slice(1).join("/");
     if (rest !== "mint-calls") {

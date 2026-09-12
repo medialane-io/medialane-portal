@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import useSWR from "swr";
 import Link from "next/link";
 import { useAccount } from "@starknet-react/core";
 import { ServiceHeader, CollapsibleSection } from "@medialane/ui";
@@ -20,7 +19,6 @@ import {
 } from "@/src/components/ui/select";
 import { CollectionPicker } from "@/src/components/portal/collection-picker";
 import { TaskDialog } from "@/src/components/portal/task-dialog";
-import { portalFetcher } from "@/src/lib/portal/fetcher";
 import { ticketIdFromReceipt } from "@/src/lib/ticket-events";
 import { parseRecipients, invalidRecipients, PROVISIONING_SECRET_MESSAGE } from "@/src/lib/provisioning";
 import {
@@ -30,14 +28,12 @@ import {
   buildTicketType,
   fetchMintCalls,
   executeSponsored,
+  quoteRun,
+  payForRun,
+  openRun,
 } from "@/src/lib/issue";
 import { issuedSummary, SERVICE_PAUSED, type TaskPhase } from "@/src/lib/task-progress";
-import { CREDITS_PER_USDC } from "@/src/lib/constants";
-import {
-  quoteIssuance,
-  formatUsd,
-  type PricingTable,
-} from "@/src/lib/issuance-cost";
+import { useRunQuote, usdFromAtomic, formatUsd } from "@/src/lib/quote";
 import { capacity, guestRows, repeatsIn, validitySentence } from "@/src/lib/ticket-event";
 import {
   imageRejectionReason,
@@ -83,15 +79,8 @@ export function TicketsTask({ serviceId, address }: { serviceId: string; address
   const invalid = invalidRecipients(recipients);
   const windowError = validityError(validFrom, validUntil);
 
-  const { data: pricingData } = useSWR<{ pricing?: PricingTable }>("/api/portal/pricing", portalFetcher, {
-    revalidateOnFocus: false,
-    shouldRetryOnError: false,
-  });
-  const quote = quoteIssuance(
-    pricingData?.pricing,
-    { recipients: recipients.length, service: serviceId },
-    CREDITS_PER_USDC,
-  );
+  const quote = useRunQuote(serviceId, recipients.length);
+  const quoteTotal = usdFromAtomic(quote?.totalAtomic);
   const room = capacity(supply, recipients.length);
   const hasRun = recipients.length > 0;
   const rows = guestRows(guests);
@@ -122,6 +111,11 @@ export function TicketsTask({ serviceId, address }: { serviceId: string; address
     setIssued(null);
 
     try {
+      setProgress("Confirm the payment in your wallet");
+      const paid = await quoteRun(serviceId, recipients.length);
+      const txHash = await payForRun(account, paid);
+      await openRun(serviceId, recipients.length, txHash);
+
       setProgress("Confirm in your wallet");
       const signature = await account.signMessage({
         types: {
@@ -488,7 +482,7 @@ export function TicketsTask({ serviceId, address }: { serviceId: string; address
                     </span>
                   </p>
                   <p className="shrink-0 text-2xl font-bold tabular-nums">
-                    {formatUsd(quote.total)}
+                    {formatUsd(quoteTotal)}
                   </p>
                 </div>
               ) : null}
