@@ -23,7 +23,9 @@ export function usePortalToken() {
     return signIn();
   }, [getValidToken, signIn]);
 
-  return { token, address, authorize, isSigningIn, error, ready };
+  const reauthorize = useCallback(async () => signIn(), [signIn]);
+
+  return { token, address, authorize, reauthorize, isSigningIn, error, ready };
 }
 
 const api = () => getMedialaneClient().api;

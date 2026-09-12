@@ -4,11 +4,17 @@ import { useState } from "react";
 import { Copy, KeyRound, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
-import { usePortalKeys } from "@/hooks/use-portal-account";
+import { usePortalKeys, usePortalToken } from "@/hooks/use-portal-account";
 import { getMedialaneClient } from "@/lib/medialane-client";
 import { friendlyErrorMessage } from "@/lib/friendly-error";
 
+function isStaleSignature(err: unknown): boolean {
+  const status = (err as { status?: unknown })?.status;
+  return status === 401;
+}
+
 export function ApiKeys({ token }: { token: string }) {
+  const { reauthorize } = usePortalToken();
   const { data: keys, mutate } = usePortalKeys(token);
   const [plaintext, setPlaintext] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
@@ -16,7 +22,9 @@ export function ApiKeys({ token }: { token: string }) {
   async function create() {
     setBusy(true);
     try {
-      const { data } = await getMedialaneClient().api.createApiKey({ appSource: "MEDIALANE_PORTAL" }, token);
+      const { data } = await withFreshSignature((t) =>
+        getMedialaneClient().api.createApiKey({ appSource: "MEDIALANE_PORTAL" }, t),
+      );
       setPlaintext(data.plaintext);
       await mutate();
     } catch (err) {
@@ -26,10 +34,21 @@ export function ApiKeys({ token }: { token: string }) {
     }
   }
 
+  async function withFreshSignature<T>(run: (token: string) => Promise<T>): Promise<T> {
+    try {
+      return await run(token);
+    } catch (err) {
+      if (!isStaleSignature(err)) throw err;
+      const fresh = await reauthorize();
+      if (!fresh) throw err;
+      return run(fresh);
+    }
+  }
+
   async function revoke(id: string) {
     setBusy(true);
     try {
-      await getMedialaneClient().api.deleteApiKey(id, token);
+      await withFreshSignature((t) => getMedialaneClient().api.deleteApiKey(id, t));
       await mutate();
     } catch (err) {
       toast.error(friendlyErrorMessage(err, "Could not revoke that key"));
@@ -44,7 +63,7 @@ export function ApiKeys({ token }: { token: string }) {
         <div>
           <h2 className="text-lg font-semibold">API keys</h2>
           <p className="text-sm text-muted-foreground">
-            A key spends the credits on this account. Create as many as you need.
+            A key spends the credits on this account. You can hold up to five at once.
           </p>
         </div>
         <Button onClick={create} disabled={busy} size="sm">
