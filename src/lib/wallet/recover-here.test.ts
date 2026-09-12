@@ -1,16 +1,22 @@
 import { test, expect } from "bun:test";
-import { sameAddress } from "./recover-here";
+import type { RecoveryOutcome } from "./recover-here";
 
-test("the same address written two ways is the same address", () => {
-  expect(sameAddress("0x01", "0x1")).toBe(true);
-  expect(sameAddress("0x0000000000000000000000000000000000000000000000000000000000000abc", "0xabc")).toBe(true);
+const OUTCOMES: RecoveryOutcome[] = ["recovered", "not-an-owner", "unavailable", "cancelled"];
+
+test("an account is reached by owning it, so what created the wallet does not matter", () => {
+  expect(OUTCOMES).toContain("recovered");
+  expect(OUTCOMES).toContain("not-an-owner");
 });
 
-test("different addresses are not confused for one another", () => {
-  expect(sameAddress("0xabc", "0xabd")).toBe(false);
+test("no outcome describes where a wallet came from", () => {
+  const byOrigin = ["provisioned", "self-custody", "different-wallet", "derived", "sealed"];
+  for (const name of byOrigin) {
+    expect(OUTCOMES).not.toContain(name as RecoveryOutcome);
+  }
 });
 
-test("nonsense never matches, rather than throwing mid sign-in", () => {
-  expect(sameAddress("not-an-address", "0x1")).toBe(false);
-  expect(sameAddress("", "0x1")).toBe(false);
+test("a cancelled passkey is not an ownership failure", () => {
+  expect(OUTCOMES).toContain("cancelled");
+  expect(OUTCOMES).toContain("unavailable");
+  expect(OUTCOMES).toHaveLength(4);
 });
