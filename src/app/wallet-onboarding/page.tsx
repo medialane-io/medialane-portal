@@ -24,7 +24,7 @@ export default function WalletOnboardingPage() {
 function WalletOnboardingForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const redirectTo = safeRelativePath(searchParams.get("redirect_url")) ?? "/airdrop";
+  const redirectTo = safeRelativePath(searchParams.get("redirect_url")) ?? "/account";
   const [step, setStep] = useState<Step | null>(null);
   const startedRef = useRef(false);
 
@@ -34,7 +34,7 @@ function WalletOnboardingForm() {
 
       await getMedialaneClient().api.upsertMyWallet(siwsToken, {
         walletType: "MEDIAWALLET",
-        appSource: "MEDIALANE_IO",
+        appSource: "MEDIALANE_PORTAL",
         chain: "STARKNET",
       });
 

@@ -15,7 +15,7 @@ export function AccountSyncOnLogin() {
     if (!hasWallet || !walletAddress) return;
 
     const walletType = "MEDIAWALLET" as const;
-    const appSource = "MEDIALANE_IO" as const;
+    const appSource = "MEDIALANE_PORTAL" as const;
     const key = `${SESSION_KEY_PREFIX}${walletAddress}:${walletType}`;
     if (sessionStorage.getItem(key)) return;
 

@@ -15,14 +15,22 @@ import { friendlyErrorMessage } from "@/lib/friendly-error";
 import { adoptAccountWallet } from "@/lib/wallet/account-wallet";
 import { loadSealedOwner } from "@/lib/wallet/store";
 import { destinationAfterSignIn } from "@/lib/wallet/next-step";
-import { recoverWalletHere } from "@/lib/wallet/recover-here";
+import { attachWalletHere, completePendingApproval } from "@/lib/wallet/attach-wallet";
 import { loadAccountAddress } from "@/lib/wallet/account-wallet";
 import { safeRelativePath } from "@/lib/safe-redirect";
 import { useWalletNativeSession } from "@/hooks/use-wallet-native-session";
 import { useEmailVerificationStatus } from "@/hooks/use-email-verification-required";
 import { useSiwsToken } from "@/hooks/use-siws-token";
 
-type Step = "email" | "checking-email" | "registering" | "code" | "verifying-code" | "add-email";
+type Step =
+  | "email"
+  | "checking-email"
+  | "registering"
+  | "code"
+  | "verifying-code"
+  | "connecting-wallet"
+  | "confirm-passkey"
+  | "add-email";
 
 const RESEND_COOLDOWN_SECONDS = 60;
 
@@ -43,6 +51,7 @@ function ConnectForm() {
   const [email, setEmail] = useState("");
   const [code, setCode] = useState("");
   const accountExistedRef = useRef(false);
+  const approvalHandledRef = useRef(false);
   const [resendCooldown, setResendCooldown] = useState(0);
   const [resending, setResending] = useState(false);
 
@@ -83,6 +92,36 @@ function ConnectForm() {
       setAddEmailError(friendlyErrorMessage(err, "Couldn't save your email. Please try again."));
     }
   };
+
+  useEffect(() => {
+    const approval = searchParams.get("approval");
+    if (!mounted || !approval || approvalHandledRef.current) return;
+    approvalHandledRef.current = true;
+
+    if (approval !== "approved") {
+      setError("Confirm your passkey to continue.");
+      setStep("confirm-passkey");
+      return;
+    }
+
+    const known = loadAccountAddress();
+    if (!known) return;
+
+    setStep("connecting-wallet");
+    completePendingApproval(known)
+      .then((outcome) => {
+        if (outcome === "connected") {
+          router.replace(redirectTo || "/");
+          return;
+        }
+        setError("Your approval is still on its way. Try again in a moment.");
+        setStep("confirm-passkey");
+      })
+      .catch((err) => {
+        setError(friendlyErrorMessage(err, "Your approval is still on its way. Try again in a moment."));
+        setStep("confirm-passkey");
+      });
+  }, [mounted, searchParams, redirectTo, router]);
 
   useEffect(() => {
     if (resendCooldown === 0) return;
@@ -168,6 +207,38 @@ function ConnectForm() {
     }
   };
 
+  const connectWallet = async () => {
+    const known = loadAccountAddress();
+    if (!known) {
+      goToWalletOnboarding();
+      return;
+    }
+
+    setError(null);
+    setStep("connecting-wallet");
+    const back = new URL(window.location.href);
+    back.searchParams.delete("approval");
+    let outcome;
+    try {
+      outcome = await attachWalletHere(known, back.toString());
+    } catch (err) {
+      console.error("[connect] wallet connection failed", err);
+      outcome = "unavailable" as const;
+    }
+    if (outcome === "connected") {
+      router.push(redirectTo || "/");
+      return;
+    }
+    if (outcome === "approving") return;
+
+    setError(
+      outcome === "cancelled"
+        ? "Confirm your passkey to continue."
+        : "Your passkey is unavailable here. Try again in a moment.",
+    );
+    setStep("confirm-passkey");
+  };
+
   const verifyLoginCode = async (codeOverride?: string) => {
     const codeToVerify = codeOverride ?? code;
     setError(null);
@@ -190,14 +261,7 @@ function ConnectForm() {
         if (destination === "onboard") {
           goToWalletOnboarding();
         } else if (destination === "pair") {
-          const known = loadAccountAddress();
-          const outcome = known ? await recoverWalletHere(known) : "unavailable";
-          if (outcome === "recovered") {
-            router.push(redirectTo || "/");
-            return;
-          }
-          const next = redirectTo ? `?redirect_url=${encodeURIComponent(redirectTo)}` : "";
-          router.push(`/link-device${next}`);
+          await connectWallet();
         } else {
           router.push(redirectTo || "/");
         }
@@ -266,7 +330,9 @@ function ConnectForm() {
     );
   }
 
-  if (step === "code" || step === "verifying-code") {
+  const busy = step === "verifying-code" || step === "connecting-wallet";
+
+  if (step === "code" || step === "verifying-code" || step === "connecting-wallet" || step === "confirm-passkey") {
     return (
       <div className="min-h-[80vh] flex items-center justify-center px-4">
         <Card className="w-full max-w-sm">
@@ -276,8 +342,12 @@ function ConnectForm() {
                 <ShieldCheck className="h-6 w-6 text-primary" />
               </div>
             </div>
-            <CardTitle>Check your email</CardTitle>
-            <CardDescription>Enter the 6-digit code we sent to {email}.</CardDescription>
+            <CardTitle>{step === "code" ? "Check your email" : "Signing you in"}</CardTitle>
+            <CardDescription>
+              {step === "code"
+                ? `Enter the 6-digit code we sent to ${email}.`
+                : "Confirm your passkey to use your wallet here."}
+            </CardDescription>
           </CardHeader>
           <CardContent className="flex flex-col items-center gap-4">
             {error && (
@@ -291,7 +361,7 @@ function ConnectForm() {
               value={code}
               onChange={(value) => setCode(value.replace(/\D/g, ""))}
               onComplete={(value) => void verifyLoginCode(value)}
-              disabled={step === "verifying-code"}
+              disabled={step !== "code"}
             >
               <InputOTPGroup>
                 {[0, 1, 2, 3, 4, 5].map((i) => (
@@ -303,13 +373,14 @@ function ConnectForm() {
               <Button
                 className="w-full gap-2 bg-transparent text-white rounded-[7px] hover:bg-transparent hover:brightness-110 active:scale-[0.98] transition-all"
                 size="lg"
-                onClick={() => void verifyLoginCode()}
-                disabled={step === "verifying-code" || code.length !== 6}
+                onClick={() => void (step === "confirm-passkey" ? connectWallet() : verifyLoginCode())}
+                disabled={busy || (step === "code" && code.length !== 6)}
               >
-                {step === "verifying-code" ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
-                Verify
+                {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
+                Continue
               </Button>
             </div>
+            {step === "code" ? (
             <p className="text-xs text-muted-foreground text-center leading-relaxed">
               Didn&apos;t receive it? Check your spam, or{" "}
               {resendCooldown > 0 ? (
@@ -331,6 +402,7 @@ function ConnectForm() {
                 dao@medialane.org
               </a>
             </p>
+            ) : null}
           </CardContent>
         </Card>
       </div>

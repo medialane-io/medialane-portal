@@ -41,12 +41,12 @@ export default function RecoverPage() {
       {mode === "choose" && (
         <div className="flex flex-col gap-3">
           <Link
-            href="/link-device"
+            href="/connect"
             className="rounded-2xl border border-border bg-card p-4 text-left transition-transform active:scale-[0.98]"
           >
-            <p className="text-sm font-semibold">I still have another device</p>
+            <p className="text-sm font-semibold">I still have my passkey</p>
             <p className="mt-1 text-xs text-muted-foreground">
-              Approve this one from a phone or browser you already use.
+              Sign in and confirm it to use your wallet here.
             </p>
           </Link>
           <button
