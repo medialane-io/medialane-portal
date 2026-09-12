@@ -27,13 +27,16 @@ export default function LinkDevicePage() {
 }
 
 function setupFailure(e: unknown): string {
-  if (e instanceof PasskeyCancelledError) return "Confirmation cancelled.";
+  if (e instanceof PasskeyCancelledError) return "No problem — you can start again whenever you like.";
 
   const raw = e instanceof Error ? e.message : String(e);
   if (/prf/i.test(raw)) {
-    return "This browser did not return the secret a passkey needs. Try Safari, or Chrome on an up-to-date system.";
+    return "This browser cannot set up a passkey. Try Safari, or Chrome on an up-to-date system.";
   }
-  return friendlyErrorMessage(e, "Could not start setup. The reason is in the browser console.");
+  if (/relying party|registrable domain|SecurityError/i.test(raw)) {
+    return "We could not set this up just now. It is our side, not yours — try again shortly.";
+  }
+  return friendlyErrorMessage(e, "That did not work. Try again in a moment.");
 }
 
 function loadPending(): SealedOwner | null {
