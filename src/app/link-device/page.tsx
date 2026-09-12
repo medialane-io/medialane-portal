@@ -2,18 +2,21 @@
 
 import { Suspense, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Check, Copy, Loader2 } from "lucide-react";
+import { Loader2, ShieldCheck } from "lucide-react";
+import { buildApprovalUrl } from "@medialane/sdk/starknet";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { createOwnerKey, PasskeyCancelledError, type SealedOwner } from "@/lib/wallet/passkey";
 import { saveSealedOwner, notifyWalletChange } from "@/lib/wallet/store";
-import { encodePairingPayload, parseAccountAddress } from "@/lib/wallet/pairing";
 import { isOwnerOf } from "@/lib/wallet/devices";
 import { loadAccountAddress } from "@/lib/wallet/account-wallet";
 import { friendlyErrorMessage } from "@/lib/friendly-error";
 
-type Step = "start" | "creating" | "share" | "checking";
+const APPROVER_ORIGIN = "https://www.medialane.io";
+const APP_NAME = "Medialane Portal";
+const PENDING_KEY = "medialane.portal.pending-owner.v1";
+
+type Step = "start" | "creating" | "confirming";
 
 export default function LinkDevicePage() {
   return (
@@ -23,125 +26,98 @@ export default function LinkDevicePage() {
   );
 }
 
+function loadPending(): SealedOwner | null {
+  try {
+    const raw = sessionStorage.getItem(PENDING_KEY);
+    return raw ? (JSON.parse(raw) as SealedOwner) : null;
+  } catch {
+    return null;
+  }
+}
+
 function LinkDeviceForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const redirectTo = searchParams.get("redirect_url");
+  const approval = searchParams.get("approval");
   const [step, setStep] = useState<Step>("start");
-  const [pending, setPending] = useState<SealedOwner | null>(null);
-  const [code, setCode] = useState("");
-  const [address, setAddress] = useState("");
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const known = loadAccountAddress();
-    if (known) setAddress(known);
-  }, []);
-  const [copied, setCopied] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+    if (approval !== "approved") {
+      if (approval === "declined") setError("Not approved. You can try again whenever you like.");
+      return;
+    }
+
+    const pending = loadPending();
+    const account = loadAccountAddress();
+    if (!pending || !account) {
+      setError("That approval could not be matched. Start again.");
+      return;
+    }
+
+    setStep("confirming");
+    isOwnerOf(account, pending.ownerPubKey)
+      .then((owns) => {
+        if (!owns) {
+          setError("Not approved yet. Try again in a moment.");
+          setStep("start");
+          return;
+        }
+        saveSealedOwner({ ...pending, address: account });
+        notifyWalletChange();
+        sessionStorage.removeItem(PENDING_KEY);
+        router.replace(redirectTo ?? "/");
+      })
+      .catch((e) => {
+        setError(friendlyErrorMessage(e, "Could not confirm the approval."));
+        setStep("start");
+      });
+  }, [approval, redirectTo, router]);
 
   const start = async () => {
     setError(null);
     setStep("creating");
     try {
       const created = await createOwnerKey();
-      setPending(created.sealed);
-      setCode(
-        encodePairingPayload({
-          publicKey: created.sealed.ownerPubKey,
-          label: typeof navigator === "undefined" ? "" : navigator.platform,
-        }),
-      );
-      setStep("share");
+      sessionStorage.setItem(PENDING_KEY, JSON.stringify(created.sealed));
+
+      const back = new URL(window.location.href);
+      back.searchParams.delete("approval");
+
+      window.location.href = buildApprovalUrl(APPROVER_ORIGIN, {
+        publicKey: created.sealed.ownerPubKey,
+        appName: APP_NAME,
+        returnUrl: back.toString(),
+      });
     } catch (e) {
       setError(
         e instanceof PasskeyCancelledError
           ? "Confirmation cancelled."
-          : friendlyErrorMessage(e, "Could not set up this device."),
+          : friendlyErrorMessage(e, "Could not start setup."),
       );
       setStep("start");
     }
-  };
-
-  const finish = async () => {
-    if (!pending) return;
-    setError(null);
-    setStep("checking");
-    try {
-      const account = parseAccountAddress(address);
-      const approved = await isOwnerOf(account, pending.ownerPubKey);
-      if (!approved) {
-        setError("Not approved yet. Approve the code on medialane.io, then try again.");
-        setStep("share");
-        return;
-      }
-      saveSealedOwner({ ...pending, address: account });
-      notifyWalletChange();
-      router.replace(redirectTo ?? "/");
-    } catch (e) {
-      setError(friendlyErrorMessage(e, "Could not confirm this device."));
-      setStep("share");
-    }
-  };
-
-  const copy = async () => {
-    await navigator.clipboard.writeText(code);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 1500);
   };
 
   return (
     <main className="mx-auto flex min-h-[70vh] max-w-lg items-center px-4">
       <Card className="w-full">
         <CardHeader>
-          <CardTitle>Use your wallet here</CardTitle>
+          <span className="mb-2 flex h-10 w-10 items-center justify-center rounded-full bg-primary/10">
+            <ShieldCheck className="h-5 w-5 text-primary" />
+          </span>
+          <CardTitle>Secure your account</CardTitle>
           <CardDescription>
-            Your wallet was set up in the Medialane app. Each app holds its own keys, even on the
-            same computer, so approve this one where you are already signed in and it will sign for
-            itself from then on.
+            Approve Medialane Portal to connect your wallet to this app.
           </CardDescription>
         </CardHeader>
 
-        <CardContent className="space-y-4">
-          {step === "share" || step === "checking" ? (
-            <>
-              <div>
-                <p className="mb-2 text-sm font-medium">
-                  1. Paste this code into Settings → Devices on medialane.io
-                </p>
-                <div className="rounded-xl bg-muted/50 p-3">
-                  <p className="break-all font-mono text-xs text-muted-foreground">{code}</p>
-                </div>
-                <Button variant="outline" size="sm" className="mt-2" onClick={copy}>
-                  {copied ? <Check className="h-4 w-4 mr-1" /> : <Copy className="h-4 w-4 mr-1" />}
-                  {copied ? "Copied" : "Copy code"}
-                </Button>
-              </div>
-
-              <div>
-                <p className="mb-2 text-sm font-medium">2. Then confirm your account address</p>
-                <Input
-                  value={address}
-                  onChange={(e) => setAddress(e.target.value)}
-                  placeholder="0x…"
-                  className="font-mono text-xs"
-                  disabled={step === "checking"}
-                />
-              </div>
-
-              {error ? <p className="text-sm text-destructive">{error}</p> : null}
-
-              <Button className="w-full" onClick={finish} disabled={!address.trim() || step === "checking"}>
-                {step === "checking" ? <Loader2 className="h-4 w-4 animate-spin" /> : "Finish"}
-              </Button>
-            </>
-          ) : (
-            <>
-              {error ? <p className="text-sm text-destructive">{error}</p> : null}
-              <Button className="w-full" onClick={start} disabled={step === "creating"}>
-                {step === "creating" ? <Loader2 className="h-4 w-4 animate-spin" /> : "Get an approval code"}
-              </Button>
-            </>
-          )}
+        <CardContent>
+          {error ? <p className="mb-3 text-sm text-destructive">{error}</p> : null}
+          <Button className="w-full" onClick={start} disabled={step !== "start"}>
+            {step === "start" ? "Start setup" : <Loader2 className="h-4 w-4 animate-spin" />}
+          </Button>
         </CardContent>
       </Card>
     </main>
