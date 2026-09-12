@@ -15,12 +15,7 @@ import { friendlyErrorMessage } from "@/lib/friendly-error";
 import { adoptAccountWallet, saveAccountEmail } from "@/lib/wallet/account-wallet";
 import { loadSealedOwner } from "@/lib/wallet/store";
 import { destinationAfterSignIn } from "@/lib/wallet/next-step";
-import {
-  attachWalletHere,
-  completePendingApproval,
-  requestAppApproval,
-  type AttachOutcome,
-} from "@/lib/wallet/attach-wallet";
+import { completePendingApproval, requestAppApproval } from "@/lib/wallet/app-approval";
 import { loadAccountAddress } from "@/lib/wallet/account-wallet";
 import { safeRelativePath } from "@/lib/safe-redirect";
 import { useWalletNativeSession } from "@/hooks/use-wallet-native-session";
@@ -38,14 +33,6 @@ type Step =
   | "add-email";
 
 const RESEND_COOLDOWN_SECONDS = 60;
-
-function attachMessage(outcome: AttachOutcome): string {
-  if (outcome === "cancelled") return "Confirm your passkey to continue.";
-  if (outcome === "wrong-passkey") {
-    return "That passkey belongs to another account. Choose the one for this email.";
-  }
-  return "Your passkey is unavailable here. Try again in a moment.";
-}
 
 export default function ConnectPage() {
   return (
@@ -228,23 +215,7 @@ function ConnectForm() {
       goToWalletOnboarding();
       return;
     }
-
-    setError(null);
-    setStep("connecting-wallet");
-    let outcome: AttachOutcome;
-    try {
-      outcome = await attachWalletHere(known);
-    } catch (err) {
-      console.error("[connect] wallet connection failed", err);
-      outcome = "unavailable";
-    }
-    if (outcome === "connected") {
-      router.push(redirectTo || "/");
-      return;
-    }
-
-    setError(attachMessage(outcome));
-    setStep("confirm-passkey");
+    await askMedialaneToApprove();
   };
 
   const askMedialaneToApprove = async () => {
@@ -259,7 +230,7 @@ function ConnectForm() {
     setError(
       outcome === "cancelled"
         ? "Confirm your passkey to continue."
-        : "Your passkey is unavailable here. Try again in a moment.",
+        : "This could not be set up just now. Try again shortly.",
     );
     setStep("confirm-passkey");
   };
@@ -368,11 +339,11 @@ function ConnectForm() {
                 <ShieldCheck className="h-6 w-6 text-primary" />
               </div>
             </div>
-            <CardTitle>{step === "code" ? "Check your email" : "Signing you in"}</CardTitle>
+            <CardTitle>{step === "code" ? "Check your email" : "Connecting your wallet"}</CardTitle>
             <CardDescription>
               {step === "code"
                 ? `Enter the 6-digit code we sent to ${email}.`
-                : "Confirm your passkey to use your wallet here."}
+                : "Medialane.io will ask you to approve Medialane Portal, then bring you back."}
             </CardDescription>
           </CardHeader>
           <CardContent className="flex flex-col items-center gap-4">
@@ -406,15 +377,6 @@ function ConnectForm() {
                 Continue
               </Button>
             </div>
-            {step === "confirm-passkey" ? (
-              <button
-                type="button"
-                onClick={() => void askMedialaneToApprove()}
-                className="text-xs text-muted-foreground underline underline-offset-2 hover:text-foreground"
-              >
-                My passkey is on Medialane.io
-              </button>
-            ) : null}
             {step === "code" ? (
             <p className="text-xs text-muted-foreground text-center leading-relaxed">
               Didn&apos;t receive it? Check your spam, or{" "}

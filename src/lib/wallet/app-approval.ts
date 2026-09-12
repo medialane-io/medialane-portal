@@ -2,13 +2,12 @@ import { buildApprovalUrl } from "@medialane/sdk/starknet";
 import { createOwnerKey, PasskeyCancelledError, type SealedOwner } from "./passkey";
 import { saveSealedOwner, notifyWalletChange } from "./store";
 import { isOwnerOf } from "./devices";
-import { unlockWalletHere } from "./unlock-here";
 
 const APPROVER_ORIGIN = "https://www.medialane.io";
 const APP_NAME = "Medialane Portal";
 const PENDING_KEY = "medialane.portal.pending-owner.v1";
 
-export type AttachOutcome = "connected" | "cancelled" | "wrong-passkey" | "unavailable";
+export type RequestOutcome = "approving" | "cancelled" | "unavailable";
 export type ApprovalOutcome = "connected" | "unmatched" | "unconfirmed";
 
 function loadPending(): SealedOwner | null {
@@ -20,15 +19,7 @@ function loadPending(): SealedOwner | null {
   }
 }
 
-export async function attachWalletHere(account: string): Promise<AttachOutcome> {
-  const unlocked = await unlockWalletHere(account);
-  if (unlocked === "unlocked") return "connected";
-  if (unlocked === "cancelled") return "cancelled";
-  if (unlocked === "not-an-owner") return "wrong-passkey";
-  return "unavailable";
-}
-
-export async function requestAppApproval(returnUrl: string): Promise<"approving" | "cancelled" | "unavailable"> {
+export async function requestAppApproval(returnUrl: string): Promise<RequestOutcome> {
   let created;
   try {
     created = await createOwnerKey();
