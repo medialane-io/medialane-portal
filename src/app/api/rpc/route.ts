@@ -1,12 +1,13 @@
 import { NextRequest } from "next/server";
+import { limiterFor } from "@/lib/rate-limit-policy";
 import { createRpcProxyHandler } from "@medialane/sdk";
-import { createRateLimiter } from "@/src/lib/rate-limit";
+import { MEDIALANE_BACKEND_URL, MEDIALANE_API_KEY } from "@/lib/constants";
 
-const checkRateLimit = createRateLimiter(60_000, 600);
+const checkRateLimit = limiterFor("proxy:rpc");
 
 const handler = createRpcProxyHandler({
-  backendUrl: process.env.MEDIALANE_API_URL ?? "",
-  apiKey: process.env.MEDIALANE_API_KEY,
+  backendUrl: MEDIALANE_BACKEND_URL,
+  apiKey: MEDIALANE_API_KEY,
   checkRateLimit,
 });
 

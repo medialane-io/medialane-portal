@@ -1,1 +1,4 @@
-{}
+{
+  "installCommand": "rm -rf node_modules && bun install",
+  "buildCommand": "bun run build"
+}

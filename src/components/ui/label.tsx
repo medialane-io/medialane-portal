@@ -1,1 +1,1 @@
-export { Label } from "@medialane/ui";
+export { Label } from "@medialane/ui/label";

@@ -1,18 +1,11 @@
 "use client";
 
-import { useAccount, useConnect, useDisconnect } from "@starknet-react/core";
+import { useWalletNativeSession } from "./use-wallet-native-session";
 
 export function useWallet() {
-  const { address, isConnected, status } = useAccount();
-  const { connect, connectors } = useConnect();
-  const { disconnect } = useDisconnect();
-
+  const { address, hasWallet } = useWalletNativeSession();
   return {
-    address: address ?? null,
-    isConnected: isConnected ?? false,
-    isConnecting: status === "connecting" || status === "reconnecting",
-    connectors,
-    connect,
-    disconnect,
+    address,
+    isConnected: hasWallet,
   };
 }
