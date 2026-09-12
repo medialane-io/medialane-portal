@@ -64,7 +64,7 @@ export function CollectionPicker({
   const [name, setName] = useState("");
   const [symbol, setSymbol] = useState("");
   const [error, setError] = useState<string | null>(null);
-  const [outOfCredits, setOutOfCredits] = useState(false);
+  const [servicePaused, setServicePaused] = useState(false);
   const [phase, setPhase] = useState<TaskPhase>("idle");
   const [detail, setDetail] = useState<string | null>(null);
 
@@ -74,15 +74,14 @@ export function CollectionPicker({
     if (!account) return;
     setBusy(true);
     setError(null);
-    setOutOfCredits(false);
+    setServicePaused(false);
     setPhase("running");
     setDetail("Confirm in your wallet");
     try {
-      const res = await fetch("/api/portal/intents/build", {
+      const res = await fetch("/api/portal/intents/create-collection", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          type: "CREATE_COLLECTION",
           owner,
           name: name.trim(),
           symbol: symbol.trim(),
@@ -92,7 +91,7 @@ export function CollectionPicker({
       });
       const body = await res.json().catch(() => ({}));
       if (res.status === 402) {
-        setOutOfCredits(true);
+        setServicePaused(true);
         setPhase("error");
         return;
       }
@@ -129,7 +128,7 @@ export function CollectionPicker({
       phase={phase}
       detail={detail}
       error={error}
-      outOfCredits={outOfCredits}
+      servicePaused={servicePaused}
       successLine="Ready"
       onClose={() => setPhase("idle")}
     />

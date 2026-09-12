@@ -4,7 +4,7 @@ import {
   buildAndSignDeployment,
   type Recipient,
 } from "@/src/lib/provisioning";
-import { OUT_OF_CREDITS } from "@/src/lib/task-progress";
+import { SERVICE_PAUSED } from "@/src/lib/task-progress";
 
 export type Call = { contractAddress: string; entrypoint: string; calldata: string[] };
 
@@ -25,7 +25,7 @@ export async function provisionOne(secret: Uint8Array, recipient: Recipient, add
     }),
   });
 
-  if (res.status === 402) throw new Error(OUT_OF_CREDITS);
+  if (res.status === 402) throw new Error(SERVICE_PAUSED);
   if (!res.ok) {
     const body = await res.json().catch(() => ({}));
     throw new Error(body?.message ?? body?.error ?? `Could not prepare ${recipient.value}`);
@@ -37,7 +37,7 @@ export async function uploadImage(file: File): Promise<string> {
   form.set("file", file);
   const res = await fetch("/api/portal/metadata/upload-file", { method: "POST", body: form });
   const body = await res.json().catch(() => ({}));
-  if (res.status === 402) throw new Error(OUT_OF_CREDITS);
+  if (res.status === 402) throw new Error(SERVICE_PAUSED);
   if (!res.ok) throw new Error(body?.error ?? "Could not upload the image");
   return (body.data?.url ?? body.data?.uri) as string;
 }
@@ -49,7 +49,7 @@ export async function pinMetadata(metadata: unknown): Promise<string> {
     body: JSON.stringify(metadata),
   });
   const body = await res.json().catch(() => ({}));
-  if (res.status === 402) throw new Error(OUT_OF_CREDITS);
+  if (res.status === 402) throw new Error(SERVICE_PAUSED);
   if (!res.ok) throw new Error(body?.error ?? "Could not prepare the asset");
   return body.data.url as string;
 }
@@ -63,13 +63,13 @@ export async function buildTicketType(input: {
   startTime?: number;
   endTime?: number;
 }): Promise<{ calls: Call[] }> {
-  const res = await fetch("/api/portal/intents/build", {
+  const res = await fetch("/api/portal/intents/create-tier", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ type: "CREATE_TIER", service: "ip-tickets", ...input }),
+    body: JSON.stringify({ service: "ip-tickets", ...input }),
   });
   const body = await res.json().catch(() => ({}));
-  if (res.status === 402) throw new Error(OUT_OF_CREDITS);
+  if (res.status === 402) throw new Error(SERVICE_PAUSED);
   if (!res.ok) throw new Error(body?.error ?? "Could not prepare the ticket");
   return { calls: body.data.calls as Call[] };
 }
@@ -90,7 +90,7 @@ export async function fetchMintCalls(input: {
     body: JSON.stringify(input),
   });
   const body = await res.json().catch(() => ({}));
-  if (res.status === 402) throw new Error(OUT_OF_CREDITS);
+  if (res.status === 402) throw new Error(SERVICE_PAUSED);
   if (!res.ok) {
     if (body?.error === "recipients_not_provisioned") {
       throw new Error(`No wallet yet for ${(body.recipients ?? []).join(", ")}`);
@@ -115,7 +115,7 @@ export async function executeSponsored(
     body: JSON.stringify({ userAddress: account.address, calls }),
   });
   const buildBody = await built.json().catch(() => ({}));
-  if (built.status === 402) throw new Error(OUT_OF_CREDITS);
+  if (built.status === 402) throw new Error(SERVICE_PAUSED);
   if (!built.ok) throw new Error(buildBody?.error ?? "Could not prepare the transaction");
 
   const signature = await account.signMessage(buildBody.typedData as never);
@@ -131,7 +131,7 @@ export async function executeSponsored(
     }),
   });
   const sentBody = await sent.json().catch(() => ({}));
-  if (sent.status === 402) throw new Error(OUT_OF_CREDITS);
+  if (sent.status === 402) throw new Error(SERVICE_PAUSED);
   if (!sent.ok) throw new Error(sentBody?.error ?? "Could not send the transaction");
 
   const hash = sentBody?.transactionHash ?? sentBody?.data?.transactionHash;

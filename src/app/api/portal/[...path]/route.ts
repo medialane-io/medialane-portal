@@ -114,10 +114,10 @@ async function route(req: NextRequest, context: { params: Promise<{ path: string
 
   if (resource === "intents") {
     const rest = path.slice(1).join("/");
-    if (rest !== "build") {
+    if (rest !== "create-tier" && rest !== "create-collection") {
       return NextResponse.json({ error: "Not allowed through this proxy" }, { status: 403 });
     }
-    const upstream = await rawFetch("/v1/intents/build", token, {
+    const upstream = await rawFetch(`/v1/intents/${rest}`, token, {
       method: req.method,
       body,
     });

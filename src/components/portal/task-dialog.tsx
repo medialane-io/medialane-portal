@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { Check, Coins, Loader2 } from "lucide-react";
 import { Button } from "@/src/components/ui/button";
 import {
@@ -18,7 +17,7 @@ export function TaskDialog({
   phase,
   detail,
   error,
-  outOfCredits,
+  servicePaused,
   successLine,
   onClose,
   onDone,
@@ -28,7 +27,7 @@ export function TaskDialog({
   phase: TaskPhase;
   detail?: string | null;
   error?: string | null;
-  outOfCredits?: boolean;
+  servicePaused?: boolean;
   successLine?: string;
   onClose: () => void;
   onDone?: () => void;
@@ -38,21 +37,21 @@ export function TaskDialog({
   return (
     <Dialog open={open} onOpenChange={(next) => { if (!next && !running) onClose(); }}>
       <DialogContent className="sm:max-w-md" hideClose={running}>
-        {outOfCredits ? (
+        {servicePaused ? (
           <>
             <DialogHeader>
               <span className="mb-2 flex h-10 w-10 items-center justify-center rounded-full bg-muted">
                 <Coins className="h-5 w-5" />
               </span>
-              <DialogTitle>You are out of credits</DialogTitle>
-              <DialogDescription>Top up and this will go straight through.</DialogDescription>
+              <DialogTitle>This one is on us to sort out</DialogTitle>
+              <DialogDescription>
+                Your run is paused while we clear something on our side. Nothing was issued, and
+                nothing was charged. Try again in a few minutes.
+              </DialogDescription>
             </DialogHeader>
             <div className="flex gap-2">
-              <Button asChild size="sm">
-                <Link href="/account/credits">Add credits</Link>
-              </Button>
-              <Button variant="ghost" size="sm" onClick={onClose}>
-                Not now
+              <Button size="sm" onClick={onClose}>
+                Close
               </Button>
             </div>
           </>

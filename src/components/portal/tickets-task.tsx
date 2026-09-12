@@ -31,10 +31,11 @@ import {
   fetchMintCalls,
   executeSponsored,
 } from "@/src/lib/issue";
-import { issuedSummary, OUT_OF_CREDITS, type TaskPhase } from "@/src/lib/task-progress";
+import { issuedSummary, SERVICE_PAUSED, type TaskPhase } from "@/src/lib/task-progress";
+import { CREDITS_PER_USDC } from "@/src/lib/constants";
 import {
-  estimateIssuance,
-  shortfall,
+  quoteIssuance,
+  formatUsd,
   type PricingTable,
 } from "@/src/lib/issuance-cost";
 import { capacity, guestRows, repeatsIn, validitySentence } from "@/src/lib/ticket-event";
@@ -74,7 +75,7 @@ export function TicketsTask({ serviceId, address }: { serviceId: string; address
   const [phase, setPhase] = useState<TaskPhase>("idle");
   const [progress, setProgress] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [outOfCredits, setOutOfCredits] = useState(false);
+  const [servicePaused, setServicePaused] = useState(false);
   const [issued, setIssued] = useState<number | null>(null);
   const busy = phase === "running";
 
@@ -86,18 +87,11 @@ export function TicketsTask({ serviceId, address }: { serviceId: string; address
     revalidateOnFocus: false,
     shouldRetryOnError: false,
   });
-  const { data: creditsData } = useSWR<{ data?: { balance?: number } }>(
-    "/api/portal/credits",
-    portalFetcher,
-    { revalidateOnFocus: false, shouldRetryOnError: false },
+  const quote = quoteIssuance(
+    pricingData?.pricing,
+    { recipients: recipients.length, service: serviceId },
+    CREDITS_PER_USDC,
   );
-  const balance = creditsData?.data?.balance;
-  const estimate = estimateIssuance(pricingData?.pricing, {
-    recipients: recipients.length,
-    hasImage: Boolean(artwork),
-    service: serviceId,
-  });
-  const missing = shortfall(estimate.total, balance);
   const room = capacity(supply, recipients.length);
   const hasRun = recipients.length > 0;
   const rows = guestRows(guests);
@@ -124,7 +118,7 @@ export function TicketsTask({ serviceId, address }: { serviceId: string; address
     if (!account) return;
     setPhase("running");
     setError(null);
-    setOutOfCredits(false);
+    setServicePaused(false);
     setIssued(null);
 
     try {
@@ -224,7 +218,7 @@ export function TicketsTask({ serviceId, address }: { serviceId: string; address
       setPhase("success");
     } catch (e) {
       const message = e instanceof Error ? e.message : String(e);
-      if (message === OUT_OF_CREDITS) setOutOfCredits(true);
+      if (message === SERVICE_PAUSED) setServicePaused(true);
       else setError(message || "Could not finish issuing.");
       setPhase("error");
     } finally {
@@ -240,7 +234,7 @@ export function TicketsTask({ serviceId, address }: { serviceId: string; address
         phase={phase}
         detail={progress}
         error={error}
-        outOfCredits={outOfCredits}
+        servicePaused={servicePaused}
         successLine={issued !== null ? issuedSummary(issued, "guest") : undefined}
         onClose={() => setPhase("idle")}
       />
@@ -494,27 +488,9 @@ export function TicketsTask({ serviceId, address }: { serviceId: string; address
                     </span>
                   </p>
                   <p className="shrink-0 text-2xl font-bold tabular-nums">
-                    {estimate.total.toLocaleString()}
-                    <span className="ml-1.5 text-base font-medium text-muted-foreground">
-                      credits
-                    </span>
+                    {formatUsd(quote.total)}
                   </p>
                 </div>
-              ) : null}
-
-              {balance !== undefined ? (
-                <p className="text-muted-foreground">
-                  Balance {balance.toLocaleString()}
-                  {missing > 0 ? (
-                    <>
-                      {" · short by "}
-                      {missing.toLocaleString()}{" "}
-                      <Link href="/account/credits" className="text-primary hover:underline">
-                        Add credits
-                      </Link>
-                    </>
-                  ) : null}
-                </p>
               ) : null}
 
               <div className="flex flex-wrap items-center gap-3 pt-1">

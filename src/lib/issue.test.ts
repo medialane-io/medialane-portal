@@ -1,6 +1,6 @@
 import { test, expect, afterEach } from "bun:test";
 import { executeSponsored } from "./issue";
-import { OUT_OF_CREDITS } from "./task-progress";
+import { SERVICE_PAUSED } from "./task-progress";
 
 const realFetch = globalThis.fetch;
 afterEach(() => {
@@ -49,7 +49,7 @@ test("the signature and the built typed data are sent back for execution", async
 
 test("running out of credits while building says so", async () => {
   stub([{ status: 402, body: { error: "no credits" } }]);
-  expect(executeSponsored(account, calls)).rejects.toThrow(OUT_OF_CREDITS);
+  expect(executeSponsored(account, calls)).rejects.toThrow(SERVICE_PAUSED);
 });
 
 test("running out of credits while executing says so", async () => {
@@ -57,7 +57,7 @@ test("running out of credits while executing says so", async () => {
     { status: 200, body: { typedData: {} } },
     { status: 402, body: { error: "no credits" } },
   ]);
-  expect(executeSponsored(account, calls)).rejects.toThrow(OUT_OF_CREDITS);
+  expect(executeSponsored(account, calls)).rejects.toThrow(SERVICE_PAUSED);
 });
 
 test("the backend's reason for refusing is what the business reads", async () => {

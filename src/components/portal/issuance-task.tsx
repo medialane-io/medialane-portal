@@ -38,8 +38,9 @@ import {
   executeSponsored,
 } from "@/src/lib/issue";
 import { portalFetcher } from "@/src/lib/portal/fetcher";
-import { estimateIssuance, shortfall, type PricingTable } from "@/src/lib/issuance-cost";
-import { issuedSummary, OUT_OF_CREDITS, type TaskPhase } from "@/src/lib/task-progress";
+import { quoteIssuance, formatUsd, type PricingTable } from "@/src/lib/issuance-cost";
+import { CREDITS_PER_USDC } from "@/src/lib/constants";
+import { issuedSummary, SERVICE_PAUSED, type TaskPhase } from "@/src/lib/task-progress";
 import {
   parseRecipients,
   invalidRecipients,
@@ -70,7 +71,7 @@ export function IssuanceTask({ serviceId, address }: { serviceId: string; addres
   const [phase, setPhase] = useState<TaskPhase>("idle");
   const [progress, setProgress] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [outOfCredits, setOutOfCredits] = useState(false);
+  const [servicePaused, setServicePaused] = useState(false);
   const [issued, setIssued] = useState<number | null>(null);
   const busy = phase === "running";
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
@@ -88,18 +89,11 @@ export function IssuanceTask({ serviceId, address }: { serviceId: string; addres
     portalFetcher,
     { revalidateOnFocus: false, shouldRetryOnError: false },
   );
-  const { data: creditsData } = useSWR<{ data?: { balance?: number } }>(
-    "/api/portal/credits",
-    portalFetcher,
-    { revalidateOnFocus: false, shouldRetryOnError: false },
+  const quote = quoteIssuance(
+    pricingData?.pricing,
+    { recipients: recipients.length, service: serviceId },
+    CREDITS_PER_USDC,
   );
-  const balance = creditsData?.data?.balance;
-  const estimate = estimateIssuance(pricingData?.pricing, {
-    recipients: recipients.length,
-    hasImage: Boolean(imageFile),
-    service: serviceId,
-  });
-  const missing = shortfall(estimate.total, balance);
 
   function chooseImage(file: File | undefined) {
     if (!file) return;
@@ -127,7 +121,7 @@ export function IssuanceTask({ serviceId, address }: { serviceId: string; addres
     setFieldErrors({});
     setPhase("running");
     setError(null);
-    setOutOfCredits(false);
+    setServicePaused(false);
     setIssued(null);
 
     try {
@@ -203,8 +197,8 @@ export function IssuanceTask({ serviceId, address }: { serviceId: string; addres
       setPhase("success");
     } catch (e) {
       const message = e instanceof Error ? e.message : String(e);
-      if (message === OUT_OF_CREDITS) {
-        setOutOfCredits(true);
+      if (message === SERVICE_PAUSED) {
+        setServicePaused(true);
       } else {
         setError(message || "Could not finish issuing.");
       }
@@ -222,7 +216,7 @@ export function IssuanceTask({ serviceId, address }: { serviceId: string; addres
         phase={phase}
         detail={progress}
         error={error}
-        outOfCredits={outOfCredits}
+        servicePaused={servicePaused}
         successLine={issued !== null ? issuedSummary(issued) : undefined}
         onClose={() => setPhase("idle")}
       />
@@ -473,42 +467,21 @@ export function IssuanceTask({ serviceId, address }: { serviceId: string; addres
           ) : null}
         </section>
 
-        {estimate.total > 0 ? (
+        {quote.total > 0 ? (
           <div className="rounded-xl border border-border p-4 space-y-3">
             <div className="flex items-baseline justify-between gap-4">
               <p className="text-sm font-medium">This run costs</p>
-              <p className="text-xl font-bold tabular-nums">
-                {estimate.total.toLocaleString()}
-                <span className="ml-1.5 text-sm font-medium text-muted-foreground">credits</span>
-              </p>
+              <p className="text-xl font-bold tabular-nums">{formatUsd(quote.total)}</p>
             </div>
 
             <ul className="space-y-1">
-              {estimate.lines.map((line) => (
+              {quote.lines.map((line) => (
                 <li key={line.label} className="flex justify-between gap-4 text-xs text-muted-foreground">
                   <span>{line.label}</span>
-                  <span className="tabular-nums">{line.credits.toLocaleString()}</span>
+                  <span className="tabular-nums">{formatUsd(line.usd)}</span>
                 </li>
               ))}
             </ul>
-
-            {balance !== undefined ? (
-              <div className="flex justify-between gap-4 border-t border-border pt-2 text-xs">
-                <span className="text-muted-foreground">You have</span>
-                <span className="tabular-nums font-medium">{balance.toLocaleString()} credits</span>
-              </div>
-            ) : null}
-
-            {missing > 0 ? (
-              <div className="flex items-center justify-between gap-3 rounded-lg bg-muted/50 p-3">
-                <p className="text-sm">
-                  You need {missing.toLocaleString()} more before this will go through.
-                </p>
-                <Button asChild size="sm" variant="outline">
-                  <Link href="/account/credits">Add credits</Link>
-                </Button>
-              </div>
-            ) : null}
           </div>
         ) : null}
 

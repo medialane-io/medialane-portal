@@ -1,10 +1,10 @@
 export type TaskPhase = "idle" | "running" | "success" | "error";
 
-export const OUT_OF_CREDITS = "out_of_credits";
+export const SERVICE_PAUSED = "service_paused";
 
-export function isOutOfCredits(error: unknown): boolean {
-  if (error === OUT_OF_CREDITS) return true;
-  return error instanceof Error && error.message === OUT_OF_CREDITS;
+export function isServicePaused(error: unknown): boolean {
+  if (error === SERVICE_PAUSED) return true;
+  return error instanceof Error && error.message === SERVICE_PAUSED;
 }
 
 export function issuedSummary(count: number, noun = "recipient"): string {
