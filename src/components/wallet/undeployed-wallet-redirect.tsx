@@ -4,7 +4,7 @@ import { useEffect, useRef } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { useWalletNativeSession } from "@/hooks/use-wallet-native-session";
 
-const EXCLUDED_PREFIXES = ["/mint", "/br/mint", "/airdrop", "/wallet-onboarding"];
+const EXCLUDED_PREFIXES = ["/connect", "/wallet-onboarding"];
 
 export function UndeployedWalletRedirect() {
   const { hasWallet, isDeployed } = useWalletNativeSession();
