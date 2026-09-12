@@ -35,11 +35,10 @@ import {
   pinMetadata,
   fetchMintCalls,
   executeSponsored,
-  quoteRun,
-  payForRun,
   openRun,
+  NOT_ENOUGH_CREDITS,
 } from "@/src/lib/issue";
-import { useRunQuote, usdFromAtomic, usdFromCredits, formatUsd } from "@/src/lib/quote";
+import { useRunQuote, usdFromCredits, formatUsd } from "@/src/lib/quote";
 import { issuedSummary, SERVICE_PAUSED, type TaskPhase } from "@/src/lib/task-progress";
 import {
   parseRecipients,
@@ -72,6 +71,7 @@ export function IssuanceTask({ serviceId, address }: { serviceId: string; addres
   const [progress, setProgress] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [servicePaused, setServicePaused] = useState(false);
+  const [needsCredits, setNeedsCredits] = useState(false);
   const [issued, setIssued] = useState<number | null>(null);
   const busy = phase === "running";
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
@@ -85,7 +85,7 @@ export function IssuanceTask({ serviceId, address }: { serviceId: string; addres
   const invalid = invalidRecipients(recipients);
 
   const quote = useRunQuote(serviceId, recipients.length);
-  const quoteTotal = usdFromAtomic(quote?.totalAtomic);
+  const quoteTotal = usdFromCredits(quote?.totalCredits ?? 0);
 
   function chooseImage(file: File | undefined) {
     if (!file) return;
@@ -114,13 +114,12 @@ export function IssuanceTask({ serviceId, address }: { serviceId: string; addres
     setPhase("running");
     setError(null);
     setServicePaused(false);
+    setNeedsCredits(false);
     setIssued(null);
 
     try {
-      setProgress("Confirm the payment in your wallet");
-      const paid = await quoteRun(serviceId, recipients.length);
-      const txHash = await payForRun(account, paid);
-      await openRun(serviceId, recipients.length, txHash);
+      setProgress("Reserving this run");
+      await openRun(serviceId, recipients.length);
 
       setProgress("Confirm in your wallet to begin");
       const signature = await account.signMessage({
@@ -194,7 +193,9 @@ export function IssuanceTask({ serviceId, address }: { serviceId: string; addres
       setPhase("success");
     } catch (e) {
       const message = e instanceof Error ? e.message : String(e);
-      if (message === SERVICE_PAUSED) {
+      if (message === NOT_ENOUGH_CREDITS) {
+        setNeedsCredits(true);
+      } else if (message === SERVICE_PAUSED) {
         setServicePaused(true);
       } else {
         setError(message || "Could not finish issuing.");
@@ -214,6 +215,7 @@ export function IssuanceTask({ serviceId, address }: { serviceId: string; addres
         detail={progress}
         error={error}
         servicePaused={servicePaused}
+        needsCredits={needsCredits}
         successLine={issued !== null ? issuedSummary(issued) : undefined}
         onClose={() => setPhase("idle")}
       />

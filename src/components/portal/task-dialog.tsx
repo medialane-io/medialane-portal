@@ -9,6 +9,7 @@ import {
   DialogTitle,
   DialogDescription,
 } from "@/src/components/ui/dialog";
+import Link from "next/link";
 import { type TaskPhase } from "@/src/lib/task-progress";
 
 export function TaskDialog({
@@ -18,6 +19,7 @@ export function TaskDialog({
   detail,
   error,
   servicePaused,
+  needsCredits,
   successLine,
   onClose,
   onDone,
@@ -28,6 +30,7 @@ export function TaskDialog({
   detail?: string | null;
   error?: string | null;
   servicePaused?: boolean;
+  needsCredits?: boolean;
   successLine?: string;
   onClose: () => void;
   onDone?: () => void;
@@ -37,7 +40,27 @@ export function TaskDialog({
   return (
     <Dialog open={open} onOpenChange={(next) => { if (!next && !running) onClose(); }}>
       <DialogContent className="sm:max-w-md" hideClose={running}>
-        {servicePaused ? (
+        {needsCredits ? (
+          <>
+            <DialogHeader>
+              <span className="mb-2 flex h-10 w-10 items-center justify-center rounded-full bg-muted">
+                <Coins className="h-5 w-5" />
+              </span>
+              <DialogTitle>You need more credits for this run</DialogTitle>
+              <DialogDescription>
+                Nothing was issued and nothing was charged. Top up and start it again.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="flex gap-2">
+              <Button asChild size="sm">
+                <Link href="/account/credits">Add credits</Link>
+              </Button>
+              <Button variant="ghost" size="sm" onClick={onClose}>
+                Not now
+              </Button>
+            </div>
+          </>
+        ) : servicePaused ? (
           <>
             <DialogHeader>
               <span className="mb-2 flex h-10 w-10 items-center justify-center rounded-full bg-muted">

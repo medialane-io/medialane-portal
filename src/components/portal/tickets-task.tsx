@@ -28,12 +28,11 @@ import {
   buildTicketType,
   fetchMintCalls,
   executeSponsored,
-  quoteRun,
-  payForRun,
   openRun,
+  NOT_ENOUGH_CREDITS,
 } from "@/src/lib/issue";
 import { issuedSummary, SERVICE_PAUSED, type TaskPhase } from "@/src/lib/task-progress";
-import { useRunQuote, usdFromAtomic, formatUsd } from "@/src/lib/quote";
+import { useRunQuote, usdFromCredits, formatUsd } from "@/src/lib/quote";
 import { capacity, guestRows, repeatsIn, validitySentence } from "@/src/lib/ticket-event";
 import {
   imageRejectionReason,
@@ -72,6 +71,7 @@ export function TicketsTask({ serviceId, address }: { serviceId: string; address
   const [progress, setProgress] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [servicePaused, setServicePaused] = useState(false);
+  const [needsCredits, setNeedsCredits] = useState(false);
   const [issued, setIssued] = useState<number | null>(null);
   const busy = phase === "running";
 
@@ -80,7 +80,7 @@ export function TicketsTask({ serviceId, address }: { serviceId: string; address
   const windowError = validityError(validFrom, validUntil);
 
   const quote = useRunQuote(serviceId, recipients.length);
-  const quoteTotal = usdFromAtomic(quote?.totalAtomic);
+  const quoteTotal = usdFromCredits(quote?.totalCredits ?? 0);
   const room = capacity(supply, recipients.length);
   const hasRun = recipients.length > 0;
   const rows = guestRows(guests);
@@ -108,13 +108,12 @@ export function TicketsTask({ serviceId, address }: { serviceId: string; address
     setPhase("running");
     setError(null);
     setServicePaused(false);
+    setNeedsCredits(false);
     setIssued(null);
 
     try {
-      setProgress("Confirm the payment in your wallet");
-      const paid = await quoteRun(serviceId, recipients.length);
-      const txHash = await payForRun(account, paid);
-      await openRun(serviceId, recipients.length, txHash);
+      setProgress("Reserving this run");
+      await openRun(serviceId, recipients.length);
 
       setProgress("Confirm in your wallet");
       const signature = await account.signMessage({
@@ -212,7 +211,8 @@ export function TicketsTask({ serviceId, address }: { serviceId: string; address
       setPhase("success");
     } catch (e) {
       const message = e instanceof Error ? e.message : String(e);
-      if (message === SERVICE_PAUSED) setServicePaused(true);
+      if (message === NOT_ENOUGH_CREDITS) setNeedsCredits(true);
+      else if (message === SERVICE_PAUSED) setServicePaused(true);
       else setError(message || "Could not finish issuing.");
       setPhase("error");
     } finally {
@@ -229,6 +229,7 @@ export function TicketsTask({ serviceId, address }: { serviceId: string; address
         detail={progress}
         error={error}
         servicePaused={servicePaused}
+        needsCredits={needsCredits}
         successLine={issued !== null ? issuedSummary(issued, "guest") : undefined}
         onClose={() => setPhase("idle")}
       />

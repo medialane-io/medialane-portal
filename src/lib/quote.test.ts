@@ -1,13 +1,13 @@
 import { test, expect } from "bun:test";
-import { usdFromAtomic, formatUsd } from "./quote";
+import { usdFromCredits, formatUsd } from "./quote";
 
-test("atomic USDC reads back as dollars", () => {
-  expect(usdFromAtomic("30500000")).toBeCloseTo(30.5, 6);
-  expect(usdFromAtomic("10000")).toBeCloseTo(0.01, 6);
+test("credits read back as dollars at the platform rate", () => {
+  expect(usdFromCredits(3050)).toBeCloseTo(30.5, 6);
+  expect(usdFromCredits(1)).toBeCloseTo(0.01, 6);
 });
 
-test("a missing quote is worth nothing, not NaN", () => {
-  expect(usdFromAtomic(undefined)).toBe(0);
+test("nothing costs nothing", () => {
+  expect(usdFromCredits(0)).toBe(0);
 });
 
 test("small amounts read as a floor, not as zero", () => {

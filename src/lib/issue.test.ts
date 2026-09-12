@@ -1,5 +1,5 @@
 import { test, expect, afterEach } from "bun:test";
-import { executeSponsored, paymentCall } from "./issue";
+import { executeSponsored } from "./issue";
 import { SERVICE_PAUSED } from "./task-progress";
 
 const realFetch = globalThis.fetch;
@@ -82,26 +82,3 @@ test("a single string signature is still sent as an array", async () => {
   expect((seen[1].body as { signature: string[] }).signature).toEqual(["0xsig"]);
 });
 
-test("the payment call moves the quoted amount to the treasury", () => {
-  const call = paymentCall({
-    lines: [],
-    totalCredits: 3050,
-    totalAtomic: "30500000",
-    asset: "0xusdc",
-    payTo: "0xtreasury",
-  });
-  expect(call.contractAddress).toBe("0xusdc");
-  expect(call.entrypoint).toBe("transfer");
-  expect(call.calldata).toEqual(["0xtreasury", "30500000", "0"]);
-});
-
-test("an amount past 2^128 is split across both u256 words", () => {
-  const call = paymentCall({
-    lines: [],
-    totalCredits: 0,
-    totalAtomic: (2n ** 128n + 7n).toString(),
-    asset: "0xusdc",
-    payTo: "0xtreasury",
-  });
-  expect(call.calldata).toEqual(["0xtreasury", "7", "1"]);
-});

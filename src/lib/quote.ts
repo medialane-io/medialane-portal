@@ -3,13 +3,6 @@ import useSWR from "swr";
 import { quoteRun, type RunQuote } from "@/src/lib/issue";
 import { CREDITS_PER_USDC } from "@/src/lib/constants";
 
-const USDC_DECIMALS = 1_000_000;
-
-export function usdFromAtomic(atomic: string | undefined): number {
-  if (!atomic) return 0;
-  return Number(BigInt(atomic)) / USDC_DECIMALS;
-}
-
 export function usdFromCredits(credits: number): number {
   return CREDITS_PER_USDC > 0 ? credits / CREDITS_PER_USDC : 0;
 }
