@@ -44,9 +44,9 @@ export default function RecoverPage() {
             href="/connect"
             className="rounded-2xl border border-border bg-card p-4 text-left transition-transform active:scale-[0.98]"
           >
-            <p className="text-sm font-semibold">I still have my passkey</p>
+            <p className="text-sm font-semibold">I can sign in on Medialane.io</p>
             <p className="mt-1 text-xs text-muted-foreground">
-              Sign in and confirm it to use your wallet here.
+              Approve this app there and your wallet works here.
             </p>
           </Link>
           <button
