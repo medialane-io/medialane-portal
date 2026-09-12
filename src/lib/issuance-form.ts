@@ -61,9 +61,9 @@ export const ISSUANCE_DEFAULTS: IssuanceValues = {
   recipients: "",
 };
 
-export const MAX_IMAGE_BYTES = 10 * 1024 * 1024;
+const MAX_IMAGE_BYTES = 10 * 1024 * 1024;
 
-export const ACCEPTED_IMAGE_TYPES = [
+const ACCEPTED_IMAGE_TYPES = [
   "image/jpeg",
   "image/png",
   "image/gif",
@@ -93,7 +93,7 @@ export function creditsFor(usdc: number, creditsPerUsdc: number): number | null 
   return Math.floor(usdc * creditsPerUsdc);
 }
 
-export const TICKETS_SERVICE = "ip-tickets";
+const TICKETS_SERVICE = "ip-tickets";
 
 export function isTicketService(serviceId: string): boolean {
   return serviceId === TICKETS_SERVICE;

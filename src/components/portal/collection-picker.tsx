@@ -23,15 +23,10 @@ export interface CollectionOption {
   totalSupply?: number | null;
 }
 
-export function collectionLabel(c: CollectionOption): string {
+function collectionLabel(c: CollectionOption): string {
   return c.name?.trim() || `Collection ${c.collectionId}`;
 }
 
-export function collectionWorks(c: CollectionOption): string {
-  const n = c.totalSupply ?? 0;
-  if (n === 0) return "No works yet";
-  return `${n} ${n === 1 ? "work" : "works"}`;
-}
 
 export function CollectionPicker({
   serviceId,

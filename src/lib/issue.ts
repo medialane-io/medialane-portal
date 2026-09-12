@@ -139,7 +139,7 @@ export async function executeSponsored(
   return hash as string;
 }
 
-export interface QuoteLine {
+interface QuoteLine {
   label: string;
   actionKey: string;
   units: number;
