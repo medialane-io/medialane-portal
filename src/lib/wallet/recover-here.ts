@@ -1,7 +1,8 @@
 import { discoverOwnerKey, PasskeyCancelledError } from "./passkey";
+import { isOwnerOf } from "./devices";
 import { saveSealedOwner, notifyWalletChange } from "./store";
 
-export type RecoveryOutcome = "recovered" | "different-wallet" | "unavailable" | "cancelled";
+export type RecoveryOutcome = "recovered" | "not-an-owner" | "unavailable" | "cancelled";
 
 export async function recoverWalletHere(accountAddress: string): Promise<RecoveryOutcome> {
   let discovered;
@@ -11,17 +12,16 @@ export async function recoverWalletHere(accountAddress: string): Promise<Recover
     return err instanceof PasskeyCancelledError ? "cancelled" : "unavailable";
   }
 
-  if (!sameAddress(discovered.address, accountAddress)) return "different-wallet";
+  let owns: boolean;
+  try {
+    owns = await isOwnerOf(accountAddress, discovered.ownerPubKey);
+  } catch {
+    return "unavailable";
+  }
 
-  saveSealedOwner(discovered);
+  if (!owns) return "not-an-owner";
+
+  saveSealedOwner({ ...discovered, address: accountAddress });
   notifyWalletChange();
   return "recovered";
-}
-
-export function sameAddress(a: string, b: string): boolean {
-  try {
-    return BigInt(a) === BigInt(b);
-  } catch {
-    return false;
-  }
 }
