@@ -1,7 +1,0 @@
-# /enterprise
-
-**Route:** `/enterprise`
-
-## Copy
-
-
