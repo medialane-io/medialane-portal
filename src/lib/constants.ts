@@ -5,7 +5,10 @@ export { SUPPORTED_TOKENS } from "@medialane/sdk";
 const isServer = typeof window === "undefined";
 
 export const MEDIALANE_BACKEND_URL = isServer
-  ? readStringEnv(process.env.NEXT_PUBLIC_MEDIALANE_BACKEND_URL, "http://localhost:3001")
+  ? readStringEnv(
+      process.env.MEDIALANE_API_URL ?? process.env.NEXT_PUBLIC_MEDIALANE_BACKEND_URL,
+      "http://localhost:3001",
+    )
   : `${window.location.origin}/api/proxy`;
 
 export const MEDIALANE_API_KEY = isServer

@@ -14,7 +14,9 @@ import {
 } from "./session-cookie";
 
 const BACKEND_URL =
-  process.env.NEXT_PUBLIC_MEDIALANE_BACKEND_URL ?? "http://localhost:3001";
+  process.env.MEDIALANE_API_URL ??
+  process.env.NEXT_PUBLIC_MEDIALANE_BACKEND_URL ??
+  "http://localhost:3001";
 
 const HOP_BY_HOP_HEADERS = new Set([
   "connection",

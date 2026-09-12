@@ -76,8 +76,9 @@ function MainShell({ children }: { children: React.ReactNode }) {
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-muted-foreground">
             <p className="text-xs">© {new Date().getFullYear()} Medialane DAO</p>
             <nav className="flex items-center gap-4 flex-wrap justify-center">
-              <Link href="/marketplace" className="hover:text-foreground transition-colors">Trade</Link>
-              <Link href="/launchpad" className="hover:text-foreground transition-colors">Launch</Link>
+              <Link href="/launchpad" className="hover:text-foreground transition-colors">Launchpad</Link>
+              <Link href="/account" className="hover:text-foreground transition-colors">Account</Link>
+              <Link href="/pricing" className="hover:text-foreground transition-colors">Pricing</Link>
               <a href="https://docs.medialane.io" target="_blank" rel="noopener noreferrer" className="hover:text-foreground transition-colors">Docs</a>
               <a href="https://docs.medialane.io/guidelines/terms" target="_blank" rel="noopener noreferrer" className="hover:text-foreground transition-colors">Terms</a>
               <a href="https://docs.medialane.io/guidelines/privacy" target="_blank" rel="noopener noreferrer" className="hover:text-foreground transition-colors">Privacy</a>

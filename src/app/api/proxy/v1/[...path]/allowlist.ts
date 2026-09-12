@@ -4,6 +4,7 @@ const ALLOWED_ROUTES: Record<string, RegExp[]> = {
     /^portal\/keys$/,
     /^portal\/credits\/(history|spend)$/,
     /^prices$/,
+    /^pricing$/,
     /^collections$/,
     /^auth\/email\/exists$/,
     /^users\/me$/,

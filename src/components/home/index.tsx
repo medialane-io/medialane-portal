@@ -18,12 +18,12 @@ export function HomePage() {
       <div className="w-full max-w-screen-2xl mx-auto px-4 sm:px-6 space-y-10 sm:space-y-16 lg:space-y-20 mt-16">
         <LaunchpadStrip
           hrefs={{
-            "nfts": "/launchpad/single-editions",
-            "limited-editions": "/launchpad/nfteditions",
-            "collection-drop": "/launchpad/drop",
-            "pop-protocol": "/launchpad/pop",
-            "ip-tickets": "/launchpad/tickets",
-            "creator-coins": "/launchpad/coin/create",
+            "nfts": "/launchpad",
+            "limited-editions": "/launchpad",
+            "collection-drop": "/launchpad",
+            "pop-protocol": "/launchpad",
+            "ip-tickets": "/launchpad",
+            "creator-coins": "/launchpad",
           }}
           launchpadHref="/launchpad"
         />
