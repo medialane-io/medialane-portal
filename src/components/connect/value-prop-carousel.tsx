@@ -2,29 +2,25 @@
 
 import { useState } from "react";
 import {
-  Award, Pencil, Trophy, ScanFace, Sparkles, KeyRound, Globe, Lock,
-  ShieldCheck, Radio, Zap, Shuffle, Package, Gem, Fingerprint, Rocket,
-  ShoppingBag, type LucideIcon,
+  ScanFace, KeyRound, Zap, Lock, ShieldCheck, Users, Ticket, Receipt,
+  Wallet, Gauge, Bot, Fingerprint, Layers, Globe, type LucideIcon,
 } from "lucide-react";
 
 const VALUE_PROPS: { label: string; icon: LucideIcon }[] = [
-  { label: "Own your work", icon: Award },
-  { label: "Create freely", icon: Pencil },
-  { label: "Get rewarded", icon: Trophy },
   { label: "Sign in with a glance", icon: ScanFace },
-  { label: "Free to mint", icon: Sparkles },
-  { label: "Self custody", icon: KeyRound },
-  { label: "Global markets", icon: Globe },
-  { label: "Immutable contracts", icon: Lock },
-  { label: "Worldwide protection", icon: ShieldCheck },
-  { label: "Censorship resistant", icon: Radio },
+  { label: "No seed phrase", icon: KeyRound },
+  { label: "Self custody", icon: Lock },
+  { label: "Issue to a list", icon: Users },
+  { label: "Everyone gets a wallet", icon: Wallet },
+  { label: "Tickets and memberships", icon: Ticket },
   { label: "Sponsored transactions", icon: Zap },
-  { label: "Remix", icon: Shuffle },
-  { label: "Limited editions", icon: Package },
-  { label: "Creator's Fund", icon: Gem },
+  { label: "Pay per call", icon: Receipt },
+  { label: "Priced up front", icon: Gauge },
+  { label: "Keys for your agents", icon: Bot },
+  { label: "Immutable contracts", icon: Layers },
   { label: "Asset provenance", icon: Fingerprint },
-  { label: "Creator Launchpad", icon: Rocket },
-  { label: "NFT Marketplace", icon: ShoppingBag },
+  { label: "Worldwide protection", icon: ShieldCheck },
+  { label: "Works anywhere", icon: Globe },
 ];
 
 function Track({ hidden }: { hidden?: boolean }) {
