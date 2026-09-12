@@ -8,6 +8,8 @@ const ALLOWED_ROUTES: Record<string, RegExp[]> = {
     /^auth\/email\/exists$/,
     /^users\/me$/,
     /^intents\/[^/]+$/,
+    /^username-claims\/me$/,
+    /^username-claims\/check\/[^/]+$/,
   ],
 
   POST: [
@@ -22,6 +24,8 @@ const ALLOWED_ROUTES: Record<string, RegExp[]> = {
     /^intents\/(create-tier|create-collection)$/,
     /^metadata\/upload(-file)?$/,
     /^tx\/sync$/,
+    /^username-claims$/,
+    /^reports$/,
   ],
 
   DELETE: [/^portal\/keys\/[^/]+$/],
