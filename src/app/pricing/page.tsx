@@ -27,10 +27,15 @@ const ACTION_LABELS: Record<string, string> = {
   "intent:fulfill": "Buy / fulfill an order",
   "intent:counter-offer": "Counter an offer",
   "intent:checkout": "Checkout",
-  "wallet:deploy": "Create a wallet for someone",
   "metadata:upload-json": "Upload metadata JSON to IPFS",
   "metadata:upload-file": "Upload a media file to IPFS",
 };
+
+const NOT_SOLD = ["wallet:deploy", "paymaster:"];
+
+function isSold(actionKey: string): boolean {
+  return !NOT_SOLD.some((prefix) => actionKey.startsWith(prefix));
+}
 
 interface PricingRule {
   actionKey: string;
@@ -60,7 +65,10 @@ export default async function PricingPage() {
   const creditsPerUsdc = pricing?.creditsPerUsdc ?? 100;
   const mdln = tierRows(pricing?.mdln?.tiers, creditsPerUsdc);
 
-  const defaults = pricing?.pricing.rules.filter((r) => r.chain === "ALL" && r.service === "ALL") ?? [];
+  const defaults =
+    pricing?.pricing.rules.filter(
+      (r) => r.chain === "ALL" && r.service === "ALL" && isSold(r.actionKey),
+    ) ?? [];
   const known = Object.keys(ACTION_LABELS);
   const ordered = [
     ...known.filter((k) => defaults.some((r) => r.actionKey === k)),

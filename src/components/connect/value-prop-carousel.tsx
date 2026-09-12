@@ -2,25 +2,23 @@
 
 import { useState } from "react";
 import {
-  ScanFace, KeyRound, Zap, Lock, ShieldCheck, Users, Ticket, Receipt,
-  Wallet, Gauge, Bot, Fingerprint, Layers, Globe, type LucideIcon,
+  ScanFace, Ticket, Users, Layers, Coins, ShieldCheck, Scale,
+  Receipt, Bot, Gauge, Fingerprint, Globe, type LucideIcon,
 } from "lucide-react";
 
 const VALUE_PROPS: { label: string; icon: LucideIcon }[] = [
+  { label: "Tickets", icon: Ticket },
+  { label: "Memberships", icon: Users },
+  { label: "Editions", icon: Layers },
+  { label: "Creator Coins", icon: Coins },
+  { label: "Programmable IP", icon: Fingerprint },
+  { label: "Licensing", icon: Scale },
+  { label: "Worldwide protection", icon: ShieldCheck },
   { label: "Sign in with a glance", icon: ScanFace },
-  { label: "No seed phrase", icon: KeyRound },
-  { label: "Self custody", icon: Lock },
-  { label: "Issue to a list", icon: Users },
-  { label: "Everyone gets a wallet", icon: Wallet },
-  { label: "Tickets and memberships", icon: Ticket },
-  { label: "Sponsored transactions", icon: Zap },
   { label: "Pay per call", icon: Receipt },
   { label: "Priced up front", icon: Gauge },
-  { label: "Keys for your agents", icon: Bot },
-  { label: "Immutable contracts", icon: Layers },
-  { label: "Asset provenance", icon: Fingerprint },
-  { label: "Worldwide protection", icon: ShieldCheck },
-  { label: "Works anywhere", icon: Globe },
+  { label: "Built for agents", icon: Bot },
+  { label: "Open to anyone", icon: Globe },
 ];
 
 function Track({ hidden }: { hidden?: boolean }) {

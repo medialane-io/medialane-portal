@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePortalToken, usePortalAccount, usePortalSpend } from "@/hooks/use-portal-account";
 import { labelForAction } from "@/lib/spend-labels";
 import { ApiKeys } from "./api-keys";
+import { AddCredits } from "./add-credits";
 import { Button } from "@/components/ui/button";
 
 const CREDITS_PER_USDC = 100;
@@ -17,7 +18,7 @@ function usd(credits: number): string {
 
 export function AccountContent() {
   const { token, address, authorize, isSigningIn, error } = usePortalToken();
-  const { data: account } = usePortalAccount(token);
+  const { data: account, mutate: refreshAccount } = usePortalAccount(token);
   const { data: spend } = usePortalSpend(token);
 
   if (!address) {
@@ -79,6 +80,8 @@ export function AccountContent() {
           </ul>
         </section>
       ) : null}
+
+      <AddCredits token={token} balance={account?.creditBalance} onCredited={() => refreshAccount()} />
 
       <ApiKeys token={token} />
     </main>
