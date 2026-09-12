@@ -13,6 +13,7 @@ import { Input } from "@/components/ui/input";
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { friendlyErrorMessage } from "@/lib/friendly-error";
+import { saveAccountEmail } from "@/lib/wallet/account-wallet";
 
 const RESEND_COOLDOWN_S = 30;
 
@@ -81,6 +82,7 @@ export default function VerifyEmailContent() {
       const token = getValidToken() ?? (await signIn());
       if (!token) throw new Error("Not authenticated");
       const result = await getMedialaneClient().api.changeMyEmail(value, token);
+      saveAccountEmail(value);
       setEmail(result.email);
       void sendCode(result.email);
     } catch (err) {

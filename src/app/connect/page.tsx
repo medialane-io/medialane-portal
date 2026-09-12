@@ -12,10 +12,15 @@ import { Loader2, ShieldCheck, AlertCircle } from "lucide-react";
 import { getMedialaneClient } from "@/lib/medialane-client";
 import { ValuePropCarousel } from "@/components/connect/value-prop-carousel";
 import { friendlyErrorMessage } from "@/lib/friendly-error";
-import { adoptAccountWallet } from "@/lib/wallet/account-wallet";
+import { adoptAccountWallet, saveAccountEmail } from "@/lib/wallet/account-wallet";
 import { loadSealedOwner } from "@/lib/wallet/store";
 import { destinationAfterSignIn } from "@/lib/wallet/next-step";
-import { attachWalletHere, completePendingApproval } from "@/lib/wallet/attach-wallet";
+import {
+  attachWalletHere,
+  completePendingApproval,
+  requestAppApproval,
+  type AttachOutcome,
+} from "@/lib/wallet/attach-wallet";
 import { loadAccountAddress } from "@/lib/wallet/account-wallet";
 import { safeRelativePath } from "@/lib/safe-redirect";
 import { useWalletNativeSession } from "@/hooks/use-wallet-native-session";
@@ -33,6 +38,14 @@ type Step =
   | "add-email";
 
 const RESEND_COOLDOWN_SECONDS = 60;
+
+function attachMessage(outcome: AttachOutcome): string {
+  if (outcome === "cancelled") return "Confirm your passkey to continue.";
+  if (outcome === "wrong-passkey") {
+    return "That passkey belongs to another account. Choose the one for this email.";
+  }
+  return "Your passkey is unavailable here. Try again in a moment.";
+}
 
 export default function ConnectPage() {
   return (
@@ -85,6 +98,7 @@ function ConnectForm() {
       const token = getValidToken() ?? (await signIn());
       if (!token) throw new Error("Not authenticated");
       await getMedialaneClient().api.changeMyEmail(value, token);
+      saveAccountEmail(value);
       toast.success("Email added to your account");
       router.replace(redirectTo ?? "/");
     } catch (err) {
@@ -164,6 +178,7 @@ function ConnectForm() {
         return;
       }
       if (!res.ok) throw new Error("register-account failed");
+      saveAccountEmail(email);
       goToWalletOnboarding();
     } catch {
       setError("Something went wrong. Please try again.");
@@ -216,19 +231,29 @@ function ConnectForm() {
 
     setError(null);
     setStep("connecting-wallet");
-    const back = new URL(window.location.href);
-    back.searchParams.delete("approval");
-    let outcome;
+    let outcome: AttachOutcome;
     try {
-      outcome = await attachWalletHere(known, back.toString());
+      outcome = await attachWalletHere(known);
     } catch (err) {
       console.error("[connect] wallet connection failed", err);
-      outcome = "unavailable" as const;
+      outcome = "unavailable";
     }
     if (outcome === "connected") {
       router.push(redirectTo || "/");
       return;
     }
+
+    setError(attachMessage(outcome));
+    setStep("confirm-passkey");
+  };
+
+  const askMedialaneToApprove = async () => {
+    setError(null);
+    setStep("connecting-wallet");
+    const back = new URL(window.location.href);
+    back.searchParams.delete("approval");
+
+    const outcome = await requestAppApproval(back.toString());
     if (outcome === "approving") return;
 
     setError(
@@ -251,6 +276,7 @@ function ConnectForm() {
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error((data as { error?: string }).error ?? "Incorrect code");
+      saveAccountEmail(email);
       if (accountExistedRef.current) {
         const walletAdopted = await adoptAccountWallet();
         const destination = destinationAfterSignIn({
@@ -380,6 +406,15 @@ function ConnectForm() {
                 Continue
               </Button>
             </div>
+            {step === "confirm-passkey" ? (
+              <button
+                type="button"
+                onClick={() => void askMedialaneToApprove()}
+                className="text-xs text-muted-foreground underline underline-offset-2 hover:text-foreground"
+              >
+                My passkey is on Medialane.io
+              </button>
+            ) : null}
             {step === "code" ? (
             <p className="text-xs text-muted-foreground text-center leading-relaxed">
               Didn&apos;t receive it? Check your spam, or{" "}

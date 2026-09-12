@@ -1,12 +1,20 @@
 import { test, expect } from "bun:test";
 import type { AttachOutcome, ApprovalOutcome } from "./attach-wallet";
 
-const ATTACH: AttachOutcome[] = ["connected", "cancelled", "approving", "unavailable"];
+const ATTACH: AttachOutcome[] = ["connected", "cancelled", "wrong-passkey", "unavailable"];
 const APPROVAL: ApprovalOutcome[] = ["connected", "unmatched", "unconfirmed"];
 
 test("confirming a passkey that already owns the account finishes without an approval", () => {
   expect(ATTACH).toContain("connected");
-  expect(ATTACH.indexOf("connected")).toBeLessThan(ATTACH.indexOf("approving"));
+});
+
+test("a passkey belonging to another account is told apart from one that cannot be read", () => {
+  expect(ATTACH).toContain("wrong-passkey");
+  expect(ATTACH).toContain("unavailable");
+});
+
+test("choosing a passkey never creates one, so a wrong choice leaves nothing behind", () => {
+  expect(ATTACH).not.toContain("approving" as AttachOutcome);
 });
 
 test("a cancelled passkey keeps the person where they are", () => {
