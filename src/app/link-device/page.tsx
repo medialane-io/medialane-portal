@@ -9,6 +9,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { createOwnerKey, PasskeyCancelledError, type SealedOwner } from "@/lib/wallet/passkey";
 import { saveSealedOwner, notifyWalletChange } from "@/lib/wallet/store";
 import { isOwnerOf } from "@/lib/wallet/devices";
+import { recoverWalletHere } from "@/lib/wallet/recover-here";
 import { loadAccountAddress } from "@/lib/wallet/account-wallet";
 import { friendlyErrorMessage } from "@/lib/friendly-error";
 
@@ -17,6 +18,7 @@ const APP_NAME = "Medialane Portal";
 const PENDING_KEY = "medialane.portal.pending-owner.v1";
 
 type Step = "start" | "creating" | "confirming";
+type Notice = { text: string; tone: "info" | "error" };
 
 export default function LinkDevicePage() {
   return (
@@ -26,17 +28,22 @@ export default function LinkDevicePage() {
   );
 }
 
-function setupFailure(e: unknown): string {
-  if (e instanceof PasskeyCancelledError) return "No problem — you can start again whenever you like.";
+function setupFailure(e: unknown): Notice {
+  if (e instanceof PasskeyCancelledError) {
+    return { text: "Setup was cancelled. Select Start setup to continue.", tone: "info" };
+  }
 
   const raw = e instanceof Error ? e.message : String(e);
   if (/prf/i.test(raw)) {
-    return "This browser cannot set up a passkey. Try Safari, or Chrome on an up-to-date system.";
+    return {
+      text: "This browser cannot set up a passkey. Try Safari, or Chrome on an up-to-date system.",
+      tone: "error",
+    };
   }
   if (/relying party|registrable domain|SecurityError/i.test(raw)) {
-    return "We could not set this up just now. It is our side, not yours — try again shortly.";
+    return { text: "Setup is unavailable right now. Try again shortly.", tone: "error" };
   }
-  return friendlyErrorMessage(e, "That did not work. Try again in a moment.");
+  return { text: friendlyErrorMessage(e, "Setup did not complete. Try again in a moment."), tone: "error" };
 }
 
 function loadPending(): SealedOwner | null {
@@ -54,18 +61,20 @@ function LinkDeviceForm() {
   const redirectTo = searchParams.get("redirect_url");
   const approval = searchParams.get("approval");
   const [step, setStep] = useState<Step>("start");
-  const [error, setError] = useState<string | null>(null);
+  const [notice, setNotice] = useState<Notice | null>(null);
 
   useEffect(() => {
     if (approval !== "approved") {
-      if (approval === "declined") setError("Not approved. You can try again whenever you like.");
+      if (approval === "declined") {
+        setNotice({ text: "Approval was declined. Select Start setup to continue.", tone: "info" });
+      }
       return;
     }
 
     const pending = loadPending();
     const account = loadAccountAddress();
     if (!pending || !account) {
-      setError("That approval could not be matched. Start again.");
+      setNotice({ text: "That approval could not be matched. Select Start setup to continue.", tone: "error" });
       return;
     }
 
@@ -73,7 +82,7 @@ function LinkDeviceForm() {
     isOwnerOf(account, pending.ownerPubKey)
       .then((owns) => {
         if (!owns) {
-          setError("Not approved yet. Try again in a moment.");
+          setNotice({ text: "Approval is not confirmed yet. Try again in a moment.", tone: "error" });
           setStep("start");
           return;
         }
@@ -83,15 +92,29 @@ function LinkDeviceForm() {
         router.replace(redirectTo ?? "/");
       })
       .catch((e) => {
-        setError(friendlyErrorMessage(e, "Could not confirm the approval."));
+        setNotice({ text: friendlyErrorMessage(e, "The approval could not be confirmed."), tone: "error" });
         setStep("start");
       });
   }, [approval, redirectTo, router]);
 
   const start = async () => {
-    setError(null);
+    setNotice(null);
     setStep("creating");
     try {
+      const known = loadAccountAddress();
+      if (known) {
+        const outcome = await recoverWalletHere(known);
+        if (outcome === "recovered") {
+          router.replace(redirectTo ?? "/");
+          return;
+        }
+        if (outcome === "cancelled") {
+          setNotice(setupFailure(new PasskeyCancelledError()));
+          setStep("start");
+          return;
+        }
+      }
+
       const created = await createOwnerKey();
       sessionStorage.setItem(PENDING_KEY, JSON.stringify(created.sealed));
 
@@ -104,8 +127,8 @@ function LinkDeviceForm() {
         returnUrl: back.toString(),
       });
     } catch (e) {
-      console.error("[link-device] setup failed", e);
-      setError(setupFailure(e));
+      if (!(e instanceof PasskeyCancelledError)) console.error("[link-device] setup failed", e);
+      setNotice(setupFailure(e));
       setStep("start");
     }
   };
@@ -119,12 +142,18 @@ function LinkDeviceForm() {
           </span>
           <CardTitle>Secure your account</CardTitle>
           <CardDescription>
-            Approve this app on Medialane.io to connect your wallet to Medialane Portal.
+            Confirm with your passkey to connect your wallet to Medialane Portal.
           </CardDescription>
         </CardHeader>
 
         <CardContent>
-          {error ? <p className="mb-3 text-sm text-destructive">{error}</p> : null}
+          {notice ? (
+            <p
+              className={`mb-3 text-sm ${notice.tone === "error" ? "text-destructive" : "text-muted-foreground"}`}
+            >
+              {notice.text}
+            </p>
+          ) : null}
           <Button className="w-full" onClick={start} disabled={step !== "start"}>
             {step === "start" ? "Start setup" : <Loader2 className="h-4 w-4 animate-spin" />}
           </Button>
