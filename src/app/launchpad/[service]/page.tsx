@@ -15,15 +15,26 @@ export default function LaunchpadServicePage({ params }: { params: Promise<{ ser
   const service = launchpadService(serviceId);
 
   if (!service) notFound();
-  if (isLoading) return null;
 
-  if (!session) {
+  if (isLoading || !session) {
     return (
-      <div className="min-h-screen flex items-center justify-center px-4">
-        <div className="text-center space-y-3">
-          <p className="text-sm text-muted-foreground">Sign in to use the Launchpad.</p>
-          <Link href="/account" className="text-sm text-primary hover:underline">Sign in</Link>
-        </div>
+      <div className="container mx-auto flex min-h-[60vh] max-w-2xl flex-col items-center justify-center px-4 text-center">
+        <h1 className="text-2xl font-bold tracking-tight">{service.displayName}</h1>
+        {isLoading ? (
+          <p className="mt-3 text-sm text-muted-foreground">Checking your wallet</p>
+        ) : (
+          <>
+            <p className="mt-3 text-sm text-muted-foreground">
+              Sign in with your wallet to issue to a list of people. It signs the run and pays for it.
+            </p>
+            <Link href="/account" className="mt-4 text-sm text-primary hover:underline">
+              Sign in
+            </Link>
+            <Link href="/launchpad" className="mt-2 text-sm text-muted-foreground hover:underline">
+              Back to the Launchpad
+            </Link>
+          </>
+        )}
       </div>
     );
   }
