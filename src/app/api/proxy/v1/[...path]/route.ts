@@ -70,7 +70,7 @@ async function handle(
       path: joinedPath,
     });
     return NextResponse.json(
-      { error: `Path not allowed through io proxy: ${req.method} /v1/${joinedPath}` },
+      { error: `Path not allowed through this proxy: ${req.method} /v1/${joinedPath}` },
       { status: 403 },
     );
   }

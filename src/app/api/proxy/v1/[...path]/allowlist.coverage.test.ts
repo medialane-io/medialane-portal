@@ -5,22 +5,16 @@ import { isPathAllowed } from "./allowlist";
 
 test("no method in the allowlist is a catch-all pattern", () => {
   for (const method of ["GET", "POST", "PATCH", "DELETE"]) {
-    expect(isPathAllowed(method, "portal/me")).toBe(false);
-    expect(isPathAllowed(method, "business/provisioning")).toBe(false);
+    expect(isPathAllowed(method, "a-path-no-allowlist-entry-describes")).toBe(false);
   }
+  expect(isPathAllowed("GET", "portal/credits/check")).toBe(false);
+  expect(isPathAllowed("POST", "portal/me")).toBe(false);
 });
 
 const REPO_ROOT = process.cwd();
-const APP_ROOTS = ["src/hooks", "src/components", "src/app"];
+const APP_ROOTS = ["src/hooks", "src/components", "src/app", "src/lib"];
 const EXCLUDED_DIRS = [join(REPO_ROOT, "src/app/api")];
-const EXCLUDED_FILES = new Set([
-
-  join(REPO_ROOT, "src/lib/api-server.ts"),
-  join(REPO_ROOT, "src/lib/backend-metadata.ts"),
-
-  join(REPO_ROOT, "src/app/collection/[slug]/page.tsx"),
-]);
-const UI_DIST_DIR = join(REPO_ROOT, "node_modules/@medialane/ui/dist");
+const EXCLUDED_FILES = new Set<string>([]);
 
 const NOT_PROXIED_PREFIXES = ["rpc", "paymaster/", "swap/"];
 
@@ -70,11 +64,10 @@ function extractPaths(source: string): string[] {
   return found;
 }
 
-test("every /v1/* path referenced by app code and @medialane/ui is covered by the proxy allowlist", () => {
-  const files = [
-    ...APP_ROOTS.flatMap((root) => walk(join(REPO_ROOT, root))),
-    ...walk(UI_DIST_DIR).filter((f) => !f.endsWith(".map")),
-  ].filter((f) => !EXCLUDED_FILES.has(f));
+test("every /v1/* path this app calls is covered by the proxy allowlist", () => {
+  const files = APP_ROOTS.flatMap((root) => walk(join(REPO_ROOT, root))).filter(
+    (f) => !EXCLUDED_FILES.has(f),
+  );
 
   const uncovered = new Map<string, string>();
 

@@ -1,99 +1,38 @@
 const ALLOWED_ROUTES: Record<string, RegExp[]> = {
-
   GET: [
-    /^orders$/,
-    /^orders\/[^/]+$/,
-    /^orders\/token\/[^/]+\/[^/]+$/,
-    /^orders\/user\/[^/]+$/,
-    /^orders\/received\/[^/]+$/,
-    /^orders\/counter-offers$/,
-    /^tokens$/,
-    /^tokens\/owned\/[^/]+$/,
-    /^tokens\/[^/]+\/[^/]+$/,
-    /^tokens\/[^/]+\/[^/]+\/(history|comments|remixes)$/,
-    /^collections$/,
-    /^collections\/[^/]+$/,
-    /^collections\/[^/]+\/tokens$/,
-    /^collections\/[^/]+\/gated-content$/,
-    /^collections\/[^/]+\/profile$/,
-    /^activities$/,
-    /^activities\/[^/]+$/,
-    /^search$/,
-    /^intents\/[^/]+$/,
-    /^metadata\/(signed-url|resolve)$/,
-    /^wallet-activity$/,
-    /^creators$/,
-    /^creators\/[^/]+\/profile$/,
-    /^creators\/by-username\/[^/]+$/,
-    /^creators\/[^/]+\/hidden$/,
-    /^collection-slug-claims\/check\/[^/]+$/,
-    /^collection-slug-claims\/me$/,
-    /^users\/me$/,
-    /^auth\/email\/exists$/,
-    /^pop\/eligibility\/[^/]+(\/[^/]+)?$/,
-    /^coins$/,
-    /^coins\/prices$/,
-    /^coins\/claims$/,
-    /^coins\/[^/]+$/,
-    /^drop\/mint-status\/[^/]+\/[^/]+$/,
-    /^drop\/[^/]+\/(info|state)$/,
-    /^rewards$/,
-    /^rewards\/config$/,
-    /^rewards\/batch$/,
-    /^rewards\/[^/]+$/,
-    /^rewards\/[^/]+\/events$/,
-    /^club\/[^/]+\/[^/]+$/,
-    /^club\/[^/]+\/[^/]+\/member\/[^/]+$/,
-    /^tickets\/[^/]+\/[^/]+$/,
-    /^tickets\/[^/]+\/count$/,
-    /^ipnft\/[^/]+\/[^/]+$/,
-    /^username-claims\/me$/,
-    /^username-claims\/check\/[^/]+$/,
-    /^stats$/,
+    /^portal\/me$/,
+    /^portal\/keys$/,
+    /^portal\/credits\/(history|spend)$/,
     /^prices$/,
-    /^remix-offers$/,
-    /^remix-offers\/[^/]+$/,
-    /^sponsorship\/offers$/,
-    /^sponsorship\/offers\/[^/]+$/,
-    /^sponsorship\/offers\/[^/]+\/bids$/,
-    /^sponsorship\/proposals$/,
-    /^sponsorship\/proposals\/[^/]+$/,
-    /^sponsorship\/licenses$/,
-    /^sponsorship\/licenses\/[^/]+$/,
+    /^collections$/,
+    /^auth\/email\/exists$/,
+    /^users\/me$/,
+    /^intents\/[^/]+$/,
   ],
 
   POST: [
-    /^intents\/[a-z-]+$/,
-    /^intents\/[^/]+\/hydrate$/,
     /^auth\/siws\/(nonce|verify)$/,
     /^auth\/email\/(request-code|verify-code|register-account)$/,
-    /^collections\/(register|sync-tx|claim)$/,
-    /^collections\/claim\/request$/,
-    /^collection-slug-claims$/,
-    /^coins\/sync$/,
-    /^drop\/conditions$/,
-    /^remix-offers(\/(auto|self\/confirm|[^/]+\/(confirm|reject|extend)))?$/,
-    /^reports$/,
-    /^users\/(me|register)$/,
-    /^users\/me\/(generate-wallet|email|wallet)$/,
-    /^username-claims$/,
-    /^metadata\/(upload|upload-file|upload-directory)$/,
+    /^users\/me\/(email|wallet|generate-wallet)$/,
+    /^portal\/keys$/,
+    /^portal\/credits\/check$/,
+    /^business\/launchpad\/(quote|runs)$/,
+    /^business\/provisioning$/,
+    /^business\/issuance\/mint-calls$/,
+    /^intents\/(create-tier|create-collection)$/,
+    /^metadata\/upload(-file)?$/,
     /^tx\/sync$/,
   ],
-  PATCH: [
-    /^intents\/[^/]+\/(confirm|signature)$/,
-    /^collections\/[^/]+\/profile$/,
-    /^creators\/[^/]+\/profile$/,
-  ],
 
+  DELETE: [/^portal\/keys\/[^/]+$/],
 };
 
-export function isPathAllowed(method: string, path: string): boolean {
-  const patterns = ALLOWED_ROUTES[method.toUpperCase()];
-  if (!patterns) return false;
-  return patterns.some((re) => re.test(path));
+export function hasTraversalSegment(path: string): boolean {
+  return path.split("/").some((segment) => segment === "." || segment === "..");
 }
 
-export function hasTraversalSegment(joinedPath: string): boolean {
-  return joinedPath.split("/").some((piece) => piece === "." || piece === "..");
+export function isPathAllowed(method: string, path: string): boolean {
+  const routes = ALLOWED_ROUTES[method.toUpperCase()];
+  if (!routes) return false;
+  return routes.some((pattern) => pattern.test(path));
 }
