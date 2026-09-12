@@ -5,7 +5,7 @@ import { Copy, KeyRound, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { usePortalKeys } from "@/hooks/use-portal-account";
-import { createApiKey, revokeApiKey } from "@/lib/portal";
+import { getMedialaneClient } from "@/lib/medialane-client";
 import { friendlyErrorMessage } from "@/lib/friendly-error";
 
 export function ApiKeys({ token }: { token: string }) {
@@ -16,8 +16,8 @@ export function ApiKeys({ token }: { token: string }) {
   async function create() {
     setBusy(true);
     try {
-      const key = await createApiKey(token);
-      setPlaintext(key.plaintext);
+      const { data } = await getMedialaneClient().api.createApiKey({ appSource: "MEDIALANE_PORTAL" }, token);
+      setPlaintext(data.plaintext);
       await mutate();
     } catch (err) {
       toast.error(friendlyErrorMessage(err, "Could not create a key"));
@@ -29,7 +29,7 @@ export function ApiKeys({ token }: { token: string }) {
   async function revoke(id: string) {
     setBusy(true);
     try {
-      await revokeApiKey(token, id);
+      await getMedialaneClient().api.deleteApiKey(id, token);
       await mutate();
     } catch (err) {
       toast.error(friendlyErrorMessage(err, "Could not revoke that key"));
