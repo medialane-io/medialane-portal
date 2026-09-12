@@ -14,12 +14,12 @@ const urbanist = Urbanist({ subsets: ["latin"], display: "swap", variable: "--fo
 export const metadata: Metadata = {
   metadataBase: new URL(APP_URL),
   title: {
-    default: "Medialane — Creator Launchpad & NFT Marketplace",
+    default: "Medialane — Credits, API keys and the Launchpad",
     template: "%s | Medialane",
   },
   description:
-    "Launch, collect, and monetize your creative works. No seed phrases — just a passkey.",
-  keywords: ["NFT", "IP", "Launchpad", "Starknet", "Creator", "Marketplace"],
+    "Buy credits, hold an API key, and issue an asset to a list of people. No seed phrase — just a passkey.",
+  keywords: ["Launchpad", "Credits", "API", "Starknet", "IP", "Tickets"],
   authors: [{ name: "Medialane" }],
   icons: {
     icon: [
@@ -35,7 +35,7 @@ export const metadata: Metadata = {
     type: "website",
     locale: "en_US",
     title: "Medialane",
-    description: "Creator launchpad & IP marketplace on Starknet",
+    description: "Credits, API keys and the Launchpad, on Starknet",
     siteName: "Medialane",
     images: [{ url: "/og-image.jpg", width: 1200, height: 630, alt: "Medialane" }],
   },

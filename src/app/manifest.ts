@@ -3,7 +3,7 @@ export default function manifest(): MetadataRoute.Manifest {
   return {
     name: "Medialane",
     short_name: "Medialane",
-    description: "Creator launchpad and IP marketplace on Starknet.",
+    description: "Credits, API keys and the Launchpad, on Starknet.",
     start_url: "/",
     scope: "/",
     display: "standalone",
