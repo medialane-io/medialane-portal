@@ -2,7 +2,7 @@ import { buildApprovalUrl } from "@medialane/sdk/starknet";
 import { createOwnerKey, PasskeyCancelledError, type SealedOwner } from "./passkey";
 import { saveSealedOwner, notifyWalletChange } from "./store";
 import { isOwnerOf } from "./devices";
-import { recoverWalletHere } from "./recover-here";
+import { unlockWalletHere } from "./unlock-here";
 
 const APPROVER_ORIGIN = "https://www.medialane.io";
 const APP_NAME = "Medialane Portal";
@@ -21,9 +21,9 @@ function loadPending(): SealedOwner | null {
 }
 
 export async function attachWalletHere(account: string, returnUrl: string): Promise<AttachOutcome> {
-  const recovered = await recoverWalletHere(account);
-  if (recovered === "recovered") return "connected";
-  if (recovered === "cancelled") return "cancelled";
+  const unlocked = await unlockWalletHere(account);
+  if (unlocked === "unlocked") return "connected";
+  if (unlocked === "cancelled") return "cancelled";
 
   let created;
   try {
