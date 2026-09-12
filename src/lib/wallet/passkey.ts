@@ -1,6 +1,5 @@
 import {
   deriveAesKey,
-  deriveStarkKeyPair,
   generateStarkKeyPair,
   starkKeyPairFromPrivateKey,
   InvalidStarkPrivateKeyError,
@@ -60,9 +59,8 @@ export interface SealedOwner {
   credentialId: string;
   ownerPubKey: string;
   address: string;
-
-  iv?: string;
-  ciphertext?: string;
+  iv: string;
+  ciphertext: string;
 }
 
 function assertBrowser(): void {
@@ -153,36 +151,6 @@ async function prfSecret(credentialId: string): Promise<Uint8Array<ArrayBuffer>>
   return new Uint8Array(result);
 }
 
-export async function discoverOwnerKey(): Promise<SealedOwner> {
-  assertBrowser();
-
-  let assertion: PublicKeyCredential;
-  try {
-    assertion = (await navigator.credentials.get({
-      publicKey: {
-        challenge: rand(32),
-        rpId: relyingPartyId(),
-        userVerification: "required",
-        extensions: { prf: { eval: { first: PRF_SALT } } } as AuthenticationExtensionsClientInputs,
-      },
-    })) as PublicKeyCredential;
-  } catch (e) {
-    if (isPasskeyCancellation(e)) throw new PasskeyCancelledError();
-    throw e;
-  }
-
-  const result = (assertion.getClientExtensionResults() as { prf?: { results?: { first?: ArrayBuffer } } })
-    .prf?.results?.first;
-  if (!result) throw new Error(prfUnsupportedMessage());
-
-  const { publicKeyHex } = await deriveStarkKeyPair(new Uint8Array(result));
-  return {
-    credentialId: b64(assertion.rawId),
-    ownerPubKey: publicKeyHex,
-    address: computeWalletAddress(publicKeyHex, 0),
-  };
-}
-
 export interface CreatedOwner {
   sealed: SealedOwner;
 
@@ -204,28 +172,28 @@ export async function createOwnerKey(): Promise<CreatedOwner> {
     }
   }
 
-  const { privateKeyHex, publicKeyHex } = await deriveStarkKeyPair(secret);
+  const credentialId = reg.credentialId;
+  const { privateKeyHex: priv, publicKeyHex: ownerPubKey } = generateStarkKeyPair();
+  const aes = await deriveAesKey(secret, HKDF_INFO);
+  const iv = rand(12);
+  const ciphertext = await sealPrivateKey(aes, iv, priv);
   return {
     sealed: {
-      credentialId: reg.credentialId,
-      ownerPubKey: publicKeyHex,
-      address: computeWalletAddress(publicKeyHex, 0),
+      credentialId,
+      ownerPubKey,
+      address: computeWalletAddress(ownerPubKey, 0),
+      iv: b64(iv),
+      ciphertext: b64(ciphertext),
     },
-    privateKeyHex,
+    privateKeyHex: priv,
   };
 }
 
 export async function unlockOwnerKey(sealed: SealedOwner): Promise<string> {
   assertBrowser();
   const secret = await prfSecret(sealed.credentialId);
-
-  if (sealed.iv && sealed.ciphertext) {
-    const aes = await deriveAesKey(secret, HKDF_INFO);
-    return unsealPrivateKey(aes, unb64(sealed.iv), unb64(sealed.ciphertext));
-  }
-
-  const { privateKeyHex } = await deriveStarkKeyPair(secret);
-  return privateKeyHex;
+  const aes = await deriveAesKey(secret, HKDF_INFO);
+  return unsealPrivateKey(aes, unb64(sealed.iv), unb64(sealed.ciphertext));
 }
 
 export function walletAddressForPrivateKey(privateKeyInput: string): string {
