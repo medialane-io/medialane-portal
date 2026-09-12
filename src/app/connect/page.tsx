@@ -15,6 +15,8 @@ import { friendlyErrorMessage } from "@/lib/friendly-error";
 import { adoptAccountWallet } from "@/lib/wallet/account-wallet";
 import { loadSealedOwner } from "@/lib/wallet/store";
 import { destinationAfterSignIn } from "@/lib/wallet/next-step";
+import { recoverWalletHere } from "@/lib/wallet/recover-here";
+import { loadAccountAddress } from "@/lib/wallet/account-wallet";
 import { safeRelativePath } from "@/lib/safe-redirect";
 import { useWalletNativeSession } from "@/hooks/use-wallet-native-session";
 import { useEmailVerificationStatus } from "@/hooks/use-email-verification-required";
@@ -188,6 +190,12 @@ function ConnectForm() {
         if (destination === "onboard") {
           goToWalletOnboarding();
         } else if (destination === "pair") {
+          const known = loadAccountAddress();
+          const outcome = known ? await recoverWalletHere(known) : "unavailable";
+          if (outcome === "recovered") {
+            router.push(redirectTo || "/");
+            return;
+          }
           const next = redirectTo ? `?redirect_url=${encodeURIComponent(redirectTo)}` : "";
           router.push(`/link-device${next}`);
         } else {
