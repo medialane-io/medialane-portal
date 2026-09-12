@@ -26,6 +26,16 @@ export default function LinkDevicePage() {
   );
 }
 
+function setupFailure(e: unknown): string {
+  if (e instanceof PasskeyCancelledError) return "Confirmation cancelled.";
+
+  const raw = e instanceof Error ? e.message : String(e);
+  if (/prf/i.test(raw)) {
+    return "This browser did not return the secret a passkey needs. Try Safari, or Chrome on an up-to-date system.";
+  }
+  return friendlyErrorMessage(e, "Could not start setup. The reason is in the browser console.");
+}
+
 function loadPending(): SealedOwner | null {
   try {
     const raw = sessionStorage.getItem(PENDING_KEY);
@@ -91,11 +101,8 @@ function LinkDeviceForm() {
         returnUrl: back.toString(),
       });
     } catch (e) {
-      setError(
-        e instanceof PasskeyCancelledError
-          ? "Confirmation cancelled."
-          : friendlyErrorMessage(e, "Could not start setup."),
-      );
+      console.error("[link-device] setup failed", e);
+      setError(setupFailure(e));
       setStep("start");
     }
   };
@@ -109,7 +116,7 @@ function LinkDeviceForm() {
           </span>
           <CardTitle>Secure your account</CardTitle>
           <CardDescription>
-            Approve Medialane Portal to connect your wallet to this app.
+            Approve this app on Medialane.io to connect your wallet to Medialane Portal.
           </CardDescription>
         </CardHeader>
 
