@@ -9,6 +9,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { createOwnerKey, PasskeyCancelledError, type SealedOwner } from "@/lib/wallet/passkey";
 import { saveSealedOwner, notifyWalletChange } from "@/lib/wallet/store";
 import { isOwnerOf } from "@/lib/wallet/devices";
+import { recoverWalletHere } from "@/lib/wallet/recover-here";
 import { loadAccountAddress } from "@/lib/wallet/account-wallet";
 import { friendlyErrorMessage } from "@/lib/friendly-error";
 
@@ -100,6 +101,20 @@ function LinkDeviceForm() {
     setNotice(null);
     setStep("creating");
     try {
+      const known = loadAccountAddress();
+      if (known) {
+        const outcome = await recoverWalletHere(known);
+        if (outcome === "recovered") {
+          router.replace(redirectTo ?? "/");
+          return;
+        }
+        if (outcome === "cancelled") {
+          setNotice(setupFailure(new PasskeyCancelledError()));
+          setStep("start");
+          return;
+        }
+      }
+
       const created = await createOwnerKey();
       sessionStorage.setItem(PENDING_KEY, JSON.stringify(created.sealed));
 
@@ -127,7 +142,7 @@ function LinkDeviceForm() {
           </span>
           <CardTitle>Secure your account</CardTitle>
           <CardDescription>
-            Approve this app on Medialane.io to connect your wallet to Medialane Portal.
+            Confirm with your passkey to connect your wallet to Medialane Portal.
           </CardDescription>
         </CardHeader>
 
