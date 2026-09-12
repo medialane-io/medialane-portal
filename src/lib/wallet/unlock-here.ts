@@ -2,9 +2,9 @@ import { discoverOwnerKey, PasskeyCancelledError } from "./passkey";
 import { isOwnerOf } from "./devices";
 import { saveSealedOwner, notifyWalletChange } from "./store";
 
-export type RecoveryOutcome = "recovered" | "not-an-owner" | "unavailable" | "cancelled";
+export type UnlockOutcome = "unlocked" | "not-an-owner" | "unavailable" | "cancelled";
 
-export async function recoverWalletHere(accountAddress: string): Promise<RecoveryOutcome> {
+export async function unlockWalletHere(accountAddress: string): Promise<UnlockOutcome> {
   let discovered;
   try {
     discovered = await discoverOwnerKey();
@@ -23,5 +23,5 @@ export async function recoverWalletHere(accountAddress: string): Promise<Recover
 
   saveSealedOwner({ ...discovered, address: accountAddress });
   notifyWalletChange();
-  return "recovered";
+  return "unlocked";
 }
