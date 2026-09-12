@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Check, Copy, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -10,6 +10,7 @@ import { createOwnerKey, PasskeyCancelledError, type SealedOwner } from "@/lib/w
 import { saveSealedOwner, notifyWalletChange } from "@/lib/wallet/store";
 import { encodePairingPayload, parseAccountAddress } from "@/lib/wallet/pairing";
 import { isOwnerOf } from "@/lib/wallet/devices";
+import { loadAccountAddress } from "@/lib/wallet/account-wallet";
 import { friendlyErrorMessage } from "@/lib/friendly-error";
 
 type Step = "start" | "creating" | "share" | "checking";
@@ -30,6 +31,11 @@ function LinkDeviceForm() {
   const [pending, setPending] = useState<SealedOwner | null>(null);
   const [code, setCode] = useState("");
   const [address, setAddress] = useState("");
+
+  useEffect(() => {
+    const known = loadAccountAddress();
+    if (known) setAddress(known);
+  }, []);
   const [copied, setCopied] = useState(false);
   const [error, setError] = useState<string | null>(null);
 

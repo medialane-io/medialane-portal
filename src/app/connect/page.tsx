@@ -13,6 +13,8 @@ import { getMedialaneClient } from "@/lib/medialane-client";
 import { ValuePropCarousel } from "@/components/connect/value-prop-carousel";
 import { friendlyErrorMessage } from "@/lib/friendly-error";
 import { adoptAccountWallet } from "@/lib/wallet/account-wallet";
+import { loadSealedOwner } from "@/lib/wallet/store";
+import { destinationAfterSignIn } from "@/lib/wallet/next-step";
 import { safeRelativePath } from "@/lib/safe-redirect";
 import { useWalletNativeSession } from "@/hooks/use-wallet-native-session";
 import { useEmailVerificationStatus } from "@/hooks/use-email-verification-required";
@@ -177,8 +179,20 @@ function ConnectForm() {
       const data = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error((data as { error?: string }).error ?? "Incorrect code");
       if (accountExistedRef.current) {
-        const linked = await adoptAccountWallet();
-        router.push(linked ? redirectTo || "/" : "/wallet-onboarding");
+        const walletAdopted = await adoptAccountWallet();
+        const destination = destinationAfterSignIn({
+          accountExisted: true,
+          walletAdopted,
+          hasLocalKey: loadSealedOwner() !== null,
+        });
+        if (destination === "onboard") {
+          goToWalletOnboarding();
+        } else if (destination === "pair") {
+          const next = redirectTo ? `?redirect_url=${encodeURIComponent(redirectTo)}` : "";
+          router.push(`/link-device${next}`);
+        } else {
+          router.push(redirectTo || "/");
+        }
         return;
       }
       goToWalletOnboarding();
