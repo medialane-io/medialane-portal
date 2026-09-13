@@ -207,7 +207,7 @@ export function IpTicketingTask() {
         onClose={() => setPhase("idle")}
       />
 
-      <div className="mx-auto max-w-[110rem] px-4 pt-6 pb-16 sm:px-6 lg:px-10">
+      <div className="mx-auto max-w-[110rem] px-4 pt-16 pb-16 sm:px-6 sm:pt-20 lg:px-10">
         <div className="flex flex-wrap items-end justify-between gap-4 border-b border-border pb-5">
           <div>
             <Link
@@ -470,13 +470,9 @@ function Field({
   align?: "center" | "start";
 }) {
   return (
-    <div
-      className={`grid gap-1.5 sm:grid-cols-[7rem_minmax(0,1fr)] sm:gap-4 ${
-        align === "center" ? "sm:items-center" : "sm:items-start"
-      }`}
-    >
-      <Label className={align === "start" ? "sm:pt-2.5" : undefined}>{label}</Label>
-      {children}
+    <div className={`flex gap-4 ${align === "center" ? "items-center" : "items-start"}`}>
+      <Label className={`w-24 shrink-0 ${align === "start" ? "pt-2.5" : ""}`}>{label}</Label>
+      <div className="min-w-0 flex-1">{children}</div>
     </div>
   );
 }
