@@ -11,11 +11,15 @@ const ALLOWED_ROUTES: Record<string, RegExp[]> = {
     /^intents\/[^/]+$/,
     /^username-claims\/me$/,
     /^username-claims\/check\/[^/]+$/,
+    /^tokens\/owned\/[^/]+$/,
+    /^activities\/[^/]+$/,
+    /^wallet-activity$/,
   ],
 
   POST: [
     /^auth\/siws\/(nonce|verify)$/,
     /^auth\/email\/(request-code|verify-code|register-account)$/,
+    /^users\/me$/,
     /^users\/me\/(email|wallet|generate-wallet)$/,
     /^portal\/keys$/,
     /^portal\/credits\/check$/,

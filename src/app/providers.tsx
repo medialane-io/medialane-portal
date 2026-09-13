@@ -18,10 +18,7 @@ import { NavConnectButton } from "@/components/nav-connect-button";
 import { HeaderWalletTrigger } from "@/components/nav-wallet-trigger";
 import { MediaWalletOverlay } from "@/components/media-wallet/media-wallet-overlay";
 import { SelfFundConsentDialog } from "@/components/wallet/self-fund-consent-dialog";
-import { useWalletNativeSession } from "@/hooks/use-wallet-native-session";
-import { useCreatorProfile } from "@/hooks/use-profiles";
 import { WalletNotDeployedError } from "@/hooks/use-siws-token";
-import { resolveTokenImage } from "@/lib/utils";
 
 const GA_ID = process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS_ID;
 
@@ -45,15 +42,6 @@ function StandaloneShell({ children }: { children: React.ReactNode }) {
 }
 
 function MainShell({ children }: { children: React.ReactNode }) {
-  const pathname = usePathname();
-  const suppressAmbient =
-    pathname.startsWith("/asset/") ||
-    pathname.startsWith("/collections/") ||
-    pathname.startsWith("/creator/");
-  const { address: walletAddress } = useWalletNativeSession();
-  const { profile } = useCreatorProfile(walletAddress ?? undefined);
-  const themeImageUrl = suppressAmbient ? null : resolveTokenImage(profile?.avatarImage);
-
   return (
     <>
       <NavCommandMenu
@@ -64,7 +52,7 @@ function MainShell({ children }: { children: React.ReactNode }) {
       />
       <MediaWalletOverlay />
       <div className="relative min-h-screen flex flex-col bg-background">
-        <ThemeAmbientBackground imageUrl={themeImageUrl} />
+        <ThemeAmbientBackground imageUrl={null} />
         <div className="fixed top-4 left-4 sm:left-6 lg:left-8 z-50">
           <NavBrandButton />
         </div>
