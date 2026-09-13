@@ -50,7 +50,7 @@ import { DATA_TOKENIZATION_SERVICE } from "@/lib/portal-launchpad/collection-cop
 const short = (a: string) => `${a.slice(0, 6)}…${a.slice(-4)}`;
 
 export function DataTokenizationTask() {
-  const { address, signer } = useWalletNativeSession();
+  const { address, signer, hasWallet } = useWalletNativeSession();
 
   const [values, setValues] = useState<IssuanceValues>(ISSUANCE_DEFAULTS);
   const [imageFile, setImageFile] = useState<File | null>(null);
@@ -175,6 +175,20 @@ export function DataTokenizationTask() {
     } finally {
       setProgress(null);
     }
+  }
+
+  if (!hasWallet) {
+    return (
+      <main className="container mx-auto max-w-2xl px-4 py-24 text-center">
+        <h1 className="text-2xl font-bold tracking-tight">Data Tokenization</h1>
+        <p className="mt-3 text-sm text-muted-foreground">
+          Sign in to tokenize your IP and issue it to a list of people.
+        </p>
+        <Button asChild className="mt-5">
+          <Link href="/connect">Sign in</Link>
+        </Button>
+      </main>
+    );
   }
 
   return (

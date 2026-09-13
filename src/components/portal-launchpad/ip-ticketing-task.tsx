@@ -38,7 +38,7 @@ import { assertTransactionSucceeded } from "@/lib/wallet/intent-tx";
 const TRANSFERABLE = ["Allowed", "Not Allowed"] as const;
 
 export function IpTicketingTask() {
-  const { address, signer } = useWalletNativeSession();
+  const { address, signer, hasWallet } = useWalletNativeSession();
 
   const [group, setGroup] = useState("");
   const [name, setName] = useState("");
@@ -192,6 +192,20 @@ export function IpTicketingTask() {
     } finally {
       setProgress(null);
     }
+  }
+
+  if (!hasWallet) {
+    return (
+      <main className="container mx-auto max-w-2xl px-4 py-24 text-center">
+        <h1 className="text-2xl font-bold tracking-tight">IP Ticketing</h1>
+        <p className="mt-3 text-sm text-muted-foreground">
+          Sign in to create tickets and distribute them to a list of people.
+        </p>
+        <Button asChild className="mt-5">
+          <Link href="/connect">Sign in</Link>
+        </Button>
+      </main>
+    );
   }
 
   return (
@@ -463,16 +477,15 @@ export function IpTicketingTask() {
 function Field({
   label,
   children,
-  align = "center",
 }: {
   label: string;
   children: React.ReactNode;
   align?: "center" | "start";
 }) {
   return (
-    <div className={`flex gap-4 ${align === "center" ? "items-center" : "items-start"}`}>
-      <Label className={`w-24 shrink-0 ${align === "start" ? "pt-2.5" : ""}`}>{label}</Label>
-      <div className="min-w-0 flex-1">{children}</div>
+    <div className="space-y-2">
+      <Label>{label}</Label>
+      {children}
     </div>
   );
 }
