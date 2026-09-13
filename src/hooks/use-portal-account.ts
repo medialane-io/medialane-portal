@@ -2,30 +2,23 @@
 
 import { useCallback, useEffect, useState } from "react";
 import useSWR from "swr";
-import { useSiwsToken } from "@/hooks/use-siws-token";
-import { useWalletNativeSession } from "@/hooks/use-wallet-native-session";
 import { getMedialaneClient } from "@/lib/medialane-client";
+import { loadAccountSession, onAccountSessionChange } from "@/lib/account-session";
 
 export function usePortalToken() {
-  const { address } = useWalletNativeSession();
-  const { token, signIn, getValidToken, isSigningIn, error } = useSiwsToken();
+  const [token, setToken] = useState<string | null>(null);
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
-    if (!address) return;
-    getValidToken();
+    const read = () => setToken(loadAccountSession());
+    read();
     setReady(true);
-  }, [address, getValidToken]);
+    return onAccountSessionChange(read);
+  }, []);
 
-  const authorize = useCallback(async () => {
-    const existing = getValidToken();
-    if (existing) return existing;
-    return signIn();
-  }, [getValidToken, signIn]);
+  const authorize = useCallback(async () => loadAccountSession(), []);
 
-  const reauthorize = useCallback(async () => signIn(), [signIn]);
-
-  return { token, address, authorize, reauthorize, isSigningIn, error, ready };
+  return { token, authorize, reauthorize: authorize, isSigningIn: false, error: null, ready };
 }
 
 const api = () => getMedialaneClient().api;
