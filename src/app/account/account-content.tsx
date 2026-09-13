@@ -17,11 +17,13 @@ function usd(credits: number): string {
 }
 
 export function AccountContent() {
-  const { token, address, authorize, isSigningIn, error } = usePortalToken();
+  const { token, ready } = usePortalToken();
   const { data: account, mutate: refreshAccount } = usePortalAccount(token);
   const { data: spend } = usePortalSpend(token);
 
-  if (!address) {
+  if (!ready) return null;
+
+  if (!token) {
     return (
       <main className="container mx-auto max-w-2xl px-4 py-24 text-center">
         <h1 className="text-2xl font-bold tracking-tight">Account</h1>
@@ -31,21 +33,6 @@ export function AccountContent() {
         <Button asChild className="mt-5">
           <Link href="/connect">Sign in</Link>
         </Button>
-      </main>
-    );
-  }
-
-  if (!token) {
-    return (
-      <main className="container mx-auto max-w-2xl px-4 py-24 text-center">
-        <h1 className="text-2xl font-bold tracking-tight">Account</h1>
-        <p className="mt-3 text-sm text-muted-foreground">
-          Approve once so this device can read your account.
-        </p>
-        <Button onClick={() => authorize()} disabled={isSigningIn} className="mt-5">
-          {isSigningIn ? "Waiting for your approval" : "Continue"}
-        </Button>
-        {error ? <p className="mt-3 text-sm text-destructive">{error}</p> : null}
       </main>
     );
   }

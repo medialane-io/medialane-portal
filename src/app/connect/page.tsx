@@ -15,7 +15,7 @@ import { friendlyErrorMessage } from "@/lib/friendly-error";
 import { adoptAccountWallet, saveAccountEmail } from "@/lib/wallet/account-wallet";
 import { loadSealedOwner } from "@/lib/wallet/store";
 import { destinationAfterSignIn } from "@/lib/wallet/next-step";
-import { completePendingApproval, requestAppApproval } from "@/lib/wallet/app-approval";
+import { saveAccountSession } from "@/lib/account-session";
 import { loadAccountAddress } from "@/lib/wallet/account-wallet";
 import { safeRelativePath } from "@/lib/safe-redirect";
 import { useWalletNativeSession } from "@/hooks/use-wallet-native-session";
@@ -28,8 +28,6 @@ type Step =
   | "registering"
   | "code"
   | "verifying-code"
-  | "connecting-wallet"
-  | "confirm-passkey"
   | "add-email";
 
 const RESEND_COOLDOWN_SECONDS = 60;
@@ -51,7 +49,6 @@ function ConnectForm() {
   const [email, setEmail] = useState("");
   const [code, setCode] = useState("");
   const accountExistedRef = useRef(false);
-  const approvalHandledRef = useRef(false);
   const [resendCooldown, setResendCooldown] = useState(0);
   const [resending, setResending] = useState(false);
 
@@ -95,36 +92,6 @@ function ConnectForm() {
   };
 
   useEffect(() => {
-    const approval = searchParams.get("approval");
-    if (!mounted || !approval || approvalHandledRef.current) return;
-    approvalHandledRef.current = true;
-
-    if (approval !== "approved") {
-      setError("Confirm your passkey to continue.");
-      setStep("confirm-passkey");
-      return;
-    }
-
-    const known = loadAccountAddress();
-    if (!known) return;
-
-    setStep("connecting-wallet");
-    completePendingApproval(known)
-      .then((outcome) => {
-        if (outcome === "connected") {
-          router.replace(redirectTo || "/");
-          return;
-        }
-        setError("Your approval is still on its way. Try again in a moment.");
-        setStep("confirm-passkey");
-      })
-      .catch((err) => {
-        setError(friendlyErrorMessage(err, "Your approval is still on its way. Try again in a moment."));
-        setStep("confirm-passkey");
-      });
-  }, [mounted, searchParams, redirectTo, router]);
-
-  useEffect(() => {
     if (resendCooldown === 0) return;
     const id = setTimeout(() => setResendCooldown((s) => Math.max(0, s - 1)), 1000);
     return () => clearTimeout(id);
@@ -164,8 +131,10 @@ function ConnectForm() {
         await requestLoginCode();
         return;
       }
+      const created = (await res.json().catch(() => ({}))) as { accountToken?: string };
       if (!res.ok) throw new Error("register-account failed");
       saveAccountEmail(email);
+      if (created.accountToken) saveAccountSession(created.accountToken);
       goToWalletOnboarding();
     } catch {
       setError("Something went wrong. Please try again.");
@@ -209,32 +178,6 @@ function ConnectForm() {
     }
   };
 
-  const connectWallet = async () => {
-    const known = loadAccountAddress();
-    if (!known) {
-      goToWalletOnboarding();
-      return;
-    }
-    await askMedialaneToApprove();
-  };
-
-  const askMedialaneToApprove = async () => {
-    setError(null);
-    setStep("connecting-wallet");
-    const back = new URL(window.location.href);
-    back.searchParams.delete("approval");
-
-    const outcome = await requestAppApproval(back.toString());
-    if (outcome === "approving") return;
-
-    setError(
-      outcome === "cancelled"
-        ? "Confirm your passkey to continue."
-        : "This could not be set up just now. Try again shortly.",
-    );
-    setStep("confirm-passkey");
-  };
-
   const verifyLoginCode = async (codeOverride?: string) => {
     const codeToVerify = codeOverride ?? code;
     setError(null);
@@ -245,26 +188,13 @@ function ConnectForm() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, code: codeToVerify }),
       });
-      const data = await res.json().catch(() => ({}));
-      if (!res.ok) throw new Error((data as { error?: string }).error ?? "Incorrect code");
+      const data = (await res.json().catch(() => ({}))) as { error?: string; accountToken?: string };
+      if (!res.ok) throw new Error(data.error ?? "Incorrect code");
+
       saveAccountEmail(email);
-      if (accountExistedRef.current) {
-        const walletAdopted = await adoptAccountWallet();
-        const destination = destinationAfterSignIn({
-          accountExisted: true,
-          walletAdopted,
-          hasLocalKey: loadSealedOwner() !== null,
-        });
-        if (destination === "onboard") {
-          goToWalletOnboarding();
-        } else if (destination === "pair") {
-          await connectWallet();
-        } else {
-          router.push(redirectTo || "/");
-        }
-        return;
-      }
-      goToWalletOnboarding();
+      if (data.accountToken) saveAccountSession(data.accountToken);
+      void adoptAccountWallet();
+      router.push(redirectTo || "/account");
     } catch (err) {
       setError(friendlyErrorMessage(err, "Incorrect code. Please try again."));
       setStep("code");
@@ -327,9 +257,9 @@ function ConnectForm() {
     );
   }
 
-  const busy = step === "verifying-code" || step === "connecting-wallet";
+  const busy = step === "verifying-code";
 
-  if (step === "code" || step === "verifying-code" || step === "connecting-wallet" || step === "confirm-passkey") {
+  if (step === "code" || step === "verifying-code") {
     return (
       <div className="min-h-[80vh] flex items-center justify-center px-4">
         <Card className="w-full max-w-sm">
@@ -339,12 +269,8 @@ function ConnectForm() {
                 <ShieldCheck className="h-6 w-6 text-primary" />
               </div>
             </div>
-            <CardTitle>{step === "code" ? "Check your email" : "Connecting your wallet"}</CardTitle>
-            <CardDescription>
-              {step === "code"
-                ? `Enter the 6-digit code we sent to ${email}.`
-                : "Medialane.io will ask you to approve Medialane Portal, then bring you back."}
-            </CardDescription>
+            <CardTitle>Check your email</CardTitle>
+            <CardDescription>Enter the 6-digit code we sent to {email}.</CardDescription>
           </CardHeader>
           <CardContent className="flex flex-col items-center gap-4">
             {error && (
@@ -370,14 +296,13 @@ function ConnectForm() {
               <Button
                 className="w-full gap-2 bg-transparent text-white rounded-[7px] hover:bg-transparent hover:brightness-110 active:scale-[0.98] transition-all"
                 size="lg"
-                onClick={() => void (step === "confirm-passkey" ? connectWallet() : verifyLoginCode())}
+                onClick={() => void verifyLoginCode()}
                 disabled={busy || (step === "code" && code.length !== 6)}
               >
                 {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
                 Continue
               </Button>
             </div>
-            {step === "code" ? (
             <p className="text-xs text-muted-foreground text-center leading-relaxed">
               Didn&apos;t receive it? Check your spam, or{" "}
               {resendCooldown > 0 ? (
@@ -399,7 +324,6 @@ function ConnectForm() {
                 dao@medialane.org
               </a>
             </p>
-            ) : null}
           </CardContent>
         </Card>
       </div>
