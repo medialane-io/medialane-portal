@@ -6,8 +6,8 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useWalletNativeSession } from "@/hooks/use-wallet-native-session";
+import { useSiwsToken } from "@/hooks/use-siws-token";
 import { executeSponsored } from "@/lib/wallet/sponsored-executor";
-import { getMedialaneClient } from "@/lib/medialane-client";
 import { creditTerms, atomicAmount, creditsFor, transferCall, type CreditTerms } from "@/lib/credits";
 import { friendlyErrorMessage } from "@/lib/friendly-error";
 
@@ -21,6 +21,7 @@ export function AddCredits({ balance, onCredited }: {
   onCredited: () => void;
 }) {
   const { signer } = useWalletNativeSession();
+  const { getValidToken, signIn } = useSiwsToken();
   const [terms, setTerms] = useState<CreditTerms | null>(null);
   const [amount, setAmount] = useState("10");
   const [step, setStep] = useState<Step>("idle");
@@ -37,13 +38,21 @@ export function AddCredits({ balance, onCredited }: {
     setStep("crediting");
     const before = balance ?? 0;
 
+    const token = getValidToken() ?? (await signIn().catch(() => null));
+
     for (let attempt = 0; attempt < CHECKS; attempt++) {
       await fetch("/api/proxy/v1/portal/credits/check", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          ...(token ? { authorization: `Bearer ${token}` } : {}),
+        },
         body: JSON.stringify({ txHash }),
       }).catch(() => null);
-      const me = await fetch("/api/proxy/v1/portal/me", { cache: "no-store" })
+      const me = await fetch("/api/proxy/v1/portal/me", {
+        cache: "no-store",
+        headers: token ? { authorization: `Bearer ${token}` } : undefined,
+      })
         .then((r) => (r.ok ? (r.json() as Promise<{ data: { creditBalance: number } }>) : null))
         .then((b) => b?.data ?? null)
         .catch(() => null);

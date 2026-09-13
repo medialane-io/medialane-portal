@@ -5,22 +5,27 @@ import { Copy, KeyRound, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { usePortalKeys } from "@/hooks/use-portal-account";
-import { getMedialaneClient } from "@/lib/medialane-client";
+import { useSiwsToken } from "@/hooks/use-siws-token";
 import { friendlyErrorMessage } from "@/lib/friendly-error";
 
 const SIGN_IN_AGAIN = "Sign in again to change your keys.";
 
 export function ApiKeys() {
   const { data: keys, mutate } = usePortalKeys(true);
+  const { getValidToken, signIn } = useSiwsToken();
   const [plaintext, setPlaintext] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
 
   async function create() {
     setBusy(true);
     try {
+      const token = getValidToken() ?? (await signIn());
       const res = await fetch("/api/proxy/v1/portal/keys", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          ...(token ? { authorization: `Bearer ${token}` } : {}),
+        },
         body: JSON.stringify({ appSource: "MEDIALANE_PORTAL" }),
       });
       if (res.status === 401) throw new Error(SIGN_IN_AGAIN);
@@ -38,7 +43,11 @@ export function ApiKeys() {
   async function revoke(id: string) {
     setBusy(true);
     try {
-      const res = await fetch(`/api/proxy/v1/portal/keys/${encodeURIComponent(id)}`, { method: "DELETE" });
+      const token = getValidToken() ?? (await signIn());
+      const res = await fetch(`/api/proxy/v1/portal/keys/${encodeURIComponent(id)}`, {
+        method: "DELETE",
+        headers: token ? { authorization: `Bearer ${token}` } : undefined,
+      });
       if (res.status === 401) throw new Error(SIGN_IN_AGAIN);
       if (!res.ok) throw new Error("Could not revoke that key");
       await mutate();

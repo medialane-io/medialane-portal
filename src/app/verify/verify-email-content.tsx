@@ -14,6 +14,7 @@ import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { friendlyErrorMessage } from "@/lib/friendly-error";
 import { saveAccountEmail } from "@/lib/wallet/account-wallet";
+import { fireConfetti } from "@/lib/confetti";
 
 const RESEND_COOLDOWN_S = 30;
 
@@ -107,6 +108,7 @@ export default function VerifyEmailContent() {
       if (!token) throw new Error("Not authenticated");
       await getMedialaneClient().api.upsertMyWallet(token, { emailVerificationToken: (data as { token: string }).token });
       setStep("verified");
+      fireConfetti();
       toast.success("Email verified");
     } catch (err) {
       setError(friendlyErrorMessage(err, "Incorrect code. Please try again."));
