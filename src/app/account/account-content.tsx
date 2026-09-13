@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePortalToken, usePortalAccount, usePortalSpend } from "@/hooks/use-portal-account";
+import { usePortalSession, usePortalSpend } from "@/hooks/use-portal-account";
 import { labelForAction } from "@/lib/spend-labels";
 import { ApiKeys } from "./api-keys";
 import { AddCredits } from "./add-credits";
@@ -17,13 +17,12 @@ function usd(credits: number): string {
 }
 
 export function AccountContent() {
-  const { token, ready } = usePortalToken();
-  const { data: account, mutate: refreshAccount } = usePortalAccount(token);
-  const { data: spend } = usePortalSpend(token);
+  const { signedIn, account, ready, refresh: refreshAccount } = usePortalSession();
+  const { data: spend } = usePortalSpend(signedIn);
 
   if (!ready) return null;
 
-  if (!token) {
+  if (!signedIn) {
     return (
       <main className="container mx-auto max-w-2xl px-4 py-24 text-center">
         <h1 className="text-2xl font-bold tracking-tight">Account</h1>
@@ -68,9 +67,9 @@ export function AccountContent() {
         </section>
       ) : null}
 
-      <AddCredits token={token} balance={account?.creditBalance} onCredited={() => refreshAccount()} />
+      <AddCredits balance={account?.creditBalance} onCredited={() => refreshAccount()} />
 
-      <ApiKeys token={token} />
+      <ApiKeys />
     </main>
   );
 }

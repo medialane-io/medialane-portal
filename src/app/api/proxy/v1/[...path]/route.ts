@@ -9,6 +9,7 @@ import {
   shouldSetSessionCookie,
   extractAccountToken,
   stripAccountToken,
+  shouldAuthorizeWithSession,
   shouldInjectSessionCookie,
   injectAccountToken,
 } from "./session-cookie";
@@ -88,6 +89,11 @@ async function handle(
     fwdHeaders.set(k, v);
   }
   fwdHeaders.set("x-api-key", apiKey);
+
+  if (shouldAuthorizeWithSession(joinedPath) && !fwdHeaders.has("authorization")) {
+    const sessionCookie = req.cookies.get(SESSION_COOKIE_NAME)?.value;
+    if (sessionCookie) fwdHeaders.set("authorization", `Bearer ${sessionCookie}`);
+  }
   fwdHeaders.set(TRUSTED_APP_IP_HEADER, callerIp);
 
   const hasBody = req.method !== "GET" && req.method !== "HEAD";

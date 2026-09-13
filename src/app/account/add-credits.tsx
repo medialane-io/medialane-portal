@@ -16,8 +16,7 @@ type Step = "idle" | "sending" | "crediting";
 const CHECKS = 8;
 const GAP_MS = 4000;
 
-export function AddCredits({ token, balance, onCredited }: {
-  token: string;
+export function AddCredits({ balance, onCredited }: {
   balance: number | undefined;
   onCredited: () => void;
 }) {
@@ -39,11 +38,18 @@ export function AddCredits({ token, balance, onCredited }: {
     const before = balance ?? 0;
 
     for (let attempt = 0; attempt < CHECKS; attempt++) {
-      await getMedialaneClient().api.checkDeposit(txHash, token).catch(() => null);
-      const me = await getMedialaneClient().api.getMe(token).catch(() => null);
+      await fetch("/api/proxy/v1/portal/credits/check", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ txHash }),
+      }).catch(() => null);
+      const me = await fetch("/api/proxy/v1/portal/me", { cache: "no-store" })
+        .then((r) => (r.ok ? (r.json() as Promise<{ data: { creditBalance: number } }>) : null))
+        .then((b) => b?.data ?? null)
+        .catch(() => null);
 
-      if (me && me.data.creditBalance > before) {
-        toast.success(`${(me.data.creditBalance - before).toLocaleString()} credits added`);
+      if (me && me.creditBalance > before) {
+        toast.success(`${(me.creditBalance - before).toLocaleString()} credits added`);
         onCredited();
         setStep("idle");
         return;

@@ -28,6 +28,10 @@ export function stripAccountToken(bodyText: string): string {
   }
 }
 
+export function shouldAuthorizeWithSession(path: string): boolean {
+  return path === "portal" || path.startsWith("portal/");
+}
+
 export function shouldInjectSessionCookie(path: string, method: string): boolean {
   return method === "POST" && (path === "users/me" || path === "users/me/wallet");
 }

@@ -1,48 +1,48 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
 import useSWR from "swr";
-import { getMedialaneClient } from "@/lib/medialane-client";
-import { loadAccountSession, onAccountSessionChange } from "@/lib/account-session";
+import type { ApiPortalMe, ApiPortalKey, ApiPortalSpend, ApiCreditPayment } from "@medialane/sdk";
 
-export function usePortalToken() {
-  const [token, setToken] = useState<string | null>(null);
-  const [ready, setReady] = useState(false);
-
-  useEffect(() => {
-    const read = () => setToken(loadAccountSession());
-    read();
-    setReady(true);
-    return onAccountSessionChange(read);
-  }, []);
-
-  const authorize = useCallback(async () => loadAccountSession(), []);
-
-  return { token, authorize, reauthorize: authorize, isSigningIn: false, error: null, ready };
+async function read<T>(url: string): Promise<T | null> {
+  const res = await fetch(url, { cache: "no-store" });
+  if (res.status === 401 || res.status === 403 || res.status === 404) return null;
+  if (!res.ok) throw new Error(`${url} failed`);
+  const body = (await res.json()) as { data: T };
+  return body.data;
 }
 
-const api = () => getMedialaneClient().api;
+const quiet = { revalidateOnFocus: false, shouldRetryOnError: false } as const;
 
-export function usePortalAccount(token: string | null) {
-  return useSWR(token ? ["portal:me", token] : null, async ([, t]) => (await api().getMe(t)).data, {
-    revalidateOnFocus: false,
-  });
+export function usePortalSession() {
+  const { data, error, isLoading, mutate } = useSWR(
+    "portal:me",
+    () => read<ApiPortalMe>("/api/proxy/v1/portal/me"),
+    quiet,
+  );
+
+  return { signedIn: data != null, account: data, ready: !isLoading, error, refresh: mutate };
 }
 
-export function usePortalKeys(token: string | null) {
-  return useSWR(token ? ["portal:keys", token] : null, async ([, t]) => (await api().getApiKeys(t)).data, {
-    revalidateOnFocus: false,
-  });
+export function usePortalKeys(signedIn: boolean) {
+  return useSWR(
+    signedIn ? "portal:keys" : null,
+    () => read<ApiPortalKey[]>("/api/proxy/v1/portal/keys"),
+    quiet,
+  );
 }
 
-export function usePortalSpend(token: string | null) {
-  return useSWR(token ? ["portal:spend", token] : null, async ([, t]) => (await api().getSpend(t)).data, {
-    revalidateOnFocus: false,
-  });
+export function usePortalSpend(signedIn: boolean) {
+  return useSWR(
+    signedIn ? "portal:spend" : null,
+    () => read<ApiPortalSpend>("/api/proxy/v1/portal/credits/spend"),
+    quiet,
+  );
 }
 
-export function usePortalCredits(token: string | null) {
-  return useSWR(token ? ["portal:credits", token] : null, async ([, t]) => (await api().getCreditHistory(t)).data, {
-    revalidateOnFocus: false,
-  });
+export function usePortalCredits(signedIn: boolean) {
+  return useSWR(
+    signedIn ? "portal:credits" : null,
+    () => read<ApiCreditPayment[]>("/api/proxy/v1/portal/credits/history"),
+    quiet,
+  );
 }

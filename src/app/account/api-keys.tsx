@@ -4,28 +4,29 @@ import { useState } from "react";
 import { Copy, KeyRound, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
-import { usePortalKeys, usePortalToken } from "@/hooks/use-portal-account";
+import { usePortalKeys } from "@/hooks/use-portal-account";
 import { getMedialaneClient } from "@/lib/medialane-client";
 import { friendlyErrorMessage } from "@/lib/friendly-error";
 
-function isStaleSignature(err: unknown): boolean {
-  const status = (err as { status?: unknown })?.status;
-  return status === 401;
-}
+const SIGN_IN_AGAIN = "Sign in again to change your keys.";
 
-export function ApiKeys({ token }: { token: string }) {
-  const { reauthorize } = usePortalToken();
-  const { data: keys, mutate } = usePortalKeys(token);
+export function ApiKeys() {
+  const { data: keys, mutate } = usePortalKeys(true);
   const [plaintext, setPlaintext] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
 
   async function create() {
     setBusy(true);
     try {
-      const { data } = await withFreshSignature((t) =>
-        getMedialaneClient().api.createApiKey({ appSource: "MEDIALANE_PORTAL" }, t),
-      );
-      setPlaintext(data.plaintext);
+      const res = await fetch("/api/proxy/v1/portal/keys", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ appSource: "MEDIALANE_PORTAL" }),
+      });
+      if (res.status === 401) throw new Error(SIGN_IN_AGAIN);
+      if (!res.ok) throw new Error("Could not create a key");
+      const body = (await res.json()) as { data: { plaintext: string } };
+      setPlaintext(body.data.plaintext);
       await mutate();
     } catch (err) {
       toast.error(friendlyErrorMessage(err, "Could not create a key"));
@@ -34,21 +35,12 @@ export function ApiKeys({ token }: { token: string }) {
     }
   }
 
-  async function withFreshSignature<T>(run: (token: string) => Promise<T>): Promise<T> {
-    try {
-      return await run(token);
-    } catch (err) {
-      if (!isStaleSignature(err)) throw err;
-      const fresh = await reauthorize();
-      if (!fresh) throw err;
-      return run(fresh);
-    }
-  }
-
   async function revoke(id: string) {
     setBusy(true);
     try {
-      await withFreshSignature((t) => getMedialaneClient().api.deleteApiKey(id, t));
+      const res = await fetch(`/api/proxy/v1/portal/keys/${encodeURIComponent(id)}`, { method: "DELETE" });
+      if (res.status === 401) throw new Error(SIGN_IN_AGAIN);
+      if (!res.ok) throw new Error("Could not revoke that key");
       await mutate();
     } catch (err) {
       toast.error(friendlyErrorMessage(err, "Could not revoke that key"));
