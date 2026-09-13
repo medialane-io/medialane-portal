@@ -15,7 +15,6 @@ import { friendlyErrorMessage } from "@/lib/friendly-error";
 import { adoptAccountWallet, saveAccountEmail } from "@/lib/wallet/account-wallet";
 import { loadSealedOwner } from "@/lib/wallet/store";
 import { destinationAfterSignIn } from "@/lib/wallet/next-step";
-import { saveAccountSession } from "@/lib/account-session";
 import { loadAccountAddress } from "@/lib/wallet/account-wallet";
 import { safeRelativePath } from "@/lib/safe-redirect";
 import { useWalletNativeSession } from "@/hooks/use-wallet-native-session";
@@ -131,10 +130,8 @@ function ConnectForm() {
         await requestLoginCode();
         return;
       }
-      const created = (await res.json().catch(() => ({}))) as { accountToken?: string };
       if (!res.ok) throw new Error("register-account failed");
       saveAccountEmail(email);
-      if (created.accountToken) saveAccountSession(created.accountToken);
       goToWalletOnboarding();
     } catch {
       setError("Something went wrong. Please try again.");
@@ -188,11 +185,10 @@ function ConnectForm() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, code: codeToVerify }),
       });
-      const data = (await res.json().catch(() => ({}))) as { error?: string; accountToken?: string };
+      const data = (await res.json().catch(() => ({}))) as { error?: string };
       if (!res.ok) throw new Error(data.error ?? "Incorrect code");
 
       saveAccountEmail(email);
-      if (data.accountToken) saveAccountSession(data.accountToken);
       void adoptAccountWallet();
       router.push(redirectTo || "/account");
     } catch (err) {

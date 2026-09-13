@@ -75,3 +75,19 @@ test("injectAccountToken handles an empty or malformed body by starting fresh", 
   expect(JSON.parse(injectAccountToken("", "tok"))).toEqual({ accountToken: "tok" });
   expect(JSON.parse(injectAccountToken("not json", "tok"))).toEqual({ accountToken: "tok" });
 });
+
+test("portal paths carry the session, so an account reads its own records", async () => {
+  const { shouldAuthorizeWithSession } = await import("./session-cookie");
+
+  expect(shouldAuthorizeWithSession("portal/me")).toBe(true);
+  expect(shouldAuthorizeWithSession("portal/keys")).toBe(true);
+  expect(shouldAuthorizeWithSession("portal/credits/spend")).toBe(true);
+});
+
+test("other paths are left as the app's own, so the app pays for what it uses", async () => {
+  const { shouldAuthorizeWithSession } = await import("./session-cookie");
+
+  expect(shouldAuthorizeWithSession("metadata/upload-json")).toBe(false);
+  expect(shouldAuthorizeWithSession("rpc")).toBe(false);
+  expect(shouldAuthorizeWithSession("portalish/me")).toBe(false);
+});
