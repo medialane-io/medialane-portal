@@ -20,22 +20,19 @@ const quiet = { revalidateOnFocus: false, shouldRetryOnError: false } as const;
 
 export function usePortalSession() {
   const { hasWallet } = useWalletNativeSession();
-  const { getValidToken } = useSiwsToken();
+  const { getValidToken, signIn } = useSiwsToken();
 
   const { data, error, isLoading, mutate } = useSWR(
     "portal:me",
-    () => read<ApiPortalMe>("/api/proxy/v1/portal/me", hasWallet ? getValidToken() : null),
+    async () => {
+      if (!hasWallet) return null;
+      const token = getValidToken() ?? (await signIn());
+      return read<ApiPortalMe>("/api/proxy/v1/portal/me", token);
+    },
     quiet,
   );
 
-  return {
-    signedIn: data != null,
-    account: data,
-    ready: !isLoading,
-    needsWalletSignIn: hasWallet && data == null,
-    error,
-    refresh: mutate,
-  };
+  return { signedIn: data != null, account: data, ready: !isLoading, hasWallet, error, refresh: mutate };
 }
 
 export function usePortalKeys(signedIn: boolean) {
