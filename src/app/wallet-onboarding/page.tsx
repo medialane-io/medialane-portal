@@ -4,7 +4,8 @@ import { Suspense, useEffect, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Loader2, ShieldCheck, CheckCircle2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Loader2, ShieldCheck, CheckCircle2, AlertTriangle } from "lucide-react";
 import { completeWalletDeployment } from "@/lib/wallet/complete-deployment";
 import { getMedialaneClient } from "@/lib/medialane-client";
 import { fireConfetti } from "@/lib/confetti";
@@ -26,11 +27,13 @@ function WalletOnboardingForm() {
   const searchParams = useSearchParams();
   const redirectTo = safeRelativePath(searchParams.get("redirect_url")) ?? "/account";
   const [step, setStep] = useState<Step | null>(null);
+  const [errorDetail, setErrorDetail] = useState<string | null>(null);
   const startedRef = useRef(false);
 
-  const runOnboarding = async () => {
+  const runOnboarding = async (options: { forceNew?: boolean } = {}) => {
+    setErrorDetail(null);
     try {
-      const { siwsToken } = await completeWalletDeployment(setStep);
+      const { siwsToken } = await completeWalletDeployment(setStep, options);
 
       await getMedialaneClient().api.upsertMyWallet(siwsToken, {
         walletType: "MEDIAWALLET",
@@ -49,7 +52,8 @@ function WalletOnboardingForm() {
 
       const message = err instanceof Error ? err.message : "Something went wrong.";
       toast.error(`We couldn't finish setting up your account: ${message}`);
-      router.push(redirectTo);
+      setErrorDetail(message);
+      setStep(null);
     }
   };
 
@@ -59,6 +63,36 @@ function WalletOnboardingForm() {
     void runOnboarding();
     // eslint-disable-next-line react-hooks/exhaustive-deps -- startedRef guards this to run exactly once on mount
   }, []);
+
+  if (errorDetail) {
+    return (
+      <div className="min-h-[80vh] flex items-center justify-center px-4">
+        <Card className="w-full max-w-md">
+          <CardHeader className="text-center">
+            <div className="flex justify-center mb-2">
+              <div className="h-12 w-12 rounded-full bg-destructive/10 flex items-center justify-center">
+                <AlertTriangle className="h-6 w-6 text-destructive" />
+              </div>
+            </div>
+            <CardTitle>We couldn&apos;t finish setting up your account</CardTitle>
+          </CardHeader>
+          <CardContent className="flex flex-col items-center gap-4">
+            <pre className="w-full whitespace-pre-wrap break-all rounded-lg border border-border/60 bg-muted/40 p-3 text-left text-xs text-muted-foreground">
+              {errorDetail}
+            </pre>
+            <div className="flex w-full gap-2">
+              <Button className="flex-1" onClick={() => void runOnboarding()}>
+                Try again
+              </Button>
+              <Button className="flex-1" variant="outline" onClick={() => router.push(redirectTo)}>
+                Not now
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   if (step === "done") {
     return (
