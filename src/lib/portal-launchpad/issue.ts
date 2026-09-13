@@ -93,7 +93,7 @@ export async function issueToRecipients(
   },
 ): Promise<{ recipientCount: number; txHash: string | null }> {
   const client = getMedialaneClient();
-  const result = await client.api.mintCalls(input);
+  const result = await client.api.emitToRecipients(input);
   if (!result.data) throw new Error("Could not prepare the issuance");
   const { batches } = result.data;
   if (batches.length === 0) return { recipientCount: result.data.recipientCount, txHash: null };

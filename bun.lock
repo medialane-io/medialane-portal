@@ -5,7 +5,7 @@
     "": {
       "name": "medialane-portal",
       "dependencies": {
-        "@medialane/sdk": "0.118.1",
+        "@medialane/sdk": "0.118.2",
         "@medialane/ui": "0.159.0",
         "@next/third-parties": "^16.2.6",
         "@radix-ui/react-dialog": "^1.1.15",
@@ -177,7 +177,7 @@
 
     "@jridgewell/trace-mapping": ["@jridgewell/trace-mapping@0.3.31", "", { "dependencies": { "@jridgewell/resolve-uri": "^3.1.0", "@jridgewell/sourcemap-codec": "^1.4.14" } }, "sha512-zzNR+SdQSDJzc8joaeP8QQoCQr8NuYx2dIIytl1QeBEZHJ9uW6hebsrYgbz8hJwUQao3TWCMtmfV8Nu1twOLAw=="],
 
-    "@medialane/sdk": ["@medialane/sdk@0.118.1", "", { "dependencies": { "@noble/hashes": "^2.2.0", "@scure/base": "^2.2.0", "zod": "^3.23.8" }, "peerDependencies": { "@solana/web3.js": ">=1.90.0", "@stellar/stellar-sdk": ">=13.0.0", "starknet": ">=6.0.0", "viem": ">=2.0.0" }, "optionalPeers": ["@solana/web3.js", "@stellar/stellar-sdk", "starknet", "viem"] }, "sha512-n/S6yyH/sX46Z2dxKLJ+trk3jqEzmroQ4yD6g/z5OxQbqHoTjX2l7zrY9KjslV73EdOS76iUDjpuOhAXSQYR7Q=="],
+    "@medialane/sdk": ["@medialane/sdk@0.118.2", "", { "dependencies": { "@noble/hashes": "^2.2.0", "@scure/base": "^2.2.0", "zod": "^3.23.8" }, "peerDependencies": { "@solana/web3.js": ">=1.90.0", "@stellar/stellar-sdk": ">=13.0.0", "starknet": ">=6.0.0", "viem": ">=2.0.0" }, "optionalPeers": ["@solana/web3.js", "@stellar/stellar-sdk", "starknet", "viem"] }, "sha512-pQWdF1FZ2NxMFLK6Bq0I4BQIibfngundJeh6y5B+LaX4ml5vWFXHGmUFcpVHSiCzKDkWjqpISzUhKibPqIzJsA=="],
 
     "@medialane/ui": ["@medialane/ui@0.159.0", "", { "peerDependencies": { "@medialane/sdk": ">=0.102.0", "@radix-ui/react-checkbox": ">=1.1.0", "@radix-ui/react-collapsible": ">=1.1.0", "@radix-ui/react-dialog": ">=1.1.0", "@radix-ui/react-dropdown-menu": ">=2.1.0", "@radix-ui/react-label": ">=2.1.0", "@radix-ui/react-popover": ">=1.1.0", "@radix-ui/react-select": ">=2.1.0", "@radix-ui/react-slot": ">=1.1.0", "@radix-ui/react-switch": ">=1.1.0", "@radix-ui/react-tabs": ">=1.1.0", "class-variance-authority": ">=0.7.0", "clsx": ">=2.0.0", "cmdk": ">=1.0.0", "framer-motion": ">=10.0.0", "lucide-react": ">=0.400.0", "next": ">=14.0.0", "next-themes": ">=0.3.0", "react": ">=18.0.0", "react-dom": ">=18.0.0", "react-hook-form": ">=7.50.0", "recharts": ">=2.0.0", "sonner": ">=1.0.0", "starknet": ">=8.0.0", "swr": ">=2.0.0", "tailwind-merge": ">=2.0.0", "zod": "^3.25.0" } }, "sha512-+2A7sf6shjjT2ZJbjNmBDftEexrAdk9STkqN38Es0bVT2Rnk15ZxXTfXcoUwKQNeaMudbnWSqqbcXenpW2rNWw=="],
 

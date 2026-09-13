@@ -20,7 +20,7 @@ test("signing in and verifying an email are reachable", () => {
 test("a launchpad run can provision recipients and issue to them", () => {
   for (const path of [
     "business/provisioning",
-    "business/issuance/mint-calls",
+    "business/issuance/emission",
     "metadata/upload",
     "metadata/upload-file",
   ]) {

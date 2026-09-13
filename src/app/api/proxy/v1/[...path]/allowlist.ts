@@ -24,7 +24,7 @@ const ALLOWED_ROUTES: Record<string, RegExp[]> = {
     /^portal\/keys$/,
     /^portal\/credits\/check$/,
     /^business\/provisioning$/,
-    /^business\/issuance\/mint-calls$/,
+    /^business\/issuance\/emission$/,
     /^intents\/(create-tier|create-collection)$/,
     /^metadata\/upload(-file)?$/,
     /^tx\/sync$/,
