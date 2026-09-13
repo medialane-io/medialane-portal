@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
+import Link from "next/link";
+import { Database, Ticket } from "lucide-react";
 import { canonical, buildSocialMetadata } from "@/lib/seo";
-import { LaunchpadStrip, LaunchpadCtaBanner } from "@medialane/ui";
+import { LaunchpadCtaBanner } from "@medialane/ui";
 
 const title = "Launchpad";
-const description =
-  "Tickets, memberships, editions and Creator Coins. Issue them to whoever you choose.";
+const description = "Tokenize your IP or issue tickets, and distribute them to a list of people.";
 
 export const metadata: Metadata = {
   title,
@@ -21,23 +22,42 @@ export default function LaunchpadPage() {
           Issue your work
         </h1>
         <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-          Tickets, memberships, editions and Creator Coins. Issue them to whoever you choose, and
-          pay for it from your credits.
+          Tokenize your IP or issue tickets, and distribute them to a list of people. Pay for it
+          from your credits.
         </p>
       </section>
 
       <div className="w-full max-w-screen-2xl mx-auto px-4 sm:px-6 space-y-10 sm:space-y-16 mt-16">
-        <LaunchpadStrip
-          hrefs={{
-            "nfts": "/launchpad",
-            "limited-editions": "/launchpad",
-            "collection-drop": "/launchpad",
-            "pop-protocol": "/launchpad",
-            "ip-tickets": "/launchpad",
-            "creator-coins": "/launchpad",
-          }}
-          launchpadHref="/launchpad"
-        />
+        <div className="grid gap-4 sm:grid-cols-2">
+          <Link
+            href="/launchpad/data-tokenization"
+            className="flex items-start gap-4 rounded-2xl border border-border p-6 transition-colors hover:border-foreground/20"
+          >
+            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/10">
+              <Database className="h-5 w-5 text-primary" />
+            </span>
+            <div className="space-y-1.5">
+              <h2 className="font-semibold">Data Tokenization</h2>
+              <p className="text-sm text-muted-foreground">
+                Tokenize your IP on-chain and mint it to a list of recipients.
+              </p>
+            </div>
+          </Link>
+          <Link
+            href="/launchpad/ip-ticketing"
+            className="flex items-start gap-4 rounded-2xl border border-border p-6 transition-colors hover:border-foreground/20"
+          >
+            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/10">
+              <Ticket className="h-5 w-5 text-primary" />
+            </span>
+            <div className="space-y-1.5">
+              <h2 className="font-semibold">IP Ticketing</h2>
+              <p className="text-sm text-muted-foreground">
+                Issue on-chain tickets and distribute them to a list of recipients.
+              </p>
+            </div>
+          </Link>
+        </div>
 
         <LaunchpadCtaBanner
           eyebrow="Pricing"

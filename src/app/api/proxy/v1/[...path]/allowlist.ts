@@ -23,7 +23,6 @@ const ALLOWED_ROUTES: Record<string, RegExp[]> = {
     /^users\/me\/(email|wallet|generate-wallet)$/,
     /^portal\/keys$/,
     /^portal\/credits\/check$/,
-    /^business\/launchpad\/(quote|runs)$/,
     /^business\/provisioning$/,
     /^business\/issuance\/mint-calls$/,
     /^intents\/(create-tier|create-collection)$/,

@@ -17,10 +17,8 @@ test("signing in and verifying an email are reachable", () => {
   }
 });
 
-test("a launchpad run can be quoted, charged and carried out", () => {
+test("a launchpad run can provision recipients and issue to them", () => {
   for (const path of [
-    "business/launchpad/quote",
-    "business/launchpad/runs",
     "business/provisioning",
     "business/issuance/mint-calls",
     "metadata/upload",
