@@ -47,7 +47,8 @@ function WalletOnboardingForm() {
         return;
       }
 
-      toast.error("We couldn't finish setting up your account. You can pick up where you left off from your wallet.");
+      const message = err instanceof Error ? err.message : "Something went wrong.";
+      toast.error(`We couldn't finish setting up your account: ${message}`);
       router.push(redirectTo);
     }
   };

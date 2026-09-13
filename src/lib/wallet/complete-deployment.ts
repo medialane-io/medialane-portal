@@ -33,8 +33,14 @@ export async function completeWalletDeployment(
 
   try {
     await deployWalletSponsored(sealed.address, sealed.ownerPubKey, privateKey);
-  } catch {
-    await deploySelf(sealed.address, sealed.ownerPubKey, privateKey);
+  } catch (sponsoredErr) {
+    try {
+      await deploySelf(sealed.address, sealed.ownerPubKey, privateKey);
+    } catch (selfFundedErr) {
+      const sponsoredMessage = sponsoredErr instanceof Error ? sponsoredErr.message : String(sponsoredErr);
+      const selfFundedMessage = selfFundedErr instanceof Error ? selfFundedErr.message : String(selfFundedErr);
+      throw new Error(`Sponsored deploy failed: ${sponsoredMessage}. Self-funded fallback failed: ${selfFundedMessage}`);
+    }
   }
 
   onStep("signing-in");
