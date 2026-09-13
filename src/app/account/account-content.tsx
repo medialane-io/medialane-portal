@@ -1,7 +1,10 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import { usePortalSession, usePortalSpend } from "@/hooks/use-portal-account";
+import { useSiwsToken } from "@/hooks/use-siws-token";
+import { friendlyErrorMessage } from "@/lib/friendly-error";
 import { labelForAction } from "@/lib/spend-labels";
 import { ApiKeys } from "./api-keys";
 import { AddCredits } from "./add-credits";
@@ -17,21 +20,46 @@ function usd(credits: number): string {
 }
 
 export function AccountContent() {
-  const { signedIn, account, ready, refresh: refreshAccount } = usePortalSession();
+  const { signedIn, account, ready, needsWalletSignIn, refresh: refreshAccount } = usePortalSession();
   const { data: spend } = usePortalSpend(signedIn);
+  const { signIn } = useSiwsToken();
+  const [signingIn, setSigningIn] = useState(false);
+  const [signInError, setSignInError] = useState<string | null>(null);
 
   if (!ready) return null;
 
   if (!signedIn) {
+    async function handleWalletSignIn() {
+      setSigningIn(true);
+      setSignInError(null);
+      try {
+        await signIn();
+        await refreshAccount();
+      } catch (err) {
+        setSignInError(friendlyErrorMessage(err, "Sign-in failed"));
+      } finally {
+        setSigningIn(false);
+      }
+    }
+
     return (
       <main className="container mx-auto max-w-2xl px-4 py-24 text-center">
         <h1 className="text-2xl font-bold tracking-tight">Account</h1>
         <p className="mt-3 text-sm text-muted-foreground">
           Sign in to see your credits, your keys and what you have spent.
         </p>
-        <Button asChild className="mt-5">
-          <Link href="/connect">Sign in</Link>
-        </Button>
+        {needsWalletSignIn ? (
+          <>
+            <Button className="mt-5" onClick={handleWalletSignIn} disabled={signingIn}>
+              {signingIn ? "Signing in…" : "Sign in"}
+            </Button>
+            {signInError && <p className="mt-3 text-sm text-destructive">{signInError}</p>}
+          </>
+        ) : (
+          <Button asChild className="mt-5">
+            <Link href="/connect">Sign in</Link>
+          </Button>
+        )}
       </main>
     );
   }
