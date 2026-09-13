@@ -13,13 +13,12 @@ import { loadSealedOwner } from "./store";
 export { signWithPrivateKey } from "@medialane/sdk/starknet";
 export { InvalidStarkPrivateKeyError };
 
-const RP_NAME = "Medialane";
-const CANONICAL_RP_ID = "www.medialane.io";
+const RP_NAME = "Medialane Portal";
 
 function relyingPartyId(): string {
-  const host = location.hostname;
-  return host === "medialane.io" || host.endsWith(".medialane.io") ? CANONICAL_RP_ID : host;
+  return location.hostname;
 }
+
 
 const enc = (s: string): Uint8Array<ArrayBuffer> => {
   const src = new TextEncoder().encode(s);
@@ -41,8 +40,8 @@ const unb64 = (s: string): Uint8Array<ArrayBuffer> => {
 const b64 = (buf: ArrayBuffer | Uint8Array): string =>
   btoa(String.fromCharCode(...new Uint8Array(buf as ArrayBuffer)));
 
-const PRF_SALT = enc("medialane://io/owner-key/v1");
-const HKDF_INFO = enc("medialane-io-owner-key");
+const PRF_SALT = enc("medialane://portal/owner-key/v1");
+const HKDF_INFO = enc("medialane-portal-owner-key");
 
 export class PasskeyCancelledError extends Error {
   constructor() {
