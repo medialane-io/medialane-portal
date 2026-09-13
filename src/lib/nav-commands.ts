@@ -49,8 +49,8 @@ export const NAV_COMMANDS: NavCommandGroup[] = [
     heading: "Learn",
     items: [
       { id: "docs",    label: "Docs",    icon: BookOpen,   href: "https://docs.medialane.io", keywords: ["documentation", "guide", "api", "reference"] },
-      { id: "terms",   label: "Terms",   icon: FileText,   href: "https://docs.medialane.io/terms",   keywords: ["legal", "conditions"] },
-      { id: "privacy", label: "Privacy", icon: ScrollText, href: "https://docs.medialane.io/privacy", keywords: ["legal", "data"] },
+      { id: "terms",   label: "Terms",   icon: FileText,   href: "https://docs.medialane.io/guidelines/terms",   keywords: ["legal", "conditions"] },
+      { id: "privacy", label: "Privacy", icon: ScrollText, href: "https://docs.medialane.io/guidelines/privacy", keywords: ["legal", "data"] },
     ],
   },
 ];
