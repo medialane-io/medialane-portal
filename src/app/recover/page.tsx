@@ -22,7 +22,7 @@ import {
   completeEscapeOwner,
   type EscapeInfo,
 } from "@/lib/wallet/guardian";
-import { describeRecoveryAction } from "@/lib/wallet/guardian-status";
+import { describeRecoveryAction } from "@medialane/sdk/starknet";
 import { friendlyErrorMessage } from "@/lib/friendly-error";
 import { isOwnerOf } from "@/lib/wallet/devices";
 

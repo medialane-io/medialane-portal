@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { getGuardians, getEscape, cancelEscape, type GuardianInfo, type EscapeInfo } from "@/lib/wallet/guardian";
-import { describeGuardianStatus, describeRecoveryAction } from "@/lib/wallet/guardian-status";
+import { describeGuardianStatus, describeRecoveryAction } from "@medialane/sdk/starknet";
 import { loadSealedOwner } from "@/lib/wallet/store";
 import { friendlyErrorMessage } from "@/lib/friendly-error";
 import { AddGuardianDialog } from "./add-guardian-dialog";
