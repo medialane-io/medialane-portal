@@ -34,7 +34,8 @@ import {
   TERRITORIES,
 } from "@/lib/portal-launchpad/issuance-form";
 import { TICKETING_SERVICE } from "@/lib/portal-launchpad/collection-copy";
-import { assertTransactionSucceeded } from "@/lib/wallet/intent-tx";
+import { assertTransactionSucceeded } from "@medialane/sdk/starknet";
+import { starknetProvider } from "@/lib/starknet";
 
 const TRANSFERABLE = ["Allowed", "Not Allowed"] as const;
 
@@ -162,7 +163,7 @@ export function IpTicketingTask() {
         startTime: toUnixSeconds(validFrom) ?? undefined,
         endTime: toUnixSeconds(validUntil) ?? undefined,
       });
-      await assertTransactionSucceeded(txHash);
+      await assertTransactionSucceeded(starknetProvider, txHash);
       const receipt = await import("@/lib/starknet").then(({ starknetProvider }) =>
         starknetProvider.getTransactionReceipt(txHash),
       );

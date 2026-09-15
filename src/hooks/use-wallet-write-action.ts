@@ -2,16 +2,21 @@
 
 import { useCallback, useState } from "react";
 import type { StarknetVenueSigner } from "@medialane/sdk/starknet";
+import { starknetProvider } from "@/lib/starknet";
 import { useWalletNativeSession } from "./use-wallet-native-session";
 import { lockVenueSigner } from "@/lib/wallet/venue-signer";
-import { assertTransactionSucceeded } from "@/lib/wallet/intent-tx";
+import { assertTransactionSucceeded } from "@medialane/sdk/starknet";
 import { friendlyErrorMessage } from "@/lib/friendly-error";
 import { loadAccountAddress } from "@/lib/wallet/account-wallet";
+
+const verifyOnStarknet = async (txHash: string): Promise<void> => {
+  await assertTransactionSucceeded(starknetProvider, txHash);
+};
 
 export type WalletWriteStatus = "idle" | "processing" | "confirming" | "success" | "error";
 
 export function useWalletWriteAction(
-  verify: (txHash: string) => Promise<void> = assertTransactionSucceeded,
+  verify: (txHash: string) => Promise<void> = verifyOnStarknet,
 ) {
   const { hasWallet, signer } = useWalletNativeSession();
   const [status, setStatus] = useState<WalletWriteStatus>("idle");

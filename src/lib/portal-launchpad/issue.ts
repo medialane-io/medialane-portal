@@ -1,7 +1,8 @@
 import type { StarknetVenueSigner } from "@medialane/sdk/starknet";
 import type { CollectionServiceId } from "@medialane/sdk";
 import { getMedialaneClient } from "@/lib/medialane-client";
-import { executeIntent, executeIntents, assertTransactionSucceeded } from "@/lib/wallet/intent-tx";
+import { executeIntent, executeIntents, assertTransactionSucceeded } from "@medialane/sdk/starknet";
+import { starknetProvider } from "@/lib/starknet";
 import {
   interimKeyFor,
   newDerivationSalt,
@@ -56,7 +57,7 @@ export async function createCollection(
   const client = getMedialaneClient();
   const created = await client.api.createCollectionIntent({ ...input, baseUri: "" });
   if (!created.data) throw new Error("Could not prepare the collection");
-  const { txHash } = await executeIntent(signer, client, created.data);
+  const { txHash } = await executeIntent(starknetProvider, signer, client, created.data);
   return { collectionId: null, txHash };
 }
 
@@ -76,7 +77,7 @@ export async function createTicketTier(
   const client = getMedialaneClient();
   const created = await client.api.createTierIntent(input);
   if (!created.data) throw new Error("Could not prepare the ticket type");
-  return executeIntent(signer, client, created.data);
+  return executeIntent(starknetProvider, signer, client, created.data);
 }
 
 export async function issueToRecipients(
@@ -101,7 +102,7 @@ export async function issueToRecipients(
   let lastTxHash: string | null = null;
   for (const batch of batches) {
     const { txHash } = await signer.execute(batch);
-    await assertTransactionSucceeded(txHash);
+    await assertTransactionSucceeded(starknetProvider, txHash);
     lastTxHash = txHash;
   }
   return { recipientCount: result.data.recipientCount, txHash: lastTxHash };
