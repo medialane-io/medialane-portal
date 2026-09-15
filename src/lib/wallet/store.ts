@@ -1,37 +1,8 @@
-import type { SealedOwner } from "./passkey";
+import { ownerStore } from "./client";
 
-const STORE_KEY = "medialane-io.wallet.owner.v1";
-const EVENT = "mlio-wallet";
-
-export function loadSealedOwner(): SealedOwner | null {
-  if (typeof window === "undefined") return null;
-  try {
-    const raw = localStorage.getItem(STORE_KEY);
-    return raw ? (JSON.parse(raw) as SealedOwner) : null;
-  } catch {
-    return null;
-  }
-}
-
-export function loadWalletAddress(): string | null {
-  return loadSealedOwner()?.address ?? null;
-}
-
-export function saveSealedOwner(sealed: SealedOwner): void {
-  localStorage.setItem(STORE_KEY, JSON.stringify(sealed));
-  window.dispatchEvent(new Event(EVENT));
-}
-
-export function notifyWalletChange(): void {
-  window.dispatchEvent(new Event(EVENT));
-}
-
-export function clearSealedOwner(): void {
-  localStorage.removeItem(STORE_KEY);
-  window.dispatchEvent(new Event(EVENT));
-}
-
-export function onWalletChange(fn: () => void): () => void {
-  window.addEventListener(EVENT, fn);
-  return () => window.removeEventListener(EVENT, fn);
-}
+export const loadSealedOwner = () => ownerStore.load();
+export const loadWalletAddress = () => ownerStore.loadAddress();
+export const saveSealedOwner = (sealed: Parameters<typeof ownerStore.save>[0]) => ownerStore.save(sealed);
+export const clearSealedOwner = () => ownerStore.clear();
+export const notifyWalletChange = () => ownerStore.notifyChange();
+export const onWalletChange = (listener: () => void) => ownerStore.onChange(listener);

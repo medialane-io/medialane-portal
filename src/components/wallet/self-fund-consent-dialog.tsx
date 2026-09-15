@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { ActionDialog } from "@medialane/ui";
-import { registerSelfFundConsentHandler, type SelfFundFeeEstimate } from "@/lib/wallet/self-fund-consent";
+import type { SelfFundFeeEstimate } from "@medialane/sdk/starknet";
+import { walletConsent } from "@/lib/wallet/client";
 import { fmt } from "@/lib/wallet-format";
 
 interface PendingRequest {
@@ -14,7 +15,7 @@ export function SelfFundConsentDialog() {
   const [pending, setPending] = useState<PendingRequest | null>(null);
 
   useEffect(() => {
-    registerSelfFundConsentHandler((feeEstimatePromise) => {
+    walletConsent.registerHandler((feeEstimatePromise) => {
       return new Promise<boolean>((resolve) => {
         setPending({ resolve, feeEstimate: "loading" });
         void feeEstimatePromise.then((feeEstimate) => {
@@ -22,7 +23,7 @@ export function SelfFundConsentDialog() {
         });
       });
     });
-    return () => registerSelfFundConsentHandler(null);
+    return () => walletConsent.registerHandler(null);
   }, []);
 
   const respond = (consented: boolean) => {

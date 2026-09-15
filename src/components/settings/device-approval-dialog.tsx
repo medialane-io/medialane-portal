@@ -12,7 +12,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { parsePairingPayload, type PairingPayload } from "@/lib/wallet/pairing";
+import { parsePairingPayload, type PairingPayload } from "@medialane/sdk/starknet";
 import { addDevice } from "@/lib/wallet/devices";
 import { loadSealedOwner } from "@/lib/wallet/store";
 import { friendlyErrorMessage } from "@/lib/friendly-error";

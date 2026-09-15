@@ -5,7 +5,7 @@ import { KeyRound, Copy, Check, EyeOff, Loader2, ShieldAlert } from "lucide-reac
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { loadSealedOwner } from "@/lib/wallet/store";
-import { isRecoveryKeyForWallet } from "@/lib/wallet/recovery-key";
+import { isRecoveryKeyForWallet } from "@medialane/sdk/starknet";
 import { unlockOwnerKey } from "@/lib/wallet/passkey";
 import { friendlyErrorMessage } from "@/lib/friendly-error";
 
