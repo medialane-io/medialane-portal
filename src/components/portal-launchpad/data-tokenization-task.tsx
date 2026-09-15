@@ -3,30 +3,27 @@
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { ServiceFormShell, ClaimRail, CollapsibleSection, Label } from "@medialane/ui";
-import { AI_POLICIES, GEOGRAPHIC_SCOPES, LICENSE_TYPES } from "@medialane/ui/data/ip";
+import { ServiceFormShell, ClaimRail } from "@medialane/ui";
 import { executeSponsored, type TypedDataSigner } from "@medialane/sdk/starknet";
-import { ArrowLeft, Database, Download, FileCheck2, Layers, Loader2, Scale, ShieldCheck, Upload } from "lucide-react";
+import { ArrowLeft, Database, FileCheck2, Layers, Loader2, Scale, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useWalletNativeSession } from "@/hooks/use-wallet-native-session";
 import { usePortalSession } from "@/hooks/use-portal-account";
 import { useRunsClient } from "@/hooks/use-runs-client";
+import { CheckoutPanel } from "@/components/launchpad/checkout-panel";
+import { Field } from "@/components/launchpad/form-fields";
 import { CollectionPicker } from "./collection-picker";
 import { TaskDialog } from "./task-dialog";
-import { CheckoutPanel } from "@/components/launchpad/checkout-panel";
+import { CatalogSection } from "./data-tokenization/catalog-section";
+import { TermsSection } from "./data-tokenization/terms-section";
+import { RunClosed, RunInProgress, itemCount } from "./data-tokenization/run-section";
 import { DATA_TOKENIZATION_SERVICE } from "@/lib/portal-launchpad/collection-copy";
 import { type TaskPhase } from "@/lib/portal-launchpad/task-progress";
 import { readManifest } from "@/lib/data-tokenization/manifest";
-import { defaultTerms, runSpec, withPreset, type CollectionChoice, type Terms } from "@/lib/data-tokenization/spec";
+import { defaultTerms, runSpec, type CollectionChoice, type Terms } from "@/lib/data-tokenization/spec";
 import { runBatchBase, runCollectionBase, type LaunchpadRun } from "@/lib/launchpad/runs-client";
 import { executeRun, MissingFilesError, putFileToSignedUrl, type RunEvent } from "@/lib/launchpad/run-executor";
-
-const TEMPLATE = [
-  "name,description,ip_type,file,image,Author",
-  '"Quarterly report","Findings for the third quarter",Documents,report.pdf,cover.png,Ana',
-  '"Street study",,Photography,street.jpg,,Rui',
-].join("\n");
 
 function describe(event: RunEvent): string {
   switch (event.kind) {
@@ -45,11 +42,6 @@ function describe(event: RunEvent): string {
   }
 }
 
-function specItemCount(run: LaunchpadRun | null): number {
-  const items = (run?.spec as { items?: unknown[] } | undefined)?.items;
-  return Array.isArray(items) ? items.length : 0;
-}
-
 export function DataTokenizationTask() {
   const router = useRouter();
   const pathname = usePathname();
@@ -63,7 +55,6 @@ export function DataTokenizationTask() {
   const [newName, setNewName] = useState("");
   const [newSymbol, setNewSymbol] = useState("");
   const [terms, setTerms] = useState<Terms>(defaultTerms);
-  const [termsOpen, setTermsOpen] = useState(false);
   const [csv, setCsv] = useState<{ name: string; text: string } | null>(null);
   const [files, setFiles] = useState<File[]>([]);
 
@@ -104,15 +95,6 @@ export function DataTokenizationTask() {
     }
   }
 
-  function downloadTemplate() {
-    const url = URL.createObjectURL(new Blob([TEMPLATE], { type: "text/csv" }));
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "catalog.csv";
-    a.click();
-    URL.revokeObjectURL(url);
-  }
-
   async function save() {
     if (!collection || !manifest) return;
     setPhase("running");
@@ -121,9 +103,7 @@ export function DataTokenizationTask() {
     try {
       const spec = runSpec(collection, terms, manifest.items);
       const saved =
-        run?.status === "DRAFT"
-          ? await client.update(run.id, spec)
-          : await client.create(DATA_TOKENIZATION_SERVICE, spec);
+        run?.status === "DRAFT" ? await client.update(run.id, spec) : await client.create(DATA_TOKENIZATION_SERVICE, spec);
       setRun(saved);
       router.replace(`${pathname}?run=${saved.id}`);
       setPhase("idle");
@@ -213,8 +193,6 @@ export function DataTokenizationTask() {
   }
 
   const status = run?.status ?? "DRAFT";
-  const building = status === "DRAFT";
-  const executing = status === "PAID" || status === "RUNNING";
   const busy = phase === "running";
 
   return (
@@ -225,7 +203,7 @@ export function DataTokenizationTask() {
         phase={phase}
         detail={detail}
         error={error}
-        successLine={`${specItemCount(run).toLocaleString()} items tokenized`}
+        successLine={`${itemCount(run).toLocaleString()} items tokenized`}
         onClose={() => setPhase("idle")}
       />
       <ServiceFormShell
@@ -256,7 +234,7 @@ export function DataTokenizationTask() {
         }
       >
         <div className="space-y-8">
-          {building ? (
+          {status === "DRAFT" ? (
             <>
               <section className="space-y-4">
                 <div className="flex gap-2">
@@ -304,111 +282,15 @@ export function DataTokenizationTask() {
                 )}
               </section>
 
-              <section className="space-y-4">
-                <div className="flex flex-wrap items-end justify-between gap-3">
-                  <div>
-                    <h2 className="text-lg font-semibold">Your catalog</h2>
-                    <p className="mt-1 text-sm text-muted-foreground">
-                      Add a CSV with one row per item, together with the files it names.
-                    </p>
-                  </div>
-                  <Button variant="ghost" size="sm" onClick={downloadTemplate}>
-                    <Download className="mr-2 h-4 w-4" />
-                    Template
-                  </Button>
-                </div>
+              <CatalogSection
+                manifest={manifest}
+                csvName={csv?.name ?? null}
+                fileCount={files.length}
+                onFiles={attach}
+                disabled={busy}
+              />
 
-                <CatalogDrop onFiles={attach} disabled={busy} />
-
-                {csv ? (
-                  <p className="text-sm text-muted-foreground">
-                    {csv.name} · {files.length.toLocaleString()} files attached
-                  </p>
-                ) : null}
-
-                {manifest && manifest.problems.length > 0 ? (
-                  <ul className="space-y-1 text-sm text-destructive">
-                    {manifest.problems.slice(0, 10).map((p) => (
-                      <li key={`${p.row}-${p.message}`}>{p.message}</li>
-                    ))}
-                    {manifest.problems.length > 10 ? <li>And {manifest.problems.length - 10} more</li> : null}
-                  </ul>
-                ) : null}
-
-                {manifest && manifest.items.length > 0 ? (
-                  <div className="overflow-x-auto rounded-xl bg-muted/40">
-                    <table className="w-full text-left text-sm">
-                      <thead className="text-muted-foreground">
-                        <tr>
-                          <th className="px-4 py-2 font-medium">Name</th>
-                          <th className="px-4 py-2 font-medium">Type</th>
-                          <th className="px-4 py-2 font-medium">File</th>
-                          <th className="px-4 py-2 font-medium">Cover</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {manifest.items.slice(0, 50).map((item) => (
-                          <tr key={item.row} className="border-t border-border">
-                            <td className="px-4 py-2">{item.name}</td>
-                            <td className="px-4 py-2">{item.ipType}</td>
-                            <td className="px-4 py-2">{item.file.name}</td>
-                            <td className="px-4 py-2">{item.image?.name ?? ""}</td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                    <p className="px-4 py-2 text-sm text-muted-foreground">
-                      {manifest.items.length.toLocaleString()} {manifest.items.length === 1 ? "item" : "items"}
-                    </p>
-                  </div>
-                ) : null}
-              </section>
-
-              <CollapsibleSection
-                open={termsOpen}
-                onOpenChange={setTermsOpen}
-                icon={<ShieldCheck className="h-4 w-4 text-primary" />}
-                label="Licensing terms"
-                hint={`${terms.licenseType} · AI ${terms.aiPolicy.toLowerCase()}`}
-              >
-                <p className="text-xs text-muted-foreground">These travel with every item in the catalog.</p>
-                <div className="grid gap-4 sm:grid-cols-2">
-                  <Field label="License">
-                    <Select
-                      value={terms.licenseType}
-                      options={LICENSE_TYPES.map((l) => ({ value: l.value, label: l.label }))}
-                      onChange={(v) => setTerms((t) => withPreset(t, v))}
-                      disabled={busy}
-                    />
-                  </Field>
-                  <Field label="AI and data mining">
-                    <Select
-                      value={terms.aiPolicy}
-                      options={AI_POLICIES.map((v) => ({ value: v, label: v }))}
-                      onChange={(v) => setTerms((t) => ({ ...t, aiPolicy: v as Terms["aiPolicy"] }))}
-                      disabled={busy}
-                    />
-                  </Field>
-                  <Field label="Territory">
-                    <Select
-                      value={terms.territory}
-                      options={GEOGRAPHIC_SCOPES.map((v) => ({ value: v, label: v }))}
-                      onChange={(v) => setTerms((t) => ({ ...t, territory: v }))}
-                      disabled={busy}
-                    />
-                  </Field>
-                  <Field label="Royalty %">
-                    <Input
-                      type="number"
-                      min={0}
-                      max={50}
-                      value={terms.royalty}
-                      onChange={(e) => setTerms((t) => ({ ...t, royalty: Math.min(50, Math.max(0, Number(e.target.value) || 0)) }))}
-                      disabled={busy}
-                    />
-                  </Field>
-                </div>
-              </CollapsibleSection>
+              <TermsSection terms={terms} onChange={setTerms} disabled={busy} />
 
               <div className="flex items-center gap-3">
                 <Button onClick={save} disabled={busy || !canSave} size="lg">
@@ -433,97 +315,22 @@ export function DataTokenizationTask() {
             </>
           ) : null}
 
-          {executing && run ? (
-            <section className="space-y-4">
-              <h2 className="text-lg font-semibold">Your run is paid for</h2>
-              <p className="text-sm text-muted-foreground">
-                {specItemCount(run).toLocaleString()} items. Continue anytime and it picks up where it stopped.
-              </p>
-              {missing.length > 0 ? (
-                <div className="space-y-3">
-                  <p className="text-sm">Attach these files to continue: {missing.join(", ")}</p>
-                  <CatalogDrop onFiles={attach} disabled={busy} />
-                </div>
-              ) : null}
-              <div className="flex flex-wrap gap-3">
-                <Button onClick={() => execute(run)} disabled={busy} size="lg">
-                  {busy ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-                  Continue
-                </Button>
-                <Button variant="ghost" onClick={cancel} disabled={busy}>
-                  Cancel and refund what is left
-                </Button>
-              </div>
-            </section>
+          {run && (status === "PAID" || status === "RUNNING") ? (
+            <RunInProgress
+              run={run}
+              missing={missing}
+              busy={busy}
+              onFiles={attach}
+              onContinue={() => execute(run)}
+              onCancel={cancel}
+            />
           ) : null}
 
-          {status === "COMPLETED" || status === "CANCELLED" ? (
-            <section className="space-y-4">
-              <h2 className="text-lg font-semibold">
-                {status === "COMPLETED"
-                  ? `${specItemCount(run).toLocaleString()} items tokenized`
-                  : "This run was cancelled and what it did not use is back in your credits"}
-              </h2>
-              <Button onClick={startOver}>Start another run</Button>
-            </section>
-          ) : null}
+          {run && (status === "COMPLETED" || status === "CANCELLED") ? <RunClosed run={run} onStartOver={startOver} /> : null}
 
           {error && phase !== "error" ? <p className="text-sm text-destructive">{error}</p> : null}
         </div>
       </ServiceFormShell>
     </>
-  );
-}
-
-function CatalogDrop({ onFiles, disabled }: { onFiles: (files: FileList | null) => void; disabled?: boolean }) {
-  return (
-    <label
-      className="flex cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed border-border p-8 text-center transition-colors hover:border-primary/50"
-      onDragOver={(e) => e.preventDefault()}
-      onDrop={(e) => {
-        e.preventDefault();
-        onFiles(e.dataTransfer.files);
-      }}
-    >
-      <input type="file" multiple className="hidden" disabled={disabled} onChange={(e) => onFiles(e.target.files)} />
-      <Upload className="h-5 w-5 text-muted-foreground" />
-      <span className="text-sm text-muted-foreground">Drop your CSV and files here, or click to choose them</span>
-    </label>
-  );
-}
-
-function Field({ label, children }: { label: string; children: React.ReactNode }) {
-  return (
-    <div className="space-y-2">
-      <Label>{label}</Label>
-      {children}
-    </div>
-  );
-}
-
-function Select({
-  value,
-  options,
-  onChange,
-  disabled,
-}: {
-  value: string;
-  options: { value: string; label: string }[];
-  onChange: (value: string) => void;
-  disabled?: boolean;
-}) {
-  return (
-    <select
-      value={value}
-      onChange={(e) => onChange(e.target.value)}
-      disabled={disabled}
-      className="h-11 w-full rounded-lg border border-border bg-background px-3 text-sm disabled:opacity-50"
-    >
-      {options.map((o) => (
-        <option key={o.value} value={o.value}>
-          {o.label}
-        </option>
-      ))}
-    </select>
   );
 }
