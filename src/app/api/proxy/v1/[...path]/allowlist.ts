@@ -14,6 +14,9 @@ const ALLOWED_ROUTES: Record<string, RegExp[]> = {
     /^tokens\/owned\/[^/]+$/,
     /^activities\/[^/]+$/,
     /^wallet-activity$/,
+    /^portal\/runs$/,
+    /^portal\/runs\/[^/]+$/,
+    /^portal\/runs\/[^/]+\/batches\/[^/]+$/,
   ],
 
   POST: [
@@ -30,7 +33,15 @@ const ALLOWED_ROUTES: Record<string, RegExp[]> = {
     /^tx\/sync$/,
     /^username-claims$/,
     /^reports$/,
+    /^portal\/runs$/,
+    /^portal\/runs\/[^/]+\/(cancel|checkout)$/,
+    /^portal\/runs\/[^/]+\/files\/(upload-url|uploaded)$/,
+    /^portal\/runs\/[^/]+\/items\/[^/]+\/metadata$/,
+    /^portal\/runs\/[^/]+\/batches\/[^/]+\/(build|execute|confirm)$/,
+    /^portal\/runs\/[^/]+\/collection\/(build|execute|confirm)$/,
   ],
+
+  PATCH: [/^portal\/runs\/[^/]+$/],
 
   DELETE: [/^portal\/keys\/[^/]+$/],
 };
