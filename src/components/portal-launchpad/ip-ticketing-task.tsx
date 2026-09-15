@@ -443,7 +443,7 @@ export function IpTicketingTask() {
                 owner={address ?? ""}
                 signer={signer}
                 value={group}
-                onChange={setGroup}
+                onChange={(c) => setGroup(c.contractAddress)}
                 disabled={busy}
               />
             </section>
