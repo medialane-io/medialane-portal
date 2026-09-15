@@ -6,7 +6,8 @@ import type { StarknetVenueSigner } from "@medialane/sdk/starknet";
 import { Button } from "@/components/ui/button";
 import { labelForAction } from "@/lib/spend-labels";
 import { creditTerms, transferCall } from "@/lib/credits";
-import { assertTransactionSucceeded } from "@/lib/wallet/intent-tx";
+import { assertTransactionSucceeded } from "@medialane/sdk/starknet";
+import { starknetProvider } from "@/lib/starknet";
 import { RunRequestError, type LaunchpadRun, type RunQuote, type RunsClient } from "@/lib/launchpad/runs-client";
 
 export function usdcAtomicFor(credits: number, creditsPerUsdc: number): bigint {
@@ -71,7 +72,7 @@ export function CheckoutPanel({
       if (!terms) throw new Error("Wallet payments are not available right now. Try again shortly.");
       const amount = usdcAtomicFor(shortfall > 0 ? shortfall : quote.total, terms.creditsPerUsdc);
       const { txHash } = await signer.execute([transferCall(terms, amount)]);
-      await assertTransactionSucceeded(txHash);
+      await assertTransactionSucceeded(starknetProvider, txHash);
 
       for (let attempt = 0; ; attempt++) {
         try {
