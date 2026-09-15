@@ -3,7 +3,7 @@ const LABELS: Record<string, string> = {
   "intent:mint": "Assets issued",
   "intent:create-tier": "Ticket types created",
   "intent:create-collection": "Collections created",
-  "metadata:upload-file": "Images stored",
+  "metadata:upload-file": "Files stored",
   "metadata:upload-json": "Details stored",
   "paymaster:invoke-build": "Transaction gas",
   "paymaster:invoke-execute": "Transaction gas",

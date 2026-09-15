@@ -34,14 +34,16 @@ export function CollectionPicker({
   onChange,
   disabled,
   hideLabel,
+  allowCreate = true,
 }: {
   serviceId: CollectionServiceId;
   owner: string;
   signer: StarknetVenueSigner | null;
   value: string;
-  onChange: (contractAddress: string) => void;
+  onChange: (collection: CollectionOption) => void;
   disabled?: boolean;
   hideLabel?: boolean;
+  allowCreate?: boolean;
 }) {
   const copy = collectionCopy(serviceId);
   const isTickets = isTicketService(serviceId);
@@ -82,7 +84,7 @@ export function CollectionPicker({
 
       setDetail("Waiting for it to be indexed");
       const created = await waitForCollection(collections.length, mutate);
-      if (created?.contractAddress) onChange(created.contractAddress);
+      if (created?.contractAddress) onChange(created);
 
       setPhase("success");
       setCreating(false);
@@ -202,7 +204,7 @@ export function CollectionPicker({
               key={c.contractAddress}
               type="button"
               disabled={disabled}
-              onClick={() => onChange(c.contractAddress)}
+              onClick={() => onChange(c)}
               className={
                 selected
                   ? "flex items-center gap-3 rounded-xl border-2 border-primary bg-primary/5 p-4 text-left"
@@ -219,6 +221,7 @@ export function CollectionPicker({
           );
         })}
 
+        {allowCreate ? (
         <button
           type="button"
           disabled={disabled}
@@ -235,6 +238,9 @@ export function CollectionPicker({
             </p>
           </div>
         </button>
+        ) : collections.length === 0 ? (
+          <p className="text-muted-foreground">{copy.empty}</p>
+        ) : null}
       </div>
 
       {collections.length > 0 ? <p className="text-muted-foreground">{copy.hint}</p> : null}

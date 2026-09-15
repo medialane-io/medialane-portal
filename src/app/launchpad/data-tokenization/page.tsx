@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import type { Metadata } from "next";
 import { canonical } from "@/lib/seo";
 import { DataTokenizationTask } from "@/components/portal-launchpad/data-tokenization-task";
@@ -9,5 +10,9 @@ export const metadata: Metadata = {
 };
 
 export default function DataTokenizationPage() {
-  return <DataTokenizationTask />;
+  return (
+    <Suspense fallback={null}>
+      <DataTokenizationTask />
+    </Suspense>
+  );
 }

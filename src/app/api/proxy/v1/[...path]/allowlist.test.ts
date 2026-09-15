@@ -54,3 +54,34 @@ test("a path cannot climb out of /v1", () => {
   expect(hasTraversalSegment("portal/./me")).toBe(true);
   expect(hasTraversalSegment("portal/me")).toBe(false);
 });
+
+test("a launchpad run is drafted, paid for and executed through its own routes", () => {
+  expect(isPathAllowed("GET", "portal/runs")).toBe(true);
+  expect(isPathAllowed("POST", "portal/runs")).toBe(true);
+  expect(isPathAllowed("GET", "portal/runs/run1")).toBe(true);
+  expect(isPathAllowed("PATCH", "portal/runs/run1")).toBe(true);
+  for (const step of [
+    "cancel",
+    "checkout",
+    "files/upload-url",
+    "files/uploaded",
+    "items/0/metadata",
+    "batches/0/build",
+    "batches/0/execute",
+    "batches/0/confirm",
+    "collection/build",
+    "collection/execute",
+    "collection/confirm",
+  ]) {
+    expect(isPathAllowed("POST", `portal/runs/run1/${step}`)).toBe(true);
+  }
+  expect(isPathAllowed("GET", "portal/runs/run1/batches/0")).toBe(true);
+});
+
+test("a run route does not open anything beside it", () => {
+  expect(isPathAllowed("PATCH", "portal/keys/k1")).toBe(false);
+  expect(isPathAllowed("DELETE", "portal/runs/run1")).toBe(false);
+  expect(isPathAllowed("POST", "portal/runs/run1/files/anything")).toBe(false);
+  expect(isPathAllowed("POST", "portal/runs/run1/batches/0/transfer")).toBe(false);
+  expect(isPathAllowed("GET", "portal/runs/run1/progress/secret")).toBe(false);
+});

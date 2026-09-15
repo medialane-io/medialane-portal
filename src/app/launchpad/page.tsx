@@ -3,9 +3,10 @@ import Link from "next/link";
 import { Database, Ticket } from "lucide-react";
 import { canonical, buildSocialMetadata } from "@/lib/seo";
 import { LaunchpadCtaBanner } from "@medialane/ui";
+import { RunsList } from "@/components/launchpad/runs-list";
 
 const title = "Launchpad";
-const description = "Tokenize your IP or issue tickets, and distribute them to a list of people.";
+const description = "Tokenize your catalog or issue tickets. Save a run, pay for it once, and pick it back up anytime.";
 
 export const metadata: Metadata = {
   title,
@@ -22,12 +23,13 @@ export default function LaunchpadPage() {
           Issue your work
         </h1>
         <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-          Tokenize your IP or issue tickets, and distribute them to a list of people. Pay for it
-          from your credits.
+          Tokenize your catalog or issue tickets. Save a run, pay for it once, and pick it back up
+          anytime.
         </p>
       </section>
 
       <div className="w-full max-w-screen-2xl mx-auto px-4 sm:px-6 space-y-10 sm:space-y-16 mt-16">
+        <RunsList />
         <div className="grid gap-4 sm:grid-cols-2">
           <Link
             href="/launchpad/data-tokenization"
@@ -39,7 +41,7 @@ export default function LaunchpadPage() {
             <div className="space-y-1.5">
               <h2 className="font-semibold">Data Tokenization</h2>
               <p className="text-sm text-muted-foreground">
-                Tokenize your IP on-chain and mint it to a list of recipients.
+                Tokenize a whole catalog into your own collection, with its licensing terms.
               </p>
             </div>
           </Link>
