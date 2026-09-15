@@ -9,7 +9,9 @@ import { assertTransactionSucceeded } from "@medialane/sdk/starknet";
 import { friendlyErrorMessage } from "@/lib/friendly-error";
 import { loadAccountAddress } from "@/lib/wallet/account-wallet";
 
-const verifyOnStarknet = (txHash: string) => assertTransactionSucceeded(starknetProvider, txHash);
+const verifyOnStarknet = async (txHash: string): Promise<void> => {
+  await assertTransactionSucceeded(starknetProvider, txHash);
+};
 
 export type WalletWriteStatus = "idle" | "processing" | "confirming" | "success" | "error";
 
