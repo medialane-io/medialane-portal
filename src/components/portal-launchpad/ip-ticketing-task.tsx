@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useWalletNativeSession } from "@/hooks/use-wallet-native-session";
 import { CollectionPicker } from "./collection-picker";
+import { Choice, Field } from "@/components/launchpad/form-fields";
 import { TaskDialog } from "./task-dialog";
 import { ticketIdFromReceipt } from "@/lib/portal-launchpad/ticket-events";
 import { parseRecipients, invalidRecipients, PROVISIONING_SECRET_MESSAGE } from "@/lib/portal-launchpad/provisioning";
@@ -252,7 +253,7 @@ export function IpTicketingTask() {
             <section className="space-y-4">
               <h2 className="font-semibold">Ticket</h2>
 
-              <Field label="Artwork" align="start">
+              <Field label="Artwork">
                 <label
                   className="flex h-32 w-32 cursor-pointer items-center justify-center rounded-xl bg-foreground/[0.04] transition-colors hover:bg-foreground/[0.07]"
                   onDragOver={(e) => e.preventDefault()}
@@ -289,7 +290,7 @@ export function IpTicketingTask() {
                 />
               </Field>
 
-              <Field label="Description" align="start">
+              <Field label="Description">
                 <Textarea
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
@@ -471,48 +472,5 @@ export function IpTicketingTask() {
         </div>
       </div>
     </>
-  );
-}
-
-function Field({
-  label,
-  children,
-}: {
-  label: string;
-  children: React.ReactNode;
-  align?: "center" | "start";
-}) {
-  return (
-    <div className="space-y-2">
-      <Label>{label}</Label>
-      {children}
-    </div>
-  );
-}
-
-function Choice({
-  value,
-  options,
-  onChange,
-  disabled,
-}: {
-  value: string;
-  options: readonly string[];
-  onChange: (value: string) => void;
-  disabled?: boolean;
-}) {
-  return (
-    <select
-      value={value}
-      onChange={(e) => onChange(e.target.value)}
-      disabled={disabled}
-      className="h-11 w-full rounded-lg border border-border bg-background px-3 text-sm disabled:opacity-50"
-    >
-      {options.map((o) => (
-        <option key={o} value={o}>
-          {o}
-        </option>
-      ))}
-    </select>
   );
 }
