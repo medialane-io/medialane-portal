@@ -64,4 +64,6 @@ export const mediaWallet = createMediaWallet({
     consent: walletConsent,
   }),
   provider: walletProvider,
+  backendUrl: "/api/proxy",
+  deployProxyUrl: "/api/wallet/deploy-sponsored",
 });
