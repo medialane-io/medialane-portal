@@ -6,11 +6,11 @@ import { toast } from "sonner";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Loader2, ShieldCheck, CheckCircle2, AlertTriangle } from "lucide-react";
-import { completeWalletDeployment } from "@/lib/wallet/complete-deployment";
 import { getMedialaneClient } from "@/lib/medialane-client";
 import { fireConfetti } from "@/lib/confetti";
 import { MedialaneApiError } from "@medialane/sdk";
 import { safeRelativePath } from "@/lib/safe-redirect";
+import { mediaWallet } from "@/lib/wallet/client";
 
 type Step = "creating-passkey" | "deploying" | "signing-in" | "done";
 
@@ -33,7 +33,7 @@ function WalletOnboardingForm() {
   const runOnboarding = async (options: { forceNew?: boolean } = {}) => {
     setErrorDetail(null);
     try {
-      const { siwsToken } = await completeWalletDeployment(setStep, options);
+      const { siwsToken } = await mediaWallet.completeDeployment(setStep, options);
 
       await getMedialaneClient().api.upsertMyWallet(siwsToken, {
         walletType: "MEDIAWALLET",
