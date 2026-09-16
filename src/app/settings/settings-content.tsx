@@ -5,8 +5,12 @@ import { useWalletNativeSession } from "@/hooks/use-wallet-native-session";
 import { AccountSection } from "@/components/settings/account-section";
 import { DevicesSection } from "@/components/settings/devices-section";
 import { GuardianRecoverySection } from "@/components/settings/guardian-recovery-section";
-import { ExportKeySection } from "@/components/wallet/export-key-section";
 import { shortenAddress } from "@medialane/sdk";
+import { ExportKeySection } from "@medialane/ui";
+import { loadSealedOwner } from "@/lib/wallet/store";
+import { unlockOwnerKey } from "@/lib/wallet/passkey";
+import { isRecoveryKeyForWallet } from "@medialane/sdk/starknet";
+import { friendlyErrorMessage } from "@/lib/friendly-error";
 
 export function SettingsContent() {
   const { address, hasWallet } = useWalletNativeSession();
@@ -60,7 +64,7 @@ export function SettingsContent() {
         title="Export your key"
         description="Take a copy of the key that controls this account. Anyone holding it holds the account."
       >
-        <ExportKeySection />
+        <ExportKeySection loadSealed={loadSealedOwner} unlock={unlockOwnerKey} isRecoveryKey={isRecoveryKeyForWallet} describeError={friendlyErrorMessage} />
       </AccountSection>
     </main>
   );
