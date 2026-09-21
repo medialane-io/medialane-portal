@@ -9,6 +9,7 @@ import type { CollectionServiceId } from "@medialane/sdk";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { getMedialaneClient } from "@/lib/medialane-client";
+import { syncTransactionBestEffort } from "@medialane/sdk/starknet";
 import { createCollection } from "@/lib/portal-launchpad/issue";
 import { collectionCopy, isTicketService } from "@/lib/portal-launchpad/collection-copy";
 import { TaskDialog } from "./task-dialog";
@@ -75,7 +76,7 @@ export function CollectionPicker({
     setPhase("running");
     setDetail("Confirm in your wallet");
     try {
-      await createCollection(signer, {
+      const { txHash } = await createCollection(signer, {
         owner,
         name: name.trim(),
         symbol: symbol.trim(),
@@ -83,6 +84,7 @@ export function CollectionPicker({
       });
 
       setDetail("Waiting for it to be indexed");
+      await syncTransactionBestEffort(getMedialaneClient(), txHash);
       const created = await waitForCollection(collections.length, mutate);
       if (created?.contractAddress) onChange(created);
 
@@ -263,8 +265,8 @@ async function waitForCollection(
   previousCount: number,
   mutate: () => Promise<CollectionOption[] | undefined>,
 ): Promise<CollectionOption | null> {
-  for (let attempt = 0; attempt < 20; attempt++) {
-    await new Promise((r) => setTimeout(r, 3000));
+  for (let attempt = 0; attempt < 3; attempt++) {
+    if (attempt > 0) await new Promise((r) => setTimeout(r, 3000));
     const refreshed = (await mutate()) ?? [];
     if (refreshed.length > previousCount) return refreshed[refreshed.length - 1];
   }
