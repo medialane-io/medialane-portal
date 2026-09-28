@@ -1,6 +1,10 @@
 import { type NextRequest, NextResponse } from "next/server";
-import { isSameOrigin } from "@medialane/sdk";
-import { TRUSTED_APP_IP_HEADER, isSpoofableForwardingHeader, trustedClientIp } from "@/lib/client-ip";
+import {
+  isSameOrigin,
+  TRUSTED_APP_IP_HEADER,
+  isSpoofableForwardingHeader,
+  trustedClientIp,
+} from "@medialane/sdk";
 import { hasTraversalSegment, isPathAllowed } from "./allowlist";
 import { limiterFor } from "@/lib/rate-limit-policy";
 import {
