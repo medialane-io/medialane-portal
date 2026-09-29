@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { tokenAmountEstimate } from "./estimate";
+import { tokenAmountEstimate, tokenAtomicEstimate } from "./estimate";
 
 describe("about how much of a token a dollar amount is", () => {
   test("USDC is the dollars themselves, without a price", () => {
@@ -29,5 +29,21 @@ describe("about how much of a token a dollar amount is", () => {
     expect(tokenAmountEstimate(0, "ETH", 2696)).toBeNull();
     expect(tokenAmountEstimate(Number.NaN, "USDC", undefined)).toBeNull();
     expect(tokenAmountEstimate(5, "ETH", 0)).toBeNull();
+  });
+});
+
+describe("about how many token units a dollar amount is, for checking a balance", () => {
+  test("USDC $10 is ten million units", () => {
+    expect(tokenAtomicEstimate(10, "USDC", 6, undefined)).toBe(10_000_000n);
+  });
+  test("ETH is the dollars over the price in 18-decimal units, rounded up so it is never worth less", () => {
+    const units = tokenAtomicEstimate(111, "ETH", 18, 2696)!;
+    expect(units * 2_696_000_000n / 10n ** 18n).toBeGreaterThanOrEqual(111_000_000n);
+    expect((units - 1n) * 2_696_000_000n / 10n ** 18n).toBeLessThan(111_000_000n + 1n);
+    expect(String(units).length).toBe(17);
+  });
+  test("nothing without a price or an amount", () => {
+    expect(tokenAtomicEstimate(5, "ETH", 18, undefined)).toBeNull();
+    expect(tokenAtomicEstimate(0, "USDC", 6, undefined)).toBeNull();
   });
 });
