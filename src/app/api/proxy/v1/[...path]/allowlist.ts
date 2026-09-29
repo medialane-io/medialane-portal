@@ -27,7 +27,6 @@ const ALLOWED_ROUTES: Record<string, RegExp[]> = {
     /^users\/me$/,
     /^users\/me\/(email|wallet|generate-wallet)$/,
     /^portal\/keys$/,
-    /^portal\/credits\/check$/,
     /^portal\/funding$/,
     /^portal\/funding\/[^/]+\/(challenge|authorize|submit|cancel)$/,
     /^business\/provisioning$/,

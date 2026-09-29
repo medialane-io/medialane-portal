@@ -5,20 +5,12 @@ import { Loader2 } from "lucide-react";
 import type { StarknetVenueSigner } from "@medialane/sdk/starknet";
 import { Button } from "@/components/ui/button";
 import { labelForAction } from "@/lib/spend-labels";
-import { creditTerms, transferCall } from "@/lib/credits";
-import { assertTransactionSucceeded } from "@medialane/sdk/starknet";
-import { starknetProvider } from "@/lib/starknet";
-import { RunRequestError, type LaunchpadRun, type RunQuote, type RunsClient } from "@/lib/launchpad/runs-client";
-
-export function usdcAtomicFor(credits: number, creditsPerUsdc: number): bigint {
-  return BigInt(Math.ceil((credits * 1_000_000) / creditsPerUsdc));
-}
-
-export function formatUsdc(atomic: bigint): string {
-  const whole = atomic / 1_000_000n;
-  const fraction = (atomic % 1_000_000n).toString().padStart(6, "0").replace(/0+$/, "");
-  return fraction ? `${whole}.${fraction.length < 2 ? fraction.padEnd(2, "0") : fraction}` : `${whole}.00`;
-}
+import { fundWithChainTransfer } from "@medialane/sdk/starknet";
+import { useSiwsToken } from "@/hooks/use-siws-token";
+import { MIN_TOP_UP_USDC, topUpUsdcFor } from "@/lib/funding/amount";
+import { portalFundingApi } from "@/lib/funding/api";
+import { mediaWalletFundingWallet } from "@/lib/funding/wallets";
+import type { LaunchpadRun, RunQuote, RunsClient } from "@/lib/launchpad/runs-client";
 
 export function quoteByLabel(quote: RunQuote): { label: string; credits: number }[] {
   const totals = new Map<string, number>();
@@ -28,8 +20,6 @@ export function quoteByLabel(quote: RunQuote): { label: string; credits: number 
   }
   return [...totals.entries()].map(([label, credits]) => ({ label, credits }));
 }
-
-const pause = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
 export function CheckoutPanel({
   run,
@@ -46,6 +36,7 @@ export function CheckoutPanel({
   client: RunsClient;
   onPaid: (run: LaunchpadRun) => void;
 }) {
+  const { getValidToken, signIn } = useSiwsToken();
   const [busy, setBusy] = useState<"credits" | "wallet" | null>(null);
   const [error, setError] = useState<string | null>(null);
   const shortfall = Math.max(0, quote.total - (balance ?? 0));
@@ -68,24 +59,14 @@ export function CheckoutPanel({
     setBusy("wallet");
     setError(null);
     try {
-      const terms = await creditTerms();
-      if (!terms) throw new Error("Wallet payments are not available right now. Try again shortly.");
-      const amount = usdcAtomicFor(shortfall > 0 ? shortfall : quote.total, terms.creditsPerUsdc);
-      const { txHash } = await signer.execute([transferCall(terms, amount)]);
-      await assertTransactionSucceeded(starknetProvider, txHash);
-
-      for (let attempt = 0; ; attempt++) {
-        try {
-          onPaid(await client.checkoutFromWallet(run.id, txHash));
-          return;
-        } catch (e) {
-          if (e instanceof RunRequestError && e.status === 402 && attempt < 5) {
-            await pause(3000);
-            continue;
-          }
-          throw e;
-        }
+      const token = getValidToken() ?? (await signIn().catch(() => null));
+      const funded = await fundWithChainTransfer(portalFundingApi(token), mediaWalletFundingWallet(signer), {
+        amountUsdc: topUpUsdcFor(shortfall > 0 ? shortfall : quote.total),
+      });
+      if (funded.status !== "SETTLED") {
+        throw new Error("Your payment is on chain and will be credited shortly. Pay with credits once it lands.");
       }
+      onPaid(await client.checkoutFromWallet(run.id, funded.intentId));
     } catch (e) {
       setError(e instanceof Error ? e.message : "Could not complete the payment.");
     } finally {
@@ -124,7 +105,7 @@ export function CheckoutPanel({
         </Button>
         <Button variant="outline" onClick={payFromWallet} disabled={busy !== null || !signer}>
           {busy === "wallet" ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-          {shortfall > 0 ? "Pay the difference from your wallet" : "Pay from your wallet"}
+          {shortfall > 0 ? `Add ${MIN_TOP_UP_USDC}+ USDC and pay the difference` : "Pay from your wallet"}
         </Button>
       </div>
 
