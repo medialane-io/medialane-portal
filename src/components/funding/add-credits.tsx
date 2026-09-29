@@ -37,6 +37,7 @@ export function AddCredits({ balance, onCredited }: { balance: number | undefine
   const [token, setToken] = useState<(typeof TOKENS)[number]>("USDC");
   const [external, setExternal] = useState<ExternalWallet[]>([]);
   const [step, setStep] = useState<FundingStep | null>(null);
+  const [active, setActive] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -48,7 +49,8 @@ export function AddCredits({ balance, onCredited }: { balance: number | undefine
   const credits = valid ? Math.floor(Number(amount) * 100) : 0;
   const busy = step !== null;
 
-  async function run(wallet: () => Promise<FundingWallet>) {
+  async function run(id: string, wallet: () => Promise<FundingWallet>) {
+    setActive(id);
     setError(null);
     setMessage(null);
     setStep("creating");
@@ -68,6 +70,7 @@ export function AddCredits({ balance, onCredited }: { balance: number | undefine
       setError(friendlyErrorMessage(err, "Could not complete the top-up."));
     } finally {
       setStep(null);
+      setActive(null);
     }
   }
 
@@ -100,13 +103,14 @@ export function AddCredits({ balance, onCredited }: { balance: number | undefine
 
       <div className="flex flex-wrap gap-3">
         {signer ? (
-          <Button disabled={busy || !valid} onClick={() => run(async () => mediaWalletFundingWallet(signer))}>
-            {busy ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+          <Button disabled={busy || !valid} onClick={() => run("media", async () => mediaWalletFundingWallet(signer))}>
+            {busy && active === "media" ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
             Pay with Media Wallet
           </Button>
         ) : null}
         {external.map((wallet) => (
-          <Button key={wallet.id} variant="outline" disabled={busy || !valid} onClick={() => run(() => connectExternalWallet(wallet))}>
+          <Button key={wallet.id} variant="outline" disabled={busy || !valid} onClick={() => run(wallet.id, () => connectExternalWallet(wallet))}>
+            {busy && active === wallet.id ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
             Pay with {wallet.name}
           </Button>
         ))}
