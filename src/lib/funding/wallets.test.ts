@@ -44,3 +44,28 @@ describe("recognising a wallet rejection", () => {
     expect(isUserRejection(undefined)).toBe(false);
   });
 });
+
+describe("a wallet that cannot cover the transfer", () => {
+  const STRK = "0x04718f5a0fc34cc1af16a1cdee98ffb20c31f5cd61d6ab07201858f4287c938d";
+  const big = { contractAddress: STRK, entrypoint: "transfer" as const, calldata: ["0xt", "2300000000000000000", "0"] };
+
+  test("Media Wallet is never asked to send, and the top-up can be closed", async () => {
+    let sent = false;
+    const wallet = mediaWalletFundingWallet(
+      signer(),
+      async () => { sent = true; return { status: "sponsored", transactionHash: "0xsp" }; },
+      async () => 1n,
+    );
+    await expect(wallet.sendTransfer(big)).rejects.toBeInstanceOf(FundingTransferNotSentError);
+    expect(sent).toBe(false);
+  });
+
+  test("a wallet with enough is unchanged", async () => {
+    const wallet = mediaWalletFundingWallet(
+      signer(),
+      async () => ({ status: "sponsored", transactionHash: "0xsp" }),
+      async () => 3_000_000_000_000_000_000n,
+    );
+    expect(await wallet.sendTransfer(big)).toEqual({ txHash: "0xsp" });
+  });
+});

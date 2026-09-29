@@ -9,6 +9,7 @@ import {
 } from "@medialane/sdk/starknet";
 import { starknetProvider } from "@/lib/starknet";
 import { executeSponsored } from "@/lib/wallet/sponsored-executor";
+import { assertWalletCanCover, readTokenBalance, type BalanceReader } from "./balance";
 
 export function isUserRejection(err: unknown): boolean {
   if (!err || typeof err !== "object") return false;
@@ -20,11 +21,13 @@ export function isUserRejection(err: unknown): boolean {
 export function mediaWalletFundingWallet(
   signer: StarknetVenueSigner,
   sponsored: typeof executeSponsored = executeSponsored,
+  readBalance: BalanceReader = readTokenBalance,
 ): FundingWallet {
   return {
     address: signer.address,
     signTypedData: (typedData) => signer.signTypedData(typedData),
     async sendTransfer(call: FundingTransferCall) {
+      await assertWalletCanCover(call, signer.address, readBalance);
       let result;
       try {
         result = await sponsored(signer, [call]);
@@ -59,7 +62,10 @@ export async function listExternalWallets(): Promise<ExternalWallet[]> {
   }));
 }
 
-export async function connectExternalWallet(wallet: ExternalWallet): Promise<FundingWallet> {
+export async function connectExternalWallet(
+  wallet: ExternalWallet,
+  readBalance: BalanceReader = readTokenBalance,
+): Promise<FundingWallet> {
   const account = await WalletAccount.connect(starknetProvider, wallet.swo as never);
   if (!account.address) throw new Error("The wallet did not share an address.");
   return {
@@ -73,6 +79,7 @@ export async function connectExternalWallet(wallet: ExternalWallet): Promise<Fun
       }
     },
     async sendTransfer(call: FundingTransferCall) {
+      await assertWalletCanCover(call, account.address, readBalance);
       try {
         const { transaction_hash } = await account.execute([call]);
         return { txHash: transaction_hash };
