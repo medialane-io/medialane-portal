@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import type { Metadata } from "next";
 import { canonical } from "@/lib/seo";
 import { IpTicketingTask } from "@/components/portal-launchpad/ip-ticketing-task";
@@ -9,5 +10,9 @@ export const metadata: Metadata = {
 };
 
 export default function IpTicketingPage() {
-  return <IpTicketingTask />;
+  return (
+    <Suspense fallback={null}>
+      <IpTicketingTask />
+    </Suspense>
+  );
 }
