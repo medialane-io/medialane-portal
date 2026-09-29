@@ -7,8 +7,9 @@ import { Button } from "@/components/ui/button";
 import { usePortalKeys } from "@/hooks/use-portal-account";
 import { useSiwsToken } from "@/hooks/use-siws-token";
 import { friendlyErrorMessage } from "@/lib/friendly-error";
+import { withFreshSignIn } from "@/lib/fresh-sign-in";
 
-const SIGN_IN_AGAIN = "Sign in again to change your keys.";
+const NOT_CONFIRMED = "We could not confirm it is you. Please try again.";
 
 export function ApiKeys() {
   const { data: keys, mutate } = usePortalKeys(true);
@@ -19,16 +20,19 @@ export function ApiKeys() {
   async function create() {
     setBusy(true);
     try {
-      const token = getValidToken() ?? (await signIn());
-      const res = await fetch("/api/proxy/v1/portal/keys", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          ...(token ? { authorization: `Bearer ${token}` } : {}),
-        },
-        body: JSON.stringify({ appSource: "MEDIALANE_PORTAL" }),
-      });
-      if (res.status === 401) throw new Error(SIGN_IN_AGAIN);
+      const res = await withFreshSignIn(
+        (token) =>
+          fetch("/api/proxy/v1/portal/keys", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              ...(token ? { authorization: `Bearer ${token}` } : {}),
+            },
+            body: JSON.stringify({ appSource: "MEDIALANE_PORTAL" }),
+          }),
+        { getToken: getValidToken, signIn: () => signIn().catch(() => null) },
+      );
+      if (res.status === 401) throw new Error(NOT_CONFIRMED);
       if (!res.ok) throw new Error("Could not create a key");
       const body = (await res.json()) as { data: { plaintext: string } };
       setPlaintext(body.data.plaintext);
@@ -43,12 +47,15 @@ export function ApiKeys() {
   async function revoke(id: string) {
     setBusy(true);
     try {
-      const token = getValidToken() ?? (await signIn());
-      const res = await fetch(`/api/proxy/v1/portal/keys/${encodeURIComponent(id)}`, {
-        method: "DELETE",
-        headers: token ? { authorization: `Bearer ${token}` } : undefined,
-      });
-      if (res.status === 401) throw new Error(SIGN_IN_AGAIN);
+      const res = await withFreshSignIn(
+        (token) =>
+          fetch(`/api/proxy/v1/portal/keys/${encodeURIComponent(id)}`, {
+            method: "DELETE",
+            headers: token ? { authorization: `Bearer ${token}` } : undefined,
+          }),
+        { getToken: getValidToken, signIn: () => signIn().catch(() => null) },
+      );
+      if (res.status === 401) throw new Error(NOT_CONFIRMED);
       if (!res.ok) throw new Error("Could not revoke that key");
       await mutate();
     } catch (err) {
