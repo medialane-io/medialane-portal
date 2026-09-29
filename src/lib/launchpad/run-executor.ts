@@ -33,7 +33,10 @@ export interface ExecutorDeps {
   maxPolls?: number;
 }
 
-async function untilConfirmed(deps: ExecutorDeps, confirm: () => Promise<ConfirmResult>) {
+export async function untilConfirmed(
+  deps: Pick<ExecutorDeps, "wait" | "pollMs" | "maxPolls">,
+  confirm: () => Promise<ConfirmResult>,
+) {
   const maxPolls = deps.maxPolls ?? 60;
   for (let attempt = 0; attempt < maxPolls; attempt++) {
     const result = await confirm();
