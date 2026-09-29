@@ -1,13 +1,13 @@
 import { test, expect } from "bun:test";
 import { hasTraversalSegment, isPathAllowed } from "./allowlist";
 
-test("an account reaches its own balance, keys, history and spend", () => {
+test("an account reaches its own balance, keys, history and spend, and the legacy deposit nudge is gone", () => {
   expect(isPathAllowed("GET", "portal/me")).toBe(true);
   expect(isPathAllowed("GET", "portal/keys")).toBe(true);
   expect(isPathAllowed("GET", "portal/credits/history")).toBe(true);
   expect(isPathAllowed("GET", "portal/credits/spend")).toBe(true);
   expect(isPathAllowed("POST", "portal/keys")).toBe(true);
-  expect(isPathAllowed("POST", "portal/credits/check")).toBe(true);
+  expect(isPathAllowed("POST", "portal/credits/check")).toBe(false);
   expect(isPathAllowed("DELETE", "portal/keys/abc-123")).toBe(true);
 });
 
@@ -84,4 +84,20 @@ test("a run route does not open anything beside it", () => {
   expect(isPathAllowed("POST", "portal/runs/run1/files/anything")).toBe(false);
   expect(isPathAllowed("POST", "portal/runs/run1/batches/0/transfer")).toBe(false);
   expect(isPathAllowed("GET", "portal/runs/run1/progress/secret")).toBe(false);
+});
+
+test("an account can run a funding: list methods, start, sign, authorize, submit, read and cancel", () => {
+  expect(isPathAllowed("GET", "portal/funding/methods")).toBe(true);
+  expect(isPathAllowed("GET", "portal/funding/fi_123")).toBe(true);
+  expect(isPathAllowed("POST", "portal/funding")).toBe(true);
+  for (const step of ["challenge", "authorize", "submit", "cancel"]) {
+    expect(isPathAllowed("POST", `portal/funding/fi_123/${step}`)).toBe(true);
+  }
+});
+
+test("funding cannot be used to reach anything else", () => {
+  expect(isPathAllowed("POST", "portal/funding/fi_123/settle")).toBe(false);
+  expect(isPathAllowed("POST", "portal/funding/fi_123/challenge/extra")).toBe(false);
+  expect(isPathAllowed("DELETE", "portal/funding/fi_123")).toBe(false);
+  expect(isPathAllowed("PATCH", "portal/funding/fi_123")).toBe(false);
 });

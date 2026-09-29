@@ -106,8 +106,8 @@ export function createRunsClient(getToken: TokenSource, fetchImpl: typeof fetch 
     checkoutWithCredits: async (id: string) =>
       (await post<LaunchpadRun>(`/api/proxy/v1/portal/runs/${id}/checkout`, { method: "credits" })).data,
 
-    checkoutFromWallet: async (id: string, txHash: string) =>
-      (await post<LaunchpadRun>(`/api/proxy/v1/portal/runs/${id}/checkout`, { method: "wallet", txHash })).data,
+    checkoutFromWallet: async (id: string, intentId: string) =>
+      (await post<LaunchpadRun>(`/api/proxy/v1/portal/runs/${id}/checkout`, { method: "wallet", intentId })).data,
 
     uploadUrl: async (id: string, name: string) =>
       (await post<{ name: string; url: string }>(`/api/proxy/v1/portal/runs/${id}/files/upload-url`, { name })).data.url,

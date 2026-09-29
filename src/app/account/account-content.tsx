@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePortalSession, usePortalSpend } from "@/hooks/use-portal-account";
 import { labelForAction } from "@/lib/spend-labels";
 import { ApiKeys } from "./api-keys";
-import { AddCredits } from "./add-credits";
+import { AddCredits } from "@/components/funding/add-credits";
 import { Button } from "@/components/ui/button";
 
 const CREDITS_PER_USDC = 100;
