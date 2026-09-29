@@ -260,8 +260,6 @@ export function DataTokenizationTask() {
                   <CollectionPicker
                     serviceId={DATA_TOKENIZATION_SERVICE}
                     owner={address ?? ""}
-                    signer={signer}
-                    allowCreate={false}
                     value={existing?.contractAddress ?? ""}
                     onChange={(c) =>
                       c.collectionId

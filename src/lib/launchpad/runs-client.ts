@@ -21,6 +21,32 @@ export type NextStep =
   | { kind: "wait"; index: number }
   | { kind: "done" };
 
+/** What a paid IP Ticketing run asks for next. Kinds it shares with the shared union keep their shape. */
+export type TicketingNextStep =
+  | { kind: "collection" }
+  | { kind: "wait-collection" }
+  | { kind: "upload"; files: string[] }
+  | { kind: "ticket-metadata" }
+  | { kind: "tier" }
+  | { kind: "wait-tier" }
+  | { kind: "wallets" }
+  | { kind: "batch"; index: number }
+  | { kind: "wait"; index: number }
+  | { kind: "done" };
+
+export interface SignedWalletDeployment {
+  typedData: unknown;
+  signature: string[];
+  deployment: unknown;
+}
+
+export interface WalletRequest {
+  recipient: string;
+  interimOwnerPubkey: string;
+  derivationSalt: string;
+  deployment: SignedWalletDeployment;
+}
+
 export interface LaunchpadRun {
   id: string;
   service: string;
@@ -30,7 +56,7 @@ export interface LaunchpadRun {
   creditsHeld: number;
   creditsSpent: number;
   progress: unknown;
-  next?: NextStep;
+  next?: NextStep | TicketingNextStep;
   createdAt: string;
   updatedAt: string;
 }
@@ -65,6 +91,22 @@ export function runCollectionBase(id: string): string {
   return `${runBase(id)}/collection`;
 }
 
+export function ticketingBase(id: string): string {
+  return `${runBase(id)}/ticketing`;
+}
+
+export function ticketingCollectionBase(id: string): string {
+  return `${ticketingBase(id)}/collection`;
+}
+
+export function ticketingTierBase(id: string): string {
+  return `${ticketingBase(id)}/tier`;
+}
+
+export function ticketingBatchBase(id: string, index: number): string {
+  return `${ticketingBase(id)}/batches/${index}`;
+}
+
 export function createRunsClient(getToken: TokenSource, fetchImpl: typeof fetch = fetch) {
   const authorizedFetch: typeof fetch = async (input, init) => {
     const token = await getToken();
@@ -88,8 +130,36 @@ export function createRunsClient(getToken: TokenSource, fetchImpl: typeof fetch 
   const post = <T>(url: string, body?: unknown) =>
     call<T>(url, { method: "POST", body: body === undefined ? undefined : JSON.stringify(body) });
 
+  const confirm = async (url: string): Promise<ConfirmResult> => {
+    const { status, data } = await post<{ status: string; completed?: boolean }>(url);
+    return { pending: status === 202, status: data.status, completed: data.completed };
+  };
+
+  const ticketing = {
+    uploadUrl: async (id: string, name: string) =>
+      (await post<{ name: string; url: string }>(`${ticketingBase(id)}/files/upload-url`, { name })).data.url,
+
+    uploaded: async (id: string, name: string, cid: string) =>
+      (await post<{ name: string; uri: string }>(`${ticketingBase(id)}/files/uploaded`, { name, cid })).data,
+
+    metadata: async (id: string, userAddress: string) =>
+      (await post<{ tokenUri: string }>(`${ticketingBase(id)}/metadata`, { userAddress })).data,
+
+    /** Guests who still need a wallet deployed; the ones who already have one are recorded on the run. */
+    resolveWallets: async (id: string) =>
+      (await post<{ pending: string[] }>(`${ticketingBase(id)}/wallets/resolve`)).data.pending,
+
+    registerWallet: async (id: string, request: WalletRequest) =>
+      (await post<{ recipient: string; walletAddress: string }>(`${ticketingBase(id)}/wallets`, request)).data,
+
+    confirmCollection: (id: string) => confirm(`${ticketingCollectionBase(id)}/confirm`),
+    confirmTier: (id: string) => confirm(`${ticketingTierBase(id)}/confirm`),
+    confirmBatch: (id: string, index: number) => confirm(`${ticketingBatchBase(id, index)}/confirm`),
+  };
+
   return {
     authorizedFetch,
+    ticketing,
 
     list: async () => (await call<LaunchpadRun[]>("/api/proxy/v1/portal/runs")).data,
 

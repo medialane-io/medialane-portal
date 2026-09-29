@@ -17,6 +17,7 @@ const STATUS_LABEL: Record<RunStatus, string> = {
 
 const SERVICE: Record<string, { label: string; href: string }> = {
   "data-tokenization-erc721": { label: "Data Tokenization", href: "/launchpad/data-tokenization" },
+  "ip-ticketing": { label: "IP Ticketing", href: "/launchpad/ip-ticketing" },
 };
 
 export function RunsList() {

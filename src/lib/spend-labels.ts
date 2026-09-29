@@ -1,6 +1,7 @@
 const LABELS: Record<string, string> = {
   "wallet:deploy": "Recipient wallets",
   "intent:mint": "Assets issued",
+  "issuance:emission": "Tickets issued",
   "intent:create-tier": "Ticket types created",
   "intent:create-collection": "Collections created",
   "metadata:upload-file": "Files stored",

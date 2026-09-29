@@ -1,6 +1,6 @@
 "use client";
 
-import { Check, Coins, Loader2 } from "lucide-react";
+import { Check, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -17,7 +17,6 @@ export function TaskDialog({
   phase,
   detail,
   error,
-  servicePaused,
   successLine,
   onClose,
   onDone,
@@ -27,7 +26,6 @@ export function TaskDialog({
   phase: TaskPhase;
   detail?: string | null;
   error?: string | null;
-  servicePaused?: boolean;
   successLine?: string;
   onClose: () => void;
   onDone?: () => void;
@@ -37,23 +35,7 @@ export function TaskDialog({
   return (
     <Dialog open={open} onOpenChange={(next) => { if (!next && !running) onClose(); }}>
       <DialogContent className="sm:max-w-md" hideClose={running}>
-        {servicePaused ? (
-          <>
-            <DialogHeader>
-              <span className="mb-2 flex h-10 w-10 items-center justify-center rounded-full bg-muted">
-                <Coins className="h-5 w-5" />
-              </span>
-              <DialogTitle>This one is on us to sort out</DialogTitle>
-              <DialogDescription>
-                Your run is paused while we clear something on our side. Nothing was issued.
-                Try again in a few minutes.
-              </DialogDescription>
-            </DialogHeader>
-            <Button size="sm" onClick={onClose}>
-              Close
-            </Button>
-          </>
-        ) : running ? (
+        {running ? (
           <div className="flex items-center gap-4 py-2">
             <Loader2 className="h-5 w-5 shrink-0 animate-spin text-primary" />
             <div className="min-w-0">

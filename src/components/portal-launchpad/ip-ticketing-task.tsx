@@ -1,48 +1,85 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { ServiceHeader, CollapsibleSection, Label } from "@medialane/ui";
-import { buildAssetMetadata } from "@medialane/sdk";
+import { executeSponsored, type TypedDataSigner } from "@medialane/sdk/starknet";
 import { ArrowLeft, Check, Loader2, ShieldCheck, Ticket, Upload, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useWalletNativeSession } from "@/hooks/use-wallet-native-session";
+import { usePortalSession } from "@/hooks/use-portal-account";
+import { useRunsClient } from "@/hooks/use-runs-client";
+import { CheckoutPanel } from "@/components/launchpad/checkout-panel";
 import { CollectionPicker } from "./collection-picker";
 import { Choice, Field } from "@/components/launchpad/form-fields";
 import { TaskDialog } from "./task-dialog";
-import { ticketIdFromReceipt } from "@/lib/portal-launchpad/ticket-events";
-import { parseRecipients, invalidRecipients, PROVISIONING_SECRET_MESSAGE } from "@/lib/portal-launchpad/provisioning";
-import {
-  provisionOne,
-  uploadImage,
-  pinMetadata,
-  createTicketTier,
-  issueToRecipients,
-  SERVICE_PAUSED,
-} from "@/lib/portal-launchpad/issue";
+import { parseRecipients, invalidRecipients } from "@/lib/portal-launchpad/provisioning";
 import { issuedSummary, type TaskPhase } from "@/lib/portal-launchpad/task-progress";
 import { capacity, guestRows, repeatsIn, validitySentence } from "@/lib/portal-launchpad/ticket-event";
 import {
   imageRejectionReason,
   maxSupplyFor,
-  toUnixSeconds,
   validityError,
   LICENSE_PRESETS,
   AI_POLICIES,
   TERRITORIES,
 } from "@/lib/portal-launchpad/issuance-form";
 import { TICKETING_SERVICE } from "@/lib/portal-launchpad/collection-copy";
-import { assertTransactionSucceeded } from "@medialane/sdk/starknet";
-import { starknetProvider } from "@/lib/starknet";
+import type { CollectionChoice } from "@/lib/data-tokenization/spec";
+import {
+  ticketingBatchBase,
+  ticketingCollectionBase,
+  ticketingTierBase,
+  type LaunchpadRun,
+} from "@/lib/launchpad/runs-client";
+import { MissingFilesError, putFileToSignedUrl } from "@/lib/launchpad/run-executor";
+import { executeTicketingRun, type TicketingEvent } from "@/lib/ticketing/run-executor";
+import { existingChoice, ticketingRunSpec } from "@/lib/ticketing/spec";
+import { provisioningSecret, walletRequestFor } from "@/lib/ticketing/wallet-request";
 
 const TRANSFERABLE = ["Allowed", "Not Allowed"] as const;
 
-export function IpTicketingTask() {
-  const { address, signer, hasWallet } = useWalletNativeSession();
+function describe(event: TicketingEvent): string {
+  switch (event.kind) {
+    case "collection":
+      return "Confirm your new group in your wallet";
+    case "upload":
+      return "Uploading artwork";
+    case "ticket-metadata":
+      return "Preparing ticket";
+    case "tier":
+      return "Confirm ticket in your wallet";
+    case "wallets":
+      return `Preparing guest ${event.done + 1} of ${event.total}`;
+    case "batch":
+      return `Confirm tickets ${event.index + 1} in your wallet`;
+    case "confirming":
+      return "Waiting for confirmation";
+    case "done":
+      return "Done";
+  }
+}
 
-  const [group, setGroup] = useState("");
+const guestCount = (run: LaunchpadRun | null) => {
+  const guests = (run?.spec as { guests?: unknown[] } | undefined)?.guests;
+  return Array.isArray(guests) ? guests.length : 0;
+};
+
+export function IpTicketingTask() {
+  const router = useRouter();
+  const pathname = usePathname();
+  const runParam = useSearchParams().get("run");
+  const { address, signer, hasWallet } = useWalletNativeSession();
+  const { account, refresh } = usePortalSession();
+  const client = useRunsClient();
+
+  const [groupMode, setGroupMode] = useState<"existing" | "new">("existing");
+  const [existingGroup, setExistingGroup] = useState<CollectionChoice | null>(null);
+  const [newName, setNewName] = useState("");
+  const [newSymbol, setNewSymbol] = useState("");
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [artwork, setArtwork] = useState<File | null>(null);
@@ -60,12 +97,21 @@ export function IpTicketingTask() {
   const [transferable, setTransferable] = useState<string>("Allowed");
   const [territory, setTerritory] = useState<string>("Worldwide");
 
+  const [run, setRun] = useState<LaunchpadRun | null>(null);
   const [phase, setPhase] = useState<TaskPhase>("idle");
   const [progress, setProgress] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [servicePaused, setServicePaused] = useState(false);
-  const [issued, setIssued] = useState<number | null>(null);
+  const [needsArtwork, setNeedsArtwork] = useState(false);
   const busy = phase === "running";
+  const status = run?.status ?? "DRAFT";
+
+  useEffect(() => {
+    if (!runParam || run?.id === runParam) return;
+    client
+      .get(runParam)
+      .then(setRun)
+      .catch((e) => setError(e instanceof Error ? e.message : "Could not open this run."));
+  }, [runParam, run?.id, client]);
 
   const recipients = parseRecipients(guests);
   const invalid = invalidRecipients(recipients);
@@ -76,6 +122,13 @@ export function IpTicketingTask() {
   const rows = guestRows(guests);
   const repeats = repeatsIn(guests);
 
+  const group: CollectionChoice | null =
+    groupMode === "new"
+      ? newName.trim() && newSymbol.trim()
+        ? { kind: "new", name: newName.trim(), symbol: newSymbol.trim().toUpperCase() }
+        : null
+      : existingGroup;
+
   function chooseArtwork(file: File | undefined) {
     if (!file) return;
     const reason = imageRejectionReason(file);
@@ -83,117 +136,114 @@ export function IpTicketingTask() {
     if (reason) return;
     setArtwork(file);
     setArtworkPreview(URL.createObjectURL(file));
+    setNeedsArtwork(false);
   }
 
   const ready =
     Boolean(address) &&
-    group.trim().length > 0 &&
+    group !== null &&
     name.trim().length > 0 &&
     recipients.length > 0 &&
     invalid.length === 0 &&
+    maxSupplyFor(recipients.length, supply) !== null &&
     !windowError;
 
-  async function run() {
-    if (!address || !signer) return;
+  async function save() {
+    if (!group) return;
     setPhase("running");
+    setProgress("Saving your run");
     setError(null);
-    setServicePaused(false);
-    setIssued(null);
-
     try {
-      setProgress("Confirm in your wallet");
-      const signature = await signer.signTypedData({
-        types: {
-          StarknetDomain: [
-            { name: "name", type: "shortstring" },
-            { name: "version", type: "shortstring" },
-            { name: "chainId", type: "shortstring" },
-            { name: "revision", type: "shortstring" },
-          ],
-          Provisioning: [{ name: "purpose", type: "shortstring" }],
-        },
-        primaryType: "Provisioning",
-        domain: { name: "Medialane", version: "1", chainId: "SN_MAIN", revision: "1" },
-        message: { purpose: PROVISIONING_SECRET_MESSAGE.slice(0, 31) },
-      });
-      const secret = new TextEncoder().encode(
-        Array.isArray(signature) ? signature.join("") : String(signature),
-      );
-
-      for (const [i, recipient] of recipients.entries()) {
-        setProgress(`Preparing guest ${i + 1} of ${recipients.length}`);
-        await provisionOne(secret, recipient);
-      }
-
-      let imageUri: string | null = null;
-      if (artwork) {
-        setProgress("Uploading artwork");
-        imageUri = await uploadImage(artwork);
-      }
-
-      setProgress("Preparing ticket");
-      const tokenUri = await pinMetadata(
-        buildAssetMetadata({
-          name,
-          description,
-          imageUri,
-          creator: address,
-          ipType: "Other",
-          licenseType,
-          commercialUse: "No",
-          derivatives: transferable === "Allowed" ? "Allowed" : "Not Allowed",
-          attribution: "Required",
-          geographicScope: territory,
-          aiPolicy,
-          royalty: String(Number(royalty) || 0),
-        }),
-      );
-
-      const made = maxSupplyFor(recipients.length, supply);
-      if (!made) throw new Error("Create at least as many tickets as there are recipients.");
-
-      setProgress("Confirm ticket in your wallet");
-      const { txHash } = await createTicketTier(signer, {
-        owner: address,
+      const spec = ticketingRunSpec({
         collection: group,
-        service: TICKETING_SERVICE,
-        maxSupply: made,
-        royaltyBps: Math.round((Number(royalty) || 0) * 100),
-        metadataUri: tokenUri,
-        startTime: toUnixSeconds(validFrom) ?? undefined,
-        endTime: toUnixSeconds(validUntil) ?? undefined,
+        name,
+        description,
+        artwork,
+        validFrom,
+        validUntil,
+        supply,
+        guests: recipients.map((r) => r.value),
+        terms: { licenseType, aiPolicy, transferable, territory, royalty },
       });
-      await assertTransactionSucceeded(starknetProvider, txHash);
-      const receipt = await import("@/lib/starknet").then(({ starknetProvider }) =>
-        starknetProvider.getTransactionReceipt(txHash),
-      );
-      const ticketId = ticketIdFromReceipt(
-        (receipt as unknown as { events?: { from_address?: string; keys?: string[] }[] }).events,
-        group,
-      );
-      if (!ticketId) throw new Error("The ticket was made but its id could not be read.");
-
-      setProgress("Preparing issuance");
-      const result = await issueToRecipients(signer, {
-        service: TICKETING_SERVICE,
-        owner: address,
-        recipients: recipients.map((r) => r.value),
-        collectionContract: group,
-        tokenId: ticketId,
-        amount: "1",
-      });
-
-      setIssued(result.recipientCount);
-      setGuests("");
-      setPhase("success");
+      const saved =
+        run?.status === "DRAFT" ? await client.update(run.id, spec) : await client.create(TICKETING_SERVICE, spec);
+      setRun(saved);
+      router.replace(`${pathname}?run=${saved.id}`);
+      setPhase("idle");
     } catch (e) {
-      const message = e instanceof Error ? e.message : String(e);
-      if (message === SERVICE_PAUSED) setServicePaused(true);
-      else setError(message || "Could not finish issuing.");
+      setError(e instanceof Error ? e.message : "Could not save this run.");
       setPhase("error");
     } finally {
       setProgress(null);
     }
+  }
+
+  async function execute(target: LaunchpadRun) {
+    if (!signer || !address) return;
+    setRun(target);
+    setNeedsArtwork(false);
+    setError(null);
+    setPhase("running");
+    let secret: Promise<Uint8Array> | null = null;
+    try {
+      const finished = await executeTicketingRun(
+        target.id,
+        {
+          client: { get: client.get, ...client.ticketing },
+          artwork,
+          userAddress: address,
+          collectionBase: ticketingCollectionBase,
+          tierBase: ticketingTierBase,
+          batchBase: ticketingBatchBase,
+          putFile: (url, file) => putFileToSignedUrl(url, file),
+          wait: (ms) => new Promise((resolve) => setTimeout(resolve, ms)),
+          walletRequest: async (email) =>
+            walletRequestFor(await (secret ??= provisioningSecret(signer as unknown as Parameters<typeof provisioningSecret>[0])), email),
+          sponsored: async (base) => {
+            const result = await executeSponsored(
+              { proxyUrl: base, fetchImpl: client.authorizedFetch },
+              signer as unknown as TypedDataSigner,
+              [],
+            );
+            if (result.status !== "sponsored") throw new Error(result.reason);
+            return result.transactionHash;
+          },
+        },
+        (event) => setProgress(describe(event)),
+      );
+      setRun(finished);
+      setGuests("");
+      setPhase("success");
+      refresh();
+    } catch (e) {
+      if (e instanceof MissingFilesError) {
+        setNeedsArtwork(true);
+        setPhase("idle");
+        return;
+      }
+      setError(e instanceof Error ? e.message : "The run stopped. Continue to pick up where it left off.");
+      setPhase("error");
+      setRun(await client.get(target.id).catch(() => target));
+    } finally {
+      setProgress(null);
+    }
+  }
+
+  async function cancel() {
+    if (!run) return;
+    try {
+      setRun(await client.cancel(run.id));
+      refresh();
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Could not cancel this run.");
+    }
+  }
+
+  function startOver() {
+    setRun(null);
+    setNeedsArtwork(false);
+    setError(null);
+    router.replace(pathname);
   }
 
   if (!hasWallet) {
@@ -218,8 +268,7 @@ export function IpTicketingTask() {
         phase={phase}
         detail={progress}
         error={error}
-        servicePaused={servicePaused}
-        successLine={issued !== null ? issuedSummary(issued, "guest") : undefined}
+        successLine={issuedSummary(guestCount(run), "guest")}
         onClose={() => setPhase("idle")}
       />
 
@@ -439,36 +488,113 @@ export function IpTicketingTask() {
 
             <section className="space-y-4">
               <h2 className="font-semibold">Group</h2>
-              <CollectionPicker
-                hideLabel
-                serviceId={TICKETING_SERVICE}
-                owner={address ?? ""}
-                signer={signer}
-                value={group}
-                onChange={(c) => setGroup(c.contractAddress)}
-                disabled={busy}
-              />
+              <div className="flex gap-2">
+                <Button
+                  variant={groupMode === "existing" ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => setGroupMode("existing")}
+                  disabled={busy}
+                >
+                  One of my groups
+                </Button>
+                <Button
+                  variant={groupMode === "new" ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => setGroupMode("new")}
+                  disabled={busy}
+                >
+                  A new group
+                </Button>
+              </div>
+              {groupMode === "existing" ? (
+                <CollectionPicker
+                  hideLabel
+                  serviceId={TICKETING_SERVICE}
+                  owner={address ?? ""}
+                  value={existingGroup?.kind === "existing" ? existingGroup.contractAddress : ""}
+                  onChange={(c) => setExistingGroup(existingChoice(c))}
+                  disabled={busy}
+                />
+              ) : (
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <Field label="Group name">
+                    <Input value={newName} onChange={(e) => setNewName(e.target.value)} placeholder="Summer series" className="h-11" disabled={busy} />
+                  </Field>
+                  <Field label="Short code">
+                    <Input value={newSymbol} onChange={(e) => setNewSymbol(e.target.value)} placeholder="SUMMER" className="h-11" disabled={busy} />
+                  </Field>
+                </div>
+              )}
             </section>
 
-            <section className="space-y-4">
-              <div className="flex flex-wrap items-center gap-3 pt-1">
-                <Button onClick={run} disabled={!ready || busy} size="lg" className="h-12">
-                  {busy ? (
-                    <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Working
-                    </>
-                  ) : (
-                    <>
-                      <Users className="mr-2 h-4 w-4" />
-                      Issue {recipients.length > 0 ? recipients.length : ""}{" "}
-                      {recipients.length === 1 ? "ticket" : "tickets"}
-                    </>
-                  )}
-                </Button>
-                {!address ? <span className="text-muted-foreground">Sign in to issue.</span> : null}
-              </div>
-            </section>
+            {status === "DRAFT" ? (
+              <section className="space-y-4">
+                <div className="flex flex-wrap items-center gap-3 pt-1">
+                  <Button onClick={save} disabled={!ready || busy} size="lg" className="h-12">
+                    {busy ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Working
+                      </>
+                    ) : (
+                      <>
+                        <Users className="mr-2 h-4 w-4" />
+                        {run ? "Save changes" : "Save and review"}
+                      </>
+                    )}
+                  </Button>
+                  {!address ? <span className="text-muted-foreground">Sign in to issue.</span> : null}
+                </div>
+
+                {run?.status === "DRAFT" && run.quote ? (
+                  <CheckoutPanel
+                    run={run}
+                    quote={run.quote}
+                    balance={account?.creditBalance}
+                    signer={signer}
+                    client={client}
+                    onPaid={(paid) => {
+                      refresh();
+                      void execute(paid);
+                    }}
+                  />
+                ) : null}
+              </section>
+            ) : null}
+
+            {run && (status === "PAID" || status === "RUNNING") ? (
+              <section className="space-y-4">
+                <h2 className="font-semibold">Your run is paid for</h2>
+                <p className="text-muted-foreground">
+                  {guestCount(run).toLocaleString()} {guestCount(run) === 1 ? "ticket" : "tickets"}. Continue anytime and it picks up where it stopped.
+                </p>
+                {needsArtwork ? (
+                  <p>Attach the artwork again to continue: {(run.spec as { artwork?: { name: string } }).artwork?.name}</p>
+                ) : null}
+                <div className="flex flex-wrap gap-3">
+                  <Button onClick={() => execute(run)} disabled={busy} size="lg" className="h-12">
+                    {busy ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                    Continue
+                  </Button>
+                  <Button variant="ghost" onClick={cancel} disabled={busy}>
+                    Cancel and refund what is left
+                  </Button>
+                </div>
+              </section>
+            ) : null}
+
+            {run && (status === "COMPLETED" || status === "CANCELLED") ? (
+              <section className="space-y-4">
+                <h2 className="font-semibold">
+                  {status === "COMPLETED"
+                    ? issuedSummary(guestCount(run), "guest")
+                    : "This run was cancelled and what it did not use is back in your credits"}
+                </h2>
+                <Button onClick={startOver}>Start another run</Button>
+              </section>
+            ) : null}
+
+            {error && phase !== "error" ? <p className="text-destructive">{error}</p> : null}
           </div>
         </div>
       </div>
