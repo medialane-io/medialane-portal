@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
 import { FundingTransferNotSentError } from "@medialane/sdk/starknet";
-import { assertWalletCanCover, formatUnits, InsufficientFundsError, insufficientFundsCopy } from "./balance";
+import { assertHolds, assertWalletCanCover, formatUnits, InsufficientFundsError, insufficientFundsCopy } from "./balance";
 
 const STRK = "0x04718f5a0fc34cc1af16a1cdee98ffb20c31f5cd61d6ab07201858f4287c938d";
 const call = (amount: bigint, token = STRK) => ({
@@ -56,31 +56,44 @@ describe("checking the wallet can cover a transfer before asking it to sign", ()
   });
 });
 
+describe("checking a wallet holds an amount before anything starts", () => {
+  test("enough passes, short raises the typed error, an unreadable balance does not block", async () => {
+    await assertHolds(STRK, 100n, "0xme", async () => 100n);
+    await expect(assertHolds(STRK, 101n, "0xme", async () => 100n)).rejects.toBeInstanceOf(InsufficientFundsError);
+    await assertHolds(STRK, 100n, "0xme", async () => { throw new Error("rpc down"); });
+  });
+
+  test("the error carries the amounts in readable units", async () => {
+    const err = (await assertHolds(STRK, 2_300_000_000_000_000_000n, "0xme", async () => 0n).catch((e) => e)) as InsufficientFundsError;
+    expect([err.symbol, err.have, err.amount]).toEqual(["STRK", "0", "2.3"]);
+  });
+});
+
 describe("what a person is told when the wallet is short", () => {
-  test("a wallet holding some of the token is told what it has and what the top-up is", () => {
-    expect(insufficientFundsCopy(new InsufficientFundsError("STRK", "0.190247", "2.3"))).toEqual({
-      title: "Not enough STRK in this wallet",
+  test("names the wallet, and says what they have and what the top-up is", () => {
+    expect(insufficientFundsCopy(new InsufficientFundsError("STRK", "0.190247", "2.3"), "your Braavos wallet")).toEqual({
+      title: "Not enough STRK in your Braavos wallet",
       body: "You have 0.190247 STRK and this top-up is 2.3 STRK. Add more, lower the amount, or pay with another token.",
     });
   });
 
   test("a wallet with none of it says so plainly", () => {
-    expect(insufficientFundsCopy(new InsufficientFundsError("USDC", "0", "10"))).toEqual({
-      title: "No USDC in this wallet",
-      body: "This top-up is 10 USDC. Add USDC to the wallet, lower the amount, or pay with another token.",
+    expect(insufficientFundsCopy(new InsufficientFundsError("USDC", "0", "10"), "your Media Wallet")).toEqual({
+      title: "No USDC in your Media Wallet",
+      body: "This top-up is 10 USDC. Add USDC to it, lower the amount, or pay with another token.",
     });
   });
 
   test("a token we cannot name still gets a helpful message", () => {
-    expect(insufficientFundsCopy(new InsufficientFundsError(null, null, null))).toEqual({
-      title: "Not enough funds in this wallet",
-      body: "Add funds to the wallet, lower the amount, or pay with another token.",
+    expect(insufficientFundsCopy(new InsufficientFundsError(null, null, null), "your Braavos wallet")).toEqual({
+      title: "Not enough funds in your Braavos wallet",
+      body: "Add funds to it, lower the amount, or pay with another token.",
     });
   });
 
   test("the words never say 'needs'", () => {
     for (const err of [new InsufficientFundsError("ETH", "0.001", "0.05"), new InsufficientFundsError("ETH", "0", "0.05"), new InsufficientFundsError(null, null, null)]) {
-      const { title, body } = insufficientFundsCopy(err);
+      const { title, body } = insufficientFundsCopy(err, "your Braavos wallet");
       expect(`${title} ${body}`).not.toMatch(/needs?\b/i);
     }
   });

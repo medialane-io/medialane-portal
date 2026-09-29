@@ -15,3 +15,15 @@ export function tokenAmountEstimate(dollars: number, symbol: string, price: numb
   if (unitPrice === undefined || !Number.isFinite(unitPrice) || unitPrice <= 0) return null;
   return formatEstimate(dollars / unitPrice);
 }
+
+/** The same estimate in the token's smallest units, rounded up, for checking a balance before anything starts. */
+export function tokenAtomicEstimate(dollars: number, symbol: string, decimals: number, price: number | undefined): bigint | null {
+  if (!Number.isFinite(dollars) || dollars <= 0) return null;
+  const unitPrice = symbol === "USDC" ? 1 : price;
+  if (unitPrice === undefined || !Number.isFinite(unitPrice) || unitPrice <= 0) return null;
+  const usdMicros = BigInt(Math.round(dollars * 1_000_000));
+  const priceMicros = BigInt(Math.round(unitPrice * 1_000_000));
+  if (priceMicros <= 0n) return null;
+  const numerator = usdMicros * 10n ** BigInt(decimals);
+  return (numerator + priceMicros - 1n) / priceMicros;
+}
