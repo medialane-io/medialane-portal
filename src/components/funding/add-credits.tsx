@@ -9,7 +9,6 @@ import { Input } from "@/components/ui/input";
 import { useWalletNativeSession } from "@/hooks/use-wallet-native-session";
 import { useSiwsToken } from "@/hooks/use-siws-token";
 import { friendlyErrorMessage } from "@/lib/friendly-error";
-import { MIN_TOP_UP_USDC } from "@/lib/funding/amount";
 import { portalFundingApi } from "@/lib/funding/api";
 import {
   connectExternalWallet,
@@ -26,12 +25,16 @@ const STEP_COPY: Record<FundingStep, string> = {
   confirming: "Waiting for the transfer to land",
 };
 
-const AMOUNT = /^\d{1,5}(\.\d{1,2})?$/;
+const AMOUNT = /^\d{1,9}(\.\d{1,2})?$/;
+
+/** Tokens offered here. The backend decides what it accepts and credits what arrives at its dollar value. */
+const TOKENS = ["USDC", "ETH", "STRK", "USDT"] as const;
 
 export function AddCredits({ balance, onCredited }: { balance: number | undefined; onCredited: () => void }) {
   const { signer } = useWalletNativeSession();
   const { getValidToken, signIn } = useSiwsToken();
   const [amount, setAmount] = useState("10");
+  const [token, setToken] = useState<(typeof TOKENS)[number]>("USDC");
   const [external, setExternal] = useState<ExternalWallet[]>([]);
   const [step, setStep] = useState<FundingStep | null>(null);
   const [message, setMessage] = useState<string | null>(null);
@@ -41,7 +44,7 @@ export function AddCredits({ balance, onCredited }: { balance: number | undefine
     listExternalWallets().then(setExternal).catch(() => setExternal([]));
   }, []);
 
-  const valid = AMOUNT.test(amount) && Number(amount) >= Number(MIN_TOP_UP_USDC) && Number(amount) <= 10_000;
+  const valid = AMOUNT.test(amount) && Number(amount) >= 0.01;
   const credits = valid ? Math.floor(Number(amount) * 100) : 0;
   const busy = step !== null;
 
@@ -50,8 +53,8 @@ export function AddCredits({ balance, onCredited }: { balance: number | undefine
     setMessage(null);
     setStep("creating");
     try {
-      const token = getValidToken() ?? (await signIn().catch(() => null));
-      const result = await fundWithChainTransfer(portalFundingApi(token), await wallet(), {
+      const session = getValidToken() ?? (await signIn().catch(() => null));
+      const result = await fundWithChainTransfer(portalFundingApi(session, token), await wallet(), {
         amountUsdc: amount,
         onStep: setStep,
       });
@@ -77,15 +80,22 @@ export function AddCredits({ balance, onCredited }: { balance: number | undefine
         <div>
           <h2 className="text-base font-bold">Add credits</h2>
           <p className="mt-0.5 text-sm text-muted-foreground">
-            Pay in USDC from your wallet. {balance !== undefined ? `You have ${balance.toLocaleString()} credits. ` : ""}
-            The minimum is {MIN_TOP_UP_USDC} USDC (100 credits).
+            Pay from your wallet. One credit is one cent. {balance !== undefined ? `You have ${balance.toLocaleString()} credits.` : ""}
           </p>
         </div>
       </div>
 
       <div>
-        <label htmlFor="usdc" className="mb-1.5 block text-sm text-muted-foreground">Amount in USDC</label>
+        <label htmlFor="usdc" className="mb-1.5 block text-sm text-muted-foreground">Amount in dollars</label>
         <Input id="usdc" inputMode="decimal" value={amount} onChange={(e) => setAmount(e.target.value)} disabled={busy} />
+      </div>
+
+      <div className="flex flex-wrap gap-2" role="group" aria-label="Pay with">
+        {TOKENS.map((symbol) => (
+          <Button key={symbol} type="button" size="sm" variant={symbol === token ? "default" : "outline"} disabled={busy} onClick={() => setToken(symbol)}>
+            {symbol}
+          </Button>
+        ))}
       </div>
 
       <div className="flex flex-wrap gap-3">
@@ -103,7 +113,7 @@ export function AddCredits({ balance, onCredited }: { balance: number | undefine
       </div>
 
       <p className="text-sm text-muted-foreground">
-        {step ? STEP_COPY[step] : credits > 0 ? `${credits.toLocaleString()} credits` : `Enter at least ${MIN_TOP_UP_USDC} USDC`}
+        {step ? STEP_COPY[step] : credits > 0 ? `${credits.toLocaleString()} credits` : "Enter an amount"}
       </p>
       {message ? <p className="text-sm text-muted-foreground">{message}</p> : null}
       {error ? <p className="text-sm text-destructive">{error}</p> : null}

@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { labelForAction } from "@/lib/spend-labels";
 import { fundWithChainTransfer } from "@medialane/sdk/starknet";
 import { useSiwsToken } from "@/hooks/use-siws-token";
-import { MIN_TOP_UP_USDC, topUpUsdcFor } from "@/lib/funding/amount";
+import { topUpUsdcFor } from "@/lib/funding/amount";
 import { portalFundingApi } from "@/lib/funding/api";
 import { mediaWalletFundingWallet } from "@/lib/funding/wallets";
 import type { LaunchpadRun, RunQuote, RunsClient } from "@/lib/launchpad/runs-client";
@@ -105,7 +105,7 @@ export function CheckoutPanel({
         </Button>
         <Button variant="outline" onClick={payFromWallet} disabled={busy !== null || !signer}>
           {busy === "wallet" ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-          {shortfall > 0 ? `Add ${MIN_TOP_UP_USDC}+ USDC and pay the difference` : "Pay from your wallet"}
+          {shortfall > 0 ? "Pay the difference from your wallet" : "Pay from your wallet"}
         </Button>
       </div>
 
