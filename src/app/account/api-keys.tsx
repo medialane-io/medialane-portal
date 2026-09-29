@@ -68,7 +68,8 @@ export function ApiKeys() {
         <div>
           <h2 className="text-lg font-semibold">API keys</h2>
           <p className="text-sm text-muted-foreground">
-            A key spends the credits on this account. You can hold up to five at once.
+            A key connects your app or the WordPress plugin to Medialane. Every request it makes is paid from this
+            account&apos;s credits. You can hold up to five keys.
           </p>
         </div>
         <Button onClick={create} disabled={busy} size="sm">
@@ -79,6 +80,7 @@ export function ApiKeys() {
       {plaintext ? (
         <div className="rounded-xl border border-primary/30 bg-primary/5 p-4 space-y-2">
           <p className="text-sm font-medium">Copy this now. It is not shown again.</p>
+          <p className="text-sm text-muted-foreground">Keep it secret: anyone who has it can spend your credits.</p>
           <div className="flex items-center gap-2">
             <code className="flex-1 break-all rounded-lg bg-background px-3 py-2 font-mono text-xs">
               {plaintext}
@@ -98,6 +100,7 @@ export function ApiKeys() {
       ) : null}
 
       {keys && keys.length > 0 ? (
+        <div className="space-y-2">
         <ul className="divide-y divide-border/40">
           {keys.map((key) => (
             <li key={key.id} className="flex items-center justify-between gap-4 py-3">
@@ -119,10 +122,13 @@ export function ApiKeys() {
             </li>
           ))}
         </ul>
+        <p className="text-xs text-muted-foreground">Revoke a key to stop it working right away.</p>
+        </div>
       ) : (
         <div className="rounded-xl border border-dashed border-border/60 p-8 text-center">
           <KeyRound className="mx-auto h-5 w-5 text-muted-foreground" />
-          <p className="mt-2 text-sm text-muted-foreground">No keys yet.</p>
+          <p className="mt-2 text-sm font-medium">No keys yet</p>
+          <p className="mt-1 text-sm text-muted-foreground">Create one to connect an app or the WordPress plugin.</p>
         </div>
       )}
     </section>

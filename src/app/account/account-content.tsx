@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePortalSession, usePortalSpend } from "@/hooks/use-portal-account";
 import { labelForAction } from "@/lib/spend-labels";
 import { ApiKeys } from "./api-keys";
+import { HowItWorks } from "./how-it-works";
 import { AddCredits } from "@/components/funding/add-credits";
 import { Button } from "@/components/ui/button";
 
@@ -53,8 +54,12 @@ export function AccountContent() {
     <main className="container mx-auto max-w-3xl space-y-10 px-4 py-16">
       <header className="space-y-2">
         <h1 className="text-3xl font-bold tracking-tight">Account</h1>
-        <p className="text-muted-foreground">What you hold, and what it has paid for.</p>
+        <p className="text-muted-foreground">Your keys, and the credits they spend.</p>
       </header>
+
+      <HowItWorks />
+
+      <ApiKeys />
 
       <section className="rounded-2xl border border-border/60 bg-card p-6">
         <p className="text-sm text-muted-foreground">Credits</p>
@@ -63,6 +68,9 @@ export function AccountContent() {
         </p>
         <p className="mt-1 text-sm text-muted-foreground">
           {account ? usd(account.creditBalance) : "Loading"}
+        </p>
+        <p className="mt-3 text-sm text-muted-foreground">
+          Credits pay for every request your keys make. They are shared by all your keys.
         </p>
       </section>
 
@@ -81,8 +89,6 @@ export function AccountContent() {
       ) : null}
 
       <AddCredits balance={account?.creditBalance} onCredited={() => refreshAccount()} />
-
-      <ApiKeys />
     </main>
   );
 }
