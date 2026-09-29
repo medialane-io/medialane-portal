@@ -17,22 +17,35 @@ test("signing in and verifying an email are reachable", () => {
   }
 });
 
-test("a launchpad run can provision recipients and issue to them", () => {
+test("a ticketing run executes through its own routes", () => {
+  const run = "portal/runs/run1/ticketing";
+  for (const path of [
+    `${run}/files/upload-url`,
+    `${run}/files/uploaded`,
+    `${run}/metadata`,
+    `${run}/wallets`,
+    `${run}/wallets/resolve`,
+    `${run}/collection/build`,
+    `${run}/tier/execute`,
+    `${run}/batches/2/confirm`,
+  ]) {
+    expect(isPathAllowed("POST", path)).toBe(true);
+  }
+  expect(isPathAllowed("POST", `${run}/anything-else`)).toBe(false);
+  expect(isPathAllowed("GET", `${run}/metadata`)).toBe(false);
+});
+
+test("the portal no longer provisions, issues, pins or builds intents on its own key: those run inside a paid run", () => {
   for (const path of [
     "business/provisioning",
     "business/issuance/emission",
     "metadata/upload",
     "metadata/upload-file",
+    "intents/create-tier",
+    "intents/create-collection",
+    "tx/sync",
   ]) {
-    expect(isPathAllowed("POST", path)).toBe(true);
-  }
-});
-
-test("only the two intents the launchpad builds are allowed", () => {
-  expect(isPathAllowed("POST", "intents/create-tier")).toBe(true);
-  expect(isPathAllowed("POST", "intents/create-collection")).toBe(true);
-  for (const other of ["intents/mint", "intents/fulfill", "intents/listing", "intents/some-future-type"]) {
-    expect(isPathAllowed("POST", other)).toBe(false);
+    expect(isPathAllowed("POST", path)).toBe(false);
   }
 });
 
