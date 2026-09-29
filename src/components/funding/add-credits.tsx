@@ -8,6 +8,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useWalletNativeSession } from "@/hooks/use-wallet-native-session";
 import { useSiwsToken } from "@/hooks/use-siws-token";
+import { usdPriceFor, useUsdPrices } from "@/hooks/use-usd-prices";
+import { tokenAmountEstimate } from "@/lib/funding/estimate";
 import { friendlyErrorMessage } from "@/lib/friendly-error";
 import { portalFundingApi } from "@/lib/funding/api";
 import {
@@ -33,6 +35,7 @@ const TOKENS = ["USDC", "ETH", "STRK", "USDT"] as const;
 export function AddCredits({ balance, onCredited }: { balance: number | undefined; onCredited: () => void }) {
   const { signer } = useWalletNativeSession();
   const { getValidToken, signIn } = useSiwsToken();
+  const usdPrices = useUsdPrices();
   const [amount, setAmount] = useState("10");
   const [token, setToken] = useState<(typeof TOKENS)[number]>("USDC");
   const [external, setExternal] = useState<ExternalWallet[]>([]);
@@ -48,6 +51,7 @@ export function AddCredits({ balance, onCredited }: { balance: number | undefine
   const valid = AMOUNT.test(amount) && Number(amount) >= 0.01;
   const credits = valid ? Math.floor(Number(amount) * 100) : 0;
   const busy = step !== null;
+  const estimate = valid ? tokenAmountEstimate(Number(amount), token, usdPriceFor(usdPrices, token)) : null;
 
   async function run(id: string, wallet: () => Promise<FundingWallet>) {
     setActive(id);
@@ -117,7 +121,7 @@ export function AddCredits({ balance, onCredited }: { balance: number | undefine
       </div>
 
       <p className="text-sm text-muted-foreground">
-        {step ? STEP_COPY[step] : credits > 0 ? `${credits.toLocaleString()} credits` : "Enter an amount"}
+        {step ? STEP_COPY[step] : credits > 0 ? `${credits.toLocaleString()} credits${estimate ? ` · about ${estimate} ${token}` : ""}` : "Enter an amount"}
       </p>
       {message ? <p className="text-sm text-muted-foreground">{message}</p> : null}
       {error ? <p className="text-sm text-destructive">{error}</p> : null}
