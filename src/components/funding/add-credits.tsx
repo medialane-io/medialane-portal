@@ -12,6 +12,7 @@ import { usdPriceFor, useUsdPrices } from "@/hooks/use-usd-prices";
 import { tokenAmountEstimate } from "@/lib/funding/estimate";
 import { friendlyErrorMessage } from "@/lib/friendly-error";
 import { portalFundingApi } from "@/lib/funding/api";
+import { InsufficientFundsError, insufficientFundsCopy } from "@/lib/funding/balance";
 import {
   connectExternalWallet,
   listExternalWallets,
@@ -43,6 +44,7 @@ export function AddCredits({ balance, onCredited }: { balance: number | undefine
   const [active, setActive] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [notice, setNotice] = useState<{ title: string; body: string } | null>(null);
 
   useEffect(() => {
     listExternalWallets().then(setExternal).catch(() => setExternal([]));
@@ -56,6 +58,7 @@ export function AddCredits({ balance, onCredited }: { balance: number | undefine
   async function run(id: string, wallet: () => Promise<FundingWallet>) {
     setActive(id);
     setError(null);
+    setNotice(null);
     setMessage(null);
     setStep("creating");
     try {
@@ -71,7 +74,9 @@ export function AddCredits({ balance, onCredited }: { balance: number | undefine
         setMessage("Your transfer is on chain and will be credited shortly. You can close this.");
       }
     } catch (err) {
-      setError(friendlyErrorMessage(err, "Could not complete the top-up."));
+      // A short wallet is a step for the person to take, not a failure of ours, so it is not shown as an error.
+      if (err instanceof InsufficientFundsError) setNotice(insufficientFundsCopy(err));
+      else setError(friendlyErrorMessage(err, "Could not complete the top-up."));
     } finally {
       setStep(null);
       setActive(null);
@@ -124,6 +129,12 @@ export function AddCredits({ balance, onCredited }: { balance: number | undefine
         {step ? STEP_COPY[step] : credits > 0 ? `${credits.toLocaleString()} credits${estimate ? ` · about ${estimate} ${token}` : ""}` : "Enter an amount"}
       </p>
       {message ? <p className="text-sm text-muted-foreground">{message}</p> : null}
+      {notice ? (
+        <div role="status" className="rounded-xl border border-border bg-muted/40 px-4 py-3">
+          <p className="text-sm font-medium">{notice.title}</p>
+          <p className="mt-0.5 text-sm text-muted-foreground">{notice.body}</p>
+        </div>
+      ) : null}
       {error ? <p className="text-sm text-destructive">{error}</p> : null}
     </section>
   );
