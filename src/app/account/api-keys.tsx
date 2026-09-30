@@ -7,8 +7,15 @@ import { Button } from "@/components/ui/button";
 import { usePortalKeys } from "@/hooks/use-portal-account";
 import { useSiwsToken } from "@/hooks/use-siws-token";
 import { friendlyErrorMessage } from "@/lib/friendly-error";
+import { getMedialaneClient } from "@/lib/medialane-client";
+import { MedialaneApiError } from "@medialane/sdk";
 
 const NOT_CONFIRMED = "We could not confirm it is you. Please try again.";
+
+function unconfirmed(err: unknown): never {
+  if (err instanceof MedialaneApiError && err.status === 401) throw new Error(NOT_CONFIRMED);
+  throw err;
+}
 
 export function ApiKeys() {
   const { data: keys, mutate } = usePortalKeys(true);
@@ -27,14 +34,7 @@ export function ApiKeys() {
     setBusy(true);
     try {
       const token = await confirm();
-      const res = await fetch("/api/proxy/v1/portal/keys", {
-        method: "POST",
-        headers: { "Content-Type": "application/json", authorization: `Bearer ${token}` },
-        body: JSON.stringify({ appSource: "MEDIALANE_PORTAL" }),
-      });
-      if (res.status === 401) throw new Error(NOT_CONFIRMED);
-      if (!res.ok) throw new Error("Could not create a key");
-      const body = (await res.json()) as { data: { plaintext: string } };
+      const body = await getMedialaneClient().api.createApiKey({}, token).catch(unconfirmed);
       setPlaintext(body.data.plaintext);
       await mutate();
     } catch (err) {
@@ -48,12 +48,7 @@ export function ApiKeys() {
     setBusy(true);
     try {
       const token = await confirm();
-      const res = await fetch(`/api/proxy/v1/portal/keys/${encodeURIComponent(id)}`, {
-        method: "DELETE",
-        headers: { authorization: `Bearer ${token}` },
-      });
-      if (res.status === 401) throw new Error(NOT_CONFIRMED);
-      if (!res.ok) throw new Error("Could not revoke that key");
+      await getMedialaneClient().api.deleteApiKey(id, token).catch(unconfirmed);
       await mutate();
     } catch (err) {
       toast.error(friendlyErrorMessage(err, "Could not revoke that key"));

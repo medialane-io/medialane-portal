@@ -15,7 +15,6 @@ export function AccountSyncOnLogin() {
     if (!hasWallet || !walletAddress) return;
 
     const walletType = "MEDIAWALLET" as const;
-    const appSource = "MEDIALANE_PORTAL" as const;
     const key = `${SESSION_KEY_PREFIX}${walletAddress}:${walletType}`;
     if (sessionStorage.getItem(key)) return;
 
@@ -30,7 +29,6 @@ export function AccountSyncOnLogin() {
 
         await getMedialaneClient().api.upsertMyWallet(token, {
           walletType,
-          appSource,
           chain: "STARKNET",
           ...(pendingEmail ? { email: pendingEmail } : {}),
         });
@@ -39,8 +37,7 @@ export function AccountSyncOnLogin() {
 
         if (!cancelled) {
           console.error("[ml-register] failed", {
-            appSource,
-            walletType,
+              walletType,
             error: error instanceof Error ? error.message : String(error),
           });
         }

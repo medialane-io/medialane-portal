@@ -37,7 +37,6 @@ function WalletOnboardingForm() {
 
       await getMedialaneClient().api.upsertMyWallet(siwsToken, {
         walletType: "MEDIAWALLET",
-        appSource: "MEDIALANE_PORTAL",
         chain: "STARKNET",
       });
 

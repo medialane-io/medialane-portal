@@ -92,10 +92,7 @@ export default function VerifyEmailContent() {
     setStep("verifying");
     setError(null);
     try {
-      const data = await getMedialaneClient().api.verifyEmailCode(email, codeToVerify);
-      const token = getValidToken() ?? (await signIn());
-      if (!token) throw new Error("Not authenticated");
-      await getMedialaneClient().api.upsertMyWallet(token, { emailVerificationToken: data.token });
+      await getMedialaneClient().api.verifyEmailCode(email, codeToVerify);
       setStep("verified");
       fireConfetti();
       toast.success("Email verified");
