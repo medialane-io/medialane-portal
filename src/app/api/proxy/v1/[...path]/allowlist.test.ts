@@ -49,6 +49,10 @@ test("the portal no longer provisions, issues, pins or builds intents on its own
   }
 });
 
+test("the portal no longer polls intents: nothing in it builds one", () => {
+  expect(isPathAllowed("GET", "intents/some-id")).toBe(false);
+});
+
 test("nothing unlisted gets through, whatever the method", () => {
   for (const method of ["GET", "POST", "PATCH", "PUT", "DELETE"]) {
     expect(isPathAllowed(method, "anything-unlisted")).toBe(false);
