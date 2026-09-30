@@ -47,19 +47,26 @@ export interface WalletRequest {
   deployment: SignedWalletDeployment;
 }
 
-export interface LaunchpadRun {
+interface LaunchpadRunBase {
   id: string;
-  service: string;
   status: RunStatus;
   spec: unknown;
   quote: RunQuote | null;
   creditsHeld: number;
   creditsSpent: number;
   progress: unknown;
-  next?: NextStep | TicketingNextStep;
   createdAt: string;
   updatedAt: string;
 }
+
+export type DataTokenizationRun = LaunchpadRunBase & { service: "data-tokenization-erc721"; next?: NextStep };
+export type TicketingRun = LaunchpadRunBase & { service: "ip-ticketing"; next?: TicketingNextStep };
+export type LaunchpadRun = DataTokenizationRun | TicketingRun;
+
+export const isDataTokenizationRun = (run: LaunchpadRun): run is DataTokenizationRun =>
+  run.service === "data-tokenization-erc721";
+
+export const isTicketingRun = (run: LaunchpadRun): run is TicketingRun => run.service === "ip-ticketing";
 
 export interface ConfirmResult {
   pending: boolean;

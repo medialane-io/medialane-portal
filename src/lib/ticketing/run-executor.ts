@@ -1,5 +1,11 @@
 import { MissingFilesError, untilConfirmed, type ExecutorDeps } from "@/lib/launchpad/run-executor";
-import type { ConfirmResult, LaunchpadRun, RunsClient, TicketingNextStep, WalletRequest } from "@/lib/launchpad/runs-client";
+import {
+  isTicketingRun,
+  type ConfirmResult,
+  type LaunchpadRun,
+  type RunsClient,
+  type WalletRequest,
+} from "@/lib/launchpad/runs-client";
 
 export type TicketingEvent =
   | { kind: "collection" }
@@ -41,7 +47,8 @@ export async function executeTicketingRun(
   let walletsResolved = false;
   for (let step = 0; step < 10_000; step++) {
     const run = await deps.client.get(runId);
-    const next = run.next as TicketingNextStep | undefined;
+    if (!isTicketingRun(run)) throw new Error("This run belongs to a different service.");
+    const next = run.next;
     if (run.status === "COMPLETED" || !next || next.kind === "done") {
       onEvent({ kind: "done" });
       return run;

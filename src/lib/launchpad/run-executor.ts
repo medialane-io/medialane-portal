@@ -1,4 +1,4 @@
-import type { ConfirmResult, LaunchpadRun, RunsClient } from "./runs-client";
+import { isDataTokenizationRun, type ConfirmResult, type LaunchpadRun, type RunsClient } from "./runs-client";
 
 export type RunEvent =
   | { kind: "collection" }
@@ -53,6 +53,7 @@ export async function executeRun(
 ): Promise<LaunchpadRun> {
   for (let step = 0; step < 10_000; step++) {
     const run = await deps.client.get(runId);
+    if (!isDataTokenizationRun(run)) throw new Error("This run belongs to a different service.");
     const next = run.next;
     if (run.status === "COMPLETED" || !next || next.kind === "done") {
       onEvent({ kind: "done" });

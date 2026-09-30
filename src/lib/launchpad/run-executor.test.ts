@@ -106,6 +106,14 @@ describe("executeRun", () => {
     expect(events.at(-1)).toEqual({ kind: "done" });
   });
 
+  test("refuses a run that belongs to another service", async () => {
+    const backend = fakeBackend([{ kind: "done" }]);
+    const other = { ...(await backend.deps.client.get("run1")), service: "ip-ticketing" } as unknown as LaunchpadRun;
+    backend.deps.client.get = async () => other;
+    await expect(executeRun("run1", backend.deps)).rejects.toThrow("different service");
+    expect(backend.calls).toEqual([]);
+  });
+
   test("resuming asks only for the files that still need uploading", async () => {
     const backend = fakeBackend([{ kind: "upload", files: ["b.pdf", "c.pdf"] }]);
     const error = await executeRun("run1", backend.deps).catch((e) => e);
