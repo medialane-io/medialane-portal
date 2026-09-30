@@ -51,27 +51,21 @@ export interface SignedDeployment {
   deployment: unknown;
 }
 
+export interface DeploymentBuild {
+  typedData: unknown;
+  deployment: unknown;
+}
+
+export type DeploymentBuilder = (owner: { ownerPubkey: string; ownerAddress: string }) => Promise<DeploymentBuild>;
+
 export async function buildAndSignDeployment(
   interim: { privateKey: string; publicKey: string; walletAddress: string },
+  build: DeploymentBuilder,
 ): Promise<SignedDeployment> {
-  const res = await fetch("/api/wallet/deploy-sponsored/build", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      ownerPubkey: interim.publicKey,
-      ownerAddress: interim.walletAddress,
-    }),
+  const { typedData, deployment } = await build({
+    ownerPubkey: interim.publicKey,
+    ownerAddress: interim.walletAddress,
   });
-
-  if (!res.ok) {
-    const body = (await res.json().catch(() => ({}))) as { error?: string };
-    throw new Error(body.error ?? "Could not prepare the wallet deployment.");
-  }
-
-  const { typedData, deployment } = (await res.json()) as {
-    typedData: unknown;
-    deployment: unknown;
-  };
 
   const msgHash = starknetTypedData.getMessageHash(typedData as never, interim.walletAddress);
   const signature = signWithPrivateKey(interim.privateKey, msgHash);

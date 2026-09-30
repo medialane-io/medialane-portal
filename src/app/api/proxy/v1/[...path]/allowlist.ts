@@ -37,7 +37,7 @@ const ALLOWED_ROUTES: Record<string, RegExp[]> = {
     /^portal\/runs\/[^/]+\/items\/[^/]+\/metadata$/,
     /^portal\/runs\/[^/]+\/batches\/[^/]+\/(build|execute|confirm)$/,
     /^portal\/runs\/[^/]+\/collection\/(build|execute|confirm)$/,
-    /^portal\/runs\/[^/]+\/ticketing\/(files\/(upload-url|uploaded)|metadata|wallets|wallets\/resolve)$/,
+    /^portal\/runs\/[^/]+\/ticketing\/(files\/(upload-url|uploaded)|metadata|wallets|wallets\/(resolve|build))$/,
     /^portal\/runs\/[^/]+\/ticketing\/(collection|tier|batches\/[^/]+)\/(build|execute|confirm)$/,
   ],
 

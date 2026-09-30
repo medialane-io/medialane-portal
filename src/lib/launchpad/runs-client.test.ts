@@ -45,6 +45,7 @@ test("ticketing steps are called under the run's ticketing path", async () => {
     derivationSalt: "s".repeat(16),
     deployment: { typedData: {}, signature: ["0x1"], deployment: {} },
   });
+  await client.ticketing.buildWallet("run1", { ownerPubkey: "0x1", ownerAddress: "0x2" });
   await client.ticketing.confirmCollection("run1");
   await client.ticketing.confirmTier("run1");
   await client.ticketing.confirmBatch("run1", 2);
@@ -56,6 +57,7 @@ test("ticketing steps are called under the run's ticketing path", async () => {
     `${base}/metadata`,
     `${base}/wallets/resolve`,
     `${base}/wallets`,
+    `${base}/wallets/build`,
     `${base}/collection/confirm`,
     `${base}/tier/confirm`,
     `${base}/batches/2/confirm`,

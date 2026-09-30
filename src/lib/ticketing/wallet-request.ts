@@ -1,6 +1,7 @@
 import type { WalletRequest } from "@/lib/launchpad/runs-client";
 import {
   buildAndSignDeployment,
+  type DeploymentBuilder,
   interimKeyFor,
   newDerivationSalt,
   PROVISIONING_SECRET_MESSAGE,
@@ -30,13 +31,17 @@ export async function provisioningSecret(signer: TypedDataSigner): Promise<Uint8
 }
 
 /** The signed request that deploys one guest's wallet, owned by an interim key until they claim it. */
-export async function walletRequestFor(secret: Uint8Array, email: string): Promise<WalletRequest> {
+export async function walletRequestFor(
+  secret: Uint8Array,
+  email: string,
+  build: DeploymentBuilder,
+): Promise<WalletRequest> {
   const derivationSalt = newDerivationSalt();
   const interim = interimKeyFor(secret, { scheme: "email", value: email }, derivationSalt);
   return {
     recipient: email,
     interimOwnerPubkey: interim.publicKey,
     derivationSalt,
-    deployment: await buildAndSignDeployment(interim),
+    deployment: await buildAndSignDeployment(interim, build),
   };
 }
