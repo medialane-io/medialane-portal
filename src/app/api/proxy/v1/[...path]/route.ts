@@ -1,12 +1,6 @@
 import { type NextRequest, NextResponse } from "next/server";
-import {
-  isSameOrigin,
-  TRUSTED_APP_IP_HEADER,
-  isSpoofableForwardingHeader,
-  trustedClientIp,
-} from "@medialane/sdk";
+import { isSameOrigin } from "@medialane/sdk";
 import { hasTraversalSegment, isPathAllowed } from "./allowlist";
-import { limiterFor } from "@/lib/rate-limit-policy";
 import {
   SESSION_COOKIE_NAME,
   SESSION_COOKIE_MAX_AGE_SECONDS,
@@ -37,8 +31,6 @@ const HOP_BY_HOP_HEADERS = new Set([
   "accept-encoding",
 ]);
 
-const checkRateLimit = limiterFor("proxy:backend");
-
 async function handle(
   req: NextRequest,
   ctx: { params: Promise<{ path: string[] }> },
@@ -48,11 +40,6 @@ async function handle(
       { error: "Cross-origin requests are not allowed" },
       { status: 403 },
     );
-  }
-
-  const callerIp = trustedClientIp(req);
-  if (!checkRateLimit(callerIp)) {
-    return NextResponse.json({ error: "Too many requests" }, { status: 429 });
   }
 
   const apiKey = process.env.MEDIALANE_API_KEY;
@@ -89,7 +76,6 @@ async function handle(
   for (const [k, v] of req.headers.entries()) {
     const key = k.toLowerCase();
     if (HOP_BY_HOP_HEADERS.has(key) || key === "x-api-key") continue;
-    if (isSpoofableForwardingHeader(key)) continue;
     fwdHeaders.set(k, v);
   }
   fwdHeaders.set("x-api-key", apiKey);
@@ -98,7 +84,6 @@ async function handle(
     const sessionCookie = req.cookies.get(SESSION_COOKIE_NAME)?.value;
     if (sessionCookie) fwdHeaders.set("authorization", `Bearer ${sessionCookie}`);
   }
-  fwdHeaders.set(TRUSTED_APP_IP_HEADER, callerIp);
 
   const hasBody = req.method !== "GET" && req.method !== "HEAD";
   const injectingCookie = shouldInjectSessionCookie(joinedPath, req.method);
