@@ -10,7 +10,6 @@ const ALLOWED_ROUTES: Record<string, RegExp[]> = {
     /^collections$/,
     /^auth\/email\/exists$/,
     /^users\/me$/,
-    /^intents\/[^/]+$/,
     /^username-claims\/me$/,
     /^username-claims\/check\/[^/]+$/,
     /^tokens\/owned\/[^/]+$/,

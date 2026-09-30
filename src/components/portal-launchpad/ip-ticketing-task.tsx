@@ -28,11 +28,10 @@ import {
   TERRITORIES,
 } from "@/lib/portal-launchpad/issuance-form";
 import { TICKETING_SERVICE } from "@/lib/portal-launchpad/collection-copy";
-import type { CollectionChoice } from "@/lib/data-tokenization/spec";
 import { runBatchBase, runCollectionBase, runTierBase, type LaunchpadRun } from "@/lib/launchpad/runs-client";
 import { MissingFilesError, putFileToSignedUrl } from "@/lib/launchpad/run-executor";
 import { executeTicketingRun, type TicketingEvent } from "@/lib/ticketing/run-executor";
-import { existingChoice, ticketingRunSpec } from "@/lib/ticketing/spec";
+import { existingChoice, ticketingRunSpec, type GroupChoice } from "@/lib/ticketing/spec";
 import { provisioningSecret, walletRequestFor } from "@/lib/ticketing/wallet-request";
 
 const TRANSFERABLE = ["Allowed", "Not Allowed"] as const;
@@ -72,7 +71,7 @@ export function IpTicketingTask() {
   const client = useRunsClient();
 
   const [groupMode, setGroupMode] = useState<"existing" | "new">("existing");
-  const [existingGroup, setExistingGroup] = useState<CollectionChoice | null>(null);
+  const [existingGroup, setExistingGroup] = useState<GroupChoice | null>(null);
   const [newName, setNewName] = useState("");
   const [newSymbol, setNewSymbol] = useState("");
   const [name, setName] = useState("");
@@ -117,7 +116,7 @@ export function IpTicketingTask() {
   const rows = guestRows(guests);
   const repeats = repeatsIn(guests);
 
-  const group: CollectionChoice | null =
+  const group: GroupChoice | null =
     groupMode === "new"
       ? newName.trim() && newSymbol.trim()
         ? { kind: "new", name: newName.trim(), symbol: newSymbol.trim().toUpperCase() }

@@ -1,8 +1,9 @@
-import type { CollectionChoice } from "@/lib/data-tokenization/spec";
 import { toUnixSeconds } from "@/lib/portal-launchpad/issuance-form";
 
+export type GroupChoice = { kind: "existing"; contractAddress: string } | { kind: "new"; name: string; symbol: string };
+
 export interface TicketingForm {
-  collection: CollectionChoice;
+  collection: GroupChoice;
   name: string;
   description: string;
   artwork: File | null;
@@ -21,9 +22,8 @@ export interface TicketingForm {
   };
 }
 
-/** Ticket groups made by the factory have no numeric id, so their address stands in for it. */
-export function existingChoice(group: { collectionId: string | null; contractAddress: string }): CollectionChoice {
-  return { kind: "existing", collectionId: group.collectionId ?? group.contractAddress, contractAddress: group.contractAddress };
+export function existingChoice(group: { contractAddress: string }): GroupChoice {
+  return { kind: "existing", contractAddress: group.contractAddress };
 }
 
 export function ticketingRunSpec(form: TicketingForm) {
