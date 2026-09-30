@@ -134,6 +134,14 @@ describe("executing a paid ticketing run", () => {
     expect((error as MissingFilesError).files).toEqual(["a.png"]);
   });
 
+  test("refuses a run that belongs to another service", async () => {
+    const { deps, calls } = backend([{ kind: "done" }]);
+    const other = { ...(await deps.client.get("run1")), service: "data-tokenization-erc721" } as unknown as LaunchpadRun;
+    deps.client.get = async () => other;
+    await expect(executeTicketingRun("run1", deps)).rejects.toThrow("different service");
+    expect(calls).toEqual([]);
+  });
+
   test("a run with nothing left to do is finished at once", async () => {
     const { deps, calls } = backend([{ kind: "done" }]);
     await executeTicketingRun("run1", deps);
