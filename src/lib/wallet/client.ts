@@ -14,6 +14,12 @@ import { loadAccountEmail } from "./account-wallet";
 const bytes = (value: string): Uint8Array<ArrayBuffer> =>
   new TextEncoder().encode(value) as Uint8Array<ArrayBuffer>;
 
+const PRODUCTION_RP_ID = "portal.medialane.io";
+
+export function relyingPartyId(host: string): string {
+  return host === PRODUCTION_RP_ID ? PRODUCTION_RP_ID : host;
+}
+
 const STORE_KEY = "medialane-io.wallet.owner.v1";
 const CHANGE_EVENT = "mlio-wallet";
 
@@ -27,7 +33,7 @@ async function stableUserId(email: string): Promise<Uint8Array<ArrayBuffer>> {
 export const passkeyOwner = createPasskeyOwner({
   appName: "Medialane Portal",
   relyingPartyName: "Medialane Portal",
-  relyingPartyId: () => location.hostname,
+  relyingPartyId: () => relyingPartyId(location.hostname),
   prfSalt: bytes("medialane://portal/owner-key/v1"),
   hkdfInfo: bytes("medialane-portal-owner-key"),
   passkeyUser: async () => {

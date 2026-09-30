@@ -5,7 +5,7 @@
   "overrides": {
     "picomatch": "2.3.2",
     "postcss": "8.5.26",
-    "brace-expansion": "1.1.18",
+    "brace-expansion": "1.1.21",
     "js-yaml": "4.3.2",
     "sharp": "0.35.5"
   },

@@ -40,15 +40,6 @@ export default function RecoverPage() {
 
       {mode === "choose" && (
         <div className="flex flex-col gap-3">
-          <Link
-            href="/connect"
-            className="rounded-2xl border border-border bg-card p-4 text-left transition-transform active:scale-[0.98]"
-          >
-            <p className="text-sm font-semibold">I can sign in on Medialane.io</p>
-            <p className="mt-1 text-xs text-muted-foreground">
-              Approve this app there and your wallet works here.
-            </p>
-          </Link>
           <button
             onClick={() => setMode("key")}
             className="rounded-2xl border border-border bg-card p-4 text-left transition-transform active:scale-[0.98]"
