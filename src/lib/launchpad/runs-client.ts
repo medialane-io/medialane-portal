@@ -91,20 +91,8 @@ export function runCollectionBase(id: string): string {
   return `${runBase(id)}/collection`;
 }
 
-export function ticketingBase(id: string): string {
-  return `${runBase(id)}/ticketing`;
-}
-
-export function ticketingCollectionBase(id: string): string {
-  return `${ticketingBase(id)}/collection`;
-}
-
-export function ticketingTierBase(id: string): string {
-  return `${ticketingBase(id)}/tier`;
-}
-
-export function ticketingBatchBase(id: string, index: number): string {
-  return `${ticketingBase(id)}/batches/${index}`;
+export function runTierBase(id: string): string {
+  return `${runBase(id)}/tier`;
 }
 
 export function createRunsClient(getToken: TokenSource, fetchImpl: typeof fetch = fetch) {
@@ -137,27 +125,27 @@ export function createRunsClient(getToken: TokenSource, fetchImpl: typeof fetch 
 
   const ticketing = {
     uploadUrl: async (id: string, name: string) =>
-      (await post<{ name: string; url: string }>(`${ticketingBase(id)}/files/upload-url`, { name })).data.url,
+      (await post<{ name: string; url: string }>(`${runBase(id)}/files/upload-url`, { name })).data.url,
 
     uploaded: async (id: string, name: string, cid: string) =>
-      (await post<{ name: string; uri: string }>(`${ticketingBase(id)}/files/uploaded`, { name, cid })).data,
+      (await post<{ name: string; uri: string }>(`${runBase(id)}/files/uploaded`, { name, cid })).data,
 
     metadata: async (id: string, userAddress: string) =>
-      (await post<{ tokenUri: string }>(`${ticketingBase(id)}/metadata`, { userAddress })).data,
+      (await post<{ tokenUri: string }>(`${runBase(id)}/metadata`, { userAddress })).data,
 
     /** Guests who still need a wallet deployed; the ones who already have one are recorded on the run. */
     resolveWallets: async (id: string) =>
-      (await post<{ pending: string[] }>(`${ticketingBase(id)}/wallets/resolve`)).data.pending,
+      (await post<{ pending: string[] }>(`${runBase(id)}/wallets/resolve`)).data.pending,
 
     buildWallet: async (id: string, owner: { ownerPubkey: string; ownerAddress: string }) =>
-      (await post<{ typedData: unknown; deployment: unknown }>(`${ticketingBase(id)}/wallets/build`, owner)).data,
+      (await post<{ typedData: unknown; deployment: unknown }>(`${runBase(id)}/wallets/build`, owner)).data,
 
     registerWallet: async (id: string, request: WalletRequest) =>
-      (await post<{ recipient: string; walletAddress: string }>(`${ticketingBase(id)}/wallets`, request)).data,
+      (await post<{ recipient: string; walletAddress: string }>(`${runBase(id)}/wallets`, request)).data,
 
-    confirmCollection: (id: string) => confirm(`${ticketingCollectionBase(id)}/confirm`),
-    confirmTier: (id: string) => confirm(`${ticketingTierBase(id)}/confirm`),
-    confirmBatch: (id: string, index: number) => confirm(`${ticketingBatchBase(id, index)}/confirm`),
+    confirmCollection: (id: string) => confirm(`${runCollectionBase(id)}/confirm`),
+    confirmTier: (id: string) => confirm(`${runTierBase(id)}/confirm`),
+    confirmBatch: (id: string, index: number) => confirm(`${runBatchBase(id, index)}/confirm`),
   };
 
   return {

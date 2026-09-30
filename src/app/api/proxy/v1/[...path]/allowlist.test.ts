@@ -17,8 +17,8 @@ test("signing in and verifying an email are reachable", () => {
   }
 });
 
-test("a ticketing run executes through its own routes", () => {
-  const run = "portal/runs/run1/ticketing";
+test("a ticketing run executes through the run routes", () => {
+  const run = "portal/runs/run1";
   for (const path of [
     `${run}/files/upload-url`,
     `${run}/files/uploaded`,
@@ -34,6 +34,12 @@ test("a ticketing run executes through its own routes", () => {
   }
   expect(isPathAllowed("POST", `${run}/anything-else`)).toBe(false);
   expect(isPathAllowed("GET", `${run}/metadata`)).toBe(false);
+});
+
+test("the old ticketing prefix is gone", () => {
+  for (const path of ["wallets/resolve", "tier/build", "batches/0/confirm", "files/upload-url"]) {
+    expect(isPathAllowed("POST", `portal/runs/run1/ticketing/${path}`)).toBe(false);
+  }
 });
 
 test("the portal no longer provisions, issues, pins or builds intents on its own key: those run inside a paid run", () => {
