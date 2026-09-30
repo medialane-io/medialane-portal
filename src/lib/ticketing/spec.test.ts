@@ -59,8 +59,8 @@ describe("the run spec for a ticketing run", () => {
     expect(spec.validUntil).toBe(Math.floor(new Date("2026-10-02T02:00").getTime() / 1000));
   });
 
-  test("an existing group is named by its id, or by its address when it has none", () => {
-    expect(existingChoice({ collectionId: "7", contractAddress: "0xabc" })).toEqual({ kind: "existing", collectionId: "7", contractAddress: "0xabc" });
-    expect(existingChoice({ collectionId: null, contractAddress: "0xabc" })).toEqual({ kind: "existing", collectionId: "0xabc", contractAddress: "0xabc" });
+  test("an existing group is named by its address alone", () => {
+    expect(existingChoice({ collectionId: "7", contractAddress: "0xabc" })).toEqual({ kind: "existing", contractAddress: "0xabc" });
+    expect(existingChoice({ collectionId: null, contractAddress: "0xabc" })).toEqual({ kind: "existing", contractAddress: "0xabc" });
   });
 });
