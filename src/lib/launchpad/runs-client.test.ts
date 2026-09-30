@@ -1,11 +1,5 @@
 import { expect, test } from "bun:test";
-import {
-  createRunsClient,
-  ticketingBase,
-  ticketingBatchBase,
-  ticketingCollectionBase,
-  ticketingTierBase,
-} from "./runs-client";
+import { createRunsClient, runBatchBase, runCollectionBase, runTierBase } from "./runs-client";
 
 function recordingFetch() {
   const bodies: unknown[] = [];
@@ -50,7 +44,7 @@ test("ticketing steps are called under the run's ticketing path", async () => {
   await client.ticketing.confirmTier("run1");
   await client.ticketing.confirmBatch("run1", 2);
 
-  const base = "/api/proxy/v1/portal/runs/run1/ticketing";
+  const base = "/api/proxy/v1/portal/runs/run1";
   expect(urls).toEqual([
     `${base}/files/upload-url`,
     `${base}/files/uploaded`,
@@ -66,9 +60,8 @@ test("ticketing steps are called under the run's ticketing path", async () => {
   expect(bodies[2]).toEqual({ userAddress: "0xowner" });
 });
 
-test("ticketing bases are the ones the sponsored signer posts to", () => {
-  expect(ticketingBase("run1")).toBe("/api/proxy/v1/portal/runs/run1/ticketing");
-  expect(ticketingCollectionBase("run1")).toBe("/api/proxy/v1/portal/runs/run1/ticketing/collection");
-  expect(ticketingTierBase("run1")).toBe("/api/proxy/v1/portal/runs/run1/ticketing/tier");
-  expect(ticketingBatchBase("run1", 3)).toBe("/api/proxy/v1/portal/runs/run1/ticketing/batches/3");
+test("a ticketing run's sponsored steps post to the same bases as any other run", () => {
+  expect(runCollectionBase("run1")).toBe("/api/proxy/v1/portal/runs/run1/collection");
+  expect(runTierBase("run1")).toBe("/api/proxy/v1/portal/runs/run1/tier");
+  expect(runBatchBase("run1", 3)).toBe("/api/proxy/v1/portal/runs/run1/batches/3");
 });

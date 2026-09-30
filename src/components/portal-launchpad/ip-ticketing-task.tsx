@@ -28,12 +28,7 @@ import {
   TERRITORIES,
 } from "@/lib/portal-launchpad/issuance-form";
 import { TICKETING_SERVICE } from "@/lib/portal-launchpad/collection-copy";
-import {
-  ticketingBatchBase,
-  ticketingCollectionBase,
-  ticketingTierBase,
-  type LaunchpadRun,
-} from "@/lib/launchpad/runs-client";
+import { runBatchBase, runCollectionBase, runTierBase, type LaunchpadRun } from "@/lib/launchpad/runs-client";
 import { MissingFilesError, putFileToSignedUrl } from "@/lib/launchpad/run-executor";
 import { executeTicketingRun, type TicketingEvent } from "@/lib/ticketing/run-executor";
 import { existingChoice, ticketingRunSpec, type GroupChoice } from "@/lib/ticketing/spec";
@@ -191,9 +186,9 @@ export function IpTicketingTask() {
           client: { get: client.get, ...client.ticketing },
           artwork,
           userAddress: address,
-          collectionBase: ticketingCollectionBase,
-          tierBase: ticketingTierBase,
-          batchBase: ticketingBatchBase,
+          collectionBase: runCollectionBase,
+          tierBase: runTierBase,
+          batchBase: runBatchBase,
           putFile: (url, file) => putFileToSignedUrl(url, file),
           wait: (ms) => new Promise((resolve) => setTimeout(resolve, ms)),
           walletRequest: async (email) =>
