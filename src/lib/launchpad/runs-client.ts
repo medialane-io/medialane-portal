@@ -149,6 +149,9 @@ export function createRunsClient(getToken: TokenSource, fetchImpl: typeof fetch 
     resolveWallets: async (id: string) =>
       (await post<{ pending: string[] }>(`${ticketingBase(id)}/wallets/resolve`)).data.pending,
 
+    buildWallet: async (id: string, owner: { ownerPubkey: string; ownerAddress: string }) =>
+      (await post<{ typedData: unknown; deployment: unknown }>(`${ticketingBase(id)}/wallets/build`, owner)).data,
+
     registerWallet: async (id: string, request: WalletRequest) =>
       (await post<{ recipient: string; walletAddress: string }>(`${ticketingBase(id)}/wallets`, request)).data,
 

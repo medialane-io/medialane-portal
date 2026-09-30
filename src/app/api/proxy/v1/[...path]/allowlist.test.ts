@@ -25,6 +25,7 @@ test("a ticketing run executes through its own routes", () => {
     `${run}/metadata`,
     `${run}/wallets`,
     `${run}/wallets/resolve`,
+    `${run}/wallets/build`,
     `${run}/collection/build`,
     `${run}/tier/execute`,
     `${run}/batches/2/confirm`,
