@@ -34,17 +34,8 @@ export type TicketingNextStep =
   | { kind: "wait"; index: number }
   | { kind: "done" };
 
-export interface SignedWalletDeployment {
-  typedData: unknown;
-  signature: string[];
-  deployment: unknown;
-}
-
 export interface WalletRequest {
   recipient: string;
-  interimOwnerPubkey: string;
-  derivationSalt: string;
-  deployment: SignedWalletDeployment;
 }
 
 interface LaunchpadRunBase {
@@ -143,9 +134,6 @@ export function createRunsClient(getToken: TokenSource, fetchImpl: typeof fetch 
     /** Guests who still need a wallet deployed; the ones who already have one are recorded on the run. */
     resolveWallets: async (id: string) =>
       (await post<{ pending: string[] }>(`${runBase(id)}/wallets/resolve`)).data.pending,
-
-    buildWallet: async (id: string, owner: { ownerPubkey: string; ownerAddress: string }) =>
-      (await post<{ typedData: unknown; deployment: unknown }>(`${runBase(id)}/wallets/build`, owner)).data,
 
     registerWallet: async (id: string, request: WalletRequest) =>
       (await post<{ recipient: string; walletAddress: string }>(`${runBase(id)}/wallets`, request)).data,

@@ -1,3 +1,5 @@
+import { getMedialaneClient } from "@/lib/medialane-client";
+
 const ACCOUNT_ADDRESS_KEY = "medialane.account.address.v1";
 const ACCOUNT_EMAIL_KEY = "medialane.account.email.v1";
 
@@ -34,14 +36,7 @@ export function saveAccountEmail(email: string): void {
 }
 
 export async function fetchAccountWalletAddress(): Promise<string | null> {
-  const res = await fetch("/api/proxy/v1/users/me/wallet", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({}),
-  });
-  if (!res.ok) return null;
-  const data = (await res.json().catch(() => ({}))) as { walletAddress?: string | null };
-  return data.walletAddress ?? null;
+  return getMedialaneClient().api.getSessionWallet().catch(() => null);
 }
 
 export async function adoptAccountWallet(): Promise<boolean> {

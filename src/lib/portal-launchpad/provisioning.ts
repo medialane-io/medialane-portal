@@ -1,8 +1,3 @@
-import { deriveOwnerKeyPair, computeAccountAddress, signWithPrivateKey } from "@medialane/sdk/starknet";
-import { typedData as starknetTypedData } from "starknet";
-
-export const PROVISIONING_SECRET_MESSAGE = "medialane://business-provisioning/interim-key/v1";
-
 export interface Recipient {
   scheme: string;
   value: string;
@@ -28,47 +23,4 @@ export function isValidEmail(value: string): boolean {
 
 export function invalidRecipients(recipients: Recipient[]): Recipient[] {
   return recipients.filter((r) => r.scheme === "email" && !isValidEmail(r.value));
-}
-
-export function newDerivationSalt(): string {
-  const bytes = new Uint8Array(16);
-  crypto.getRandomValues(bytes);
-  return Array.from(bytes, (b) => b.toString(16).padStart(2, "0")).join("");
-}
-
-export function interimKeyFor(secret: Uint8Array, recipient: Recipient, salt: string) {
-  if (salt.length < 16) throw new Error("derivation salt is too short");
-  const { privateKey, publicKey } = deriveOwnerKeyPair(
-    secret,
-    `${recipient.scheme}:${recipient.value}:${salt}`,
-  );
-  return { privateKey, publicKey, walletAddress: computeAccountAddress(publicKey, 0) };
-}
-
-export interface SignedDeployment {
-  typedData: unknown;
-  signature: string[];
-  deployment: unknown;
-}
-
-export interface DeploymentBuild {
-  typedData: unknown;
-  deployment: unknown;
-}
-
-export type DeploymentBuilder = (owner: { ownerPubkey: string; ownerAddress: string }) => Promise<DeploymentBuild>;
-
-export async function buildAndSignDeployment(
-  interim: { privateKey: string; publicKey: string; walletAddress: string },
-  build: DeploymentBuilder,
-): Promise<SignedDeployment> {
-  const { typedData, deployment } = await build({
-    ownerPubkey: interim.publicKey,
-    ownerAddress: interim.walletAddress,
-  });
-
-  const msgHash = starknetTypedData.getMessageHash(typedData as never, interim.walletAddress);
-  const signature = signWithPrivateKey(interim.privateKey, msgHash);
-
-  return { typedData, signature, deployment };
 }

@@ -4,7 +4,6 @@ import {
   type ConfirmResult,
   type LaunchpadRun,
   type RunsClient,
-  type WalletRequest,
 } from "@/lib/launchpad/runs-client";
 
 export type TicketingEvent =
@@ -27,8 +26,6 @@ export interface TicketingExecutorDeps extends Pick<ExecutorDeps, "wait" | "poll
   putFile(url: string, file: File): Promise<string>;
   /** The artwork the guest list's ticket carries, or null when the page was reloaded and it has to be attached again. */
   artwork: File | null;
-  /** The signed request that deploys one guest's wallet. */
-  walletRequest(recipient: string): Promise<WalletRequest>;
   collectionBase(runId: string): string;
   tierBase(runId: string): string;
   batchBase(runId: string, index: number): string;
@@ -97,7 +94,7 @@ export async function executeTicketingRun(
         walletsResolved = pending.length === 0;
         for (const [done, recipient] of pending.entries()) {
           onEvent({ kind: "wallets", done, total: pending.length });
-          await deps.client.registerWallet(runId, await deps.walletRequest(recipient));
+          await deps.client.registerWallet(runId, { recipient });
         }
         break;
       }

@@ -55,12 +55,7 @@ export default function VerifyEmailContent() {
     setStep("sending");
     setError(null);
     try {
-      const res = await fetch("/api/proxy/v1/auth/email/request-code", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: forEmail }),
-      });
-      if (!res.ok) throw new Error("Couldn't send the code. Please try again.");
+      await getMedialaneClient().api.requestEmailCode(forEmail);
       setStep("code");
       setCooldown(RESEND_COOLDOWN_S);
     } catch (err) {
@@ -97,16 +92,10 @@ export default function VerifyEmailContent() {
     setStep("verifying");
     setError(null);
     try {
-      const res = await fetch("/api/proxy/v1/auth/email/verify-code", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, code: codeToVerify }),
-      });
-      const data = await res.json().catch(() => ({}));
-      if (!res.ok) throw new Error((data as { error?: string }).error ?? "Incorrect code. Please try again.");
+      const data = await getMedialaneClient().api.verifyEmailCode(email, codeToVerify);
       const token = getValidToken() ?? (await signIn());
       if (!token) throw new Error("Not authenticated");
-      await getMedialaneClient().api.upsertMyWallet(token, { emailVerificationToken: (data as { token: string }).token });
+      await getMedialaneClient().api.upsertMyWallet(token, { emailVerificationToken: data.token });
       setStep("verified");
       fireConfetti();
       toast.success("Email verified");

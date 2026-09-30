@@ -9,6 +9,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Input } from "@/components/ui/input";
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
 import { Loader2, ShieldCheck, AlertCircle } from "lucide-react";
+import { MedialaneApiError } from "@medialane/sdk";
 import { getMedialaneClient } from "@/lib/medialane-client";
 import { ValuePropCarousel } from "@/components/connect/value-prop-carousel";
 import { friendlyErrorMessage } from "@/lib/friendly-error";
@@ -104,7 +105,7 @@ function ConnectForm() {
     setError(null);
     setStep("checking-email");
     try {
-      const exists = await getMedialaneClient().api.checkEmailExists(email);
+      const { exists } = await getMedialaneClient().api.checkEmail(email);
       accountExistedRef.current = exists;
       if (exists) {
         await requestLoginCode();
@@ -120,17 +121,16 @@ function ConnectForm() {
   const registerNewAccount = async () => {
     setStep("registering");
     try {
-      const res = await fetch("/api/proxy/v1/auth/email/register-account", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email }),
-      });
-      if (res.status === 409) {
-        accountExistedRef.current = true;
-        await requestLoginCode();
-        return;
+      try {
+        await getMedialaneClient().api.registerEmailAccount(email);
+      } catch (err) {
+        if (err instanceof MedialaneApiError && err.status === 409) {
+          accountExistedRef.current = true;
+          await requestLoginCode();
+          return;
+        }
+        throw err;
       }
-      if (!res.ok) throw new Error("register-account failed");
       saveAccountEmail(email);
       goToWalletOnboarding();
     } catch {
@@ -141,12 +141,7 @@ function ConnectForm() {
 
   const requestLoginCode = async () => {
     try {
-      const res = await fetch("/api/proxy/v1/auth/email/request-code", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email }),
-      });
-      if (!res.ok) throw new Error("request-code failed");
+      await getMedialaneClient().api.requestEmailCode(email);
       setResendCooldown(RESEND_COOLDOWN_SECONDS);
       setStep("code");
     } catch {
@@ -160,13 +155,7 @@ function ConnectForm() {
     setResending(true);
     setError(null);
     try {
-      const res = await fetch("/api/proxy/v1/auth/email/request-code", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email }),
-      });
-      const data = await res.json().catch(() => ({}));
-      if (!res.ok) throw new Error((data as { error?: string }).error ?? "Couldn't resend the code. Please try again.");
+      await getMedialaneClient().api.requestEmailCode(email);
       setResendCooldown(RESEND_COOLDOWN_SECONDS);
     } catch (err) {
       setError(friendlyErrorMessage(err, "Couldn't resend the code. Please try again."));
@@ -180,13 +169,7 @@ function ConnectForm() {
     setError(null);
     setStep("verifying-code");
     try {
-      const res = await fetch("/api/proxy/v1/auth/email/verify-code", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, code: codeToVerify }),
-      });
-      const data = (await res.json().catch(() => ({}))) as { error?: string };
-      if (!res.ok) throw new Error(data.error ?? "Incorrect code");
+      await getMedialaneClient().api.verifyEmailCode(email, codeToVerify);
 
       saveAccountEmail(email);
       void adoptAccountWallet();

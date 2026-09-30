@@ -52,12 +52,6 @@ function backend(steps: TicketingNextStep[], options: { pending?: string[]; poll
     wait: async () => {},
     artwork,
     userAddress: "0xowner",
-    walletRequest: async (recipient) => ({
-      recipient,
-      interimOwnerPubkey: "0x1",
-      derivationSalt: "s".repeat(16),
-      deployment: { typedData: {}, signature: ["0x1"], deployment: {} },
-    }),
     collectionBase: (id) => `/runs/${id}/collection`,
     tierBase: (id) => `/runs/${id}/tier`,
     batchBase: (id, index) => `/runs/${id}/batches/${index}`,
@@ -107,6 +101,20 @@ describe("executing a paid ticketing run", () => {
     };
     await executeTicketingRun("run1", deps);
     expect(calls).toEqual(["resolve", "wallet:ana@x.com", "wallet:bruno@x.com"]);
+  });
+
+  test("asks for each guest's wallet by recipient only", async () => {
+    const { deps, advance } = backend([{ kind: "wallets" }, { kind: "done" }], { pending: ["ana@x.com"] });
+    const requests: unknown[] = [];
+    const register = deps.client.registerWallet;
+    deps.client.registerWallet = async (id, request) => {
+      requests.push(request);
+      const result = await register(id, request);
+      advance();
+      return result;
+    };
+    await executeTicketingRun("run1", deps);
+    expect(requests).toEqual([{ recipient: "ana@x.com" }]);
   });
 
   test("stops instead of spinning when a guest's wallet is stuck part-way", async () => {

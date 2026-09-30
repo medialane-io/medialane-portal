@@ -33,13 +33,7 @@ test("ticketing steps are called under the run's ticketing path", async () => {
   await client.ticketing.uploaded("run1", "a.png", "bafy-cid-123456");
   await client.ticketing.metadata("run1", "0xowner");
   await client.ticketing.resolveWallets("run1");
-  await client.ticketing.registerWallet("run1", {
-    recipient: "ana@x.com",
-    interimOwnerPubkey: "0x1",
-    derivationSalt: "s".repeat(16),
-    deployment: { typedData: {}, signature: ["0x1"], deployment: {} },
-  });
-  await client.ticketing.buildWallet("run1", { ownerPubkey: "0x1", ownerAddress: "0x2" });
+  await client.ticketing.registerWallet("run1", { recipient: "ana@x.com" });
   await client.ticketing.confirmCollection("run1");
   await client.ticketing.confirmTier("run1");
   await client.ticketing.confirmBatch("run1", 2);
@@ -51,13 +45,14 @@ test("ticketing steps are called under the run's ticketing path", async () => {
     `${base}/metadata`,
     `${base}/wallets/resolve`,
     `${base}/wallets`,
-    `${base}/wallets/build`,
     `${base}/collection/confirm`,
     `${base}/tier/confirm`,
     `${base}/batches/2/confirm`,
   ]);
   expect(bodies[0]).toEqual({ name: "a.png" });
   expect(bodies[2]).toEqual({ userAddress: "0xowner" });
+  expect(bodies[4]).toEqual({ recipient: "ana@x.com" });
+  expect("buildWallet" in client.ticketing).toBe(false);
 });
 
 test("a ticketing run's sponsored steps post to the same bases as any other run", () => {

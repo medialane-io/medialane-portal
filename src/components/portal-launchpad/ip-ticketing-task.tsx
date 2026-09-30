@@ -32,7 +32,6 @@ import { runBatchBase, runCollectionBase, runTierBase, type LaunchpadRun } from 
 import { MissingFilesError, putFileToSignedUrl } from "@/lib/launchpad/run-executor";
 import { executeTicketingRun, type TicketingEvent } from "@/lib/ticketing/run-executor";
 import { existingChoice, ticketingRunSpec, type GroupChoice } from "@/lib/ticketing/spec";
-import { provisioningSecret, walletRequestFor } from "@/lib/ticketing/wallet-request";
 
 const TRANSFERABLE = ["Allowed", "Not Allowed"] as const;
 
@@ -178,7 +177,6 @@ export function IpTicketingTask() {
     setNeedsArtwork(false);
     setError(null);
     setPhase("running");
-    let secret: Promise<Uint8Array> | null = null;
     try {
       const finished = await executeTicketingRun(
         target.id,
@@ -191,12 +189,6 @@ export function IpTicketingTask() {
           batchBase: runBatchBase,
           putFile: (url, file) => putFileToSignedUrl(url, file),
           wait: (ms) => new Promise((resolve) => setTimeout(resolve, ms)),
-          walletRequest: async (email) =>
-            walletRequestFor(
-              await (secret ??= provisioningSecret(signer as unknown as Parameters<typeof provisioningSecret>[0])),
-              email,
-              (owner) => client.ticketing.buildWallet(target.id, owner),
-            ),
           sponsored: async (base) => {
             const result = await executeSponsored(
               { proxyUrl: base, fetchImpl: client.authorizedFetch },
