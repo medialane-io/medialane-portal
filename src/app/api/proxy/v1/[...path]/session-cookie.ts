@@ -4,7 +4,7 @@ export const SESSION_COOKIE_MAX_AGE_SECONDS = 30 * 24 * 60 * 60;
 export function shouldSetSessionCookie(path: string, method: string): boolean {
   return (
     method === "POST" &&
-    (path === "auth/email/register-account" || path === "auth/email/verify-code")
+    path === "auth/email/verify-code"
   );
 }
 

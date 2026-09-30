@@ -14,8 +14,8 @@ test("SESSION_COOKIE_NAME and SESSION_COOKIE_MAX_AGE_SECONDS are the expected co
   expect(SESSION_COOKIE_MAX_AGE_SECONDS).toBe(30 * 24 * 60 * 60);
 });
 
-test("shouldSetSessionCookie is true for register-account and verify-code POSTs", () => {
-  expect(shouldSetSessionCookie("auth/email/register-account", "POST")).toBe(true);
+test("shouldSetSessionCookie is true only for verify-code POSTs; portal signs up with the code first", () => {
+  expect(shouldSetSessionCookie("auth/email/register-account", "POST")).toBe(false);
   expect(shouldSetSessionCookie("auth/email/verify-code", "POST")).toBe(true);
 });
 

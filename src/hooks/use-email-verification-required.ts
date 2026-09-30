@@ -8,7 +8,6 @@ import { getMedialaneClient } from "@/lib/medialane-client";
 export interface EmailVerificationStatus {
   email: string | null;
   emailVerified: boolean;
-  requiresEmailVerification: boolean;
 }
 
 export function useEmailVerificationStatus(): EmailVerificationStatus | null {
@@ -29,10 +28,5 @@ export function useEmailVerificationStatus(): EmailVerificationStatus | null {
   return {
     email: data.email ?? null,
     emailVerified: data.emailVerified ?? false,
-    requiresEmailVerification: data.requiresEmailVerification ?? false,
   };
-}
-
-export function useEmailVerificationRequired(): boolean {
-  return useEmailVerificationStatus()?.requiresEmailVerification ?? false;
 }

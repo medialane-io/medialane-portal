@@ -9,7 +9,6 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Input } from "@/components/ui/input";
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
 import { Loader2, ShieldCheck, AlertCircle } from "lucide-react";
-import { MedialaneApiError } from "@medialane/sdk";
 import { getMedialaneClient } from "@/lib/medialane-client";
 import { ValuePropCarousel } from "@/components/connect/value-prop-carousel";
 import { friendlyErrorMessage } from "@/lib/friendly-error";
@@ -25,7 +24,6 @@ import { useSiwsToken } from "@/hooks/use-siws-token";
 type Step =
   | "email"
   | "checking-email"
-  | "registering"
   | "code"
   | "verifying-code"
   | "add-email";
@@ -107,32 +105,7 @@ function ConnectForm() {
     try {
       const { exists } = await getMedialaneClient().api.checkEmail(email);
       accountExistedRef.current = exists;
-      if (exists) {
-        await requestLoginCode();
-      } else {
-        await registerNewAccount();
-      }
-    } catch {
-      setError("Something went wrong. Please try again.");
-      setStep("email");
-    }
-  };
-
-  const registerNewAccount = async () => {
-    setStep("registering");
-    try {
-      try {
-        await getMedialaneClient().api.registerEmailAccount(email);
-      } catch (err) {
-        if (err instanceof MedialaneApiError && err.status === 409) {
-          accountExistedRef.current = true;
-          await requestLoginCode();
-          return;
-        }
-        throw err;
-      }
-      saveAccountEmail(email);
-      goToWalletOnboarding();
+      await requestLoginCode();
     } catch {
       setError("Something went wrong. Please try again.");
       setStep("email");
@@ -172,6 +145,10 @@ function ConnectForm() {
       await getMedialaneClient().api.verifyEmailCode(email, codeToVerify);
 
       saveAccountEmail(email);
+      if (!accountExistedRef.current) {
+        goToWalletOnboarding();
+        return;
+      }
       void adoptAccountWallet();
       router.push(redirectTo || "/account");
     } catch (err) {
@@ -333,7 +310,7 @@ function ConnectForm() {
               placeholder="you@example.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              disabled={step === "checking-email" || step === "registering"}
+              disabled={step === "checking-email"}
               className="w-full"
               onKeyDown={(e) => {
                 if (e.key === "Enter" && email) void continueWithEmail();
@@ -344,9 +321,9 @@ function ConnectForm() {
                 className="w-full gap-2 bg-transparent text-white rounded-[7px] hover:bg-transparent hover:brightness-110 active:scale-[0.98] transition-all"
                 size="lg"
                 onClick={continueWithEmail}
-                disabled={step === "checking-email" || step === "registering" || !email}
+                disabled={step === "checking-email" || !email}
               >
-                {step === "checking-email" || step === "registering" ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
+                {step === "checking-email" ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
                 Continue
               </Button>
             </div>

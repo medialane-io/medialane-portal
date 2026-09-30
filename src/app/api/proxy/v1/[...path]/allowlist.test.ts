@@ -125,3 +125,9 @@ test("funding cannot be used to reach anything else", () => {
   expect(isPathAllowed("DELETE", "portal/funding/fi_123")).toBe(false);
   expect(isPathAllowed("PATCH", "portal/funding/fi_123")).toBe(false);
 });
+
+test("portal signs up with the code first, so register-account is not reachable", () => {
+  expect(isPathAllowed("POST", "auth/email/register-account")).toBe(false);
+  expect(isPathAllowed("POST", "auth/email/request-code")).toBe(true);
+  expect(isPathAllowed("POST", "auth/email/verify-code")).toBe(true);
+});
