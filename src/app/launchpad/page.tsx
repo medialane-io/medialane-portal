@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Database, Ticket } from "lucide-react";
+import { Award, Database, Ticket } from "lucide-react";
 import { canonical, buildSocialMetadata } from "@/lib/seo";
 import { LaunchpadCtaBanner } from "@medialane/ui";
 import { RunsList } from "@/components/launchpad/runs-list";
@@ -30,7 +30,7 @@ export default function LaunchpadPage() {
 
       <div className="w-full max-w-screen-2xl mx-auto px-4 sm:px-6 space-y-10 sm:space-y-16 mt-16">
         <RunsList />
-        <div className="grid gap-4 sm:grid-cols-2">
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           <Link
             href="/launchpad/data-tokenization"
             className="flex items-start gap-4 rounded-2xl border border-border p-6 transition-colors hover:border-foreground/20"
@@ -56,6 +56,20 @@ export default function LaunchpadPage() {
               <h2 className="font-semibold">IP Ticketing</h2>
               <p className="text-sm text-muted-foreground">
                 Issue on-chain tickets and distribute them to a list of recipients.
+              </p>
+            </div>
+          </Link>
+          <Link
+            href="/launchpad/certificate-emission"
+            className="flex items-start gap-4 rounded-2xl border border-border p-6 transition-colors hover:border-foreground/20"
+          >
+            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/10">
+              <Award className="h-5 w-5 text-primary" />
+            </span>
+            <div className="space-y-1.5">
+              <h2 className="font-semibold">Certificate Emission</h2>
+              <p className="text-sm text-muted-foreground">
+                Issue on-chain certificates and distribute them to a list of recipients.
               </p>
             </div>
           </Link>
