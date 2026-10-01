@@ -6,7 +6,7 @@ import { Shield, ShieldAlert, ChevronRight, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { getGuardians, getEscape, cancelEscape, type GuardianInfo, type EscapeInfo } from "@/lib/wallet/guardian";
+import { getGuardians, getEscape, cancelEscape, GUARDIAN_RECOVERY_AVAILABLE, type GuardianInfo, type EscapeInfo } from "@/lib/wallet/guardian";
 import { describeGuardianStatus, describeRecoveryAction } from "@medialane/sdk/starknet";
 import { loadSealedOwner } from "@/lib/wallet/store";
 import { friendlyErrorMessage } from "@/lib/friendly-error";
@@ -95,7 +95,7 @@ export function GuardianRecoverySection({ walletAddress }: { walletAddress: stri
               <p className="text-xs text-muted-foreground mt-0.5">Checking…</p>
             ) : status.kind === "none" ? (
               <p className="text-xs text-muted-foreground mt-0.5">
-                Not set up — add one from another device you trust.
+                {GUARDIAN_RECOVERY_AVAILABLE ? "Not set up — add one from another device you trust." : "Not available yet."}
               </p>
             ) : (
               <p className="text-xs text-muted-foreground mt-0.5">
@@ -104,7 +104,7 @@ export function GuardianRecoverySection({ walletAddress }: { walletAddress: stri
             )}
           </div>
           {status?.kind === "none" && sealed && (
-            <Button onClick={() => setAddOpen(true)} variant="outline" size="sm">
+            <Button onClick={() => setAddOpen(true)} variant="outline" size="sm" disabled={!GUARDIAN_RECOVERY_AVAILABLE}>
               Add guardian
             </Button>
           )}
@@ -129,7 +129,7 @@ export function GuardianRecoverySection({ walletAddress }: { walletAddress: stri
         </Link>
       </div>
 
-      {sealed && (
+      {sealed && GUARDIAN_RECOVERY_AVAILABLE && (
         <AddGuardianDialog
           open={addOpen}
           onOpenChange={setAddOpen}

@@ -20,6 +20,7 @@ import {
   getEscapeSecurityPeriod,
   triggerEscapeOwner,
   completeEscapeOwner,
+  GUARDIAN_RECOVERY_AVAILABLE,
   type EscapeInfo,
 } from "@/lib/wallet/guardian";
 import { describeRecoveryAction } from "@medialane/sdk/starknet";
@@ -51,28 +52,30 @@ export default function RecoverPage() {
           </button>
           <button
             onClick={() => setMode("lost")}
-            className="rounded-2xl border border-border bg-card p-4 text-left transition-transform active:scale-[0.98]"
+            disabled={!GUARDIAN_RECOVERY_AVAILABLE}
+            className="rounded-2xl border border-border bg-card p-4 text-left transition-transform active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 disabled:active:scale-100"
           >
             <p className="text-sm font-semibold">I lost my wallet</p>
             <p className="mt-1 text-xs text-muted-foreground">
-              Generate a new key on this device and share it with your guardian.
+              {GUARDIAN_RECOVERY_AVAILABLE ? "Generate a new key on this device and share it with your guardian." : "Not available yet."}
             </p>
           </button>
           <button
             onClick={() => setMode("guardian")}
-            className="rounded-2xl border border-border bg-card p-4 text-left transition-transform active:scale-[0.98]"
+            disabled={!GUARDIAN_RECOVERY_AVAILABLE}
+            className="rounded-2xl border border-border bg-card p-4 text-left transition-transform active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 disabled:active:scale-100"
           >
             <p className="text-sm font-semibold">I&apos;m someone&apos;s guardian</p>
             <p className="mt-1 text-xs text-muted-foreground">
-              Help recover a wallet you&apos;re registered as a guardian for.
+              {GUARDIAN_RECOVERY_AVAILABLE ? "Help recover a wallet you're registered as a guardian for." : "Not available yet."}
             </p>
           </button>
         </div>
       )}
 
       {mode === "key" && <RecoveryKeyFlow onBack={() => setMode("choose")} />}
-      {mode === "lost" && <LostWalletFlow onBack={() => setMode("choose")} />}
-      {mode === "guardian" && <GuardianFlow onBack={() => setMode("choose")} />}
+      {GUARDIAN_RECOVERY_AVAILABLE && mode === "lost" && <LostWalletFlow onBack={() => setMode("choose")} />}
+      {GUARDIAN_RECOVERY_AVAILABLE && mode === "guardian" && <GuardianFlow onBack={() => setMode("choose")} />}
     </main>
   );
 }
