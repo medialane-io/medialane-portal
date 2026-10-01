@@ -1,42 +1,37 @@
 import { test, expect } from "bun:test";
-import { generateStarkKeyPair, InvalidStarkPrivateKeyError } from "@medialane/sdk/starknet";
+import { encodeRecoveryKey, generateStarkKeyPair, InvalidRecoveryKeyError, parseRecoveryKey } from "@medialane/sdk/starknet";
 import { computeWalletAddress } from "./account";
-import { walletAddressForPrivateKey } from "./passkey";
 
-test("a key restores the same address the wallet was created with", () => {
+const WALLET = "0x071c174b93d24b72fc4b25e1d28fce1267e30c4c57fa4b0980a403a97fa84f5f";
+
+test("an exported recovery key restores the wallet it was exported from, with the same key", () => {
+  for (let i = 0; i < 25; i++) {
+    const { privateKeyHex } = generateStarkKeyPair();
+    expect(parseRecoveryKey(encodeRecoveryKey({ walletAddress: WALLET, privateKey: privateKeyHex }))).toEqual({
+      walletAddress: WALLET,
+      privateKey: privateKeyHex,
+    });
+  }
+});
+
+test("a key saved before recovery keys carried the address restores the wallet it created", () => {
   for (let i = 0; i < 25; i++) {
     const { privateKeyHex, publicKeyHex } = generateStarkKeyPair();
-    const createdAddress = computeWalletAddress(publicKeyHex, 0);
-    expect(walletAddressForPrivateKey(privateKeyHex)).toBe(createdAddress);
+    expect(BigInt(parseRecoveryKey(privateKeyHex).walletAddress)).toBe(BigInt(computeWalletAddress(publicKeyHex, 0)));
   }
 });
 
-test("formatting differences in a pasted key still restore the same address", () => {
+test("formatting differences in a pasted recovery key still restore the same wallet", () => {
   const { privateKeyHex } = generateStarkKeyPair();
-  const expected = walletAddressForPrivateKey(privateKeyHex);
-  expect(walletAddressForPrivateKey(`  ${privateKeyHex}  `)).toBe(expected);
-  expect(walletAddressForPrivateKey(`${privateKeyHex}\n`)).toBe(expected);
-  expect(walletAddressForPrivateKey(privateKeyHex.slice(2))).toBe(expected);
+  const encoded = encodeRecoveryKey({ walletAddress: WALLET, privateKey: privateKeyHex });
+  expect(parseRecoveryKey(`  ${encoded}  `).walletAddress).toBe(WALLET);
+  expect(parseRecoveryKey(`${encoded}\n`).walletAddress).toBe(WALLET);
 });
 
-test("two different keys never resolve to the same address", () => {
-  const seen = new Set<string>();
-  for (let i = 0; i < 50; i++) {
-    const { privateKeyHex } = generateStarkKeyPair();
-    seen.add(walletAddressForPrivateKey(privateKeyHex));
-  }
-  expect(seen.size).toBe(50);
-});
-
-test("a malformed key is refused rather than resolving to some other wallet", () => {
-  for (const bad of ["", "0x", "0x0", "nonsense", "0xzz", "0x" + "f".repeat(64)]) {
-    expect(() => walletAddressForPrivateKey(bad)).toThrow(InvalidStarkPrivateKeyError);
-  }
-});
-
-test("a truncated key does not silently resolve to a valid-looking address", () => {
+test("a malformed or truncated recovery key is refused rather than resolving to some other wallet", () => {
   const { privateKeyHex } = generateStarkKeyPair();
-  const full = walletAddressForPrivateKey(privateKeyHex);
-  const truncated = privateKeyHex.slice(0, -4);
-  expect(walletAddressForPrivateKey(truncated)).not.toBe(full);
+  const encoded = encodeRecoveryKey({ walletAddress: WALLET, privateKey: privateKeyHex });
+  for (const bad of ["", "0x", "0x0", "nonsense", "0xzz", "0x" + "f".repeat(64), encoded.slice(0, 30)]) {
+    expect(() => parseRecoveryKey(bad)).toThrow(InvalidRecoveryKeyError);
+  }
 });
