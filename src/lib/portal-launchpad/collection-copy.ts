@@ -21,6 +21,14 @@ export function collectionCopy(serviceId: string): CollectionCopy {
       countOf: (n) => (n === 0 ? "Nothing issued yet" : `${n.toLocaleString()} issued`),
     };
   }
+  if (serviceId === "pop-protocol") {
+    return {
+      label: "Collection",
+      hint: "One per cohort, or one for everything.",
+      empty: "No collections yet",
+      countOf: (n) => (n === 0 ? "Nothing issued yet" : `${n.toLocaleString()} issued`),
+    };
+  }
   return {
     label: "Collection",
     hint: "One per project, or one for everything.",
