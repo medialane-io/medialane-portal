@@ -12,10 +12,10 @@ import { Loader2, ShieldCheck, AlertCircle } from "lucide-react";
 import { getMedialaneClient } from "@/lib/medialane-client";
 import { ValuePropCarousel } from "@/components/connect/value-prop-carousel";
 import { friendlyErrorMessage } from "@/lib/friendly-error";
-import { adoptAccountWallet, saveAccountEmail } from "@/lib/wallet/account-wallet";
-import { loadSealedOwner } from "@/lib/wallet/store";
-import { destinationAfterSignIn } from "@/lib/wallet/next-step";
-import { loadAccountAddress } from "@/lib/wallet/account-wallet";
+import { saveAccountAddress, saveAccountEmail } from "@/lib/wallet/account-wallet";
+import { notifyWalletChange, saveSealedOwner } from "@/lib/wallet/store";
+import { createOwnerKey } from "@/lib/wallet/passkey";
+import { adoptSessionWallet, setupSessionWalletKey } from "@medialane/sdk/starknet";
 import { safeRelativePath } from "@/lib/safe-redirect";
 import { useWalletNativeSession } from "@/hooks/use-wallet-native-session";
 import { useEmailVerificationStatus } from "@/hooks/use-email-verification-required";
@@ -145,14 +145,24 @@ function ConnectForm() {
       await getMedialaneClient().api.verifyEmailCode(email, codeToVerify);
 
       saveAccountEmail(email);
-      if (!accountExistedRef.current) {
+      const api = getMedialaneClient().api;
+      const wallet = accountExistedRef.current ? await adoptSessionWallet(api, saveAccountAddress) : null;
+      if (!wallet) {
         goToWalletOnboarding();
         return;
       }
-      void adoptAccountWallet();
+      if (wallet.needsKeySetup) {
+        await setupSessionWalletKey(api, wallet.walletAddress, {
+          createOwnerKey,
+          saveOwner: (sealed) => {
+            saveSealedOwner(sealed);
+            notifyWalletChange();
+          },
+        });
+      }
       router.push(redirectTo || "/account");
     } catch (err) {
-      setError(friendlyErrorMessage(err, "Incorrect code. Please try again."));
+      setError(friendlyErrorMessage(err, "Something went wrong. Please try again."));
       setStep("code");
     }
   };
