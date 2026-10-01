@@ -3,20 +3,10 @@
 import useSWR from "swr";
 import { useWalletNativeSession } from "@/hooks/use-wallet-native-session";
 import { useSiwsToken } from "@/hooks/use-siws-token";
-import { type ApiCreatorProfile } from "@medialane/sdk";
+import type { ApiCreatorProfile, ApiUsernameClaim } from "@medialane/sdk";
 import { getMedialaneClient } from "@/lib/medialane-client";
-import { apiFetch, ApiError } from "@/lib/api-fetch";
 
-export interface UsernameClaim {
-  id: string;
-  username: string;
-  walletAddress: string;
-  status: "PENDING" | "APPROVED" | "REJECTED";
-  adminNotes: string | null;
-  reviewedAt: string | null;
-  createdAt: string;
-}
-
+export type { ApiUsernameClaim as UsernameClaim } from "@medialane/sdk";
 export type { ApiCreatorProfile as CreatorByUsername };
 
 export function useMyUsernameClaim() {
@@ -27,10 +17,8 @@ export function useMyUsernameClaim() {
     hasWallet ? "username-claim-me" : null,
     async () => {
       const token = getValidToken() ?? (await signIn());
-      return apiFetch<{ username: string | null; claim: UsernameClaim | null }>(
-        "/v1/username-claims/me",
-        { bearer: token }
-      );
+      if (!token) throw new Error("Wallet sign-in is required");
+      return getMedialaneClient().api.getMyUsernameClaim(token);
     },
     { revalidateOnFocus: false, shouldRetryOnError: false }
   );
@@ -38,28 +26,19 @@ export function useMyUsernameClaim() {
   return { username: data?.username ?? null, claim: data?.claim ?? null, isLoading, error, mutate };
 }
 
-export async function checkUsernameAvailability(
-  username: string
-): Promise<{ available: boolean; reason?: string }> {
-  return apiFetch<{ available: boolean; reason?: string }>(
-    `/v1/username-claims/check/${encodeURIComponent(username)}`
-  );
+export function checkUsernameAvailability(username: string): Promise<{ available: boolean; reason?: string }> {
+  return getMedialaneClient().api.checkUsernameAvailability(username);
 }
 
 export async function submitUsernameClaim(
   username: string,
   token: string,
   notifyEmail?: string
-): Promise<{ claim?: UsernameClaim; error?: string }> {
+): Promise<{ claim?: ApiUsernameClaim; error?: string }> {
   try {
-    const json = await apiFetch<{ claim: UsernameClaim }>("/v1/username-claims", {
-      method: "POST",
-      bearer: token,
-      body: { username, ...(notifyEmail ? { notifyEmail } : {}) },
-    });
-    return { claim: json.claim };
+    return { claim: await getMedialaneClient().api.submitUsernameClaim(username, token, notifyEmail) };
   } catch (err) {
-    return { error: err instanceof ApiError ? err.message : "Failed to submit claim" };
+    return { error: err instanceof Error ? err.message : "Failed to submit claim" };
   }
 }
 

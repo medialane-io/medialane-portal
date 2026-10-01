@@ -10,7 +10,7 @@ import { useSiwsToken } from "@/hooks/use-siws-token";
 import { topUpUsdcFor } from "@/lib/funding/amount";
 import { portalFundingApi } from "@/lib/funding/api";
 import { mediaWalletFundingWallet } from "@/lib/funding/wallets";
-import type { LaunchpadRun, RunQuote, RunsClient } from "@/lib/launchpad/runs-client";
+import type { LaunchpadRun, RunQuote, LaunchpadRunsClient } from "@medialane/sdk";
 
 export function quoteByLabel(quote: RunQuote): { label: string; credits: number }[] {
   const totals = new Map<string, number>();
@@ -33,7 +33,7 @@ export function CheckoutPanel({
   quote: RunQuote;
   balance: number | undefined;
   signer: StarknetVenueSigner | null;
-  client: RunsClient;
+  client: LaunchpadRunsClient;
   onPaid: (run: LaunchpadRun) => void;
 }) {
   const { getValidToken, signIn } = useSiwsToken();

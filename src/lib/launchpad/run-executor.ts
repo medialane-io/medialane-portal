@@ -1,4 +1,4 @@
-import { isDataTokenizationRun, type ConfirmResult, type LaunchpadRun, type RunsClient } from "./runs-client";
+import { isDataTokenizationRun, type ConfirmResult, type LaunchpadRun, type LaunchpadRunsClient } from "@medialane/sdk";
 
 export type RunEvent =
   | { kind: "collection" }
@@ -21,7 +21,7 @@ export class StillConfirmingError extends Error {
 }
 
 export interface ExecutorDeps {
-  client: Pick<RunsClient, "get" | "uploadUrl" | "uploaded" | "itemMetadata" | "confirmBatch" | "confirmCollection">;
+  client: Pick<LaunchpadRunsClient, "get" | "uploadUrl" | "uploaded" | "itemMetadata" | "confirmBatch" | "confirmCollection">;
   sponsored(base: string): Promise<string>;
   putFile(url: string, file: File): Promise<string>;
   wait(ms: number): Promise<void>;

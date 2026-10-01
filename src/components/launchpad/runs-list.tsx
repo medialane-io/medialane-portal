@@ -4,7 +4,7 @@ import Link from "next/link";
 import useSWR from "swr";
 import { usePortalSession } from "@/hooks/use-portal-account";
 import { useRunsClient } from "@/hooks/use-runs-client";
-import type { RunStatus } from "@/lib/launchpad/runs-client";
+import type { RunStatus } from "@medialane/sdk";
 
 const STATUS_LABEL: Record<RunStatus, string> = {
   DRAFT: "Draft",

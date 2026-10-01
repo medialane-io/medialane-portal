@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { unstable_cache } from "next/cache";
+import { getMedialaneClient } from "@/lib/medialane-client";
 import { canonical, buildSocialMetadata } from "@/lib/seo";
 import { tierRows, type MdlnTier } from "@/lib/mdln-tiers";
 import { LaunchpadCtaBanner } from "@medialane/ui";
@@ -50,15 +52,17 @@ interface PricingResponse {
   pricing: { default: number; rules: PricingRule[] };
 }
 
-async function livePricing(): Promise<PricingResponse | null> {
-  const base = process.env.NEXT_PUBLIC_MEDIALANE_BACKEND_URL ?? "https://api.medialane.io";
-  try {
-    const res = await fetch(`${base}/v1/pricing`, { next: { revalidate: 300 } });
-    return res.ok ? ((await res.json()) as PricingResponse) : null;
-  } catch {
-    return null;
-  }
-}
+const livePricing = unstable_cache(
+  async (): Promise<PricingResponse | null> => {
+    try {
+      return await getMedialaneClient().api.getPricing();
+    } catch {
+      return null;
+    }
+  },
+  ["pricing"],
+  { revalidate: 300 },
+);
 
 export default async function PricingPage() {
   const pricing = await livePricing();

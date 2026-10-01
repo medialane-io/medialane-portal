@@ -1,13 +1,18 @@
 "use client";
 
 import { useMemo } from "react";
+import { createLaunchpadRunsClient } from "@medialane/sdk";
 import { useSiwsToken } from "@/hooks/use-siws-token";
-import { createRunsClient } from "@/lib/launchpad/runs-client";
+import { MEDIALANE_BACKEND_URL } from "@/lib/constants";
 
 export function useRunsClient() {
   const { getValidToken, signIn } = useSiwsToken();
   return useMemo(
-    () => createRunsClient(async () => getValidToken() ?? (await signIn())),
+    () =>
+      createLaunchpadRunsClient({
+        baseUrl: MEDIALANE_BACKEND_URL,
+        getToken: async () => getValidToken() ?? (await signIn()),
+      }),
     [getValidToken, signIn],
   );
 }

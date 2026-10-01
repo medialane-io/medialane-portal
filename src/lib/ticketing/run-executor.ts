@@ -3,8 +3,8 @@ import {
   isTicketingRun,
   type ConfirmResult,
   type LaunchpadRun,
-  type RunsClient,
-} from "@/lib/launchpad/runs-client";
+  type LaunchpadRunsClient,
+} from "@medialane/sdk";
 
 export type TicketingEvent =
   | { kind: "collection" }
@@ -17,9 +17,9 @@ export type TicketingEvent =
   | { kind: "done" };
 
 export interface TicketingExecutorDeps extends Pick<ExecutorDeps, "wait" | "pollMs" | "maxPolls" | "userAddress"> {
-  client: Pick<RunsClient, "get"> &
+  client: Pick<LaunchpadRunsClient, "get"> &
     Pick<
-      RunsClient["ticketing"],
+      LaunchpadRunsClient["ticketing"],
       "uploadUrl" | "uploaded" | "metadata" | "resolveWallets" | "registerWallet" | "confirmCollection" | "confirmTier" | "confirmBatch"
     >;
   sponsored(base: string): Promise<string>;

@@ -22,7 +22,7 @@ import { DATA_TOKENIZATION_SERVICE } from "@/lib/portal-launchpad/collection-cop
 import { type TaskPhase } from "@/lib/portal-launchpad/task-progress";
 import { readManifest } from "@/lib/data-tokenization/manifest";
 import { defaultTerms, runSpec, type CollectionChoice, type Terms } from "@/lib/data-tokenization/spec";
-import { runBatchBase, runCollectionBase, type LaunchpadRun } from "@/lib/launchpad/runs-client";
+import type { LaunchpadRun } from "@medialane/sdk";
 import { executeRun, MissingFilesError, putFileToSignedUrl, type RunEvent } from "@/lib/launchpad/run-executor";
 
 function describe(event: RunEvent): string {
@@ -128,8 +128,8 @@ export function DataTokenizationTask() {
           client,
           files: new Map(files.map((f) => [f.name, f])),
           userAddress: address,
-          batchBase: runBatchBase,
-          collectionBase: runCollectionBase,
+          batchBase: client.runBatchBase,
+          collectionBase: client.runCollectionBase,
           putFile: (url, file) => putFileToSignedUrl(url, file),
           wait: (ms) => new Promise((resolve) => setTimeout(resolve, ms)),
           sponsored: async (base) => {

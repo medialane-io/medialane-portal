@@ -1,20 +1,22 @@
 "use client";
 
 import useSWR from "swr";
-import type { ApiPortalMe, ApiPortalKey, ApiPortalSpend, ApiCreditPayment } from "@medialane/sdk";
+import { MedialaneApiError, type ApiPortalMe, type ApiPortalKey, type ApiPortalSpend, type ApiCreditPayment } from "@medialane/sdk";
+import { getMedialaneClient } from "@/lib/medialane-client";
 import { useWalletNativeSession } from "./use-wallet-native-session";
 import { useSiwsToken } from "./use-siws-token";
 
-async function read<T>(url: string, token: string | null): Promise<T | null> {
-  const res = await fetch(url, {
-    cache: "no-store",
-    headers: token ? { authorization: `Bearer ${token}` } : undefined,
-  });
-  if (res.status === 401 || res.status === 403 || res.status === 404) return null;
-  if (!res.ok) throw new Error(`${url} failed`);
-  const body = (await res.json()) as { data: T };
-  return body.data;
+/** Signed-out, forbidden and not-yet-provisioned all read as "no data". */
+async function orNull<T>(request: Promise<{ data: T }>): Promise<T | null> {
+  try {
+    return (await request).data;
+  } catch (err) {
+    if (err instanceof MedialaneApiError && [401, 403, 404].includes(err.status)) return null;
+    throw err;
+  }
 }
+
+const api = () => getMedialaneClient().api;
 
 const quiet = { revalidateOnFocus: false, shouldRetryOnError: false } as const;
 
@@ -27,7 +29,7 @@ export function usePortalSession() {
     async () => {
       if (!hasWallet) return null;
       const token = getValidToken() ?? (await signIn());
-      return read<ApiPortalMe>("/api/proxy/v1/portal/me", token);
+      return orNull<ApiPortalMe>(api().getMe(token ?? undefined));
     },
     quiet,
   );
@@ -39,7 +41,7 @@ export function usePortalKeys(signedIn: boolean) {
   const { getValidToken } = useSiwsToken();
   return useSWR(
     signedIn ? "portal:keys" : null,
-    () => read<ApiPortalKey[]>("/api/proxy/v1/portal/keys", getValidToken()),
+    () => orNull<ApiPortalKey[]>(api().getApiKeys(getValidToken() ?? undefined)),
     quiet,
   );
 }
@@ -48,7 +50,7 @@ export function usePortalSpend(signedIn: boolean) {
   const { getValidToken } = useSiwsToken();
   return useSWR(
     signedIn ? "portal:spend" : null,
-    () => read<ApiPortalSpend>("/api/proxy/v1/portal/credits/spend", getValidToken()),
+    () => orNull<ApiPortalSpend>(api().getSpend(getValidToken() ?? undefined)),
     quiet,
   );
 }
@@ -57,7 +59,7 @@ export function usePortalCredits(signedIn: boolean) {
   const { getValidToken } = useSiwsToken();
   return useSWR(
     signedIn ? "portal:credits" : null,
-    () => read<ApiCreditPayment[]>("/api/proxy/v1/portal/credits/history", getValidToken()),
+    () => orNull<ApiCreditPayment[]>(api().getCreditHistory(getValidToken() ?? undefined)),
     quiet,
   );
 }

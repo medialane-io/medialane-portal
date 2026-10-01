@@ -2,7 +2,7 @@
 
 import { Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import type { LaunchpadRun } from "@/lib/launchpad/runs-client";
+import type { LaunchpadRun } from "@medialane/sdk";
 import { CatalogDrop } from "./catalog-section";
 
 export function itemCount(run: LaunchpadRun | null): number {
