@@ -36,7 +36,7 @@ export function saveAccountEmail(email: string): void {
 }
 
 export async function fetchAccountWalletAddress(): Promise<string | null> {
-  return getMedialaneClient().api.getSessionWallet().catch(() => null);
+  return (await getMedialaneClient().api.getSessionWallet().catch(() => null))?.walletAddress ?? null;
 }
 
 export async function adoptAccountWallet(): Promise<boolean> {
