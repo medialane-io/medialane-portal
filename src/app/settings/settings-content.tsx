@@ -9,7 +9,6 @@ import { shortenAddress } from "@medialane/sdk";
 import { ExportKeySection } from "@medialane/ui";
 import { loadSealedOwner } from "@/lib/wallet/store";
 import { unlockOwnerKey } from "@/lib/wallet/passkey";
-import { isRecoveryKeyForWallet } from "@medialane/sdk/starknet";
 import { friendlyErrorMessage } from "@/lib/friendly-error";
 
 export function SettingsContent() {
@@ -64,7 +63,7 @@ export function SettingsContent() {
         title="Export your key"
         description="Take a copy of the key that controls this account. Anyone holding it holds the account."
       >
-        <ExportKeySection loadSealed={loadSealedOwner} unlock={unlockOwnerKey} isRecoveryKey={isRecoveryKeyForWallet} describeError={friendlyErrorMessage} />
+        <ExportKeySection loadSealed={loadSealedOwner} unlock={unlockOwnerKey} describeError={friendlyErrorMessage} />
       </AccountSection>
     </main>
   );
