@@ -13,9 +13,10 @@ import { getMedialaneClient } from "@/lib/medialane-client";
 import { ValuePropCarousel } from "@/components/connect/value-prop-carousel";
 import { friendlyErrorMessage } from "@/lib/friendly-error";
 import { saveAccountAddress, saveAccountEmail } from "@/lib/wallet/account-wallet";
-import { notifyWalletChange, saveSealedOwner } from "@/lib/wallet/store";
+import { loadSealedOwner, notifyWalletChange, saveSealedOwner } from "@/lib/wallet/store";
 import { createOwnerKey } from "@/lib/wallet/passkey";
-import { adoptSessionWallet, setupSessionWalletKey } from "@medialane/sdk/starknet";
+import { removeDevice } from "@/lib/wallet/devices";
+import { adoptSessionWallet, claimSessionWallet } from "@medialane/sdk/starknet";
 import { safeRelativePath } from "@/lib/safe-redirect";
 import { useWalletNativeSession } from "@/hooks/use-wallet-native-session";
 import { useEmailVerificationStatus } from "@/hooks/use-email-verification-required";
@@ -152,12 +153,14 @@ function ConnectForm() {
         return;
       }
       if (wallet.needsKeySetup) {
-        await setupSessionWalletKey(api, wallet.walletAddress, {
+        await claimSessionWallet(api, wallet.walletAddress, {
           createOwnerKey,
+          loadOwner: loadSealedOwner,
           saveOwner: (sealed) => {
             saveSealedOwner(sealed);
             notifyWalletChange();
           },
+          removeOwner: removeDevice,
         });
       }
       router.push(redirectTo || "/account");
