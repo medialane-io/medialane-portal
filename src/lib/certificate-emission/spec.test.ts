@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { certificateEmissionRunSpec, existingChoice } from "./spec.js";
+import { certificateEmissionRunSpec, defaultTerms, existingChoice, withPreset } from "./spec.js";
 
 describe("certificateEmissionRunSpec", () => {
   test("omits artwork when none was chosen", () => {
@@ -9,6 +9,7 @@ describe("certificateEmissionRunSpec", () => {
       description: "",
       artwork: null,
       guests: ["a@x.com"],
+      terms: defaultTerms(),
     });
     expect(spec).not.toHaveProperty("artwork");
     expect(spec.guests).toEqual(["a@x.com"]);
@@ -23,7 +24,29 @@ describe("certificateEmissionRunSpec", () => {
       description: "",
       artwork: file,
       guests: ["a@x.com"],
+      terms: defaultTerms(),
     });
     expect(spec).toMatchObject({ artwork: { name: "a.png", type: "image/png" } });
+  });
+
+  test("royalty is always 0 — there is no transfer, so nothing to set a royalty on", () => {
+    const spec = certificateEmissionRunSpec({
+      collection: existingChoice({ collectionId: "1", contractAddress: "0x1" }),
+      name: "Course completion",
+      description: "",
+      artwork: null,
+      guests: ["a@x.com"],
+      terms: defaultTerms(),
+    });
+    expect(spec.terms.royalty).toBe(0);
+  });
+});
+
+describe("withPreset", () => {
+  test("choosing a license fills in commercialUse, derivatives and attribution from its preset", () => {
+    const terms = withPreset(defaultTerms(), "All Rights Reserved");
+    const preset = terms;
+    expect(preset.licenseType).toBe("All Rights Reserved");
+    expect(preset.commercialUse).toBe("No");
   });
 });
