@@ -7,10 +7,8 @@ export interface TicketingForm {
   name: string;
   description: string;
   artwork: File | null;
-  /** Local date-time text from the form, or empty. */
   validFrom: string;
   validUntil: string;
-  /** How many tickets exist, or empty to match the guest list. */
   supply: string;
   guests: string[];
   terms: {

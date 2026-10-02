@@ -35,7 +35,6 @@ const STEP_COPY: Record<FundingStep, string> = {
 
 const AMOUNT = /^\d{1,9}(\.\d{1,2})?$/;
 
-/** Tokens offered here. The backend decides what it accepts and credits what arrives at its dollar value. */
 const TOKENS = ["USDC", "ETH", "STRK", "USDT"] as const;
 type Token = (typeof TOKENS)[number];
 
@@ -45,7 +44,6 @@ function tokenMeta(symbol: Token) {
   return SUPPORTED_TOKENS.find((t) => t.symbol === symbol)!;
 }
 
-/** One line under a wallet: what it holds of the chosen token. */
 function WalletBalance({ token, owner }: { token: Token; owner: string | null }) {
   const meta = tokenMeta(token);
   const { rawBalance, isLoading } = useErc20Balance(meta.address, owner);
@@ -144,7 +142,6 @@ export function AddCredits({ balance, onCredited }: { balance: number | undefine
         setMessage("Your transfer is on chain and will be credited shortly. You can close this.");
       }
     } catch (err) {
-      // A short wallet is a step for the person to take, not a failure of ours, so it is not shown as an error.
       if (err instanceof InsufficientFundsError) setShortAtPayment(err);
       else setError(friendlyErrorMessage(err, "Could not complete the top-up."));
     } finally {

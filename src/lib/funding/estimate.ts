@@ -5,10 +5,6 @@ function formatEstimate(amount: number): string {
   return String(Number(amount.toFixed(places)));
 }
 
-/**
- * About how much of a token a dollar amount is, for showing before paying. The exact amount is fixed
- * by the backend when the top-up starts; this only tells the person what to expect.
- */
 export function tokenAmountEstimate(dollars: number, symbol: string, price: number | undefined): string | null {
   if (!Number.isFinite(dollars) || dollars <= 0) return null;
   const unitPrice = symbol === "USDC" ? 1 : price;
@@ -16,7 +12,6 @@ export function tokenAmountEstimate(dollars: number, symbol: string, price: numb
   return formatEstimate(dollars / unitPrice);
 }
 
-/** The same estimate in the token's smallest units, rounded up, for checking a balance before anything starts. */
 export function tokenAtomicEstimate(dollars: number, symbol: string, decimals: number, price: number | undefined): bigint | null {
   if (!Number.isFinite(dollars) || dollars <= 0) return null;
   const unitPrice = symbol === "USDC" ? 1 : price;

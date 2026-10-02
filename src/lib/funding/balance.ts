@@ -9,7 +9,6 @@ export const readTokenBalance: BalanceReader = async (token, owner) => {
   return BigInt(res[0]!) + (BigInt(res[1] ?? "0x0") << 128n);
 };
 
-/** Shows an amount with at most six places, rounded the way that never misleads: what you have down, what you need up. */
 export function formatUnits(value: bigint, decimals: number, round: "down" | "up"): string {
   const places = Math.min(6, decimals);
   const scale = 10n ** BigInt(decimals - places);
@@ -29,7 +28,6 @@ function tokenAt(address: string) {
   }
 }
 
-/** Raised when a wallet holds less of a token than the top-up asks for. Nothing was sent. */
 export class InsufficientFundsError extends FundingTransferNotSentError {
   constructor(
     readonly symbol: string | null,
@@ -45,7 +43,6 @@ export class InsufficientFundsError extends FundingTransferNotSentError {
   }
 }
 
-/** The words shown to a person whose wallet is short: which wallet, what they have, what they are adding, and what to do. */
 export function insufficientFundsCopy(err: InsufficientFundsError, where: string): { title: string; body: string } {
   const next = "lower the amount, or pay with another token.";
   if (!err.symbol) {
@@ -63,7 +60,6 @@ export function insufficientFundsCopy(err: InsufficientFundsError, where: string
   };
 }
 
-/** Checks a wallet holds an amount of a token. If the balance cannot be read it lets the payment go ahead: the wallet has the last word. */
 export async function assertHolds(
   tokenAddress: string,
   needed: bigint,
@@ -84,11 +80,6 @@ export async function assertHolds(
     : new InsufficientFundsError(null, null, null);
 }
 
-/**
- * Before the wallet is asked to sign, make sure it holds enough of the token. Throws the "not sent"
- * error, so the top-up is closed and the person is told what is short. If the balance cannot be read
- * it lets the payment go ahead: the wallet has the last word.
- */
 export async function assertWalletCanCover(
   call: FundingTransferCall,
   owner: string,

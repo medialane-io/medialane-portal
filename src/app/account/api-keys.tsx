@@ -23,7 +23,6 @@ export function ApiKeys() {
   const [plaintext, setPlaintext] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
 
-  /** Keys never expire and spend credits, so changing them always asks for the passkey. Nothing else in the portal does. */
   async function confirm(): Promise<string> {
     const token = await signIn().catch(() => null);
     if (!token) throw new Error(NOT_CONFIRMED);

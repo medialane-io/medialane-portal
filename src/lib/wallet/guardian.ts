@@ -1,7 +1,6 @@
 import type { SealedOwner } from "@medialane/sdk/starknet";
 import { mediaWallet } from "./client";
 
-/** Guardian recovery is not available yet: its controls are shown but disabled. */
 export const GUARDIAN_RECOVERY_AVAILABLE = false;
 
 export type { GuardianInfo, EscapeInfo } from "@medialane/sdk/starknet";

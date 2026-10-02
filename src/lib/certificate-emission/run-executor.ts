@@ -27,7 +27,6 @@ export interface CertificateEmissionExecutorDeps extends Pick<ExecutorDeps, "wai
     >;
   sponsored(base: string): Promise<string>;
   putFile(url: string, file: File): Promise<string>;
-  /** The artwork the recipient list's certificate carries, or null when the page was reloaded and it has to be attached again. */
   artwork: File | null;
   collectionBase(runId: string): string;
   batchBase(runId: string, index: number): string;
@@ -80,7 +79,6 @@ export async function executeCertificateEmissionRun(
 
       case "wallets": {
         const pending = await deps.client.resolveWallets(runId);
-        // Nothing left to prepare, yet the run still waits on wallets: one is stuck part-way, so looping would never end.
         if (pending.length === 0 && walletsResolved) {
           throw new Error("A recipient's wallet is still being prepared. Try again in a moment.");
         }

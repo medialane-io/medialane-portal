@@ -6,7 +6,6 @@ import { getMedialaneClient } from "@/lib/medialane-client";
 import { useWalletNativeSession } from "./use-wallet-native-session";
 import { useSiwsToken } from "./use-siws-token";
 
-/** Signed-out, forbidden and not-yet-provisioned all read as "no data". */
 async function orNull<T>(request: Promise<{ data: T }>): Promise<T | null> {
   try {
     return (await request).data;

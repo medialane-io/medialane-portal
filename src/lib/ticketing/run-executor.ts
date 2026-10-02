@@ -24,7 +24,6 @@ export interface TicketingExecutorDeps extends Pick<ExecutorDeps, "wait" | "poll
     >;
   sponsored(base: string): Promise<string>;
   putFile(url: string, file: File): Promise<string>;
-  /** The artwork the guest list's ticket carries, or null when the page was reloaded and it has to be attached again. */
   artwork: File | null;
   collectionBase(runId: string): string;
   tierBase(runId: string): string;
@@ -87,7 +86,6 @@ export async function executeTicketingRun(
 
       case "wallets": {
         const pending = await deps.client.resolveWallets(runId);
-        // Nothing left to prepare, yet the run still waits on wallets: one is stuck part-way, so looping would never end.
         if (pending.length === 0 && walletsResolved) {
           throw new Error("A guest's wallet is still being prepared. Try again in a moment.");
         }
