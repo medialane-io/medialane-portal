@@ -3,7 +3,8 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { ServiceFormShell, ClaimRail } from "@medialane/ui";
+import { ServiceFormShell, ClaimRail, CollapsibleSection } from "@medialane/ui";
+import { AI_POLICIES, GEOGRAPHIC_SCOPES, LICENSE_TYPES } from "@medialane/ui/data/ip";
 import { executeSponsored, type TypedDataSigner } from "@medialane/sdk/starknet";
 import { ArrowLeft, Award, Check, Layers, Loader2, ShieldCheck, Upload, Users, Wallet } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -14,7 +15,7 @@ import { usePortalSession } from "@/hooks/use-portal-account";
 import { useRunsClient } from "@/hooks/use-runs-client";
 import { CheckoutPanel } from "@/components/launchpad/checkout-panel";
 import { CollectionPicker } from "./collection-picker";
-import { Field } from "@/components/launchpad/form-fields";
+import { Choice, Field } from "@/components/launchpad/form-fields";
 import { TaskDialog } from "./task-dialog";
 import { parseRecipients, invalidRecipients } from "@/lib/portal-launchpad/provisioning";
 import { issuedSummary, type TaskPhase } from "@/lib/portal-launchpad/task-progress";
@@ -23,7 +24,7 @@ import { imageRejectionReason } from "@/lib/portal-launchpad/issuance-form";
 import type { LaunchpadRun } from "@medialane/sdk";
 import { MissingFilesError, putFileToSignedUrl } from "@/lib/launchpad/run-executor";
 import { executeCertificateEmissionRun, type CertificateEmissionEvent } from "@/lib/certificate-emission/run-executor";
-import { existingChoice, certificateEmissionRunSpec, type GroupChoice } from "@/lib/certificate-emission/spec";
+import { existingChoice, certificateEmissionRunSpec, defaultTerms, withPreset, type GroupChoice } from "@/lib/certificate-emission/spec";
 
 const CERTIFICATE_EMISSION_SERVICE = "certificate-emission";
 
@@ -69,6 +70,8 @@ export function CertificateEmissionTask() {
   const [artworkPreview, setArtworkPreview] = useState<string | null>(null);
   const [artworkError, setArtworkError] = useState<string | null>(null);
   const [guests, setGuests] = useState("");
+  const [terms, setTerms] = useState(defaultTerms);
+  const [termsOpen, setTermsOpen] = useState(false);
 
   const [run, setRun] = useState<LaunchpadRun | null>(null);
   const [phase, setPhase] = useState<TaskPhase>("idle");
@@ -127,6 +130,7 @@ export function CertificateEmissionTask() {
         description,
         artwork,
         guests: recipients.map((r) => r.value),
+        terms,
       });
       const saved =
         run?.status === "DRAFT"
@@ -355,6 +359,42 @@ export function CertificateEmissionTask() {
                 </div>
                 {artworkError ? <p className="text-sm text-destructive">{artworkError}</p> : null}
               </section>
+
+              <CollapsibleSection
+                open={termsOpen}
+                onOpenChange={setTermsOpen}
+                icon={<ShieldCheck className="h-4 w-4 text-primary" />}
+                label="Licensing terms"
+                hint={`${terms.licenseType} · AI ${terms.aiPolicy.toLowerCase()}`}
+              >
+                <p className="text-xs text-muted-foreground">These describe rights over the certificate&apos;s artwork and content — the certificate itself is soulbound and never trades.</p>
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <Field label="License">
+                    <Choice
+                      value={terms.licenseType}
+                      options={LICENSE_TYPES.map((l) => ({ value: l.value, label: l.label }))}
+                      onChange={(v) => setTerms((t) => withPreset(t, v))}
+                      disabled={busy}
+                    />
+                  </Field>
+                  <Field label="AI and data mining">
+                    <Choice
+                      value={terms.aiPolicy}
+                      options={AI_POLICIES}
+                      onChange={(v) => setTerms((t) => ({ ...t, aiPolicy: v as typeof t.aiPolicy }))}
+                      disabled={busy}
+                    />
+                  </Field>
+                  <Field label="Territory">
+                    <Choice
+                      value={terms.territory}
+                      options={GEOGRAPHIC_SCOPES}
+                      onChange={(v) => setTerms((t) => ({ ...t, territory: v }))}
+                      disabled={busy}
+                    />
+                  </Field>
+                </div>
+              </CollapsibleSection>
 
               <section className="space-y-4">
                 <div className="flex flex-wrap items-end justify-between gap-3">
