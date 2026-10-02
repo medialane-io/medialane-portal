@@ -15,6 +15,10 @@ export type CertificateEmissionEvent =
   | { kind: "confirming" }
   | { kind: "done" };
 
+export function transactionPacingMs(minMs = 1000, maxMs = 10000): number {
+  return minMs + Math.random() * (maxMs - minMs);
+}
+
 export interface CertificateEmissionExecutorDeps extends Pick<ExecutorDeps, "wait" | "pollMs" | "maxPolls" | "userAddress"> {
   client: Pick<LaunchpadRunsClient, "get"> &
     Pick<
@@ -83,6 +87,7 @@ export async function executeCertificateEmissionRun(
         walletsResolved = pending.length === 0;
         for (const [done, recipient] of pending.entries()) {
           onEvent({ kind: "wallets", done, total: pending.length });
+          await deps.wait(transactionPacingMs());
           await deps.client.registerWallet(runId, { recipient });
         }
         break;
@@ -90,6 +95,7 @@ export async function executeCertificateEmissionRun(
 
       case "batch":
         onEvent({ kind: "batch", index: next.index });
+        await deps.wait(transactionPacingMs());
         await deps.sponsored(deps.batchBase(runId, next.index));
         break;
 

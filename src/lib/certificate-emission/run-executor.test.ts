@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { executeCertificateEmissionRun, type CertificateEmissionExecutorDeps, type CertificateEmissionEvent } from "./run-executor";
+import { executeCertificateEmissionRun, transactionPacingMs, type CertificateEmissionExecutorDeps, type CertificateEmissionEvent } from "./run-executor";
 import { MissingFilesError, StillConfirmingError } from "@/lib/launchpad/run-executor";
 import type { CertificateEmissionNextStep, LaunchpadRun } from "@medialane/sdk";
 
@@ -7,6 +7,7 @@ const artwork = new File(["x"], "a.png", { type: "image/png" });
 
 function backend(steps: CertificateEmissionNextStep[], options: { pending?: string[]; polls?: number } = {}) {
   const calls: string[] = [];
+  const waits: number[] = [];
   let i = 0;
   let polls = options.polls ?? 0;
   const advance = () => void i++;
@@ -48,13 +49,13 @@ function backend(steps: CertificateEmissionNextStep[], options: { pending?: stri
     },
     sponsored: async (base) => (calls.push(`sponsored:${base}`), advance(), "0xtx"),
     putFile: async (url) => (calls.push(`put:${url}`), "bafy-cid-1234567"),
-    wait: async () => {},
+    wait: async (ms) => void waits.push(ms),
     artwork,
     userAddress: "0xowner",
     collectionBase: (id) => `/runs/${id}/collection`,
     batchBase: (id, index) => `/runs/${id}/batches/${index}`,
   };
-  return { deps, calls, advance };
+  return { deps, calls, waits, advance };
 }
 
 describe("executing a paid certificate-emission run", () => {
@@ -134,5 +135,24 @@ describe("executing a paid certificate-emission run", () => {
     const { deps, calls } = backend([{ kind: "done" }]);
     await executeCertificateEmissionRun("run1", deps);
     expect(calls).toEqual([]);
+  });
+
+  test("a wallet deployment and a batch are each paced with a random wait beforehand", async () => {
+    const { deps, waits, advance } = backend(
+      [{ kind: "wallets" }, { kind: "batch", index: 0 }, { kind: "wait", index: 0 }, { kind: "done" }],
+      { pending: ["ana@x.com"] },
+    );
+    const register = deps.client.registerWallet;
+    deps.client.registerWallet = async (id, request) => {
+      const result = await register(id, request);
+      advance();
+      return result;
+    };
+    await executeCertificateEmissionRun("run1", deps);
+    expect(waits).toHaveLength(2);
+    for (const ms of waits) {
+      expect(ms).toBeGreaterThanOrEqual(1000);
+      expect(ms).toBeLessThan(10000);
+    }
   });
 });
