@@ -1,5 +1,6 @@
 "use client";
 
+import { describeError } from "@medialane/ui";
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { Shield, ShieldAlert, ChevronRight, Loader2 } from "lucide-react";
@@ -9,7 +10,6 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { getGuardians, getEscape, cancelEscape, GUARDIAN_RECOVERY_AVAILABLE, type GuardianInfo, type EscapeInfo } from "@/lib/wallet/guardian";
 import { describeGuardianStatus, describeRecoveryAction } from "@medialane/sdk/starknet";
 import { loadSealedOwner } from "@/lib/wallet/store";
-import { friendlyErrorMessage } from "@/lib/friendly-error";
 import { AddGuardianDialog } from "./add-guardian-dialog";
 
 const short = (a: string) => `${a.slice(0, 6)}…${a.slice(-4)}`;
@@ -37,7 +37,7 @@ export function GuardianRecoverySection({ walletAddress }: { walletAddress: stri
       await cancelEscape(sealed);
       refresh();
     } catch (e) {
-      setCancelError(friendlyErrorMessage(e));
+      setCancelError(describeError(e, "We couldn't cancel recovery. Please try again.").message);
     } finally {
       setCancelBusy(false);
     }

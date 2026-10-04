@@ -1,14 +1,16 @@
 "use client";
 
+import { describeError } from "@medialane/ui";
 import { useState } from "react";
 import { Copy, KeyRound, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { usePortalKeys } from "@/hooks/use-portal-account";
 import { useSiwsToken } from "@/hooks/use-siws-token";
-import { friendlyErrorMessage } from "@/lib/friendly-error";
 import { getMedialaneClient } from "@/lib/medialane-client";
 import { MedialaneApiError } from "@medialane/sdk";
+
+export const MAX_API_KEYS = 5;
 
 const NOT_CONFIRMED = "We could not confirm it is you. Please try again.";
 
@@ -37,7 +39,7 @@ export function ApiKeys() {
       setPlaintext(body.data.plaintext);
       await mutate();
     } catch (err) {
-      toast.error(friendlyErrorMessage(err, "Could not create a key"));
+      toast.error(describeError(err, "Could not create a key").message);
     } finally {
       setBusy(false);
     }
@@ -50,7 +52,7 @@ export function ApiKeys() {
       await getMedialaneClient().api.deleteApiKey(id, token).catch(unconfirmed);
       await mutate();
     } catch (err) {
-      toast.error(friendlyErrorMessage(err, "Could not revoke that key"));
+      toast.error(describeError(err, "Could not revoke that key").message);
     } finally {
       setBusy(false);
     }
@@ -63,10 +65,10 @@ export function ApiKeys() {
           <h2 className="text-lg font-semibold">API keys</h2>
           <p className="text-sm text-muted-foreground">
             A key connects your app or the WordPress plugin to Medialane. Every request it makes is paid from this
-            account&apos;s credits. You can hold up to five keys.
+            account&apos;s credits. You can hold up to {MAX_API_KEYS} keys.
           </p>
         </div>
-        <Button onClick={create} disabled={busy} size="sm">
+        <Button onClick={create} disabled={busy || (keys?.length ?? 0) >= MAX_API_KEYS} size="sm">
           New key
         </Button>
       </div>

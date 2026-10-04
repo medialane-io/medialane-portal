@@ -1,5 +1,6 @@
 "use client";
 
+import { describeError } from "@medialane/ui";
 import { useCallback, useState } from "react";
 import { useWalletNativeSession } from "@/hooks/use-wallet-native-session";
 import { lockVenueSigner } from "@/lib/wallet/venue-signer";
@@ -8,7 +9,6 @@ import {
   requestSiwsToken,
   type SiwsSigner,
 } from "@/lib/siws-client";
-import { friendlyErrorMessage } from "@/lib/friendly-error";
 
 export class WalletNotDeployedError extends Error {
   constructor() {
@@ -39,7 +39,7 @@ export function useSiwsToken() {
       setToken(newToken);
       return newToken;
     } catch (err) {
-      const message = friendlyErrorMessage(err, "Account sign-in failed");
+      const message = describeError(err, "Account sign-in failed").message;
       setError(message);
       throw err instanceof Error ? err : new Error(message);
     } finally {

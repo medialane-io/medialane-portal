@@ -1,5 +1,6 @@
 "use client";
 
+import { describeError } from "@medialane/ui";
 import { useEffect, useState } from "react";
 import { AlertCircle, Info, Loader2, Wallet } from "lucide-react";
 import { toast } from "sonner";
@@ -14,7 +15,6 @@ import { useWalletNativeSession } from "@/hooks/use-wallet-native-session";
 import { useSiwsToken } from "@/hooks/use-siws-token";
 import { usdPriceFor, useUsdPrices } from "@/hooks/use-usd-prices";
 import { cn } from "@/lib/utils";
-import { friendlyErrorMessage } from "@/lib/friendly-error";
 import { portalFundingApi } from "@/lib/funding/api";
 import { formatUnits, InsufficientFundsError, insufficientFundsCopy } from "@/lib/funding/balance";
 import { tokenAmountEstimate, tokenAtomicEstimate } from "@/lib/funding/estimate";
@@ -114,7 +114,7 @@ export function AddCredits({ balance, onCredited }: { balance: number | undefine
       const funding = await connectExternalWallet(wallet);
       setConnected((prev) => ({ ...prev, [id]: funding }));
     } catch (err) {
-      setError(friendlyErrorMessage(err, `Could not connect to ${wallet.name}.`));
+      setError(describeError(err, `Could not connect to ${wallet.name}.`).message);
     } finally {
       setConnecting(null);
     }
@@ -143,7 +143,7 @@ export function AddCredits({ balance, onCredited }: { balance: number | undefine
       }
     } catch (err) {
       if (err instanceof InsufficientFundsError) setShortAtPayment(err);
-      else setError(friendlyErrorMessage(err, "Could not complete the top-up."));
+      else setError(describeError(err, "Could not complete the top-up.").message);
     } finally {
       setStep(null);
     }

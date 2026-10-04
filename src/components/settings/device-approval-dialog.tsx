@@ -1,5 +1,6 @@
 "use client";
 
+import { describeError } from "@medialane/ui";
 import { useState } from "react";
 import { Loader2, Smartphone, TriangleAlert } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -15,7 +16,6 @@ import {
 import { parsePairingPayload, type PairingPayload } from "@medialane/sdk/starknet";
 import { addDevice } from "@/lib/wallet/devices";
 import { loadSealedOwner } from "@/lib/wallet/store";
-import { friendlyErrorMessage } from "@/lib/friendly-error";
 
 export function DeviceApprovalDialog({
   open,
@@ -42,7 +42,7 @@ export function DeviceApprovalDialog({
     try {
       setPending(parsePairingPayload(raw.trim()));
     } catch (e) {
-      setError(friendlyErrorMessage(e));
+      setError(describeError(e, "That device code isn't valid. Check it and try again.").message);
     }
   };
 
@@ -57,7 +57,7 @@ export function DeviceApprovalDialog({
       onOpenChange(false);
       onApproved();
     } catch (e) {
-      setError(friendlyErrorMessage(e));
+      setError(describeError(e, "We couldn't approve that device. Please try again.").message);
     } finally {
       setBusy(false);
     }

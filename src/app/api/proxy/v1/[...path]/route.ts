@@ -1,5 +1,6 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { isSameOrigin } from "@medialane/sdk";
+import { MEDIALANE_BACKEND_URL } from "@/lib/constants";
 import { hasTraversalSegment, isPathAllowed } from "./allowlist";
 import {
   SESSION_COOKIE_NAME,
@@ -12,10 +13,7 @@ import {
   injectAccountToken,
 } from "./session-cookie";
 
-const BACKEND_URL =
-  process.env.MEDIALANE_API_URL ??
-  process.env.NEXT_PUBLIC_MEDIALANE_BACKEND_URL ??
-  "http://localhost:3001";
+const BACKEND_URL = MEDIALANE_BACKEND_URL;
 
 const UPSTREAM_TIMEOUT_MS = 55_000;
 

@@ -1,12 +1,12 @@
 "use client";
 
+import { describeError } from "@medialane/ui";
 import { useCallback, useEffect, useState } from "react";
 import { Loader2, Monitor, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { getOwners, describeDevices, canRemoveDevice, removeDevice, type DeviceEntry } from "@/lib/wallet/devices";
 import { loadSealedOwner } from "@/lib/wallet/store";
-import { friendlyErrorMessage } from "@/lib/friendly-error";
 import { DeviceApprovalDialog } from "./device-approval-dialog";
 
 const short = (v: string) => `${v.slice(0, 10)}…${v.slice(-6)}`;
@@ -44,7 +44,7 @@ export function DevicesSection({ walletAddress }: { walletAddress: string }) {
       await removeDevice(sealed, device.guid);
       refresh();
     } catch (e) {
-      setError(friendlyErrorMessage(e));
+      setError(describeError(e, "We couldn't remove that device. Please try again.").message);
     } finally {
       setBusyGuid(null);
     }

@@ -19,8 +19,8 @@
     "audit:dead-code": "npx knip"
   },
   "dependencies": {
-    "@medialane/sdk": "0.146.0",
-    "@medialane/ui": "0.172.0",
+    "@medialane/sdk": "0.151.0",
+    "@medialane/ui": "0.174.0",
     "@next/third-parties": "^16.2.6",
     "@radix-ui/react-dialog": "^1.1.15",
     "@radix-ui/react-slot": "^1.2.4",

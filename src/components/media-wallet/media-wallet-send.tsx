@@ -3,12 +3,11 @@
 import { useState } from "react";
 import { Account, CallData, cairo, validateAndParseAddress, type Call } from "starknet";
 import { parseAmount, formatAmount } from "@medialane/sdk";
-import { CurrencyIcon, ActionButton } from "@medialane/ui";
+import { ActionButton, CurrencyIcon, describeError } from "@medialane/ui";
 import { starknetProvider } from "@/lib/starknet";
 import { useWalletNativeSession } from "@/hooks/use-wallet-native-session";
 import { useErc20Balance, useTokenBalance } from "@/hooks/use-erc20-balance";
 import { useWalletWriteAction } from "@/hooks/use-wallet-write-action";
-import { friendlyErrorMessage } from "@/lib/friendly-error";
 import { fmt, short } from "@/lib/wallet-format";
 import { BackButton } from "./back-button";
 import { TrustNote } from "./action-button";
@@ -101,7 +100,7 @@ export function MediaWalletSend({
     setConfirmOpen(true);
     estimateSendFee(address, currency.address, to.trim(), amountRaw)
       .then((f) => setFee({ raw: f.feeRaw, unit: f.unit }))
-      .catch((e) => setFeeError(friendlyErrorMessage(e)));
+      .catch((e) => setFeeError(describeError(e, "We couldn't estimate the network fee. Please try again.").message));
   };
 
   const send = async () => {

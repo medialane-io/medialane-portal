@@ -1,5 +1,6 @@
 "use client";
 
+import { describeError } from "@medialane/ui";
 import { useCallback, useEffect, useState } from "react";
 import Image from "next/image";
 import type { ApiWalletActivity, ApiActivity } from "@medialane/sdk";
@@ -9,7 +10,6 @@ import { getMedialaneClient } from "@/lib/medialane-client";
 import { mergeActivityFeeds, type MergedActivityItem } from "@/lib/activity-feed";
 import { walletActivityTitle, walletActivitySubtitle, walletActivityAmount } from "@/lib/wallet-activity";
 import { short, when, explorerTxUrl, gateway, fmt } from "@/lib/wallet-format";
-import { friendlyErrorMessage } from "@/lib/friendly-error";
 import { BackButton } from "./back-button";
 import { WalletActivityIcon } from "./wallet-activity-icon";
 import { ActionModal } from "./action-modal";
@@ -48,7 +48,7 @@ export function MediaWalletActivity({ onNavigate }: { onNavigate: (view: MediaWa
         ]);
         if (live) setItems(mergeActivityFeeds(walletRes.data, protocolRes.data));
       } catch (e) {
-        if (live) setError(friendlyErrorMessage(e));
+        if (live) setError(describeError(e, "We couldn't load your activity. Please try again.").message);
       } finally {
         if (live) setLoading(false);
       }

@@ -1,5 +1,6 @@
 "use client";
 
+import { describeError } from "@medialane/ui";
 import { useState } from "react";
 import { Shield, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -14,7 +15,6 @@ import {
 import { setFirstGuardian } from "@/lib/wallet/guardian";
 import { isValidStarknetAddress } from "@/lib/wallet/account-ops";
 import type { SealedOwner } from "@/lib/wallet/passkey";
-import { friendlyErrorMessage } from "@/lib/friendly-error";
 
 interface AddGuardianDialogProps {
   open: boolean;
@@ -42,7 +42,7 @@ export function AddGuardianDialog({ open, onOpenChange, sealed, onAdded }: AddGu
       setPubkey("");
       onAdded();
     } catch (e) {
-      setError(friendlyErrorMessage(e));
+      setError(describeError(e, "We couldn't add that guardian. Please try again.").message);
     } finally {
       setBusy(false);
     }
