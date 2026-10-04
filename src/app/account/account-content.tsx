@@ -7,6 +7,9 @@ import { ApiKeys } from "./api-keys";
 import { HowItWorks } from "./how-it-works";
 import { AddCredits } from "@/components/funding/add-credits";
 import { Button } from "@/components/ui/button";
+import { RecoveryGate } from "@/components/settings/recovery-nudge";
+import { SecuritySummary } from "@/components/settings/security-summary";
+import { MissingKeyNotice, useMissingKey } from "@/components/wallet/missing-key-notice";
 
 const CREDITS_PER_USDC = 100;
 
@@ -20,6 +23,7 @@ function usd(credits: number): string {
 export function AccountContent() {
   const { signedIn, account, ready, hasWallet, error, refresh: refreshAccount } = usePortalSession();
   const { data: spend } = usePortalSpend(signedIn);
+  const missingKey = useMissingKey();
 
   if (!ready) return null;
 
@@ -43,9 +47,13 @@ export function AccountContent() {
         <p className="mt-3 text-sm text-muted-foreground">
           Sign in to see your credits, your keys and what you have spent.
         </p>
-        <Button asChild className="mt-5">
-          <Link href="/connect">Sign in</Link>
-        </Button>
+        {missingKey ? (
+          <MissingKeyNotice returnTo="/account" />
+        ) : (
+          <Button asChild className="mt-5">
+            <Link href="/connect">Sign in</Link>
+          </Button>
+        )}
       </main>
     );
   }
@@ -88,7 +96,11 @@ export function AccountContent() {
         </section>
       ) : null}
 
-      <AddCredits balance={account?.creditBalance} onCredited={() => refreshAccount()} />
+      <SecuritySummary />
+
+      <RecoveryGate>
+        <AddCredits balance={account?.creditBalance} onCredited={() => refreshAccount()} />
+      </RecoveryGate>
     </main>
   );
 }

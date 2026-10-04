@@ -159,7 +159,7 @@ export function MediaWalletHome({
 
       {needsEmailVerification && (
         <Link
-          href="/verify"
+          href="/settings/email"
           onClick={onClose}
           className="flex items-center gap-3 rounded-2xl px-4 py-3 transition-opacity hover:opacity-90"
           style={{ background: "linear-gradient(115deg, hsl(var(--brand-orange) / 0.12), hsl(var(--brand-maeve, 327 64% 67%) / 0.12))" }}
