@@ -1,39 +1,44 @@
 import type { Metadata } from "next";
 import { canonical, buildSocialMetadata } from "@/lib/seo";
 import { ServiceDetailPage, type ServiceDetailContent } from "@/components/services/service-detail-page";
+import { BERNE_COUNTRIES } from "@/lib/site";
 
-const title = "Tokenization for IP";
+const title = "IP protection";
 const description =
-  "Protect creative work worldwide: proof of authorship in minutes, plus licensing and catalog tracking, including for AI training use.";
+  "A permanent, verifiable record of authorship and date for creative work, with license terms and an AI policy attached.";
 
 export const metadata: Metadata = {
   title,
   description,
   alternates: canonical("/services/ip"),
-  ...buildSocialMetadata({ title, description, imageAlt: "Tokenization for IP" }),
+  ...buildSocialMetadata({ title, description, imageAlt: title }),
 };
 
 const content: ServiceDetailContent = {
-  title: "Protecting your creative work worldwide",
-  description:
-    "Ensure the authenticity, timestamping, and immutability of your media assets with blockchain technology. Register creative content, deliverables, contracts, and digital evidence quickly, securely, and with international legal validity.",
+  eyebrow: "Solutions",
+  title: "A record of authorship you can point to",
+  description: `Copyright under the Berne Convention applies automatically in ${BERNE_COUNTRIES} countries. A Medialane record gives you a permanent, verifiable account of who made a work and when, with the terms attached.`,
+  cta: { label: "Register work", href: "/launchpad/data-tokenization" },
   blocks: [
-    { eyebrow: "Worldwide compliance", title: "Legal recognition and global backing", description: "Every record receives tamper-proof blockchain verification and legally recognized timestamping, giving your intellectual property solid backing in courtrooms and arbitration." },
-    { title: "Global validity in 170+ countries", description: "Your creative assets and media rights are protected across Latin America, North America, Europe, and Asia under international intellectual property frameworks." },
-    { title: "Fast, digital workflow", description: "Complete asset registration in under 5 minutes through a streamlined, fully digital interface." },
-    { title: "Creative agencies & studios", description: "Protect campaign concepts, pitch decks, client mockups, and final deliverables before sharing them externally." },
-    { title: "Production houses & software developers", description: "Timestamp original soundtracks, video edits, script revisions, and proprietary source code with absolute proof of creation date." },
-    { title: "Corporate media teams & freelancers", description: "Organize client projects, track asset ownership transfers, and archive digital evidence like email threads or contract approvals." },
-    { eyebrow: "How it works, step 1", title: "Start a new record", description: "Onchain with our SDK, or with our apps at medialane.io or starknet.medialane.io." },
-    { eyebrow: "How it works, step 2", title: "Set ownership & visibility", description: "Select access permissions, tag co-creators or team members, and upload your files." },
-    { eyebrow: "How it works, step 3", title: "Confirm & issue onchain asset", description: "Review your details and finalize. Your file's cryptographic hash is etched onto the blockchain, generating an immutable certificate of ownership." },
+    { eyebrow: "Built for Berne", title: "Immutable by design", description: "Authorship and ownership claims live in content-addressed, immutable metadata, not in a database row that can be rewritten." },
+    { eyebrow: "Terms", title: "License and AI policy", description: "Choose the license, commercial use, derivatives, territory and royalty, and whether AI may use the work." },
+    { eyebrow: "Speed", title: "Under five minutes", description: "Register an asset through a fully digital flow, with no paperwork." },
+    { eyebrow: "Agencies and studios", title: "Before you share it", description: "Record campaign concepts, pitch decks and final deliverables before they leave your hands." },
+    { eyebrow: "Production and software", title: "Proof of creation date", description: "Timestamp soundtracks, edits, scripts and source code." },
+    { eyebrow: "Media teams and freelancers", title: "Keep the evidence", description: "Organize client work and archive digital evidence such as approvals and agreements." },
+  ],
+  steps: [
+    { title: "Start a record", description: "Use the Launchpad, or the SDK from your own system." },
+    { title: "Set ownership and terms", description: "Add your files and choose the license and AI policy." },
+    { title: "Pay once", description: "Pay with credits or USDC." },
+    { title: "Issue it onchain", description: "Approve the batch. Each item is minted to your wallet with its record." },
   ],
   secondaryCta: {
-    eyebrow: "AI Data & Training",
+    eyebrow: "AI data licensing",
     title: "Your catalog, licensed for AI",
-    description: "The same provenance and licensing that protects a single work also covers a whole catalog used for AI training.",
+    description: "The record that protects one work also covers a whole catalog used for AI training.",
     href: "/services/ai-data",
-    ctaLabel: "See AI Data & Training",
+    ctaLabel: "See AI data licensing",
   },
 };
 

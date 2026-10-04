@@ -14,12 +14,12 @@ const urbanist = Urbanist({ subsets: ["latin"], display: "swap", variable: "--fo
 export const metadata: Metadata = {
   metadataBase: new URL(APP_URL),
   title: {
-    default: "Medialane — Credits, API keys and the Launchpad",
+    default: "Medialane | Protect, license and monetize your IP onchain",
     template: "%s | Medialane",
   },
   description:
-    "Buy credits, hold an API key, and issue an asset to a list of people. No seed phrase — just a passkey.",
-  keywords: ["Launchpad", "Credits", "API", "Starknet", "IP", "Tickets"],
+    "Proof of authorship and license terms, including an AI policy, for the work you own. Issue to a list of people from the Launchpad, or build it into your product with one API.",
+  keywords: ["IP protection", "licensing", "AI data licensing", "tokenization", "Launchpad", "API", "Starknet", "Berne Convention"],
   authors: [{ name: "Medialane" }],
   icons: {
     icon: [
@@ -35,7 +35,7 @@ export const metadata: Metadata = {
     type: "website",
     locale: "en_US",
     title: "Medialane",
-    description: "Credits, API keys and the Launchpad, on Starknet",
+    description: "Protect, license and monetize your IP onchain",
     siteName: "Medialane",
     images: [{ url: "/og-image.jpg", width: 1200, height: 630, alt: "Medialane" }],
   },
@@ -66,11 +66,6 @@ const siteJsonLd = [
     "@type": "WebSite",
     name: "Medialane",
     url: APP_URL,
-    potentialAction: {
-      "@type": "SearchAction",
-      target: `${APP_URL}/search?q={search_term_string}`,
-      "query-input": "required name=search_term_string",
-    },
   },
 ];
 

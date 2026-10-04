@@ -6,7 +6,8 @@ import { LaunchpadCtaBanner } from "@medialane/ui";
 import { RunsList } from "@/components/launchpad/runs-list";
 
 const title = "Launchpad";
-const description = "Tokenize your catalog or issue tickets. Save a run, pay for it once, and pick it back up anytime.";
+const description =
+  "Register a catalog, issue tickets or issue certificates. Save a run, pay for it once, and pick it back up any time.";
 
 export const metadata: Metadata = {
   title,
@@ -23,8 +24,8 @@ export default function LaunchpadPage() {
           Issue your work
         </h1>
         <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-          Tokenize your catalog or issue tickets. Save a run, pay for it once, and pick it back up
-          anytime.
+          Register a catalog, issue tickets or issue certificates. Save a run, pay for it once, and
+          pick it back up any time. Everything is issued to your own wallet.
         </p>
       </section>
 
@@ -41,7 +42,7 @@ export default function LaunchpadPage() {
             <div className="space-y-1.5">
               <h2 className="font-semibold">Data Tokenization</h2>
               <p className="text-sm text-muted-foreground">
-                Tokenize a whole catalog into your own collection, with its licensing terms.
+                Register up to 500 items in one run, with license terms attached to each.
               </p>
             </div>
           </Link>
@@ -55,7 +56,7 @@ export default function LaunchpadPage() {
             <div className="space-y-1.5">
               <h2 className="font-semibold">IP Ticketing</h2>
               <p className="text-sm text-muted-foreground">
-                Issue on-chain tickets and distribute them to a list of recipients.
+                Issue tickets with their own supply and validity window, and send them to a guest list.
               </p>
             </div>
           </Link>
@@ -69,7 +70,7 @@ export default function LaunchpadPage() {
             <div className="space-y-1.5">
               <h2 className="font-semibold">Certificate Emission</h2>
               <p className="text-sm text-muted-foreground">
-                Issue on-chain certificates and distribute them to a list of recipients.
+                Issue non-transferable certificates and send them to a list of recipients.
               </p>
             </div>
           </Link>

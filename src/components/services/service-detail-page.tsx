@@ -1,5 +1,6 @@
-import { LaunchpadCtaBanner } from "@medialane/ui";
 import Link from "next/link";
+import { LaunchpadCtaBanner } from "@medialane/ui";
+import { CardGrid, InfoCard, PageBody, PageHero, Section, StepList } from "@/components/site/page-shell";
 
 export interface ServiceDetailBlock {
   eyebrow?: string;
@@ -8,9 +9,12 @@ export interface ServiceDetailBlock {
 }
 
 export interface ServiceDetailContent {
+  eyebrow?: string;
   title: string;
   description: string;
   blocks: ServiceDetailBlock[];
+  steps?: { title: string; description: string }[];
+  cta?: { label: string; href: string };
   secondaryCta?: {
     eyebrow: string;
     title: string;
@@ -23,26 +27,29 @@ export interface ServiceDetailContent {
 export function ServiceDetailPage({ content }: { content: ServiceDetailContent }) {
   return (
     <div className="pb-20">
-      <section className="w-full max-w-screen-2xl mx-auto px-4 sm:px-6 pt-16 sm:pt-24 text-center space-y-5">
-        <h1 className="font-display text-4xl md:text-6xl font-extrabold tracking-tight text-foreground">
-          {content.title}
-        </h1>
-        <p className="text-lg text-muted-foreground max-w-2xl mx-auto">{content.description}</p>
-      </section>
-
-      <div className="w-full max-w-screen-2xl mx-auto px-4 sm:px-6 space-y-10 sm:space-y-16 mt-16">
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <PageHero eyebrow={content.eyebrow} title={content.title} description={content.description}>
+        {content.cta ? (
+          <div>
+            <Link
+              href={content.cta.href}
+              className="inline-flex items-center rounded-lg bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90"
+            >
+              {content.cta.label}
+            </Link>
+          </div>
+        ) : null}
+      </PageHero>
+      <PageBody>
+        <CardGrid columns={3}>
           {content.blocks.map((block) => (
-            <div key={block.title} className="rounded-2xl border border-border/60 bg-card p-6 space-y-2">
-              {block.eyebrow ? (
-                <p className="text-xs font-semibold uppercase tracking-wide text-primary">{block.eyebrow}</p>
-              ) : null}
-              <h3 className="font-display text-lg font-bold text-foreground">{block.title}</h3>
-              <p className="text-sm text-muted-foreground">{block.description}</p>
-            </div>
+            <InfoCard key={block.title} eyebrow={block.eyebrow} title={block.title} description={block.description} />
           ))}
-        </div>
-
+        </CardGrid>
+        {content.steps ? (
+          <Section title="How it works">
+            <StepList steps={content.steps} />
+          </Section>
+        ) : null}
         {content.secondaryCta ? (
           <LaunchpadCtaBanner
             eyebrow={content.secondaryCta.eyebrow}
@@ -53,13 +60,12 @@ export function ServiceDetailPage({ content }: { content: ServiceDetailContent }
             tone="manage"
           />
         ) : null}
-
         <div className="text-center">
           <Link href="/services" className="text-sm font-medium text-primary hover:underline">
             All services
           </Link>
         </div>
-      </div>
+      </PageBody>
     </div>
   );
 }

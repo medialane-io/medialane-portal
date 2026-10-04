@@ -1,42 +1,43 @@
 import type { Metadata } from "next";
-import { canonical, buildSocialMetadata } from "@/lib/seo";
 import { LaunchpadCtaBanner } from "@medialane/ui";
+import { canonical, buildSocialMetadata } from "@/lib/seo";
+import { CardGrid, InfoCard, PageBody, PageHero, Section } from "@/components/site/page-shell";
 
-const title = "Platform";
+const title = "How Medialane works";
 const description =
-  "One shared, on-chain catalog behind every Medialane product and partner app: immutable contracts, a full replayable history, and the same record no matter which app reads it.";
+  "Immutable records, permissionless contracts and one shared catalog behind every Medialane product and partner app.";
 
 export const metadata: Metadata = {
   title,
   description,
   alternates: canonical("/platform"),
-  ...buildSocialMetadata({ title, description, imageAlt: "Medialane Platform" }),
+  ...buildSocialMetadata({ title, description, imageAlt: "How Medialane works" }),
 };
 
-const RULES = [
+const PRINCIPLES = [
   {
-    eyebrow: "01 · The rules",
+    eyebrow: "The record",
+    title: "Kept where it cannot be rewritten",
+    description:
+      "Authorship, date and license terms are stored in content-addressed, immutable metadata. The history of every asset, sale and license can be replayed from onchain events.",
+  },
+  {
+    eyebrow: "The contracts",
     title: "Set once, in public",
     description:
-      "Contracts are immutable and permissionless. Once deployed, they stay exactly as set, including for Medialane itself.",
+      "Contracts are immutable and permissionless. Once deployed they stay as they were set, including for Medialane itself.",
   },
   {
-    eyebrow: "02 · The record",
-    title: "Every asset, sale, and license, kept",
+    eyebrow: "The terms",
+    title: "License and AI policy, with the asset",
     description:
-      "The full history is searchable and could be rebuilt from nothing if it ever needed to be, replayed straight from on-chain events.",
+      "Every asset carries its license type, commercial use, derivatives, attribution, territory and royalty, and an AI policy of Allowed, Training Only or Not Allowed.",
   },
   {
-    eyebrow: "03 · The connection",
-    title: "One shared catalog",
+    eyebrow: "The catalog",
+    title: "One record, many apps",
     description:
-      "Any product, Medialane's own or a partner's, plugs into the same capabilities and the same catalog through the SDK. Every app built on Medialane, ours or a partner's, reads and writes through the same protocol.",
-  },
-  {
-    eyebrow: "04 · The apps",
-    title: "Different views, same record",
-    description:
-      "Medialane's apps and partner apps are just different ways of using the same underlying record. None of them can bend what it says.",
+      "Medialane's apps and partner apps read and write the same catalog through the SDK. Different views of one record, none of which can change what it says.",
   },
 ];
 
@@ -44,88 +45,63 @@ const HUBS = [
   {
     title: "Launchpad",
     description:
-      "Create and release something new: a collection, an edition, a membership, a ticket, a sponsorship offer, or a coin for your community.",
+      "Create and release something new: a catalog of registered work, a set of tickets, a batch of certificates, or any other protocol service.",
   },
   {
     title: "Marketplace",
     description:
-      "Buy, sell, and license everything issued on Medialane. A sale pays out the moment it completes, directly between buyer and seller, with no escrow holding funds in between.",
+      "Buy, sell and license what has been issued. A sale pays out the moment it completes, directly between buyer and seller, with no escrow holding funds in between.",
   },
 ];
 
 export default function PlatformPage() {
   return (
     <div className="pb-20">
-      <section className="w-full max-w-screen-2xl mx-auto px-4 sm:px-6 pt-16 sm:pt-24 text-center space-y-5">
-        <h1 className="font-display text-4xl md:text-6xl font-extrabold tracking-tight text-foreground">
-          How Medialane actually works
-        </h1>
-        <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-          Tokenization turns something you own into a digital record you can
-          trade, license, and verify on Starknet, secured by zero-knowledge
-          validity proofs at every step. It&apos;s the same idea behind
-          tokenizing real estate or bonds, applied to intellectual property.
-        </p>
-      </section>
-
-      <div className="w-full max-w-screen-2xl mx-auto px-4 sm:px-6 space-y-10 sm:space-y-16 mt-16">
-        <section className="space-y-6">
-          <div className="text-center space-y-2">
-            <h2 className="font-display text-2xl font-bold text-foreground">Four layers, one system</h2>
-            <p className="text-sm text-muted-foreground max-w-2xl mx-auto">
-              Authority only flows down. The chain is the only truth;
-              everything above it is a cache, a lens, or a view.
-            </p>
-          </div>
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {RULES.map((rule) => (
-              <div key={rule.title} className="rounded-2xl border border-border/60 bg-card p-6 space-y-2">
-                <p className="text-xs font-semibold uppercase tracking-wide text-primary">{rule.eyebrow}</p>
-                <h3 className="font-display text-lg font-bold text-foreground">{rule.title}</h3>
-                <p className="text-sm text-muted-foreground">{rule.description}</p>
-              </div>
+      <PageHero
+        title="How Medialane works"
+        description="Tokenization turns something you own into a digital record you can license, trade and verify on Starknet, secured by zero-knowledge validity proofs. It is the idea behind tokenizing real estate or bonds, applied to intellectual property."
+      />
+      <PageBody>
+        <Section title="Four ideas" description="What every Medialane product and partner app is built on.">
+          <CardGrid columns={4}>
+            {PRINCIPLES.map((item) => (
+              <InfoCard key={item.title} {...item} />
             ))}
-          </div>
-        </section>
+          </CardGrid>
+        </Section>
 
-        <section className="space-y-6">
-          <div className="text-center space-y-2">
-            <h2 className="font-display text-2xl font-bold text-foreground">Two hubs</h2>
-            <p className="text-sm text-muted-foreground max-w-2xl mx-auto">
-              Everything Medialane does falls into issuing an asset or trading one.
-            </p>
-          </div>
-          <div className="grid gap-4 sm:grid-cols-2 max-w-3xl mx-auto">
+        <Section title="Two hubs" description="Everything Medialane does is issuing an asset or trading one.">
+          <CardGrid columns={2}>
             {HUBS.map((hub) => (
-              <div key={hub.title} className="rounded-2xl border border-border/60 bg-card p-6 space-y-2">
-                <h3 className="font-display text-lg font-bold text-foreground">{hub.title}</h3>
-                <p className="text-sm text-muted-foreground">{hub.description}</p>
-              </div>
+              <InfoCard key={hub.title} title={hub.title} description={hub.description} />
             ))}
-          </div>
-        </section>
+          </CardGrid>
+        </Section>
 
-        <section className="max-w-2xl mx-auto text-center space-y-2">
-          <p className="text-xs font-semibold uppercase tracking-wide text-primary">Coming</p>
-          <h2 className="font-display text-2xl font-bold text-foreground">Value you can verify</h2>
-          <p className="text-sm text-muted-foreground">
-            Starknet&apos;s proof system will let Medialane attest to
-            real-world facts on-chain: how many times a song streamed, how
-            many times an article was cited. As those proofs accumulate, a
-            licensed asset&apos;s value becomes something anyone can verify
-            for themselves.
-          </p>
-        </section>
+        <Section
+          title="You are in control"
+          description="Medialane is not an intermediary. It sponsors transactions and runs the services, but it never holds your keys or your funds, and contracts settle payments directly."
+        >
+          <CardGrid columns={2}>
+            <InfoCard title="Your wallet" description="Assets are minted to a wallet only you control, secured with a passkey, Face ID or Touch ID. There is no seed phrase to lose." />
+            <InfoCard title="Your approval" description="You approve every batch of a run from your wallet before anything is issued." />
+          </CardGrid>
+        </Section>
+
+        <Section
+          title="On the roadmap: value you can verify"
+          description="Starknet's proof system will let Medialane attest to real-world facts onchain, such as how many times a song streamed or an article was cited. As those proofs accumulate, the value of a licensed asset becomes something anyone can verify for themselves."
+        />
 
         <LaunchpadCtaBanner
           eyebrow="Launchpad"
-          title="See what you can issue and trade today"
-          description="View Launchpad services."
+          title="See what you can issue today"
+          description="Data Tokenization, IP Ticketing and Certificate Emission, run on your credits."
           href="/services"
-          ctaLabel="View Launchpad services"
+          ctaLabel="View services"
           tone="manage"
         />
-      </div>
+      </PageBody>
     </div>
   );
 }

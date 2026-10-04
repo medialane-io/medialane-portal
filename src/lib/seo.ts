@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 
-export const APP_URL = (process.env.NEXT_PUBLIC_APP_URL || "https://medialane.io").replace(/\/$/, "");
+export const APP_URL = (process.env.NEXT_PUBLIC_APP_URL || "https://portal.medialane.io").replace(/\/$/, "");
 
 export function absoluteUrl(path = "/"): string {
   if (/^https?:\/\//i.test(path)) return path;

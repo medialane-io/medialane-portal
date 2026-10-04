@@ -1,10 +1,12 @@
 import type { Metadata } from "next";
-import { canonical, buildSocialMetadata } from "@/lib/seo";
 import { LaunchpadCtaBanner } from "@medialane/ui";
+import { canonical, buildSocialMetadata } from "@/lib/seo";
+import { CardGrid, InfoCard, PageBody, PageHero, Section, StepList } from "@/components/site/page-shell";
+import { DOCS_URL } from "@/lib/site";
 
 const title = "Developers";
 const description =
-  "A typed SDK, a service registry, and one metered API for every live service on the protocol: marketplace orders, collections, minting, metadata, and on-chain activity.";
+  "A typed SDK, a service registry and one metered API for every live service: registration, licensing, minting, marketplace orders, metadata and onchain activity.";
 
 export const metadata: Metadata = {
   title,
@@ -14,95 +16,77 @@ export const metadata: Metadata = {
 };
 
 const STEPS = [
-  { eyebrow: "Step 1", title: "Sign in, get an API key", description: "Any Starknet keypair works, human or agent. Provision credits and issue a key from your account dashboard." },
-  { eyebrow: "Step 2", title: "Read the service registry", description: "Every service, mip-erc721, ip-erc721, drop-collection, ip-tickets, ip-club, ip-sponsorship, creator-coin, and more, is described as structured JSON. No hardcoded per-route behavior to guess at." },
-  { eyebrow: "Step 3", title: "Call the API or sign an intent", description: "Read endpoints return indexed data directly. Write actions return ready-to-sign calldata; your key never leaves your device." },
+  { title: "Sign in and get a key", description: "Sign in with your email and a passkey, then create an API key from your account. You can hold up to five." },
+  { title: "Add credits", description: "Buy credits with USDC. Every call your keys make is paid from them, and they are shared by all your keys." },
+  { title: "Read the service registry", description: "Every service is described as structured data, so there is no per-route behavior to guess at." },
+  { title: "Call the API or sign an intent", description: "Reads return indexed data. Writes return calldata for you to sign, so your key never leaves your device." },
 ];
 
 const ENDPOINTS = [
-  { title: "Marketplace Orders", description: "Query active listings, bids, and completed sales. Filter by contract, token, or wallet." },
-  { title: "Collections & Drops", description: "Fetch collection metadata, floor prices, volume, and token inventories. Includes POP and Collection Drop sources." },
-  { title: "Launch & Mint", description: "Deploy collection contracts and mint assets programmatically. Get ready-to-sign calldata for on-chain deployment." },
-  { title: "Decentralized Metadata", description: "Resolve full metadata for any token, including license terms, remix history, and provenance." },
-  { title: "Onchain Activity", description: "Stream every event, from mints and transfers to sales, offers, and cancellations, indexed in real time." },
-  { title: "Trade Intents", description: "Sign a buy or sell order with your wallet, keeping your private key on your own device. Submit it for direct settlement." },
-  { title: "Tickets & Clubs", description: "Issue and query redeemable tickets and tiered membership cards, per-creator factories with full holder history." },
-  { title: "Sponsorship", description: "Direct-settlement sponsorship bids and licenses, no escrow, settled the moment a deal closes." },
-  { title: "Creator Coins", description: "Deploy and track fixed-supply creator coins, Ekubo-only, ownership renounced at launch." },
+  { title: "Metadata", description: "Upload and resolve metadata for any asset, including license terms, AI policy and provenance." },
+  { title: "Launch and mint", description: "Deploy collections and mint assets programmatically, with ready-to-sign calldata." },
+  { title: "Collections and tokens", description: "Collection metadata, token inventories and ownership, indexed from the chain." },
+  { title: "Onchain activity", description: "Mints, transfers, sales, offers and cancellations, indexed as they happen." },
+  { title: "Marketplace orders", description: "Query listings, bids and completed sales, and sign trade intents with your own wallet." },
+  { title: "Tickets and clubs", description: "Issue and query tickets and membership cards, with full holder history." },
+  { title: "Sponsorship", description: "Bids and licenses settled directly when a deal is accepted, with no escrow." },
+  { title: "Creator coins", description: "Deploy and track fixed-supply creator coins." },
 ];
 
 const CALLERS = [
-  { title: "Business", description: "Fully managed tokenization and monetization for schools, festivals, publishers, and rights holders." },
-  { title: "AI Agents", description: "Headless authentication and x402 pay-per-call access, the same fee schedule as a human integrator." },
+  { title: "Businesses", description: "Run Launchpad services on your credits, or call the same capabilities from your own systems." },
+  { title: "AI agents", description: "Authenticate headlessly with a keypair and pay per call over x402, at the same prices as a person." },
 ];
 
 export default function DevelopersPage() {
   return (
     <div className="pb-20">
-      <section className="w-full max-w-screen-2xl mx-auto px-4 sm:px-6 pt-16 sm:pt-24 text-center space-y-5">
-        <h1 className="font-display text-4xl md:text-6xl font-extrabold tracking-tight text-foreground">
-          One API for the whole protocol
-        </h1>
-        <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-          One API covers every live service: minting, marketplace orders,
-          licensing, drops, tickets, clubs, sponsorship, and coins. Sign in
-          to get a key and start building. Paid over x402, per call, the
-          same rail enterprises and AI agents both use.
-        </p>
-      </section>
+      <PageHero
+        title="One API for the whole protocol"
+        description="One API covers every live service. Sign in, get a key and start building. Paid per call, on the same rail businesses and AI agents both use."
+      >
+        <div className="flex flex-wrap items-center justify-center gap-3">
+          <a
+            href={DOCS_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center rounded-lg bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90"
+          >
+            Read the docs
+          </a>
+        </div>
+      </PageHero>
 
-      <div className="w-full max-w-screen-2xl mx-auto px-4 sm:px-6 space-y-10 sm:space-y-16 mt-16">
-        <section className="space-y-6">
-          <h2 className="font-display text-2xl font-bold text-foreground text-center">Get building in three steps</h2>
-          <div className="grid gap-4 sm:grid-cols-3">
-            {STEPS.map((step) => (
-              <div key={step.title} className="rounded-2xl border border-border/60 bg-card p-6 space-y-2">
-                <p className="text-xs font-semibold uppercase tracking-wide text-primary">{step.eyebrow}</p>
-                <h3 className="font-display text-lg font-bold text-foreground">{step.title}</h3>
-                <p className="text-sm text-muted-foreground">{step.description}</p>
-              </div>
-            ))}
-          </div>
-        </section>
+      <PageBody>
+        <Section title="Get building in four steps">
+          <StepList steps={STEPS} />
+        </Section>
 
-        <section className="space-y-6">
-          <h2 className="font-display text-2xl font-bold text-foreground text-center">Every live service, one API</h2>
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {ENDPOINTS.map((endpoint) => (
-              <div key={endpoint.title} className="rounded-2xl border border-border/60 bg-card p-6 space-y-2">
-                <h3 className="font-display text-lg font-bold text-foreground">{endpoint.title}</h3>
-                <p className="text-sm text-muted-foreground">{endpoint.description}</p>
-              </div>
+        <Section title="Every live service, one API">
+          <CardGrid columns={4}>
+            {ENDPOINTS.map((item) => (
+              <InfoCard key={item.title} {...item} />
             ))}
-          </div>
-        </section>
+          </CardGrid>
+        </Section>
 
-        <section className="space-y-6">
-          <div className="text-center space-y-2">
-            <h2 className="font-display text-2xl font-bold text-foreground">Built for every caller</h2>
-            <p className="text-sm text-muted-foreground max-w-2xl mx-auto">
-              The same registry and the same API, three different ways in.
-            </p>
-          </div>
-          <div className="grid gap-4 sm:grid-cols-2 max-w-3xl mx-auto">
-            {CALLERS.map((caller) => (
-              <div key={caller.title} className="rounded-2xl border border-border/60 bg-card p-6 space-y-2">
-                <h3 className="font-display text-lg font-bold text-foreground">{caller.title}</h3>
-                <p className="text-sm text-muted-foreground">{caller.description}</p>
-              </div>
+        <Section title="Built for every caller" description="The same registry and the same API, two ways in.">
+          <CardGrid columns={2}>
+            {CALLERS.map((item) => (
+              <InfoCard key={item.title} {...item} />
             ))}
-          </div>
-        </section>
+          </CardGrid>
+        </Section>
 
         <LaunchpadCtaBanner
-          eyebrow="Developers"
-          title="Sign in & get access"
-          description="Any Starknet keypair works, human or agent. Provision credits and issue a key from your account dashboard."
+          eyebrow="Get started"
+          title="Sign in and get a key"
+          description="Create an API key and add credits from your account."
           href="/account"
-          ctaLabel="Sign in & get access"
+          ctaLabel="Go to your account"
           tone="manage"
         />
-      </div>
+      </PageBody>
     </div>
   );
 }
