@@ -1,9 +1,9 @@
 "use client";
 
+import { EmailCodeEntry } from "@medialane/ui";
 import { useEffect, useState } from "react";
 import { Mail, CheckCircle2 } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
-import { EmailCodeEntry } from "@/components/connect/email-code-entry";
 import { useEmailCode } from "@/hooks/use-email-code";
 
 interface EmailVerifyDialogProps {

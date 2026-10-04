@@ -1,13 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { describeError, describeWalletFailure, detectPasskeySupport, isPasskeyCancelled } from "@medialane/ui";
+import { EmailCodeEntry, describeError, describeWalletFailure, detectPasskeySupport, isPasskeyCancelled } from "@medialane/ui";
 import { useCallback, useEffect, useReducer, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Input } from "@/components/ui/input";
 import { Loader2, AlertCircle, CheckCircle2 } from "lucide-react";
-import { EmailCodeEntry } from "@/components/connect/email-code-entry";
 import { getMedialaneClient } from "@/lib/medialane-client";
 import { saveAccountAddress, saveAccountEmail } from "@/lib/wallet/account-wallet";
 import { loadWalletAddress } from "@/lib/wallet/store";
