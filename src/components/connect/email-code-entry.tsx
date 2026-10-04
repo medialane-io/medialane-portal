@@ -4,7 +4,7 @@ import { Loader2, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
-import { canResendCode, canVerifyCode } from "@/lib/email-code";
+import { canResendCode, canVerifyCode } from "@medialane/ui";
 import type { EmailCode } from "@/hooks/use-email-code";
 
 interface EmailCodeEntryProps {

@@ -1,9 +1,8 @@
 "use client";
 
-import { describeError } from "@medialane/ui";
+import { describeError, emailCodeReducer, initialEmailCodeState, type EmailCodeState } from "@medialane/ui";
 import { useCallback, useEffect, useReducer } from "react";
 import { getMedialaneClient } from "@/lib/medialane-client";
-import { emailCodeReducer, initialEmailCodeState, type EmailCodeState } from "@/lib/email-code";
 
 export interface EmailCode {
   state: EmailCodeState;

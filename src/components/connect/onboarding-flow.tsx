@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { describeError } from "@medialane/ui";
+import { describeError, describeWalletFailure, detectPasskeySupport, isPasskeyCancelled } from "@medialane/ui";
 import { useCallback, useEffect, useReducer, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -21,8 +21,6 @@ import { mediaWallet } from "@/lib/wallet/client";
 import { adoptSessionWallet } from "@medialane/sdk/starknet";
 import { CONSUMER_APP_URL } from "@/lib/site";
 import { afterCodeVerified } from "@/lib/onboarding/decisions";
-import { describeWalletFailure, isPasskeyCancelled } from "@/lib/onboarding/failures";
-import { detectPasskeySupport } from "@/lib/onboarding/passkey-support";
 import { flowReducer, initialFlow, type OnboardingStep } from "@/lib/onboarding/flow";
 
 export type { OnboardingStep };
