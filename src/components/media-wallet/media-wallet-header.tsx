@@ -4,14 +4,12 @@ import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import useSWR from "swr";
-import { useMyUsernameClaim } from "@/hooks/use-username-claims";
 import { useSiwsToken } from "@/hooks/use-siws-token";
 import { getMedialaneClient } from "@/lib/medialane-client";
 import { short } from "@/lib/wallet-format";
 import { CopyIcon } from "./copy-icon";
 
 export function MediaWalletHeader({ address, onNavigate }: { address: string; onNavigate: () => void }) {
-  const { username } = useMyUsernameClaim();
   const { getValidToken } = useSiwsToken();
   const [copied, setCopied] = useState(false);
 
@@ -31,7 +29,7 @@ export function MediaWalletHeader({ address, onNavigate }: { address: string; on
     setTimeout(() => setCopied(false), 1500);
   };
 
-  const headline = username ? `@${username}` : short(address);
+  const headline = short(address);
   const verifiedEmail = wallet?.emailVerified ? wallet.email : null;
 
   return (
