@@ -1,5 +1,5 @@
 import { runEngine, walletsStep, type PollDeps } from "@/lib/launchpad/engine";
-import { artworkUploadStep, sharedSteps } from "@/lib/launchpad/steps";
+import { artworkUploadStep, pacedBy, sharedSteps } from "@/lib/launchpad/steps";
 import {
   isTicketingRun,
   type LaunchpadRunsClient,
@@ -82,6 +82,7 @@ export function executeTicketingRun(
       },
       tier: async (_next, id) => {
         onEvent({ kind: "tier" });
+        await pacedBy(deps)();
         await deps.sponsored(deps.tierBase(id));
       },
       "wait-tier": (_next, id) => confirm(() => deps.client.confirmTier(id)),
@@ -90,6 +91,7 @@ export function executeTicketingRun(
         register: (id, recipient) => deps.client.registerWallet(id, { recipient }),
         onProgress: (done, total) => onEvent({ kind: "wallets", done, total }),
         stalledMessage: "A guest's wallet is still being prepared. Try again in a moment.",
+        pace: pacedBy(deps),
       }),
     },
   });
