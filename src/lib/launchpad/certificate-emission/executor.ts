@@ -1,5 +1,5 @@
 import { runEngine, walletsStep, type PollDeps } from "@/lib/launchpad/engine";
-import { artworkUploadStep, sharedSteps } from "@/lib/launchpad/steps";
+import { artworkUploadStep, pacedBy, sharedSteps } from "@/lib/launchpad/steps";
 import {
   isCertificateEmissionRun,
   type CertificateEmissionNextStep,
@@ -35,10 +35,6 @@ export function describeCertificateEvent(event: CertificateEmissionEvent): strin
   }
 }
 
-export function transactionPacingMs(minMs = 1000, maxMs = 10000): number {
-  return minMs + Math.random() * (maxMs - minMs);
-}
-
 export interface CertificateEmissionExecutorDeps extends PollDeps {
   userAddress: string;
   client: Pick<LaunchpadRunsClient, "get"> &
@@ -58,8 +54,6 @@ export function executeCertificateEmissionRun(
   deps: CertificateEmissionExecutorDeps,
   onEvent: (event: CertificateEmissionEvent) => void = () => {},
 ): Promise<CertificateEmissionRun> {
-  const pace = () => deps.wait(transactionPacingMs());
-
   return runEngine<CertificateEmissionRun, CertificateEmissionNextStep>({
     runId,
     load: deps.client.get,
@@ -70,7 +64,6 @@ export function executeCertificateEmissionRun(
       ...sharedSteps({
         deps,
         emit: onEvent,
-        pace,
         collectionBase: deps.collectionBase,
         batchBase: deps.batchBase,
         confirmCollection: deps.client.confirmCollection,
@@ -86,7 +79,7 @@ export function executeCertificateEmissionRun(
         register: (id, recipient) => deps.client.registerWallet(id, { recipient }),
         onProgress: (done, total) => onEvent({ kind: "wallets", done, total }),
         stalledMessage: "A recipient's wallet is still being prepared. Try again in a moment.",
-        pace,
+        pace: pacedBy(deps),
       }),
     },
   });

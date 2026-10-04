@@ -10,10 +10,16 @@ export interface SharedStepOptions {
   batchBase(runId: string, index: number): string;
   confirmCollection(runId: string): Promise<ConfirmResult>;
   confirmBatch(runId: string, index: number): Promise<ConfirmResult>;
-  pace?: () => Promise<void>;
 }
 
-export function sharedSteps({ deps, emit, pace, ...o }: SharedStepOptions) {
+export function transactionPacingMs(minMs = 1000, maxMs = 10000): number {
+  return minMs + Math.random() * (maxMs - minMs);
+}
+
+export const pacedBy = (deps: Pick<PollDeps, "wait">) => () => deps.wait(transactionPacingMs());
+
+export function sharedSteps({ deps, emit, ...o }: SharedStepOptions) {
+  const pace = pacedBy(deps);
   const confirm = async (check: () => Promise<ConfirmResult>) => {
     emit({ kind: "confirming" });
     await untilConfirmed(deps, check);
@@ -28,7 +34,7 @@ export function sharedSteps({ deps, emit, pace, ...o }: SharedStepOptions) {
     "wait-collection": (_next: unknown, id: string) => confirm(() => o.confirmCollection(id)),
     batch: async (next: { index: number }, id: string) => {
       emit({ kind: "batch", index: next.index });
-      await pace?.();
+      await pace();
       await deps.sponsored(o.batchBase(id, next.index));
     },
     wait: (next: { index: number }, id: string) => confirm(() => o.confirmBatch(id, next.index)),

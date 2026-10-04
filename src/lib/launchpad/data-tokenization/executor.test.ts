@@ -129,4 +129,13 @@ describe("executeRun", () => {
     const error = await executeRun("run1", { ...backend.deps, maxPolls: 3 }).catch((e) => e);
     expect(error).toBeInstanceOf(StillConfirmingError);
   });
+
+  test("each batch is paced with a random wait before it is signed", async () => {
+    const backend = fakeBackend([{ kind: "batch", index: 0 }, { kind: "wait", index: 0 }, { kind: "done" }]);
+    const waits: number[] = [];
+    await executeRun("run1", { ...backend.deps, wait: async (ms) => void waits.push(ms) });
+    expect(waits).toHaveLength(1);
+    expect(waits[0]).toBeGreaterThanOrEqual(1000);
+    expect(waits[0]).toBeLessThan(10000);
+  });
 });

@@ -155,4 +155,25 @@ describe("executing a paid ticketing run", () => {
     await executeTicketingRun("run1", deps);
     expect(calls).toEqual([]);
   });
+
+  test("a wallet, the ticket tier and a batch are each paced with a random wait beforehand", async () => {
+    const { deps, advance } = backend(
+      [{ kind: "wallets" }, { kind: "tier" }, { kind: "batch", index: 0 }, { kind: "wait", index: 0 }, { kind: "done" }],
+      { pending: ["ana@x.com"] },
+    );
+    const waits: number[] = [];
+    deps.wait = async (ms) => void waits.push(ms);
+    const register = deps.client.registerWallet;
+    deps.client.registerWallet = async (id, request) => {
+      const result = await register(id, request);
+      advance();
+      return result;
+    };
+    await executeTicketingRun("run1", deps);
+    expect(waits).toHaveLength(3);
+    for (const ms of waits) {
+      expect(ms).toBeGreaterThanOrEqual(1000);
+      expect(ms).toBeLessThan(10000);
+    }
+  });
 });
