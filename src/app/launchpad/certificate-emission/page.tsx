@@ -1,7 +1,7 @@
 import { Suspense } from "react";
 import type { Metadata } from "next";
 import { canonical } from "@/lib/seo";
-import { CertificateEmissionTask } from "@/components/portal-launchpad/certificate-emission-task";
+import { CertificateEmissionTask } from "@/components/launchpad/certificate-emission-task";
 
 export const metadata: Metadata = {
   title: "Certificate Emission",

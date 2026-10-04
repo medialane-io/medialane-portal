@@ -17,6 +17,8 @@ const BACKEND_URL =
   process.env.NEXT_PUBLIC_MEDIALANE_BACKEND_URL ??
   "http://localhost:3001";
 
+const UPSTREAM_TIMEOUT_MS = 55_000;
+
 const HOP_BY_HOP_HEADERS = new Set([
   "connection",
   "keep-alive",
@@ -44,10 +46,8 @@ async function handle(
 
   const apiKey = process.env.MEDIALANE_API_KEY;
   if (!apiKey) {
-    return NextResponse.json(
-      { error: "MEDIALANE_API_KEY is not configured on the server" },
-      { status: 500 },
-    );
+    console.error("[/api/proxy] MEDIALANE_API_KEY is not configured");
+    return NextResponse.json({ error: "Service unavailable" }, { status: 500 });
   }
 
   const { path } = await ctx.params;
@@ -97,13 +97,22 @@ async function handle(
     body = await req.arrayBuffer();
   }
 
-  const res = await fetch(target, {
-    method: req.method,
-    headers: fwdHeaders,
-    body,
-    cache: "no-store",
-    redirect: "manual",
-  });
+  let res: Response;
+  try {
+    res = await fetch(target, {
+      method: req.method,
+      headers: fwdHeaders,
+      body,
+      cache: "no-store",
+      redirect: "manual",
+      signal: AbortSignal.timeout(UPSTREAM_TIMEOUT_MS),
+    });
+  } catch (e) {
+    if (e instanceof DOMException && e.name === "TimeoutError") {
+      return NextResponse.json({ error: "The service took too long to respond" }, { status: 504 });
+    }
+    throw e;
+  }
 
   const outHeaders = new Headers();
   for (const [k, v] of res.headers.entries()) {
