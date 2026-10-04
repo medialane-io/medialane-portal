@@ -1,5 +1,6 @@
 "use client";
 
+import { describeError } from "@medialane/ui";
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -22,7 +23,6 @@ import {
   type EscapeInfo,
 } from "@/lib/wallet/guardian";
 import { describeRecoveryAction, parseRecoveryKey, InvalidRecoveryKeyError } from "@medialane/sdk/starknet";
-import { friendlyErrorMessage } from "@/lib/friendly-error";
 import { isOwnerOf } from "@/lib/wallet/devices";
 
 type Mode = "choose" | "key" | "lost" | "guardian";
@@ -39,6 +39,15 @@ export default function RecoverPage() {
 
       {mode === "choose" && (
         <div className="flex flex-col gap-3">
+          <Link
+            href="/link-device"
+            className="rounded-2xl border border-border bg-card p-4 text-left transition-transform active:scale-[0.98]"
+          >
+            <p className="text-sm font-semibold">I still have another device</p>
+            <p className="mt-1 text-xs text-muted-foreground">
+              Approve this one from a phone or browser you already use.
+            </p>
+          </Link>
           <button
             onClick={() => setMode("key")}
             className="rounded-2xl border border-border bg-card p-4 text-left transition-transform active:scale-[0.98]"
@@ -108,12 +117,12 @@ function RecoveryKeyFlow({ onBack }: { onBack: () => void }) {
         return;
       }
       saveSealedOwner(sealed);
-      router.push("/portfolio");
+      router.push("/account");
     } catch (e) {
       if (e instanceof InvalidRecoveryKeyError) {
         setErr("That does not look like a recovery key. Check you copied all of it.");
       } else {
-        setErr(friendlyErrorMessage(e, "Could not restore your wallet. Please try again."));
+        setErr(describeError(e, "Could not restore your wallet. Please try again.").message);
       }
       setBusy(false);
     }
@@ -171,7 +180,7 @@ function LostWalletFlow({ onBack }: { onBack: () => void }) {
       saveSealedOwner(forLostWallet);
       setNewPubkey(sealed.ownerPubKey);
     } catch (e) {
-      setErr(friendlyErrorMessage(e));
+      setErr(describeError(e, "We couldn't create a new key for this wallet. Please try again.").message);
     } finally {
       setBusy(false);
     }
@@ -248,7 +257,7 @@ function GuardianFlow({ onBack }: { onBack: () => void }) {
       setEscape(e);
       setPeriodDays(Math.round(period / 86400));
     } catch (e) {
-      setErr(friendlyErrorMessage(e));
+      setErr(describeError(e, "We couldn't read this wallet's recovery status. Please try again.").message);
     }
   };
 
@@ -264,7 +273,7 @@ function GuardianFlow({ onBack }: { onBack: () => void }) {
       await triggerEscapeOwner(sealed, targetAddress.trim(), newOwnerPubkey.trim());
       await checkStatus();
     } catch (e) {
-      setErr(friendlyErrorMessage(e));
+      setErr(describeError(e, "We couldn't start recovery for this wallet. Please try again.").message);
     } finally {
       setBusy(null);
     }
@@ -278,7 +287,7 @@ function GuardianFlow({ onBack }: { onBack: () => void }) {
       await completeEscapeOwner(sealed, targetAddress.trim());
       await checkStatus();
     } catch (e) {
-      setErr(friendlyErrorMessage(e));
+      setErr(describeError(e, "We couldn't complete recovery for this wallet. Please try again.").message);
     } finally {
       setBusy(null);
     }
