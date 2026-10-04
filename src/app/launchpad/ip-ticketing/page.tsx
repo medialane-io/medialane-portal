@@ -1,7 +1,7 @@
 import { Suspense } from "react";
 import type { Metadata } from "next";
 import { canonical } from "@/lib/seo";
-import { IpTicketingTask } from "@/components/portal-launchpad/ip-ticketing-task";
+import { IpTicketingTask } from "@/components/launchpad/ip-ticketing-task";
 
 export const metadata: Metadata = {
   title: "IP Ticketing",

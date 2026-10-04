@@ -10,7 +10,7 @@ export function resolveRpcUrl(origin: string | undefined, backendUrl: string): s
 }
 
 export const RPC_PRIMARY_URL = resolveRpcUrl(
-  typeof window === "undefined" ? undefined : window.location.origin,
+  typeof window === "undefined" ? undefined : window.location?.origin,
   MEDIALANE_BACKEND_URL,
 );
 
