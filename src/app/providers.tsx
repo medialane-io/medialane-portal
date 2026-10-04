@@ -11,14 +11,14 @@ import { GoogleAnalytics } from "@next/third-parties/google";
 import { NavCommandMenu, NavBrandButton, ThemeAmbientBackground, SelfFundConsentDialog } from "@medialane/ui";
 import { NAV_COMMANDS } from "@/lib/nav-commands";
 import { AccountSyncOnLogin } from "@/components/shared/account-sync-on-login";
-import { UndeployedWalletRedirect } from "@/components/wallet/undeployed-wallet-redirect";
-import { EmailRequiredRedirect } from "@/components/wallet/email-required-redirect";
+import { OnboardingGate } from "@/components/wallet/onboarding-gate";
 import { NavThemeToggle } from "@/components/nav-theme-toggle";
 import { NavConnectButton } from "@/components/nav-connect-button";
 import { HeaderWalletTrigger } from "@/components/nav-wallet-trigger";
 import { MediaWalletOverlay } from "@/components/media-wallet/media-wallet-overlay";
 import { WalletNotDeployedError } from "@/hooks/use-siws-token";
 import { walletConsent } from "@/lib/wallet/client";
+import { DOCS_URL, PRIVACY_URL, TERMS_URL } from "@/lib/site";
 
 const GA_ID = process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS_ID;
 
@@ -64,17 +64,18 @@ function MainShell({ children }: { children: React.ReactNode }) {
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-muted-foreground">
             <p className="text-xs">© {new Date().getFullYear()} Medialane DAO</p>
             <nav className="flex items-center gap-4 flex-wrap justify-center">
-              <Link href="/platform" className="hover:text-foreground transition-colors">Platform</Link>
+              <Link href="/platform" className="hover:text-foreground transition-colors">How it works</Link>
               <Link href="/services" className="hover:text-foreground transition-colors">Services</Link>
               <Link href="/developers" className="hover:text-foreground transition-colors">Developers</Link>
-              <Link href="/agents" className="hover:text-foreground transition-colors">AI Agents</Link>
+              <Link href="/agents" className="hover:text-foreground transition-colors">AI agents</Link>
               <Link href="/infrastructure" className="hover:text-foreground transition-colors">Infrastructure</Link>
               <Link href="/launchpad" className="hover:text-foreground transition-colors">Launchpad</Link>
               <Link href="/account" className="hover:text-foreground transition-colors">Account</Link>
               <Link href="/pricing" className="hover:text-foreground transition-colors">Pricing</Link>
-              <a href="https://docs.medialane.io" target="_blank" rel="noopener noreferrer" className="hover:text-foreground transition-colors">Docs</a>
-              <a href="https://docs.medialane.io/guidelines/terms" target="_blank" rel="noopener noreferrer" className="hover:text-foreground transition-colors">Terms</a>
-              <a href="https://docs.medialane.io/guidelines/privacy" target="_blank" rel="noopener noreferrer" className="hover:text-foreground transition-colors">Privacy</a>
+              <Link href="/contact" className="hover:text-foreground transition-colors">Contact</Link>
+              <a href={DOCS_URL} target="_blank" rel="noopener noreferrer" className="hover:text-foreground transition-colors">Docs</a>
+              <a href={TERMS_URL} target="_blank" rel="noopener noreferrer" className="hover:text-foreground transition-colors">Terms</a>
+              <a href={PRIVACY_URL} target="_blank" rel="noopener noreferrer" className="hover:text-foreground transition-colors">Privacy</a>
               <a href="https://x.com/medialane_io" target="_blank" rel="noopener noreferrer" className="hover:text-foreground transition-colors">X</a>
             </nav>
             <div className="flex items-center gap-2">
@@ -122,8 +123,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
       >
         {GA_ID && <GoogleAnalytics gaId={GA_ID} />}
         <AccountSyncOnLogin />
-        <UndeployedWalletRedirect />
-        <EmailRequiredRedirect />
+        <OnboardingGate />
         <Shell>{children}</Shell>
         <SelfFundConsentDialog consent={walletConsent} />
         <Toaster
