@@ -4,7 +4,7 @@ import { AccountContent } from "./account-content";
 
 export const metadata: Metadata = {
   title: "Account",
-  description: "Your credits, your API keys, and what you have spent.",
+  description: "Your credits, your API key, and what you have spent.",
   alternates: canonical("/account"),
 };
 
