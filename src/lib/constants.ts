@@ -19,7 +19,7 @@ if (!isServer && MEDIALANE_API_KEY) {
   throw new Error(
     "MEDIALANE_API_KEY is non-empty in the browser bundle — the server-only " +
     "secret may be leaking. Check that no env var with a NEXT_PUBLIC_ prefix " +
-    "carries the tenant API key, and that the isServer branch above is intact."
+    "carries the API key, and that the isServer branch above is intact."
   );
 }
 
