@@ -10,9 +10,9 @@ import { useSiwsToken } from "@/hooks/use-siws-token";
 import { getMedialaneClient } from "@/lib/medialane-client";
 import { MedialaneApiError } from "@medialane/sdk";
 
-export const MAX_API_KEYS = 5;
-
 const NOT_CONFIRMED = "We could not confirm it is you. Please try again.";
+const REPLACE_WARNING =
+  "Replacing the key stops the current key working right away. Anything that uses it must be updated with the new key. Continue?";
 
 function unconfirmed(err: unknown): never {
   if (err instanceof MedialaneApiError && err.status === 401) throw new Error(NOT_CONFIRMED);
@@ -24,6 +24,7 @@ export function ApiKeys() {
   const { signIn } = useSiwsToken();
   const [plaintext, setPlaintext] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const hasKey = (keys?.length ?? 0) > 0;
 
   async function confirm(): Promise<string> {
     const token = await signIn().catch(() => null);
@@ -32,6 +33,7 @@ export function ApiKeys() {
   }
 
   async function create() {
+    if (hasKey && !window.confirm(REPLACE_WARNING)) return;
     setBusy(true);
     try {
       const token = await confirm();
@@ -39,20 +41,21 @@ export function ApiKeys() {
       setPlaintext(body.data.plaintext);
       await mutate();
     } catch (err) {
-      toast.error(describeError(err, "Could not create a key").message);
+      toast.error(describeError(err, "Could not create the key").message);
     } finally {
       setBusy(false);
     }
   }
 
-  async function revoke(id: string) {
+  async function remove(id: string) {
     setBusy(true);
     try {
       const token = await confirm();
       await getMedialaneClient().api.deleteApiKey(id, token).catch(unconfirmed);
+      setPlaintext(null);
       await mutate();
     } catch (err) {
-      toast.error(describeError(err, "Could not revoke that key").message);
+      toast.error(describeError(err, "Could not delete the key").message);
     } finally {
       setBusy(false);
     }
@@ -62,14 +65,14 @@ export function ApiKeys() {
     <section className="space-y-4">
       <div className="flex items-center justify-between gap-4">
         <div>
-          <h2 className="text-lg font-semibold">API keys</h2>
+          <h2 className="text-lg font-semibold">API key</h2>
           <p className="text-sm text-muted-foreground">
-            A key connects your app or the WordPress plugin to Medialane. Every request it makes is paid from this
-            account&apos;s credits. You can hold up to {MAX_API_KEYS} keys.
+            Your key connects your app or the WordPress plugin to Medialane. Every request it makes is paid from this
+            account&apos;s credits. An account has one key.
           </p>
         </div>
-        <Button onClick={create} disabled={busy || (keys?.length ?? 0) >= MAX_API_KEYS} size="sm">
-          New key
+        <Button onClick={create} disabled={busy} size="sm">
+          {hasKey ? "Replace key" : "Create key"}
         </Button>
       </div>
 
@@ -110,21 +113,21 @@ export function ApiKeys() {
                 size="sm"
                 variant="ghost"
                 disabled={busy}
-                onClick={() => revoke(key.id)}
-                aria-label={`Revoke key ${key.prefix}`}
+                onClick={() => remove(key.id)}
+                aria-label="Delete key"
               >
                 <Trash2 className="h-3.5 w-3.5" />
               </Button>
             </li>
           ))}
         </ul>
-        <p className="text-xs text-muted-foreground">Revoke a key to stop it working right away.</p>
+        <p className="text-xs text-muted-foreground">Delete the key to stop it working right away.</p>
         </div>
       ) : (
         <div className="rounded-xl border border-dashed border-border/60 p-8 text-center">
           <KeyRound className="mx-auto h-5 w-5 text-muted-foreground" />
-          <p className="mt-2 text-sm font-medium">No keys yet</p>
-          <p className="mt-1 text-sm text-muted-foreground">Create one to connect an app or the WordPress plugin.</p>
+          <p className="mt-2 text-sm font-medium">No key yet</p>
+          <p className="mt-1 text-sm text-muted-foreground">Create it to connect an app or the WordPress plugin.</p>
         </div>
       )}
     </section>
