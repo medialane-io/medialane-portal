@@ -45,7 +45,7 @@ export function AccountContent() {
       <main className="container mx-auto max-w-2xl px-4 py-24 text-center">
         <h1 className="text-2xl font-bold tracking-tight">Account</h1>
         <p className="mt-3 text-sm text-muted-foreground">
-          Sign in to see your credits, your keys and what you have spent.
+          Sign in to see your credits, your key and what you have spent.
         </p>
         {missingKey ? (
           <MissingKeyNotice returnTo="/account" />
@@ -62,7 +62,7 @@ export function AccountContent() {
     <main className="container mx-auto max-w-3xl space-y-10 px-4 py-16">
       <header className="space-y-2">
         <h1 className="text-3xl font-bold tracking-tight">Account</h1>
-        <p className="text-muted-foreground">Your keys, and the credits they spend.</p>
+        <p className="text-muted-foreground">Your key, and the credits it spends.</p>
       </header>
 
       <HowItWorks />
@@ -78,7 +78,7 @@ export function AccountContent() {
           {account ? usd(account.creditBalance) : "Loading"}
         </p>
         <p className="mt-3 text-sm text-muted-foreground">
-          Credits pay for every request your keys make. They are shared by all your keys.
+          Credits pay for every request your key makes.
         </p>
       </section>
 

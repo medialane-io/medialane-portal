@@ -40,7 +40,7 @@ export function RecoveryGate({ children }: { children: ReactNode }) {
       <div className="space-y-1">
         <h2 className="text-lg font-semibold">Set up recovery before adding credits</h2>
         <p className="text-sm text-muted-foreground">
-          Your credits and API keys are tied to this account&apos;s key. If you lose this device with no recovery in
+          Your credits and API key are tied to this account&apos;s key. If you lose this device with no recovery in
           place, you lose access to both.
         </p>
       </div>

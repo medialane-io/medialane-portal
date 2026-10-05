@@ -7,7 +7,7 @@ const STEPS = [
   },
   {
     title: "Add credits",
-    body: "Credits pay for what your keys do. One credit is one cent, and credits don't expire.",
+    body: "Credits pay for what your key does. One credit is one cent, and credits don't expire.",
   },
   {
     title: "Use the key",
