@@ -14,7 +14,7 @@ export function useAccountEmail() {
 
   const load = useCallback(async (token: string) => {
     const result = await getMedialaneClient().api.getMyWallet(token);
-    if (result) setStatus({ email: result.email ?? null, verified: result.emailVerified ?? false });
+    if (result) setStatus({ email: result.email ?? null, verified: !result.emailDeadline });
   }, []);
 
   useEffect(() => {
@@ -36,7 +36,7 @@ export function useAccountEmail() {
       if (!token) throw new Error("Not authenticated");
       const result = await getMedialaneClient().api.changeMyEmail(email, token);
       saveAccountEmail(email);
-      setStatus({ email: result.email, verified: result.emailVerified });
+      setStatus((s) => ({ email: result.email, verified: s?.verified ?? true }));
     },
     [getValidToken, signIn],
   );

@@ -27,6 +27,6 @@ export function useEmailVerificationStatus(): EmailVerificationStatus | null {
   if (!data) return null;
   return {
     email: data.email ?? null,
-    emailVerified: data.emailVerified ?? false,
+    emailVerified: !data.emailDeadline,
   };
 }
