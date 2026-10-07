@@ -30,7 +30,6 @@ export function MediaWalletHeader({ address, onNavigate }: { address: string; on
   };
 
   const headline = short(address);
-  const verifiedEmail = wallet?.emailVerified ? wallet.email : null;
 
   return (
     <header className="flex flex-col items-center gap-2 pt-6">
@@ -55,7 +54,7 @@ export function MediaWalletHeader({ address, onNavigate }: { address: string; on
           <CopyIcon className="shrink-0 opacity-50" />
         )}
       </button>
-      {verifiedEmail && <span className="text-xs text-muted-foreground">{verifiedEmail}</span>}
+      {wallet?.email && <span className="text-xs text-muted-foreground">{wallet.email}</span>}
     </header>
   );
 }
