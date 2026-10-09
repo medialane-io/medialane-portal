@@ -188,6 +188,12 @@ export function OnboardingFlow({ start = "email", redirectTo = null, onDone }: O
       <div className="w-full space-y-3">
         {errorBanner}
         {error ? (
+          <p className="text-xs text-muted-foreground">
+            Your account is saved. You can finish your wallet later by signing in with your email, here or on another
+            device.
+          </p>
+        ) : null}
+        {error ? (
           canRetry ? (
             <Button onClick={() => void runWalletSetup()} size="lg" className="w-full">
               Try again
