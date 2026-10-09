@@ -6,7 +6,7 @@
       "name": "medialane-portal",
       "dependencies": {
         "@medialane/sdk": "0.161.0",
-        "@medialane/ui": "0.178.0",
+        "@medialane/ui": "0.179.0",
         "@next/third-parties": "^16.2.6",
         "@radix-ui/react-dialog": "^1.1.15",
         "@radix-ui/react-slot": "^1.2.4",
@@ -180,7 +180,7 @@
 
     "@medialane/sdk": ["@medialane/sdk@0.161.0", "", { "dependencies": { "@noble/hashes": "^2.2.0", "@scure/base": "^2.2.0", "zod": "^3.23.8" }, "peerDependencies": { "@solana/web3.js": ">=1.90.0", "@stellar/stellar-sdk": ">=13.0.0", "starknet": ">=6.0.0", "viem": ">=2.0.0" }, "optionalPeers": ["@solana/web3.js", "@stellar/stellar-sdk", "starknet", "viem"] }, "sha512-wp0OJ//aaffh3NH8p+/jSYMpmeNyLZFbBoAt231IfWDy5t6stNvl8FF6CRGW5YtrOb3qmgPGPlgLq2lGhrKmCg=="],
 
-    "@medialane/ui": ["@medialane/ui@0.178.0", "", { "peerDependencies": { "@medialane/sdk": ">=0.161.0", "@radix-ui/react-checkbox": ">=1.1.0", "@radix-ui/react-collapsible": ">=1.1.0", "@radix-ui/react-dialog": ">=1.1.0", "@radix-ui/react-dropdown-menu": ">=2.1.0", "@radix-ui/react-label": ">=2.1.0", "@radix-ui/react-popover": ">=1.1.0", "@radix-ui/react-select": ">=2.1.0", "@radix-ui/react-slot": ">=1.1.0", "@radix-ui/react-switch": ">=1.1.0", "@radix-ui/react-tabs": ">=1.1.0", "class-variance-authority": ">=0.7.0", "clsx": ">=2.0.0", "cmdk": ">=1.0.0", "framer-motion": ">=10.0.0", "input-otp": ">=1.4.1", "lucide-react": ">=0.400.0", "next": ">=14.0.0", "next-themes": ">=0.3.0", "react": ">=18.0.0", "react-dom": ">=18.0.0", "react-hook-form": ">=7.50.0", "recharts": ">=2.0.0", "starknet": ">=8.0.0", "swr": ">=2.0.0", "tailwind-merge": ">=2.0.0", "zod": "^3.25.0" } }, "sha512-rw8xcUxdfGuXTBGSNzu+z/ftPrl5/45mJIrptHYrtqB5Nv9wvx4apFOFrUo3tWkuVY1e4koYVZuTa8BBUtoW6A=="],
+    "@medialane/ui": ["@medialane/ui@0.179.0", "", { "peerDependencies": { "@medialane/sdk": ">=0.161.0", "@radix-ui/react-checkbox": ">=1.1.0", "@radix-ui/react-collapsible": ">=1.1.0", "@radix-ui/react-dialog": ">=1.1.0", "@radix-ui/react-dropdown-menu": ">=2.1.0", "@radix-ui/react-label": ">=2.1.0", "@radix-ui/react-popover": ">=1.1.0", "@radix-ui/react-select": ">=2.1.0", "@radix-ui/react-slot": ">=1.1.0", "@radix-ui/react-switch": ">=1.1.0", "@radix-ui/react-tabs": ">=1.1.0", "class-variance-authority": ">=0.7.0", "clsx": ">=2.0.0", "cmdk": ">=1.0.0", "framer-motion": ">=10.0.0", "input-otp": ">=1.4.1", "lucide-react": ">=0.400.0", "next": ">=14.0.0", "next-themes": ">=0.3.0", "react": ">=18.0.0", "react-dom": ">=18.0.0", "react-hook-form": ">=7.50.0", "recharts": ">=2.0.0", "starknet": ">=8.0.0", "swr": ">=2.0.0", "tailwind-merge": ">=2.0.0", "zod": "^3.25.0" } }, "sha512-klVEHjoRcNioM5jtitZePowYbV8jU4RT07ZWWzIRNlPk3MMddfaDTa72vjDlxxHNnUtIux4q7agQhdHsvzghiA=="],
 
     "@napi-rs/wasm-runtime": ["@napi-rs/wasm-runtime@1.2.4", "", { "dependencies": { "@tybys/wasm-util": "^0.10.3" }, "peerDependencies": { "@emnapi/core": "^1.7.1 || ^2.0.0-alpha.4", "@emnapi/runtime": "^1.7.1 || ^2.0.0-alpha.4" } }, "sha512-AJxoUD2/15ESHbvpcyjU274nsAPLuOtPHCk0vKJM5pj//Fg/B1FXNWjPnXTT9PymCYYiHo4zPj0ZomXBKhoy7g=="],
 
