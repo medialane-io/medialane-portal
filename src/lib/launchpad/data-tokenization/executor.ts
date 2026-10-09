@@ -4,13 +4,14 @@ import {
   type LaunchpadRunsClient,
   type NextStep,
 } from "@medialane/sdk";
-import { MissingFilesError, runEngine, throwIfAborted, type PollDeps } from "@/lib/launchpad/engine";
-import { sharedSteps } from "@/lib/launchpad/steps";
+import { MissingFilesError, runEngine, throwIfAborted, walletsStep, type PollDeps } from "@/lib/launchpad/engine";
+import { pacedBy, sharedSteps } from "@/lib/launchpad/steps";
 
 export type RunEvent =
   | { kind: "collection" }
   | { kind: "upload"; name: string; done: number; total: number }
   | { kind: "metadata"; done: number; total: number }
+  | { kind: "wallets"; done: number; total: number }
   | { kind: "batch"; index: number }
   | { kind: "confirming" }
   | { kind: "done" };
@@ -23,6 +24,8 @@ export function describeRunEvent(event: RunEvent): string {
       return `Uploading ${event.name} (${event.done + 1} of ${event.total})`;
     case "metadata":
       return `Recording details (${event.done + 1} of ${event.total})`;
+    case "wallets":
+      return `Preparing guest ${event.done + 1} of ${event.total}`;
     case "batch":
       return `Confirm batch ${event.index + 1} in your wallet`;
     case "confirming":
@@ -33,7 +36,10 @@ export function describeRunEvent(event: RunEvent): string {
 }
 
 export interface ExecutorDeps extends PollDeps {
-  client: Pick<LaunchpadRunsClient, "get" | "uploadUrl" | "uploaded" | "itemMetadata" | "confirmBatch" | "confirmCollection">;
+  client: Pick<
+    LaunchpadRunsClient,
+    "get" | "uploadUrl" | "uploaded" | "itemMetadata" | "confirmBatch" | "confirmCollection" | "resolveGuests" | "registerGuest"
+  >;
   sponsored(base: string): Promise<string>;
   putFile(url: string, file: File): Promise<string>;
   files: Map<string, File>;
@@ -80,6 +86,13 @@ export function executeRun(
           await deps.client.itemMetadata(id, index, deps.userAddress);
         }
       },
+      wallets: walletsStep({
+        resolve: deps.client.resolveGuests,
+        register: (id, recipient) => deps.client.registerGuest(id, { recipient }),
+        onProgress: (done, total) => onEvent({ kind: "wallets", done, total }),
+        stalledMessage: "A guest's wallet is still being prepared. Try again in a moment.",
+        pace: pacedBy(deps),
+      }),
     },
   });
 }

@@ -25,6 +25,7 @@ function fakeBackend(steps: NextStep[]) {
     i++;
   };
   let pendingPolls = 0;
+  let pendingGuests: string[] = [];
 
   const deps: ExecutorDeps = {
     client: {
@@ -42,6 +43,13 @@ function fakeBackend(steps: NextStep[]) {
         return { pending: false, status: "SUCCEEDED" };
       },
       confirmCollection: async () => (calls.push("confirm:collection"), advance(), { pending: false, status: "SUCCEEDED" }),
+      resolveGuests: async () => (calls.push("resolve"), pendingGuests),
+      registerGuest: async (_id, request) => {
+        calls.push(`guest:${request.recipient}`);
+        pendingGuests = pendingGuests.filter((g) => g !== request.recipient);
+        if (pendingGuests.length === 0) advance();
+        return {} as never;
+      },
     },
     sponsored: async (base) => (calls.push(`sponsored:${base}`), advance(), "0xtx"),
     putFile: async (url) => (calls.push(`put:${url}`), `bafy-${url.split("/").pop()}`),
@@ -72,7 +80,12 @@ function fakeBackend(steps: NextStep[]) {
     },
   };
 
-  return { deps: withAdvancingUploads, calls, setPendingPolls: (n: number) => (pendingPolls = n) };
+  return {
+    deps: withAdvancingUploads,
+    calls,
+    setPendingPolls: (n: number) => (pendingPolls = n),
+    setPendingGuests: (guests: string[]) => (pendingGuests = guests),
+  };
 }
 
 describe("executeRun", () => {
@@ -137,5 +150,17 @@ describe("executeRun", () => {
     expect(waits).toHaveLength(1);
     expect(waits[0]).toBeGreaterThanOrEqual(1000);
     expect(waits[0]).toBeLessThan(10000);
+  });
+
+  test("prepares a wallet for each guest the run lists", async () => {
+    const backend = fakeBackend([{ kind: "wallets" }, { kind: "done" }]);
+    backend.setPendingGuests(["ana@x.com", "bruno@x.com"]);
+    const events: RunEvent[] = [];
+    await executeRun("run1", backend.deps, (e) => events.push(e));
+    expect(backend.calls).toEqual(["resolve", "guest:ana@x.com", "guest:bruno@x.com"]);
+    expect(events.filter((e) => e.kind === "wallets")).toEqual([
+      { kind: "wallets", done: 0, total: 2 },
+      { kind: "wallets", done: 1, total: 2 },
+    ]);
   });
 });

@@ -156,6 +156,21 @@ describe("when the passkey step fails", () => {
     await waitFor(() => expect(done).toEqual([{ celebrated: true }]));
     expect(completeDeployment).toHaveBeenCalledTimes(2);
   });
+
+  test("a passkey that can't protect a wallet keeps the account, says so, and retries only the wallet", async () => {
+    const unsupported = Object.assign(new Error("unsupported"), { name: "PasskeyUnsupportedError", reason: "no-prf" });
+    completeDeployment.mockImplementationOnce(async () => {
+      throw unsupported;
+    });
+    await enterEmail("no-prf@example.com");
+    await enterCode();
+    await waitFor(() => expect(screen.getByText(/Your account is saved/)).toBeTruthy());
+    expect(done).toEqual([]);
+    fireEvent.click(screen.getByRole("button", { name: "Try again" }));
+    await waitFor(() => expect(done).toEqual([{ celebrated: true }]));
+    expect(api.verifyEmailCode).toHaveBeenCalledTimes(1);
+    expect(completeDeployment).toHaveBeenCalledTimes(2);
+  });
 });
 
 describe("resuming wallet setup for an account that is already signed in", () => {
