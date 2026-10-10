@@ -4,7 +4,7 @@ import useSWR from "swr";
 import { MedialaneApiError, type ApiPortalMe, type ApiPortalKey, type ApiPortalSpend, type ApiCreditPayment } from "@medialane/sdk";
 import { getMedialaneClient } from "@/lib/medialane-client";
 import { useWalletNativeSession } from "./use-wallet-native-session";
-import { useSiwsToken } from "./use-siws-token";
+import { useSession } from "./use-session";
 
 async function orNull<T>(request: Promise<{ data: T }>): Promise<T | null> {
   try {
@@ -21,15 +21,11 @@ const quiet = { revalidateOnFocus: false, shouldRetryOnError: false } as const;
 
 export function usePortalSession() {
   const { hasWallet } = useWalletNativeSession();
-  const { getValidToken, signIn } = useSiwsToken();
+  const { session } = useSession();
 
   const { data, error, isLoading, mutate } = useSWR(
-    "portal:me",
-    async () => {
-      if (!hasWallet) return null;
-      const token = getValidToken() ?? (await signIn());
-      return orNull<ApiPortalMe>(api().getMe(token ?? undefined));
-    },
+    session ? "portal:me" : null,
+    () => orNull<ApiPortalMe>(api().getMe()),
     quiet,
   );
 
@@ -37,28 +33,25 @@ export function usePortalSession() {
 }
 
 export function usePortalKeys(signedIn: boolean) {
-  const { getValidToken } = useSiwsToken();
   return useSWR(
     signedIn ? "portal:keys" : null,
-    () => orNull<ApiPortalKey[]>(api().getApiKeys(getValidToken() ?? undefined)),
+    () => orNull<ApiPortalKey[]>(api().getApiKeys()),
     quiet,
   );
 }
 
 export function usePortalSpend(signedIn: boolean) {
-  const { getValidToken } = useSiwsToken();
   return useSWR(
     signedIn ? "portal:spend" : null,
-    () => orNull<ApiPortalSpend>(api().getSpend(getValidToken() ?? undefined)),
+    () => orNull<ApiPortalSpend>(api().getSpend()),
     quiet,
   );
 }
 
 export function usePortalCredits(signedIn: boolean) {
-  const { getValidToken } = useSiwsToken();
   return useSWR(
     signedIn ? "portal:credits" : null,
-    () => orNull<ApiCreditPayment[]>(api().getCreditHistory(getValidToken() ?? undefined)),
+    () => orNull<ApiCreditPayment[]>(api().getCreditHistory()),
     quiet,
   );
 }

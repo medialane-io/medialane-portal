@@ -6,7 +6,6 @@ const ready: OnboardingGateState = {
   hasWallet: true,
   isDeployed: true,
   isDeploying: false,
-  emailStatus: { email: "team@example.com", emailVerified: true },
 };
 
 const at = (state: Partial<OnboardingGateState>) => resolveOnboardingRedirect({ ...ready, ...state });
@@ -19,15 +18,15 @@ describe("someone with no wallet", () => {
 });
 
 describe("public pages", () => {
-  test("are never gated, even for a wallet that is not deployed or has no email", () => {
+  test("are never gated, even for a wallet that is not deployed", () => {
     for (const pathname of ["/", "/pricing", "/services", "/services/ip", "/developers", "/platform"]) {
-      expect(at({ pathname, isDeployed: false, emailStatus: { email: null, emailVerified: false } })).toBeNull();
+      expect(at({ pathname, isDeployed: false })).toBeNull();
     }
   });
 
   test("the account setup screens are never gated", () => {
     for (const pathname of ["/connect", "/wallet-onboarding", "/settings", "/settings/email", "/link-device", "/recover"]) {
-      expect(at({ pathname, isDeployed: false, emailStatus: { email: null, emailVerified: false } })).toBeNull();
+      expect(at({ pathname, isDeployed: false })).toBeNull();
     }
   });
 });
@@ -51,20 +50,6 @@ describe("the gated pages", () => {
 
   test("a wallet whose deployment is not known yet passes", () => {
     expect(at({ isDeployed: null })).toBeNull();
-  });
-
-  test("an account with no email is asked for one, then sent back", () => {
-    expect(at({ emailStatus: { email: null, emailVerified: false } })).toBe("/connect?redirect_url=%2Faccount");
-  });
-
-  test("an email status that has not loaded passes", () => {
-    expect(at({ emailStatus: null })).toBeNull();
-  });
-
-  test("the deployment comes before the email", () => {
-    expect(at({ isDeployed: false, emailStatus: { email: null, emailVerified: false } })).toBe(
-      "/wallet-onboarding?redirect_url=%2Faccount",
-    );
   });
 
   test("a look-alike path is not gated", () => {

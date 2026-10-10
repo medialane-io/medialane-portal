@@ -12,7 +12,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useErc20Balance } from "@/hooks/use-erc20-balance";
 import { useWalletNativeSession } from "@/hooks/use-wallet-native-session";
-import { useSiwsToken } from "@/hooks/use-siws-token";
 import { usdPriceFor, useUsdPrices } from "@/hooks/use-usd-prices";
 import { cn } from "@/lib/utils";
 import { portalFundingApi } from "@/lib/funding/api";
@@ -58,7 +57,6 @@ function WalletBalance({ token, owner }: { token: Token; owner: string | null })
 
 export function AddCredits({ balance, onCredited }: { balance: number | undefined; onCredited: () => void }) {
   const { signer, address: mediaAddress } = useWalletNativeSession();
-  const { getValidToken, signIn } = useSiwsToken();
   const usdPrices = useUsdPrices();
 
   const [amount, setAmount] = useState("10");
@@ -130,8 +128,7 @@ export function AddCredits({ balance, onCredited }: { balance: number | undefine
     setShortAtPayment(null);
     setStep("creating");
     try {
-      const session = getValidToken() ?? (await signIn().catch(() => null));
-      const result = await fundWithChainTransfer(portalFundingApi(session, token), wallet, {
+      const result = await fundWithChainTransfer(portalFundingApi(null, token), wallet, {
         amountUsdc: amount,
         onStep: setStep,
       });

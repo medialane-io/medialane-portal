@@ -80,11 +80,3 @@ describe("when the wallet step fails", () => {
   });
 });
 
-describe("adding an email to an account that has none", () => {
-  test("a failure shows the message and stays on the step, and trying again clears it", () => {
-    let s = run(fresh, { type: "needs-email" }, { type: "add-email-failed", message: "Couldn't save your email." });
-    expect(s).toMatchObject({ step: "add-email", error: "Couldn't save your email." });
-    s = run(s, { type: "add-email-submitted" });
-    expect(s).toMatchObject({ step: "add-email", error: null });
-  });
-});

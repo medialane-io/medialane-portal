@@ -1,32 +1,15 @@
 "use client";
 
-import useSWR from "swr";
-import { useSiwsToken } from "./use-siws-token";
-import { useWalletNativeSession } from "./use-wallet-native-session";
-import { getMedialaneClient } from "@/lib/medialane-client";
+import { useSession } from "./use-session";
 
 export interface EmailVerificationStatus {
   email: string | null;
   emailVerified: boolean;
+  deadline?: string | null;
 }
 
 export function useEmailVerificationStatus(): EmailVerificationStatus | null {
-  const { address } = useWalletNativeSession();
-  const { getValidToken } = useSiwsToken();
-
-  const { data } = useSWR(
-    address ? ["email-verification-required", address] : null,
-    async () => {
-      const token = getValidToken();
-      if (!token) return null;
-      return getMedialaneClient().api.getMyWallet(token);
-    },
-    { revalidateOnFocus: false, shouldRetryOnError: false }
-  );
-
-  if (!data) return null;
-  return {
-    email: data.email ?? null,
-    emailVerified: !data.emailDeadline,
-  };
+  const { session } = useSession();
+  if (!session) return null;
+  return { email: session.email, emailVerified: !session.emailDeadline, deadline: session.emailDeadline };
 }

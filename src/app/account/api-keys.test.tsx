@@ -15,11 +15,10 @@ const confirmReplace = mock((message?: unknown) => typeof message === "string");
 
 const real = {
   account: await import("@/hooks/use-portal-account"),
-  siws: await import("@/hooks/use-siws-token"),
 };
 
 mock.module("@/hooks/use-portal-account", () => ({ ...real.account, usePortalKeys: () => ({ data: keys, mutate }) }));
-mock.module("@/hooks/use-siws-token", () => ({ ...real.siws, useSiwsToken: () => ({ signIn }) }));
+mock.module("@/hooks/use-fresh-signature", () => ({ useFreshSignature: () => signIn }));
 mock.module("@/lib/medialane-client", () => ({ getMedialaneClient: () => ({ api }) }));
 
 const { ApiKeys } = await import("./api-keys");

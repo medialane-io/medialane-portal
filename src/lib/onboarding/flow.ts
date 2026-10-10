@@ -3,7 +3,6 @@ export type OnboardingStep =
   | "checking-email"
   | "code"
   | "verifying-code"
-  | "add-email"
   | "creating-passkey"
   | "deploying"
   | "signing-in"
@@ -30,9 +29,6 @@ export type FlowEvent =
   | { type: "wallet-progress"; step: "creating-passkey" | "deploying" | "signing-in" }
   | { type: "wallet-failed"; message: string; canRetry: boolean }
   | { type: "link-required" }
-  | { type: "needs-email" }
-  | { type: "add-email-submitted" }
-  | { type: "add-email-failed"; message: string }
   | { type: "needs-pairing"; walletAddress: string }
   | { type: "needs-setup-elsewhere" }
   | { type: "finished" };
@@ -67,12 +63,6 @@ export function flowReducer(state: FlowState, event: FlowEvent): FlowState {
       return { ...state, step: "creating-passkey", error: event.message, canRetry: event.canRetry };
     case "link-required":
       return { ...state, step: "email" };
-    case "needs-email":
-      return { ...state, step: "add-email" };
-    case "add-email-submitted":
-      return { ...state, error: null };
-    case "add-email-failed":
-      return { ...state, error: event.message };
     case "needs-pairing":
       return { ...state, step: "pair-or-recover", error: null, walletAddress: event.walletAddress };
     case "needs-setup-elsewhere":

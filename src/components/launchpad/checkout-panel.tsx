@@ -6,7 +6,6 @@ import type { StarknetVenueSigner } from "@medialane/sdk/starknet";
 import { Button } from "@/components/ui/button";
 import { labelForAction } from "@/lib/spend-labels";
 import { fundWithChainTransfer } from "@medialane/sdk/starknet";
-import { useSiwsToken } from "@/hooks/use-siws-token";
 import { topUpUsdcFor } from "@/lib/funding/amount";
 import { portalFundingApi } from "@/lib/funding/api";
 import { mediaWalletFundingWallet } from "@/lib/funding/wallets";
@@ -36,7 +35,6 @@ export function CheckoutPanel({
   client: LaunchpadRunsClient;
   onPaid: (run: LaunchpadRun) => void;
 }) {
-  const { getValidToken, signIn } = useSiwsToken();
   const [busy, setBusy] = useState<"credits" | "wallet" | null>(null);
   const [error, setError] = useState<string | null>(null);
   const shortfall = Math.max(0, quote.total - (balance ?? 0));
@@ -59,8 +57,7 @@ export function CheckoutPanel({
     setBusy("wallet");
     setError(null);
     try {
-      const token = getValidToken() ?? (await signIn().catch(() => null));
-      const funded = await fundWithChainTransfer(portalFundingApi(token), mediaWalletFundingWallet(signer), {
+      const funded = await fundWithChainTransfer(portalFundingApi(null), mediaWalletFundingWallet(signer), {
         amountUsdc: topUpUsdcFor(shortfall > 0 ? shortfall : quote.total),
       });
       if (funded.status !== "SETTLED") {

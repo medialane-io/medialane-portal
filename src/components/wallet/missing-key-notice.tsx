@@ -1,20 +1,14 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useWalletNativeSession } from "@/hooks/use-wallet-native-session";
-import { loadAccountAddress } from "@/lib/wallet/account-wallet";
+import { useSession } from "@/hooks/use-session";
 
 export function useMissingKey(): boolean {
   const { hasWallet } = useWalletNativeSession();
-  const [accountKnown, setAccountKnown] = useState(false);
-
-  useEffect(() => {
-    setAccountKnown(loadAccountAddress() !== null);
-  }, []);
-
-  return !hasWallet && accountKnown;
+  const { session } = useSession();
+  return !hasWallet && Boolean(session?.walletAddress);
 }
 
 export function MissingKeyNotice({ returnTo }: { returnTo: string }) {

@@ -12,25 +12,14 @@ import { EmailVerifyDialog } from "@/components/settings/email-verify-dialog";
 import { useAccountEmail } from "@/hooks/use-account-email";
 
 export default function EmailSettingsPage() {
-  const { status, unlock, markVerified, changeEmail } = useAccountEmail();
+  const { status, markVerified, changeEmail } = useAccountEmail();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [codeAlreadySent, setCodeAlreadySent] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
   const [input, setInput] = useState("");
-  const [busy, setBusy] = useState<"idle" | "saving" | "unlocking">("idle");
+  const [busy, setBusy] = useState<"idle" | "saving">("idle");
   const [error, setError] = useState<string | null>(null);
 
-  async function handleUnlock() {
-    setBusy("unlocking");
-    setError(null);
-    try {
-      await unlock();
-    } catch (err) {
-      setError(describeError(err, "We couldn't confirm it's you. Please try again.").message);
-    } finally {
-      setBusy("idle");
-    }
-  }
 
   async function handleChange() {
     const email = input.trim();
@@ -67,14 +56,7 @@ export default function EmailSettingsPage() {
           description="This is how you sign in on a new device."
         >
           {status === null ? (
-            <div className="space-y-3">
-              <p className="text-sm text-muted-foreground">Confirm it&apos;s you with your passkey to manage your email.</p>
-              {error ? <p className="text-sm text-destructive">{error}</p> : null}
-              <Button onClick={handleUnlock} disabled={busy === "unlocking"}>
-                {busy === "unlocking" ? <Loader2 className="mr-1.5 h-4 w-4 animate-spin" /> : null}
-                Continue
-              </Button>
-            </div>
+            <p className="text-sm text-muted-foreground">Loading…</p>
           ) : editOpen ? (
             <div className="space-y-3">
               <Input
