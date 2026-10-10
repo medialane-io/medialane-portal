@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { createOwnerKey, PasskeyCancelledError, type SealedOwner } from "@/lib/wallet/passkey";
 import { saveSealedOwner, notifyWalletChange } from "@/lib/wallet/store";
-import { loadAccountAddress } from "@/lib/wallet/account-wallet";
+import { useSession } from "@/hooks/use-session";
 import { isOwnerOf } from "@/lib/wallet/devices";
 import { safeRelativePath } from "@/lib/safe-redirect";
 import { encodePairingPayload, parseAccountAddress } from "@medialane/sdk/starknet";
@@ -27,9 +27,10 @@ export function LinkDeviceContent() {
   const [copied, setCopied] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  const { session } = useSession();
   useEffect(() => {
-    setAddress((current) => current || loadAccountAddress() || "");
-  }, []);
+    setAddress((current) => current || session?.walletAddress || "");
+  }, [session?.walletAddress]);
 
   const start = async () => {
     setError(null);

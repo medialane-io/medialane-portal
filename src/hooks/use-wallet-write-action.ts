@@ -7,7 +7,7 @@ import { starknetProvider } from "@/lib/starknet";
 import { useWalletNativeSession } from "./use-wallet-native-session";
 import { lockVenueSigner } from "@/lib/wallet/venue-signer";
 import { assertTransactionSucceeded } from "@medialane/sdk/starknet";
-import { loadAccountAddress } from "@/lib/wallet/account-wallet";
+import { useSession } from "@/hooks/use-session";
 
 const verifyOnStarknet = async (txHash: string): Promise<void> => {
   await assertTransactionSucceeded(starknetProvider, txHash);
@@ -19,6 +19,7 @@ export function useWalletWriteAction(
   verify: (txHash: string) => Promise<void> = verifyOnStarknet,
 ) {
   const { hasWallet, signer } = useWalletNativeSession();
+  const { session } = useSession();
   const [status, setStatus] = useState<WalletWriteStatus>("idle");
   const [txHash, setTxHash] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -27,7 +28,7 @@ export function useWalletWriteAction(
   const run = useCallback(
     async (execute: (signer: StarknetVenueSigner) => Promise<{ txHash: string } | void>) => {
       if (!hasWallet || !signer) {
-        if (loadAccountAddress()) {
+        if (session?.walletAddress) {
           setNeedsDeviceApproval(true);
           setError("This device needs to be approved before it can sign for your account.");
           setStatus("error");

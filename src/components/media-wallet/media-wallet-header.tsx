@@ -3,25 +3,15 @@
 import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import useSWR from "swr";
-import { useSiwsToken } from "@/hooks/use-siws-token";
-import { getMedialaneClient } from "@/lib/medialane-client";
+import { useSession } from "@/hooks/use-session";
 import { short } from "@/lib/wallet-format";
 import { CopyIcon } from "./copy-icon";
 
 export function MediaWalletHeader({ address, onNavigate }: { address: string; onNavigate: () => void }) {
-  const { getValidToken } = useSiwsToken();
+  const { session } = useSession();
   const [copied, setCopied] = useState(false);
 
-  const { data: wallet } = useSWR(
-    ["media-wallet-header-email", address],
-    async () => {
-      const token = getValidToken();
-      if (!token) return null;
-      return getMedialaneClient().api.getMyWallet(token);
-    },
-    { revalidateOnFocus: false, shouldRetryOnError: false }
-  );
+  const wallet = session;
 
   const copy = () => {
     navigator.clipboard?.writeText(address).catch(() => {});

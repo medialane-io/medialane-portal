@@ -6,7 +6,7 @@ import { Copy, KeyRound, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { usePortalKeys } from "@/hooks/use-portal-account";
-import { useSiwsToken } from "@/hooks/use-siws-token";
+import { useFreshSignature } from "@/hooks/use-fresh-signature";
 import { getMedialaneClient } from "@/lib/medialane-client";
 import { MedialaneApiError } from "@medialane/sdk";
 
@@ -21,13 +21,13 @@ function unconfirmed(err: unknown): never {
 
 export function ApiKeys() {
   const { data: keys, mutate } = usePortalKeys(true);
-  const { signIn } = useSiwsToken();
+  const signFresh = useFreshSignature();
   const [plaintext, setPlaintext] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const hasKey = (keys?.length ?? 0) > 0;
 
   async function confirm(): Promise<string> {
-    const token = await signIn().catch(() => null);
+    const token = await signFresh().catch(() => null);
     if (!token) throw new Error(NOT_CONFIRMED);
     return token;
   }

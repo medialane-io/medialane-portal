@@ -1,6 +1,5 @@
 import { afterEach, beforeEach, describe, expect, mock, test } from "bun:test";
 import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
-import { loadAccountEmail } from "@/lib/wallet/account-wallet";
 
 const WALLET = "0x01575d29b83d7828cd1d833ef785083b809adeb187b6ac14aab21db568f2bf02";
 
@@ -9,9 +8,10 @@ const api = {
   requestEmailCode: mock<(email: string) => Promise<object>>(async () => ({})),
   verifyEmailCode: mock<(email: string, code: string) => Promise<object>>(async () => ({})),
   upsertMyWallet: mock<(token: string, body: object) => Promise<object>>(async () => ({})),
+  getSessionWallet: () => getSessionWallet(),
 };
 const completeDeployment = mock<(onStep: (s: string) => void) => Promise<{ siwsToken: string }>>(async () => ({ siwsToken: "siws" }));
-const adoptSessionWallet = mock<() => Promise<{ walletAddress: string; needsKeySetup: boolean } | null>>(async () => null);
+const getSessionWallet = mock<() => Promise<{ walletAddress: string; needsKeySetup: boolean } | null>>(async () => null);
 let localAddress: string | null = null;
 
 const real = {
@@ -19,19 +19,16 @@ const real = {
   store: await import("@/lib/wallet/store"),
   confetti: await import("@/lib/confetti"),
   session: await import("@/hooks/use-wallet-native-session"),
-  emailStatus: await import("@/hooks/use-email-verification-required"),
-  siws: await import("@/hooks/use-siws-token"),
-  starknet: await import("@medialane/sdk/starknet"),
+  sessionHook: await import("@/hooks/use-session"),
 };
 
 mock.module("@/lib/medialane-client", () => ({ getMedialaneClient: () => ({ api }) }));
 mock.module("@/lib/wallet/client", () => ({ ...real.client, mediaWallet: { ...real.client.mediaWallet, completeDeployment } }));
-mock.module("@medialane/sdk/starknet", () => ({ ...real.starknet, adoptSessionWallet }));
 mock.module("@/lib/wallet/store", () => ({ ...real.store, loadWalletAddress: () => localAddress }));
 mock.module("@/lib/confetti", () => ({ ...real.confetti, fireConfetti: () => {} }));
 mock.module("@/hooks/use-wallet-native-session", () => ({ ...real.session, useWalletNativeSession: () => ({ hasWallet: false }) }));
-mock.module("@/hooks/use-email-verification-required", () => ({ ...real.emailStatus, useEmailVerificationStatus: () => null }));
-mock.module("@/hooks/use-siws-token", () => ({ ...real.siws, useSiwsToken: () => ({ getValidToken: () => null, signIn: async () => null }) }));
+let session: { email: string; walletAddress: string | null } | null = null;
+mock.module("@/hooks/use-session", () => ({ ...real.sessionHook, useSession: () => ({ session, isLoading: false }), refreshSession: async () => undefined }));
 
 const { OnboardingFlow } = await import("./onboarding-flow");
 
@@ -41,14 +38,15 @@ const onDone = (result: { celebrated: boolean }) => void done.push(result);
 beforeEach(() => {
   done.length = 0;
   localAddress = null;
+  session = null;
   for (const m of [api.checkEmail, api.requestEmailCode, api.verifyEmailCode, api.upsertMyWallet]) m.mockClear();
   completeDeployment.mockClear();
-  adoptSessionWallet.mockClear();
+  getSessionWallet.mockClear();
   localStorage.clear();
   api.checkEmail.mockImplementation(async () => ({ exists: false }));
   api.verifyEmailCode.mockImplementation(async () => ({}));
   completeDeployment.mockImplementation(async () => ({ siwsToken: "siws" }));
-  adoptSessionWallet.mockImplementation(async () => null);
+  getSessionWallet.mockImplementation(async () => null);
 });
 afterEach(cleanup);
 
@@ -67,6 +65,16 @@ async function enterCode(code = "123456") {
   fireEvent.change(input, { target: { value: code } });
 }
 
+describe("someone signed in whose account has no wallet yet", () => {
+  test("goes straight to the wallet step, with no code asked again", async () => {
+    session = { email: "signed-in@example.com", walletAddress: null };
+    render(<OnboardingFlow onDone={onDone} />);
+    await waitFor(() => expect(done).toEqual([{ celebrated: true }]));
+    expect(completeDeployment).toHaveBeenCalledTimes(1);
+    expect(api.requestEmailCode).not.toHaveBeenCalled();
+  });
+});
+
 describe("a new account", () => {
   test("proves the email with a code first, then makes a wallet, links it and celebrates", async () => {
     await enterEmail("new@example.com");
@@ -75,10 +83,9 @@ describe("a new account", () => {
     expect(api.checkEmail).toHaveBeenCalledWith("new@example.com");
     expect(api.requestEmailCode).toHaveBeenCalledWith("new@example.com");
     expect(api.verifyEmailCode).toHaveBeenCalledWith("new@example.com", "123456");
-    expect(adoptSessionWallet).not.toHaveBeenCalled();
+    expect(getSessionWallet).not.toHaveBeenCalled();
     expect(completeDeployment).toHaveBeenCalledTimes(1);
     expect(api.upsertMyWallet).toHaveBeenCalledTimes(1);
-    expect(loadAccountEmail()).toBe("new@example.com");
   });
 
   test("never makes a wallet before the code is verified", async () => {
@@ -95,7 +102,7 @@ describe("an address that already has an account", () => {
 
   test("on the device holding the key, signs in and finishes with no new wallet and no celebration", async () => {
     localAddress = WALLET;
-    adoptSessionWallet.mockImplementation(async () => ({ walletAddress: WALLET, needsKeySetup: false }));
+    getSessionWallet.mockImplementation(async () => ({ walletAddress: WALLET, needsKeySetup: false }));
     await enterEmail("back@example.com");
     await enterCode();
     await waitFor(() => expect(done).toEqual([{ celebrated: false }]));
@@ -103,7 +110,7 @@ describe("an address that already has an account", () => {
   });
 
   test("on a device with no key, offers pairing and recovery and keeps the return path", async () => {
-    adoptSessionWallet.mockImplementation(async () => ({ walletAddress: WALLET, needsKeySetup: false }));
+    getSessionWallet.mockImplementation(async () => ({ walletAddress: WALLET, needsKeySetup: false }));
     await enterEmail("newdevice@example.com", "/launchpad");
     await enterCode();
     const pair = await screen.findByRole("link", { name: "Approve this device from another one" });
@@ -121,7 +128,7 @@ describe("an address that already has an account", () => {
   });
 
   test("a wallet still holding the platform's provisioning key is sent to medialane.io", async () => {
-    adoptSessionWallet.mockImplementation(async () => ({ walletAddress: WALLET, needsKeySetup: true }));
+    getSessionWallet.mockImplementation(async () => ({ walletAddress: WALLET, needsKeySetup: true }));
     await enterEmail("consumer@example.com");
     await enterCode();
     const link = await screen.findByRole("link", { name: "Open medialane.io" });
@@ -138,7 +145,7 @@ describe("an address that already has an account", () => {
     await enterCode("000000");
     await waitFor(() => expect(screen.getByText(/Incorrect code|Something went wrong/)).toBeTruthy());
     expect(done).toEqual([]);
-    expect(adoptSessionWallet).not.toHaveBeenCalled();
+    expect(getSessionWallet).not.toHaveBeenCalled();
   });
 });
 
