@@ -5,8 +5,6 @@ import {
   shouldSetSessionCookie,
   extractAccountToken,
   stripAccountToken,
-  shouldInjectSessionCookie,
-  injectAccountToken,
 } from "./session-cookie";
 
 test("SESSION_COOKIE_NAME and SESSION_COOKIE_MAX_AGE_SECONDS are the expected constants", () => {
@@ -47,33 +45,6 @@ test("stripAccountToken is a no-op when there's no accountToken field, or the bo
   const body = JSON.stringify({ token: "email_verified_abc.def" });
   expect(JSON.parse(stripAccountToken(body))).toEqual({ token: "email_verified_abc.def" });
   expect(stripAccountToken("not json")).toBe("not json");
-});
-
-test("shouldInjectSessionCookie is true only for a users/me POST", () => {
-  expect(shouldInjectSessionCookie("users/me", "POST")).toBe(true);
-  expect(shouldInjectSessionCookie("users/me", "GET")).toBe(false);
-  expect(shouldInjectSessionCookie("users/register", "POST")).toBe(false);
-});
-
-test("injectAccountToken sets accountToken on an existing JSON body without disturbing other fields", () => {
-  const body = JSON.stringify({ walletType: "MEDIAWALLET", chain: "STARKNET" });
-  const injected = JSON.parse(injectAccountToken(body, "account_session_abc.def"));
-  expect(injected).toEqual({
-    walletType: "MEDIAWALLET",
-    chain: "STARKNET",
-    accountToken: "account_session_abc.def",
-  });
-});
-
-test("injectAccountToken overwrites a client-supplied accountToken rather than trusting it", () => {
-  const body = JSON.stringify({ accountToken: "client_supplied_forged_value" });
-  const injected = JSON.parse(injectAccountToken(body, "account_session_real.value"));
-  expect(injected.accountToken).toBe("account_session_real.value");
-});
-
-test("injectAccountToken handles an empty or malformed body by starting fresh", () => {
-  expect(JSON.parse(injectAccountToken("", "tok"))).toEqual({ accountToken: "tok" });
-  expect(JSON.parse(injectAccountToken("not json", "tok"))).toEqual({ accountToken: "tok" });
 });
 
 test("portal paths carry the session, so an account reads its own records", async () => {

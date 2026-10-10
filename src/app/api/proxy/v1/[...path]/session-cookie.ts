@@ -31,18 +31,3 @@ export function stripAccountToken(bodyText: string): string {
 export function shouldAuthorizeWithSession(path: string): boolean {
   return path === "portal" || path.startsWith("portal/");
 }
-
-export function shouldInjectSessionCookie(path: string, method: string): boolean {
-  return method === "POST" && (path === "users/me" || path === "users/me/wallet");
-}
-
-export function injectAccountToken(bodyText: string, accountToken: string): string {
-  let data: Record<string, unknown>;
-  try {
-    data = JSON.parse(bodyText || "{}") as Record<string, unknown>;
-  } catch {
-    data = {};
-  }
-  data.accountToken = accountToken;
-  return JSON.stringify(data);
-}
