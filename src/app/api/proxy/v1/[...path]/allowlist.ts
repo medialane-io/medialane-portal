@@ -20,6 +20,7 @@ const ALLOWED_ROUTES: Record<string, RegExp[]> = {
 
   POST: [
     /^auth\/siws\/(nonce|verify)$/,
+    /^intents\/(transfer-token|funding-transfer|wallet-manage)$/,
     /^auth\/email\/(request-code|verify-code)$/,
     /^users\/me$/,
     /^users\/me\/(email|wallet)$/,

@@ -9,6 +9,6 @@ export { SponsoredCallRejectedError, type TypedDataSigner, type SponsoredExecute
 
 const PROXY_URL = "/api/wallet/sponsored-invoke";
 
-export function executeSponsored(signer: TypedDataSigner, calls: Call[]): Promise<SponsoredExecuteResult> {
-  return sdkExecuteSponsored({ proxyUrl: PROXY_URL }, signer, calls);
+export function executeSponsored(signer: TypedDataSigner, calls: Call[], intentIds?: string[]): Promise<SponsoredExecuteResult> {
+  return sdkExecuteSponsored({ proxyUrl: PROXY_URL }, signer, calls, intentIds);
 }

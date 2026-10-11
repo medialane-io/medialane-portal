@@ -1,5 +1,5 @@
 import { getStarknet } from "get-starknet-core";
-import { WalletAccount, stark, type TypedData } from "starknet";
+import { WalletAccount, stark, type Call, type TypedData } from "starknet";
 import {
   FundingTransferNotSentError,
   PasskeyCancelledError,
@@ -9,6 +9,8 @@ import {
 } from "@medialane/sdk/starknet";
 import { starknetProvider } from "@/lib/starknet";
 import { executeSponsored } from "@/lib/wallet/sponsored-executor";
+import { getMedialaneClient } from "@/lib/medialane-client";
+import type { CreateFundingTransferIntentParams } from "@medialane/sdk";
 import { assertWalletCanCover, readTokenBalance, type BalanceReader } from "./balance";
 
 export function isUserRejection(err: unknown): boolean {
@@ -18,19 +20,27 @@ export function isUserRejection(err: unknown): boolean {
   return typeof message === "string" && /reject|declin|denied|cancel/i.test(message);
 }
 
+export type FundingIntentCreator = (params: CreateFundingTransferIntentParams) => Promise<{ id: string; calls: Call[] }>;
+
+const createFundingIntent: FundingIntentCreator = async (params) =>
+  (await getMedialaneClient().api.createFundingTransferIntent(params)).data as { id: string; calls: Call[] };
+
 export function mediaWalletFundingWallet(
   signer: StarknetVenueSigner,
   sponsored: typeof executeSponsored = executeSponsored,
   readBalance: BalanceReader = readTokenBalance,
+  createIntent: FundingIntentCreator = createFundingIntent,
 ): FundingWallet {
   return {
     address: signer.address,
     signTypedData: (typedData) => signer.signTypedData(typedData),
     async sendTransfer(call: FundingTransferCall) {
       await assertWalletCanCover(call, signer.address, readBalance);
+      const amount = BigInt(call.calldata[1]) + (BigInt(call.calldata[2]) << 128n);
+      const intent = await createIntent({ owner: signer.address, asset: call.contractAddress, amountAtomic: amount.toString() });
       let result;
       try {
-        result = await sponsored(signer, [call]);
+        result = await sponsored(signer, intent.calls, [intent.id]);
       } catch (err) {
         if (err instanceof PasskeyCancelledError) {
           throw new FundingTransferNotSentError("You cancelled the transfer.");
