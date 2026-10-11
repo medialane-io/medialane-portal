@@ -1,24 +1,18 @@
-function formatEstimate(amount: number): string {
-  if (amount >= 100) return Math.round(amount).toLocaleString("en-US");
-  if (amount >= 1) return String(Number(amount.toFixed(2)));
-  const places = Math.min(12, 2 - Math.floor(Math.log10(amount)));
-  return String(Number(amount.toFixed(places)));
+const AMOUNT = /^\d{1,12}(\.\d{1,18})?$/;
+
+export function atomicAmount(amount: string, decimals: number): bigint | null {
+  if (!AMOUNT.test(amount)) return null;
+  const [whole = "0", fraction = ""] = amount.split(".");
+  if (fraction.length > decimals) return null;
+  const atomic = BigInt(whole) * 10n ** BigInt(decimals) + BigInt(fraction.padEnd(decimals, "0") || "0");
+  return atomic > 0n ? atomic : null;
 }
 
-export function tokenAmountEstimate(dollars: number, symbol: string, price: number | undefined): string | null {
-  if (!Number.isFinite(dollars) || dollars <= 0) return null;
+export function creditsEstimate(amount: string, symbol: string, price: number | undefined): number | null {
+  if (!AMOUNT.test(amount)) return null;
+  const value = Number(amount);
+  if (!Number.isFinite(value) || value <= 0) return null;
   const unitPrice = symbol === "USDC" ? 1 : price;
   if (unitPrice === undefined || !Number.isFinite(unitPrice) || unitPrice <= 0) return null;
-  return formatEstimate(dollars / unitPrice);
-}
-
-export function tokenAtomicEstimate(dollars: number, symbol: string, decimals: number, price: number | undefined): bigint | null {
-  if (!Number.isFinite(dollars) || dollars <= 0) return null;
-  const unitPrice = symbol === "USDC" ? 1 : price;
-  if (unitPrice === undefined || !Number.isFinite(unitPrice) || unitPrice <= 0) return null;
-  const usdMicros = BigInt(Math.round(dollars * 1_000_000));
-  const priceMicros = BigInt(Math.round(unitPrice * 1_000_000));
-  if (priceMicros <= 0n) return null;
-  const numerator = usdMicros * 10n ** BigInt(decimals);
-  return (numerator + priceMicros - 1n) / priceMicros;
+  return Math.floor(value * unitPrice * 100);
 }
