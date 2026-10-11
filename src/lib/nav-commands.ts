@@ -37,7 +37,7 @@ export const NAV_COMMANDS: NavCommandGroup[] = [
   {
     heading: "Account",
     items: [
-      { id: "credits",  label: "Credits",   icon: Wallet,      href: "/account",           keywords: ["balance", "top up", "buy", "usdc"] },
+      { id: "credits",  label: "Credits",   icon: Wallet,      href: "/account#add-credits", keywords: ["balance", "top up", "buy", "usdc"] },
       { id: "keys",     label: "API keys",  icon: KeyRound,    href: "/account",           keywords: ["key", "token", "developer", "agent"] },
       { id: "spend",    label: "Spend",     icon: Receipt,     href: "/account",           keywords: ["usage", "history", "billing"] },
       { id: "settings", label: "Settings",  icon: Settings,    href: "/settings",          keywords: ["email", "wallet", "account"] },
