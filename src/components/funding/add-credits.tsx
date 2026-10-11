@@ -155,7 +155,7 @@ export function AddCredits({ balance, onCredited }: { balance: number | undefine
       : null;
 
   return (
-    <section className="space-y-5 rounded-2xl border border-border/60 bg-card p-6">
+    <section id="add-credits" className="scroll-mt-24 space-y-5 rounded-2xl border border-border/60 bg-card p-6">
       <div className="flex items-start gap-3">
         <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/10">
           <Wallet className="h-5 w-5 text-primary" />

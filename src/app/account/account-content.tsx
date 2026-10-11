@@ -1,13 +1,13 @@
 "use client";
 
 import Link from "next/link";
+import { useEffect } from "react";
 import { usePortalSession, usePortalSpend } from "@/hooks/use-portal-account";
 import { labelForAction } from "@/lib/spend-labels";
 import { ApiKeys } from "./api-keys";
 import { HowItWorks } from "./how-it-works";
 import { AddCredits } from "@/components/funding/add-credits";
 import { Button } from "@/components/ui/button";
-import { RecoveryGate } from "@/components/settings/recovery-nudge";
 import { SecuritySummary } from "@/components/settings/security-summary";
 import { MissingKeyNotice, useMissingKey } from "@/components/wallet/missing-key-notice";
 
@@ -24,6 +24,11 @@ export function AccountContent() {
   const { signedIn, account, ready, hasWallet, error, refresh: refreshAccount } = usePortalSession();
   const { data: spend } = usePortalSpend(signedIn);
   const missingKey = useMissingKey();
+
+  useEffect(() => {
+    if (!signedIn || !window.location.hash) return;
+    document.getElementById(window.location.hash.slice(1))?.scrollIntoView();
+  }, [signedIn]);
 
   if (!ready) return null;
 
@@ -98,9 +103,7 @@ export function AccountContent() {
 
       <SecuritySummary />
 
-      <RecoveryGate>
-        <AddCredits balance={account?.creditBalance} onCredited={() => refreshAccount()} />
-      </RecoveryGate>
+      <AddCredits balance={account?.creditBalance} onCredited={() => refreshAccount()} />
     </main>
   );
 }
