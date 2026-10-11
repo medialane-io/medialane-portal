@@ -16,7 +16,7 @@ import { usdPriceFor, useUsdPrices } from "@/hooks/use-usd-prices";
 import { cn } from "@/lib/utils";
 import { portalFundingApi } from "@/lib/funding/api";
 import { formatUnits, InsufficientFundsError, insufficientFundsCopy } from "@/lib/funding/balance";
-import { tokenAmountEstimate, tokenAtomicEstimate } from "@/lib/funding/estimate";
+import { atomicAmount, creditsEstimate } from "@/lib/funding/estimate";
 import {
   connectExternalWallet,
   listExternalWallets,
@@ -31,8 +31,6 @@ const STEP_COPY: Record<FundingStep, string> = {
   paying: "Approve the transfer in your wallet",
   confirming: "Waiting for the transfer to land",
 };
-
-const AMOUNT = /^\d{1,9}(\.\d{1,2})?$/;
 
 const TOKENS = ["USDC", "ETH", "STRK", "USDT"] as const;
 type Token = (typeof TOKENS)[number];
@@ -59,7 +57,7 @@ export function AddCredits({ balance, onCredited }: { balance: number | undefine
   const { signer, address: mediaAddress } = useWalletNativeSession();
   const usdPrices = useUsdPrices();
 
-  const [amount, setAmount] = useState("10");
+  const [amount, setAmount] = useState("");
   const [token, setToken] = useState<Token>("USDC");
   const [external, setExternal] = useState<ExternalWallet[]>([]);
   const [chosen, setChosen] = useState<string | null>(null);
@@ -84,12 +82,9 @@ export function AddCredits({ balance, onCredited }: { balance: number | undefine
   const selectedOwner = selectedId ? owner(selectedId) : null;
 
   const meta = tokenMeta(token);
-  const dollars = Number(amount);
-  const valid = AMOUNT.test(amount) && dollars >= 0.01;
-  const credits = valid ? Math.floor(dollars * 100) : 0;
-  const price = usdPriceFor(usdPrices, token);
-  const estimate = valid ? tokenAmountEstimate(dollars, token, price) : null;
-  const needed = valid ? tokenAtomicEstimate(dollars, token, meta.decimals, price) : null;
+  const needed = atomicAmount(amount, meta.decimals);
+  const valid = needed !== null;
+  const credits = creditsEstimate(amount, token, usdPriceFor(usdPrices, token));
 
   const { rawBalance: held } = useErc20Balance(meta.address, selectedOwner);
   const shortNow =
@@ -129,11 +124,11 @@ export function AddCredits({ balance, onCredited }: { balance: number | undefine
     setStep("creating");
     try {
       const result = await fundWithChainTransfer(portalFundingApi(null, token), wallet, {
-        amountUsdc: amount,
+        amount,
         onStep: setStep,
       });
       if (result.status === "SETTLED") {
-        toast.success(`${(result.credited ?? credits).toLocaleString()} credits added`);
+        toast.success(`${(result.credited ?? credits ?? 0).toLocaleString()} credits added`);
         onCredited();
       } else {
         setMessage("Your transfer is on chain and will be credited shortly. You can close this.");
@@ -169,14 +164,6 @@ export function AddCredits({ balance, onCredited }: { balance: number | undefine
       </div>
 
       <div className="space-y-1.5">
-        <label htmlFor="amount" className="text-sm text-muted-foreground">Amount in dollars</label>
-        <Input id="amount" inputMode="decimal" value={amount} onChange={(e) => { setAmount(e.target.value); setShortAtPayment(null); }} disabled={busy} />
-        <p className="text-sm text-muted-foreground tabular-nums">
-          {credits > 0 ? `${credits.toLocaleString()} credits${estimate ? ` · about ${estimate} ${token}` : ""}` : "Enter an amount"}
-        </p>
-      </div>
-
-      <div className="space-y-1.5">
         <span className="text-sm text-muted-foreground">Pay with</span>
         <div className="flex flex-wrap gap-2" role="radiogroup" aria-label="Pay with">
           {TOKENS.map((symbol) => (
@@ -195,6 +182,29 @@ export function AddCredits({ balance, onCredited }: { balance: number | undefine
             </Button>
           ))}
         </div>
+      </div>
+
+      <div className="space-y-1.5">
+        <label htmlFor="amount" className="text-sm text-muted-foreground">Amount</label>
+        <div className="relative">
+          <Input
+            id="amount"
+            inputMode="decimal"
+            placeholder="0.00"
+            value={amount}
+            onChange={(e) => { setAmount(e.target.value.trim()); setShortAtPayment(null); }}
+            disabled={busy}
+            className="pr-24"
+          />
+          <span className="pointer-events-none absolute inset-y-0 right-3 flex items-center gap-1.5 text-sm font-medium">
+            <CurrencyIcon symbol={token} size={16} />
+            {token}
+          </span>
+        </div>
+        {credits !== null && credits > 0 ? (
+          <p className="text-sm text-muted-foreground tabular-nums">≈ {credits.toLocaleString()} credits</p>
+        ) : null}
+        <p className="text-xs text-muted-foreground">Credits are added at the value when your payment arrives.</p>
       </div>
 
       <div className="space-y-1.5">
@@ -248,7 +258,7 @@ export function AddCredits({ balance, onCredited }: { balance: number | undefine
       <div className="flex flex-wrap items-center gap-3">
         <Button onClick={pay} disabled={!canPay}>
           {busy ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-          {valid ? `Add $${amount} in credits` : "Add credits"}
+          Add credits
         </Button>
         {status ? <span className="text-sm text-muted-foreground" role="status">{status}</span> : null}
       </div>
