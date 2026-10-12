@@ -2,9 +2,9 @@ import { IP_TYPES, type IPType } from "@medialane/ui/data/ip";
 import { IP_TEMPLATES, DOC_UPLOAD } from "@medialane/ui/data/ip-templates";
 import { RESERVED_TRAITS } from "@medialane/sdk";
 
-export const MAX_ITEMS = 500;
+const MAX_ITEMS = 500;
 export const MAX_FILE_BYTES = 10 * 1024 * 1024;
-export const MAX_TRAITS = 20;
+const MAX_TRAITS = 20;
 
 export type Placement = "image" | "animation" | "document";
 

@@ -16,7 +16,7 @@ export interface CollectionOption {
   totalSupply?: number | null;
 }
 
-export function collectionLabel(c: CollectionOption): string {
+function collectionLabel(c: CollectionOption): string {
   return c.name?.trim() || `Collection ${c.collectionId}`;
 }
 

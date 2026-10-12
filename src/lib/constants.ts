@@ -1,6 +1,5 @@
 import { readStringEnv } from "./env";
 
-export { SUPPORTED_TOKENS } from "@medialane/sdk";
 
 const isServer = typeof window === "undefined";
 
