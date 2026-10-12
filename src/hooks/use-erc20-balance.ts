@@ -2,7 +2,6 @@
 
 import useSWR from "swr";
 import { starknetProvider } from "@/lib/starknet";
-import { getListableTokens } from "@medialane/sdk";
 
 async function fetchErc20Balance(tokenAddress: string, holderAddress: string): Promise<bigint> {
   const result = await starknetProvider.callContract(
@@ -34,10 +33,3 @@ export function useErc20Balance(tokenAddress: string | null, holderAddress: stri
   );
   return { rawBalance: data ?? null, isLoading, error };
 }
-
-export function useTokenBalance(symbol: string | null, holderAddress: string | null) {
-  const token = symbol ? getListableTokens().find((t) => t.symbol === symbol) ?? null : null;
-  const { rawBalance, isLoading, error } = useErc20Balance(token?.address ?? null, holderAddress);
-  return { rawBalance, isLoading, error, decimals: token?.decimals ?? 18 };
-}
-
