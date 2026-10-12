@@ -27,7 +27,7 @@ function sponsoredBy(signer: StarknetVenueSigner, client: LaunchpadRunsClient) {
     const result = await executeSponsored(
       { proxyUrl: base, fetchImpl: client.authorizedFetch },
       signer as unknown as TypedDataSigner,
-      [],
+      { userAddress: signer.address },
     );
     if (result.status !== "sponsored") throw new Error(result.reason);
     return result.transactionHash;

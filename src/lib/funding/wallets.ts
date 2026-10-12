@@ -1,5 +1,5 @@
 import { getStarknet } from "get-starknet-core";
-import { WalletAccount, stark, type Call, type TypedData } from "starknet";
+import { WalletAccount, stark, type TypedData } from "starknet";
 import {
   FundingTransferNotSentError,
   PasskeyCancelledError,
@@ -20,10 +20,10 @@ export function isUserRejection(err: unknown): boolean {
   return typeof message === "string" && /reject|declin|denied|cancel/i.test(message);
 }
 
-export type FundingIntentCreator = (params: CreateFundingTransferIntentParams) => Promise<{ id: string; calls: Call[] }>;
+export type FundingIntentCreator = (params: CreateFundingTransferIntentParams) => Promise<{ id: string }>;
 
 const createFundingIntent: FundingIntentCreator = async (params) =>
-  (await getMedialaneClient().api.createFundingTransferIntent(params)).data as { id: string; calls: Call[] };
+  (await getMedialaneClient().api.createFundingTransferIntent(params)).data as { id: string };
 
 export function mediaWalletFundingWallet(
   signer: StarknetVenueSigner,
@@ -40,7 +40,7 @@ export function mediaWalletFundingWallet(
       const intent = await createIntent({ owner: signer.address, asset: call.contractAddress, amountAtomic: amount.toString() });
       let result;
       try {
-        result = await sponsored(signer, intent.calls, [intent.id]);
+        result = await sponsored(signer, [intent.id]);
       } catch (err) {
         if (err instanceof PasskeyCancelledError) {
           throw new FundingTransferNotSentError("You cancelled the transfer.");
