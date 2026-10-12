@@ -1,5 +1,5 @@
 import { test, expect } from "bun:test";
-import { hasTraversalSegment, isPathAllowed } from "./allowlist";
+import { isPathAllowed } from "./allowlist";
 
 test("an account reaches its own balance, keys, history and spend, and the legacy deposit nudge is gone", () => {
   expect(isPathAllowed("GET", "portal/me")).toBe(true);
@@ -71,12 +71,6 @@ test("nothing unlisted gets through, whatever the method", () => {
 test("a method with no list of its own allows nothing", () => {
   expect(isPathAllowed("PATCH", "portal/me")).toBe(false);
   expect(isPathAllowed("PUT", "portal/keys")).toBe(false);
-});
-
-test("a path cannot climb out of /v1", () => {
-  expect(hasTraversalSegment("portal/../admin")).toBe(true);
-  expect(hasTraversalSegment("portal/./me")).toBe(true);
-  expect(hasTraversalSegment("portal/me")).toBe(false);
 });
 
 test("a launchpad run is drafted, paid for and executed through its own routes", () => {

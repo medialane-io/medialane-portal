@@ -1,7 +1,7 @@
 import { RpcProvider } from "starknet";
 import { MEDIALANE_BACKEND_URL } from "./constants";
 
-const RPC_PROXY_PATH = "/api/rpc";
+const RPC_PROXY_PATH = "/api/proxy/v1/rpc";
 
 function resolveRpcUrl(origin: string | undefined, backendUrl: string): string {
   return origin

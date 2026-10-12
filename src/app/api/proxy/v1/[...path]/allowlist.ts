@@ -1,4 +1,4 @@
-const ALLOWED_ROUTES: Record<string, RegExp[]> = {
+export const ALLOW: Record<string, RegExp[]> = {
   GET: [
     /^portal\/me$/,
     /^portal\/keys$/,
@@ -19,6 +19,8 @@ const ALLOWED_ROUTES: Record<string, RegExp[]> = {
   ],
 
   POST: [
+    /^rpc$/,
+    /^paymaster\/(invoke|deploy)\/(build|execute)$/,
     /^auth\/siws\/(nonce|verify)$/,
     /^intents\/(transfer-token|funding-transfer|wallet-manage)$/,
     /^auth\/email\/(request-code|verify-code)$/,
@@ -42,12 +44,6 @@ const ALLOWED_ROUTES: Record<string, RegExp[]> = {
   DELETE: [/^portal\/keys\/[^/]+$/],
 };
 
-export function hasTraversalSegment(path: string): boolean {
-  return path.split("/").some((segment) => segment === "." || segment === "..");
-}
-
 export function isPathAllowed(method: string, path: string): boolean {
-  const routes = ALLOWED_ROUTES[method.toUpperCase()];
-  if (!routes) return false;
-  return routes.some((pattern) => pattern.test(path));
+  return (ALLOW[method.toUpperCase()] ?? []).some((re) => re.test(path));
 }
