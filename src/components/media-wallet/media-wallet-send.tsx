@@ -16,6 +16,8 @@ import { CurrencySheet } from "./currency-sheet";
 import { WALLET_TOKENS, type WalletToken } from "./wallet-tokens";
 import { SuccessDialog } from "./success-dialog";
 import type { MediaWalletView } from "./types";
+import { getMedialaneClient } from "@/lib/medialane-client";
+import { runIntentCalls } from "@/lib/wallet/run-intent-calls";
 
 function isValidStarknetAddress(address: string): boolean {
   try {
@@ -109,12 +111,9 @@ export function MediaWalletSend({
     const dest = to.trim();
     const amt = amountRaw;
     await run(async (signer) => {
-      const call: Call = {
-        contractAddress: currency.address,
-        entrypoint: "transfer",
-        calldata: CallData.compile({ recipient: dest, amount: cairo.uint256(amt) }),
-      };
-      const result = await signer.execute([call]);
+      const result = await runIntentCalls(signer, () =>
+        getMedialaneClient().api.createTransferTokenIntent({ owner: signer.address, token: currency.address, recipient: dest, amount: amt.toString() }),
+      );
       setTxHash(result.txHash);
       return result;
     });
