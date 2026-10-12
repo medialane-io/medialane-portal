@@ -12,7 +12,7 @@ export interface SharedStepOptions {
   confirmBatch(runId: string, index: number): Promise<ConfirmResult>;
 }
 
-export function transactionPacingMs(minMs = 1000, maxMs = 10000): number {
+function transactionPacingMs(minMs = 1000, maxMs = 10000): number {
   return minMs + Math.random() * (maxMs - minMs);
 }
 

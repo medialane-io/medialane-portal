@@ -3,7 +3,7 @@ import { MEDIALANE_BACKEND_URL } from "./constants";
 
 const RPC_PROXY_PATH = "/api/rpc";
 
-export function resolveRpcUrl(origin: string | undefined, backendUrl: string): string {
+function resolveRpcUrl(origin: string | undefined, backendUrl: string): string {
   return origin
     ? `${origin}${RPC_PROXY_PATH}`
     : `${backendUrl.replace(/\/$/, "")}/v1/rpc`;

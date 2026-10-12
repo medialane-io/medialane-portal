@@ -11,7 +11,7 @@ import { portalFundingApi } from "@/lib/funding/api";
 import { mediaWalletFundingWallet } from "@/lib/funding/wallets";
 import type { LaunchpadRun, RunQuote, LaunchpadRunsClient } from "@medialane/sdk";
 
-export function quoteByLabel(quote: RunQuote): { label: string; credits: number }[] {
+function quoteByLabel(quote: RunQuote): { label: string; credits: number }[] {
   const totals = new Map<string, number>();
   for (const line of quote.lines) {
     const label = labelForAction(line.action);

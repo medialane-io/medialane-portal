@@ -10,9 +10,9 @@ export const AI_POLICIES = ["Allowed", "Training Only", "Not Allowed"] as const;
 
 export const TERRITORIES = ["Worldwide", "Americas", "Europe", "Asia Pacific"] as const;
 
-export const MAX_IMAGE_BYTES = 10 * 1024 * 1024;
+const MAX_IMAGE_BYTES = 10 * 1024 * 1024;
 
-export const ACCEPTED_IMAGE_TYPES = [
+const ACCEPTED_IMAGE_TYPES = [
   "image/jpeg",
   "image/png",
   "image/gif",

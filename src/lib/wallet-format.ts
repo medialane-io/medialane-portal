@@ -1,7 +1,6 @@
 import { formatAmount } from "@medialane/sdk";
 import { ipfsToHttp } from "@/lib/utils";
 import { EXPLORER_URL } from "@/lib/constants";
-import type { UsdPrices } from "@/hooks/use-usd-prices";
 
 export const gateway = (u: string | null): string | null => (u ? ipfsToHttp(u) : null);
 
@@ -25,19 +24,6 @@ export const fmt = (raw: bigint | null, decimals = 18, dp = 4): string => {
 
 export const fmtUsd = (n: number): string =>
   n > 0 && n < 0.01 ? "<$0.01" : `$${n.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-
-export const usdValueFor = (
-  amountFormatted: string | null | undefined,
-  currency: string | null | undefined,
-  usdPrices: UsdPrices | null
-): string | null => {
-  if (!amountFormatted || !currency || !usdPrices) return null;
-  const rate = usdPrices[currency.toUpperCase() as keyof UsdPrices];
-  if (rate == null) return null;
-  const amount = parseFloat(amountFormatted);
-  if (isNaN(amount)) return null;
-  return fmtUsd(amount * rate);
-};
 
 export const when = (iso: string): string => {
   const d = new Date(iso);

@@ -2,7 +2,7 @@
 
 import useSWR from "swr";
 import { starknetProvider } from "@/lib/starknet";
-import { getListableTokens, parseAmount } from "@medialane/sdk";
+import { getListableTokens } from "@medialane/sdk";
 
 async function fetchErc20Balance(tokenAddress: string, holderAddress: string): Promise<bigint> {
   const result = await starknetProvider.callContract(
@@ -41,14 +41,3 @@ export function useTokenBalance(symbol: string | null, holderAddress: string | n
   return { rawBalance, isLoading, error, decimals: token?.decimals ?? 18 };
 }
 
-export function hasSufficientBalance(
-  rawBalance: bigint | null,
-  requiredHuman: string,
-  decimals: number
-): boolean | null {
-  if (rawBalance === null) return null;
-  const n = parseFloat(requiredHuman);
-  if (!requiredHuman || isNaN(n) || n <= 0) return null;
-  const required = BigInt(parseAmount(requiredHuman, decimals));
-  return rawBalance >= required;
-}
