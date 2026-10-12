@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation";
 import { NavWalletTrigger as SharedNavWalletTrigger } from "@medialane/ui";
 import { useWalletNativeSession } from "@/hooks/use-wallet-native-session";
-import { useMediaWallet } from "@/components/media-wallet/media-wallet-overlay";
+import { useMediaWallet } from "@medialane/ui";
 import { UserShieldIcon } from "@/components/icons/user-shield-icon";
 
 export function HeaderWalletTrigger() {

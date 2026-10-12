@@ -1,6 +1,6 @@
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
-import { toDisplayUrl, toDisplayUrlOrNull, PINATA_PUBLIC_GATEWAY } from "@medialane/ui";
+import { toDisplayUrlOrNull, PINATA_PUBLIC_GATEWAY } from "@medialane/ui";
 import { IPFS_GATEWAY } from "./constants";
 
 export function cn(...inputs: ClassValue[]) {
@@ -8,10 +8,6 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 const displayOptions = { gateway: IPFS_GATEWAY ?? PINATA_PUBLIC_GATEWAY };
-
-export function ipfsToHttp(uri: string | null | undefined): string {
-  return toDisplayUrl(uri, displayOptions);
-}
 
 export function resolveTokenImage(raw: string | null | undefined): string | null {
   return toDisplayUrlOrNull(raw, displayOptions);
