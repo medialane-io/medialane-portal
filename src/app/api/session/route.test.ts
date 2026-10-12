@@ -1,21 +1,25 @@
-import { afterEach, beforeEach, expect, test } from "bun:test";
+import { afterAll, beforeAll, beforeEach, expect, test } from "bun:test";
 import { NextRequest } from "next/server";
-import { GET } from "./route";
 
 const realFetch = globalThis.fetch;
 let calls: Array<{ url: string; headers: Headers }> = [];
-let backend: () => Response;
+let backend: () => Response = () => Response.json(null);
+let GET: (req: Request) => Promise<Response>;
 
-beforeEach(() => {
+beforeAll(async () => {
   process.env.MEDIALANE_API_KEY = "test-key";
-  calls = [];
   globalThis.fetch = (async (url: unknown, init?: RequestInit) => {
     calls.push({ url: String(url), headers: new Headers(init?.headers) });
     return backend();
   }) as typeof fetch;
+  ({ GET } = await import("./route"));
 });
 
-afterEach(() => {
+beforeEach(() => {
+  calls = [];
+});
+
+afterAll(() => {
   globalThis.fetch = realFetch;
 });
 

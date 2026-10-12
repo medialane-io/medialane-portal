@@ -16,7 +16,6 @@ const APP_ROOTS = ["src/hooks", "src/components", "src/app", "src/lib"];
 const EXCLUDED_DIRS = [join(REPO_ROOT, "src/app/api")];
 const EXCLUDED_FILES = new Set<string>([]);
 
-const NOT_PROXIED_PREFIXES = ["rpc", "paymaster/", "swap/"];
 
 function walk(dir: string, out: string[] = []): string[] {
   if (EXCLUDED_DIRS.some((excluded) => dir === excluded || dir.startsWith(excluded + "/"))) {
@@ -74,9 +73,8 @@ test("every /v1/* path this app calls is covered by the proxy allowlist", () => 
   for (const file of files) {
     const source = readFileSync(file, "utf8");
     for (const path of extractPaths(source)) {
-      if (NOT_PROXIED_PREFIXES.some((prefix) => path.startsWith(prefix))) continue;
       const covered = ["GET", "POST", "PATCH", "DELETE"].some((method) =>
-        isPathAllowed(method, path)
+        isPathAllowed(method, path) || isPathAllowed(method, `${path}/build`)
       );
       if (!covered && !uncovered.has(path)) {
         uncovered.set(path, relative(REPO_ROOT, file));
