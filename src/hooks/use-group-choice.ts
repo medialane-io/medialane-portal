@@ -1,12 +1,8 @@
 "use client";
 
 import { useState } from "react";
-
-export interface NewGroup {
-  kind: "new";
-  name: string;
-  symbol: string;
-}
+import { externalLinkProblem, type NewCollectionChoice } from "@/lib/launchpad/collection-choice";
+import { useArtwork } from "@/hooks/use-artwork";
 
 interface Picked {
   contractAddress: string;
@@ -17,11 +13,15 @@ export function useGroupChoice<E, C extends Picked>(toExisting: (picked: C) => E
   const [existing, setExisting] = useState<{ value: E; address: string } | null>(null);
   const [name, setName] = useState("");
   const [symbol, setSymbol] = useState("");
+  const [description, setDescription] = useState("");
+  const [externalLink, setExternalLink] = useState("");
+  const cover = useArtwork();
+  const linkProblem = externalLinkProblem(externalLink);
 
-  const choice: E | NewGroup | null =
+  const choice: E | NewCollectionChoice | null =
     mode === "new"
-      ? name.trim() && symbol.trim()
-        ? { kind: "new", name: name.trim(), symbol: symbol.trim().toUpperCase() }
+      ? name.trim() && symbol.trim() && !linkProblem
+        ? { kind: "new", name: name.trim(), symbol: symbol.trim().toUpperCase(), description, externalLink, image: cover.artwork }
         : null
       : (existing?.value ?? null);
 
@@ -32,6 +32,12 @@ export function useGroupChoice<E, C extends Picked>(toExisting: (picked: C) => E
     setName,
     symbol,
     setSymbol,
+    description,
+    setDescription,
+    externalLink,
+    setExternalLink,
+    linkProblem,
+    cover,
     choice,
     pickedAddress: existing?.address ?? "",
     pick: (picked: C) => {

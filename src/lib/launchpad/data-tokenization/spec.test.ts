@@ -44,7 +44,12 @@ describe("run spec", () => {
   ];
 
   test("the spec names each file by name, size and type, never its bytes", () => {
-    const spec = runSpec({ kind: "new", name: "Archive", symbol: "ARC" }, defaultTerms(), items);
+    const spec = runSpec(
+      { kind: "new", name: "Archive", symbol: "ARC", description: "All my work", externalLink: "", image: null },
+      defaultTerms(),
+      items,
+    );
+    expect(spec.collection).toEqual({ kind: "new", name: "Archive", symbol: "ARC", description: "All my work" });
     expect(spec.items[0]).toEqual({
       name: "Report",
       description: "",

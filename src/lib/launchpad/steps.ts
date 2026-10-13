@@ -1,5 +1,5 @@
 import type { ConfirmResult } from "@medialane/sdk";
-import { MissingFilesError, untilConfirmed, type PollDeps } from "./engine";
+import { MissingFilesError, throwIfAborted, untilConfirmed, type PollDeps } from "./engine";
 
 export type SharedEvent = { kind: "collection" } | { kind: "batch"; index: number } | { kind: "confirming" };
 
@@ -41,23 +41,27 @@ export function sharedSteps({ deps, emit, ...o }: SharedStepOptions) {
   };
 }
 
-export interface ArtworkUploadOptions {
-  artwork: File | null;
+export interface FilesUploadOptions {
+  files: Map<string, File>;
   client: {
     uploadUrl(runId: string, name: string): Promise<string>;
     uploaded(runId: string, name: string, cid: string): Promise<unknown>;
   };
   putFile(url: string, file: File): Promise<string>;
-  emit(event: { kind: "upload"; name: string }): void;
+  signal?: AbortSignal;
+  emit(event: { kind: "upload"; name: string; done: number; total: number }): void;
 }
 
-export function artworkUploadStep({ artwork, client, putFile, emit }: ArtworkUploadOptions) {
+export function filesUploadStep({ files, client, putFile, signal, emit }: FilesUploadOptions) {
   return async (next: { files: string[] }, id: string) => {
-    const name = next.files[0]!;
-    if (!artwork) throw new MissingFilesError(next.files);
-    emit({ kind: "upload", name });
-    const url = await client.uploadUrl(id, name);
-    const cid = await putFile(url, artwork);
-    await client.uploaded(id, name, cid);
+    const missing = next.files.filter((name) => !files.has(name));
+    if (missing.length > 0) throw new MissingFilesError(missing);
+    for (const [done, name] of next.files.entries()) {
+      throwIfAborted(signal);
+      emit({ kind: "upload", name, done, total: next.files.length });
+      const url = await client.uploadUrl(id, name);
+      const cid = await putFile(url, files.get(name)!);
+      await client.uploaded(id, name, cid);
+    }
   };
 }

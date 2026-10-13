@@ -1,5 +1,5 @@
 import { runEngine, walletsStep, type PollDeps } from "@/lib/launchpad/engine";
-import { artworkUploadStep, pacedBy, sharedSteps } from "@/lib/launchpad/steps";
+import { filesUploadStep, pacedBy, sharedSteps } from "@/lib/launchpad/steps";
 import {
   isTicketingRun,
   type LaunchpadRunsClient,
@@ -9,7 +9,7 @@ import {
 
 export type TicketingEvent =
   | { kind: "collection" }
-  | { kind: "upload"; name: string }
+  | { kind: "upload"; name: string; done: number; total: number }
   | { kind: "ticket-metadata" }
   | { kind: "tier" }
   | { kind: "wallets"; done: number; total: number }
@@ -22,7 +22,7 @@ export function describeTicketingEvent(event: TicketingEvent): string {
     case "collection":
       return "Confirm your new group in your wallet";
     case "upload":
-      return "Uploading artwork";
+      return `Uploading ${event.name} (${event.done + 1} of ${event.total})`;
     case "ticket-metadata":
       return "Preparing ticket";
     case "tier":
@@ -47,7 +47,7 @@ export interface TicketingExecutorDeps extends PollDeps {
     >;
   sponsored(base: string): Promise<string>;
   putFile(url: string, file: File): Promise<string>;
-  artwork: File | null;
+  files: Map<string, File>;
   collectionBase(runId: string): string;
   tierBase(runId: string): string;
   batchBase(runId: string, index: number): string;
@@ -75,7 +75,7 @@ export function executeTicketingRun(
     onDone: () => onEvent({ kind: "done" }),
     steps: {
       ...shared,
-      upload: artworkUploadStep({ artwork: deps.artwork, client: deps.client, putFile: deps.putFile, emit: onEvent }),
+      upload: filesUploadStep({ files: deps.files, client: deps.client, putFile: deps.putFile, signal: deps.signal, emit: onEvent }),
       "ticket-metadata": async (_next, id) => {
         onEvent({ kind: "ticket-metadata" });
         await deps.client.metadata(id, deps.userAddress);

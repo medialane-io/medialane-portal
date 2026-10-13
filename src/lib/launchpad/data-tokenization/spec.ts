@@ -1,4 +1,5 @@
 import { LAUNCHPAD } from "@/lib/launchpad/services";
+import { newCollectionSpec, type NewCollectionChoice } from "@/lib/launchpad/collection-choice";
 import { baseTerms, withPreset, type Terms as BaseTerms } from "@/lib/launchpad/terms";
 import type { ManifestItem } from "./manifest";
 
@@ -8,7 +9,7 @@ export interface Terms extends BaseTerms {
 
 export type CollectionChoice =
   | { kind: "existing"; collectionId: string; contractAddress: string }
-  | { kind: "new"; name: string; symbol: string };
+  | NewCollectionChoice;
 
 export { withPreset };
 
@@ -20,7 +21,7 @@ const fileRef = (file: File) => ({ name: file.name, size: file.size, type: file.
 
 export function runSpec(collection: CollectionChoice, terms: Terms, items: ManifestItem[]) {
   return {
-    collection,
+    collection: collection.kind === "new" ? newCollectionSpec(collection) : collection,
     terms,
     items: items.map((item) => ({
       name: item.name,

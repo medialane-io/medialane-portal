@@ -21,6 +21,7 @@ import { RunClosed, RunInProgress, itemCount } from "./data-tokenization/run-sec
 import { LAUNCHPAD } from "@/lib/launchpad/services";
 import { readManifest } from "@/lib/launchpad/data-tokenization/manifest";
 import { defaultTerms, runSpec, type CollectionChoice, type Terms } from "@/lib/launchpad/data-tokenization/spec";
+import { collectionFiles, collectionImageProblem } from "@/lib/launchpad/collection-choice";
 import type { LaunchpadRun } from "@medialane/sdk";
 import { executeRun, describeRunEvent } from "@/lib/launchpad/data-tokenization/executor";
 
@@ -63,7 +64,8 @@ export function DataTokenizationTask() {
 
   const collection = groupState.choice;
 
-  const canSave = Boolean(collection && manifest && manifest.items.length > 0 && manifest.problems.length === 0);
+  const imageProblem = groupState.mode === "new" ? collectionImageProblem(groupState.cover.artwork, files) : null;
+  const canSave = Boolean(collection && !imageProblem && manifest && manifest.items.length > 0 && manifest.problems.length === 0);
 
   async function attach(list: FileList | null) {
     if (!list) return;
@@ -96,7 +98,7 @@ export function DataTokenizationTask() {
         {
           ...deps,
           client,
-          files: new Map(files.map((f) => [f.name, f])),
+          files: new Map([...(collection ? collectionFiles(collection) : []), ...files.map((f) => [f.name, f] as [string, File])]),
           userAddress: address!,
           batchBase: client.runBatchBase,
           collectionBase: client.runCollectionBase,
@@ -189,6 +191,7 @@ export function DataTokenizationTask() {
                   symbolPlaceholder: "ARCH",
                 }}
                 group={groupState}
+                imageProblem={imageProblem}
                 serviceId={LAUNCHPAD.dataTokenization.collections}
                 owner={address ?? ""}
                 disabled={busy}

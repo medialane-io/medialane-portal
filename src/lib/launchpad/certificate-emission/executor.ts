@@ -1,5 +1,5 @@
 import { runEngine, walletsStep, type PollDeps } from "@/lib/launchpad/engine";
-import { artworkUploadStep, pacedBy, sharedSteps } from "@/lib/launchpad/steps";
+import { filesUploadStep, pacedBy, sharedSteps } from "@/lib/launchpad/steps";
 import {
   isCertificateEmissionRun,
   type CertificateEmissionNextStep,
@@ -9,7 +9,7 @@ import {
 
 export type CertificateEmissionEvent =
   | { kind: "collection" }
-  | { kind: "upload"; name: string }
+  | { kind: "upload"; name: string; done: number; total: number }
   | { kind: "certificate-metadata" }
   | { kind: "wallets"; done: number; total: number }
   | { kind: "batch"; index: number }
@@ -21,7 +21,7 @@ export function describeCertificateEvent(event: CertificateEmissionEvent): strin
     case "collection":
       return "Confirm your new collection in your wallet";
     case "upload":
-      return "Uploading artwork";
+      return `Uploading ${event.name} (${event.done + 1} of ${event.total})`;
     case "certificate-metadata":
       return "Preparing certificate";
     case "wallets":
@@ -44,7 +44,7 @@ export interface CertificateEmissionExecutorDeps extends PollDeps {
     >;
   sponsored(base: string): Promise<string>;
   putFile(url: string, file: File): Promise<string>;
-  artwork: File | null;
+  files: Map<string, File>;
   collectionBase(runId: string): string;
   batchBase(runId: string, index: number): string;
 }
@@ -69,7 +69,7 @@ export function executeCertificateEmissionRun(
         confirmCollection: deps.client.confirmCollection,
         confirmBatch: deps.client.confirmBatch,
       }),
-      upload: artworkUploadStep({ artwork: deps.artwork, client: deps.client, putFile: deps.putFile, emit: onEvent }),
+      upload: filesUploadStep({ files: deps.files, client: deps.client, putFile: deps.putFile, signal: deps.signal, emit: onEvent }),
       "certificate-metadata": async (_next, id) => {
         onEvent({ kind: "certificate-metadata" });
         await deps.client.metadata(id, deps.userAddress);

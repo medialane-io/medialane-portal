@@ -50,7 +50,7 @@ function backend(steps: CertificateEmissionNextStep[], options: { pending?: stri
     sponsored: async (base) => (calls.push(`sponsored:${base}`), advance(), "0xtx"),
     putFile: async (url) => (calls.push(`put:${url}`), "bafy-cid-1234567"),
     wait: async (ms) => void waits.push(ms),
-    artwork,
+    files: new Map([["a.png", artwork]]),
     userAddress: "0xowner",
     collectionBase: (id) => `/runs/${id}/collection`,
     batchBase: (id, index) => `/runs/${id}/batches/${index}`,
@@ -118,9 +118,23 @@ describe("executing a paid certificate-emission run", () => {
 
   test("asks for the artwork again when the page was reloaded and the file is gone", async () => {
     const { deps } = backend([{ kind: "upload", files: ["a.png"] }, { kind: "done" }]);
-    const error = await executeCertificateEmissionRun("run1", { ...deps, artwork: null }).catch((e) => e);
+    const error = await executeCertificateEmissionRun("run1", { ...deps, files: new Map() }).catch((e) => e);
     expect(error).toBeInstanceOf(MissingFilesError);
     expect((error as MissingFilesError).files).toEqual(["a.png"]);
+  });
+
+  test("uploads the collection image the run asks for along with the artwork", async () => {
+    const cover = new File(["c"], "cover.png", { type: "image/png" });
+    const { deps, calls } = backend([{ kind: "upload", files: ["a.png", "cover.png"] }, { kind: "done" }, { kind: "done" }]);
+    await executeCertificateEmissionRun("run1", { ...deps, files: new Map([["a.png", artwork], ["cover.png", cover]]) });
+    expect(calls).toEqual([
+      "url:a.png",
+      "put:https://upload/a.png",
+      "uploaded:a.png:bafy-cid-1234567",
+      "url:cover.png",
+      "put:https://upload/cover.png",
+      "uploaded:cover.png:bafy-cid-1234567",
+    ]);
   });
 
   test("refuses a run that belongs to another service", async () => {

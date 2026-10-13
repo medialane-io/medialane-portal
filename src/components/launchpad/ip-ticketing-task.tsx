@@ -17,6 +17,7 @@ import { useGroupChoice } from "@/hooks/use-group-choice";
 import { CheckoutPanel } from "@/components/launchpad/checkout-panel";
 import type { CollectionOption } from "./collection-picker";
 import { GroupSection } from "./group-section";
+import { collectionFiles, collectionImageProblem } from "@/lib/launchpad/collection-choice";
 import { RecipientsSection } from "./recipients-section";
 import { ArtworkDrop } from "./artwork-drop";
 import { ClosedRunSection, PaidRunSection, recipientCount } from "./issued-run-sections";
@@ -65,14 +66,14 @@ export function IpTicketingTask() {
   const [territory, setTerritory] = useState<string>("Worldwide");
 
   const [run, setRun] = useState<LaunchpadRun | null>(null);
-  const [needsArtwork, setNeedsArtwork] = useState(false);
+  const [missing, setMissing] = useState<string[]>([]);
   const { phase, detail: progress, error, busy, execute: runWith, save: saveWith, fail, clearError, close } = useRunExecution({
     client,
     signer,
     address,
     describe: describeTicketingEvent,
     onRun: setRun,
-    onNeedsFiles: () => setNeedsArtwork(true),
+    onNeedsFiles: setMissing,
     onSuccess: () => {
       setGuests("");
       void refresh();
@@ -96,14 +97,20 @@ export function IpTicketingTask() {
   const hasRun = recipients.length > 0;
 
   const group = groupState.choice;
+  const imageProblem = groupState.mode === "new" ? collectionImageProblem(groupState.cover.artwork, artwork ? [artwork] : []) : null;
+  const runFiles = new Map<string, File>([
+    ...(group ? collectionFiles(group) : []),
+    ...(artwork ? [[artwork.name, artwork] as [string, File]] : []),
+  ]);
 
   function chooseArtwork(file: File | undefined) {
-    if (art.choose(file)) setNeedsArtwork(false);
+    if (art.choose(file)) setMissing([]);
   }
 
   const ready =
     Boolean(address) &&
     group !== null &&
+    !imageProblem &&
     name.trim().length > 0 &&
     recipients.length > 0 &&
     invalid.length === 0 &&
@@ -132,14 +139,14 @@ export function IpTicketingTask() {
       : undefined;
 
   function execute(target: LaunchpadRun) {
-    setNeedsArtwork(false);
+    setMissing([]);
     return runWith(target, ({ deps, emit }) =>
       executeTicketingRun(
         target.id,
         {
           ...deps,
           client: ticketingApi(client),
-          artwork,
+          files: runFiles,
           userAddress: address!,
           collectionBase: client.runCollectionBase,
           tierBase: client.runTierBase,
@@ -162,7 +169,7 @@ export function IpTicketingTask() {
 
   function startOver() {
     setRun(null);
-    setNeedsArtwork(false);
+    setMissing([]);
     clearError();
     router.replace(pathname);
   }
@@ -368,6 +375,7 @@ export function IpTicketingTask() {
                 symbolPlaceholder: "SUMMER",
               }}
               group={groupState}
+              imageProblem={imageProblem}
               serviceId={LAUNCHPAD.ticketing.collections}
               owner={address ?? ""}
               disabled={busy}
@@ -413,7 +421,7 @@ export function IpTicketingTask() {
               <PaidRunSection
                 run={run}
                 unit="ticket"
-                needsArtwork={needsArtwork}
+                missing={missing}
                 busy={busy}
                 onContinue={() => execute(run)}
                 onCancel={cancel}
