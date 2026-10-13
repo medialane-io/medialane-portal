@@ -4,8 +4,8 @@ import {
   type LaunchpadRunsClient,
   type NextStep,
 } from "@medialane/sdk";
-import { MissingFilesError, runEngine, throwIfAborted, walletsStep, type PollDeps } from "@/lib/launchpad/engine";
-import { pacedBy, sharedSteps } from "@/lib/launchpad/steps";
+import { runEngine, throwIfAborted, walletsStep, type PollDeps } from "@/lib/launchpad/engine";
+import { filesUploadStep, pacedBy, sharedSteps } from "@/lib/launchpad/steps";
 
 export type RunEvent =
   | { kind: "collection" }
@@ -68,17 +68,7 @@ export function executeRun(
         confirmCollection: deps.client.confirmCollection,
         confirmBatch: deps.client.confirmBatch,
       }),
-      upload: async (next, id) => {
-        const missing = next.files.filter((name) => !deps.files.has(name));
-        if (missing.length > 0) throw new MissingFilesError(missing);
-        for (const [done, name] of next.files.entries()) {
-          throwIfAborted(deps.signal);
-          onEvent({ kind: "upload", name, done, total: next.files.length });
-          const url = await deps.client.uploadUrl(id, name);
-          const cid = await deps.putFile(url, deps.files.get(name)!);
-          await deps.client.uploaded(id, name, cid);
-        }
-      },
+      upload: filesUploadStep({ files: deps.files, client: deps.client, putFile: deps.putFile, signal: deps.signal, emit: onEvent }),
       metadata: async (next, id) => {
         for (const [done, index] of next.items.entries()) {
           throwIfAborted(deps.signal);

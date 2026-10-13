@@ -50,7 +50,7 @@ function backend(steps: TicketingNextStep[], options: { pending?: string[]; poll
     sponsored: async (base) => (calls.push(`sponsored:${base}`), advance(), "0xtx"),
     putFile: async (url) => (calls.push(`put:${url}`), "bafy-cid-1234567"),
     wait: async () => {},
-    artwork,
+    files: new Map([["a.png", artwork]]),
     userAddress: "0xowner",
     collectionBase: (id) => `/runs/${id}/collection`,
     tierBase: (id) => `/runs/${id}/tier`,
@@ -137,7 +137,7 @@ describe("executing a paid ticketing run", () => {
 
   test("asks for the artwork again when the page was reloaded and the file is gone", async () => {
     const { deps } = backend([{ kind: "upload", files: ["a.png"] }, { kind: "done" }]);
-    const error = await executeTicketingRun("run1", { ...deps, artwork: null }).catch((e) => e);
+    const error = await executeTicketingRun("run1", { ...deps, files: new Map() }).catch((e) => e);
     expect(error).toBeInstanceOf(MissingFilesError);
     expect((error as MissingFilesError).files).toEqual(["a.png"]);
   });

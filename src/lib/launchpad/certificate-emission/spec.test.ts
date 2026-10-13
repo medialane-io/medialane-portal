@@ -19,7 +19,7 @@ describe("certificateEmissionRunSpec", () => {
   test("includes artwork when one was chosen", () => {
     const file = new File(["x"], "a.png", { type: "image/png" });
     const spec = certificateEmissionRunSpec({
-      collection: { kind: "new", name: "Cohort 1", symbol: "C1" },
+      collection: { kind: "new", name: "Cohort 1", symbol: "C1", description: "", externalLink: "https://x.example", image: null },
       name: "Course completion",
       description: "",
       artwork: file,
@@ -27,6 +27,7 @@ describe("certificateEmissionRunSpec", () => {
       terms: defaultTerms(),
     });
     expect(spec).toMatchObject({ artwork: { name: "a.png", type: "image/png" } });
+    expect(spec.collection).toEqual({ kind: "new", name: "Cohort 1", symbol: "C1", externalLink: "https://x.example" });
   });
 
   test("royalty is always 0 — there is no transfer, so nothing to set a royalty on", () => {

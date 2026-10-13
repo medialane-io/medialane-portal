@@ -9,12 +9,14 @@ export function ArtworkDrop({
   disabled,
   className,
   imageClassName,
+  label = "Artwork",
 }: {
   preview: string | null;
   onChoose: (file: File | undefined) => void;
   disabled: boolean;
   className?: string;
   imageClassName?: string;
+  label?: string;
 }) {
   return (
     <label
@@ -31,7 +33,7 @@ export function ArtworkDrop({
       ) : (
         <span className="flex flex-col items-center gap-1.5 text-muted-foreground">
           <Upload className="h-5 w-5" />
-          Artwork
+          {label}
         </span>
       )}
     </label>

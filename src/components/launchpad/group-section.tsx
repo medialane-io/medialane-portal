@@ -3,7 +3,9 @@
 import type { CollectionServiceId } from "@medialane/sdk";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { Field } from "@/components/launchpad/form-fields";
+import { ArtworkDrop } from "./artwork-drop";
 import { CollectionPicker, type CollectionOption } from "./collection-picker";
 import type { useGroupChoice } from "@/hooks/use-group-choice";
 
@@ -29,7 +31,20 @@ export function GroupSection({
   words: GroupWords;
   group: Pick<
     ReturnType<typeof useGroupChoice<unknown, CollectionOption>>,
-    "mode" | "setMode" | "name" | "setName" | "symbol" | "setSymbol" | "pick" | "pickedAddress"
+    | "mode"
+    | "setMode"
+    | "name"
+    | "setName"
+    | "symbol"
+    | "setSymbol"
+    | "description"
+    | "setDescription"
+    | "externalLink"
+    | "setExternalLink"
+    | "linkProblem"
+    | "cover"
+    | "pick"
+    | "pickedAddress"
   >;
   serviceId: CollectionServiceId;
   owner: string;
@@ -58,12 +73,50 @@ export function GroupSection({
           disabled={disabled}
         />
       ) : (
-        <div className="grid gap-4 sm:grid-cols-2">
-          <Field label={words.nameLabel}>
-            <Input value={group.name} onChange={(e) => group.setName(e.target.value)} placeholder={words.namePlaceholder} className={inputClassName} disabled={disabled} />
+        <div className="space-y-4">
+          <div className="flex flex-col gap-4 sm:flex-row">
+            <ArtworkDrop
+              label="Collection image"
+              preview={group.cover.preview}
+              onChoose={group.cover.choose}
+              disabled={disabled}
+              className="rounded-xl border-2 border-dashed border-border transition-colors hover:border-primary/50"
+              imageClassName="rounded-[10px]"
+            />
+            <div className="grid flex-1 gap-4 sm:grid-cols-2">
+              <Field label={words.nameLabel}>
+                <Input value={group.name} onChange={(e) => group.setName(e.target.value)} placeholder={words.namePlaceholder} className={inputClassName} disabled={disabled} />
+              </Field>
+              <Field label="Short code">
+                <Input value={group.symbol} onChange={(e) => group.setSymbol(e.target.value)} placeholder={words.symbolPlaceholder} className={inputClassName} disabled={disabled} />
+              </Field>
+            </div>
+          </div>
+          {group.cover.error ? <p className="text-sm text-destructive">{group.cover.error}</p> : null}
+          <Field label="Description (optional)">
+            <Textarea
+              value={group.description}
+              onChange={(e) => group.setDescription(e.target.value)}
+              placeholder="What this collection holds"
+              rows={3}
+              maxLength={500}
+              disabled={disabled}
+            />
           </Field>
-          <Field label="Short code">
-            <Input value={group.symbol} onChange={(e) => group.setSymbol(e.target.value)} placeholder={words.symbolPlaceholder} className={inputClassName} disabled={disabled} />
+          <Field label="External link (optional)">
+            <Input
+              type="url"
+              value={group.externalLink}
+              onChange={(e) => group.setExternalLink(e.target.value)}
+              placeholder="https://yourwebsite.com"
+              className={inputClassName}
+              disabled={disabled}
+            />
+            {group.linkProblem ? (
+              <p className="text-xs text-destructive">{group.linkProblem}</p>
+            ) : (
+              <p className="text-xs text-muted-foreground">Defaults to your Medialane account page.</p>
+            )}
           </Field>
         </div>
       )}

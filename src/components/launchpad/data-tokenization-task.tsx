@@ -21,6 +21,7 @@ import { RunClosed, RunInProgress, itemCount } from "./data-tokenization/run-sec
 import { LAUNCHPAD } from "@/lib/launchpad/services";
 import { readManifest } from "@/lib/launchpad/data-tokenization/manifest";
 import { defaultTerms, runSpec, type CollectionChoice, type Terms } from "@/lib/launchpad/data-tokenization/spec";
+import { collectionFiles } from "@/lib/launchpad/collection-choice";
 import type { LaunchpadRun } from "@medialane/sdk";
 import { executeRun, describeRunEvent } from "@/lib/launchpad/data-tokenization/executor";
 
@@ -96,7 +97,7 @@ export function DataTokenizationTask() {
         {
           ...deps,
           client,
-          files: new Map(files.map((f) => [f.name, f])),
+          files: new Map([...files.map((f) => [f.name, f] as [string, File]), ...(collection ? collectionFiles(collection) : [])]),
           userAddress: address!,
           batchBase: client.runBatchBase,
           collectionBase: client.runCollectionBase,

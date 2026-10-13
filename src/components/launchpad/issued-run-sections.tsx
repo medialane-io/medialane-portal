@@ -13,7 +13,7 @@ export const recipientCount = (run: LaunchpadRun | null) => {
 export function PaidRunSection({
   run,
   unit,
-  needsArtwork,
+  missing,
   busy,
   onContinue,
   onCancel,
@@ -22,7 +22,7 @@ export function PaidRunSection({
 }: {
   run: LaunchpadRun;
   unit: string;
-  needsArtwork: boolean;
+  missing: string[];
   busy: boolean;
   onContinue: () => void;
   onCancel: () => void;
@@ -36,7 +36,7 @@ export function PaidRunSection({
       <p className="text-muted-foreground">
         {count.toLocaleString()} {count === 1 ? unit : `${unit}s`}. Continue anytime and it picks up where it stopped.
       </p>
-      {needsArtwork ? <p>Attach the artwork again to continue: {(run.spec as { artwork?: { name: string } }).artwork?.name}</p> : null}
+      {missing.length > 0 ? <p>Attach these files again to continue: {missing.join(", ")}</p> : null}
       <div className="flex flex-wrap gap-3">
         <Button onClick={onContinue} disabled={busy} size="lg" className={buttonClassName}>
           {busy ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}

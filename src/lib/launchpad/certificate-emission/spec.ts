@@ -1,11 +1,12 @@
 import { LAUNCHPAD } from "@/lib/launchpad/services";
+import { newCollectionSpec, type NewCollectionChoice } from "@/lib/launchpad/collection-choice";
 import { baseTerms, withPreset, type Terms } from "@/lib/launchpad/terms";
 
 export type { Terms };
 
 export type GroupChoice =
   | { kind: "existing"; collectionId: string; contractAddress: string }
-  | { kind: "new"; name: string; symbol: string };
+  | NewCollectionChoice;
 
 export interface CertificateEmissionForm {
   collection: GroupChoice;
@@ -28,7 +29,7 @@ export function defaultTerms(): Terms {
 
 export function certificateEmissionRunSpec(form: CertificateEmissionForm) {
   return {
-    collection: form.collection,
+    collection: form.collection.kind === "new" ? newCollectionSpec(form.collection) : form.collection,
     terms: { ...form.terms, royalty: 0 },
     name: form.name.trim(),
     description: form.description,

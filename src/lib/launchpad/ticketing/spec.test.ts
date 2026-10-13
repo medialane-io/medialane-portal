@@ -2,7 +2,14 @@ import { describe, expect, test } from "bun:test";
 import { ticketingRunSpec, existingChoice, type TicketingForm } from "./spec";
 
 const form: TicketingForm = {
-  collection: { kind: "new", name: "Gala", symbol: "GALA" },
+  collection: {
+    kind: "new",
+    name: "Gala",
+    symbol: "GALA",
+    description: "Gala night",
+    externalLink: "",
+    image: new File(["c"], "cover.png", { type: "image/png" }),
+  },
   name: "General admission",
   description: "Doors at 8",
   artwork: new File(["xyz"], "a.png", { type: "image/png" }),
@@ -16,7 +23,13 @@ const form: TicketingForm = {
 describe("the run spec for a ticketing run", () => {
   test("carries the collection, the ticket, the artwork's identity and the guests", () => {
     const spec = ticketingRunSpec(form);
-    expect(spec.collection).toEqual({ kind: "new", name: "Gala", symbol: "GALA" });
+    expect(spec.collection).toEqual({
+      kind: "new",
+      name: "Gala",
+      symbol: "GALA",
+      description: "Gala night",
+      image: { name: "cover.png", size: 1, type: "image/png" },
+    });
     expect(spec.name).toBe("General admission");
     expect(spec.description).toBe("Doors at 8");
     expect(spec.artwork).toEqual({ name: "a.png", size: 3, type: "image/png" });

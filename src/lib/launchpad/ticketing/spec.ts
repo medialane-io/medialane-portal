@@ -1,6 +1,7 @@
 import { toUnixSeconds } from "@/lib/launchpad/issuance-form";
+import { newCollectionSpec, type NewCollectionChoice } from "@/lib/launchpad/collection-choice";
 
-export type GroupChoice = { kind: "existing"; contractAddress: string } | { kind: "new"; name: string; symbol: string };
+export type GroupChoice = { kind: "existing"; contractAddress: string } | NewCollectionChoice;
 
 export interface TicketingForm {
   collection: GroupChoice;
@@ -30,7 +31,7 @@ export function ticketingRunSpec(form: TicketingForm) {
   const supply = form.supply.trim();
 
   return {
-    collection: form.collection,
+    collection: form.collection.kind === "new" ? newCollectionSpec(form.collection) : form.collection,
     terms: {
       licenseType: form.terms.licenseType,
       commercialUse: "No" as const,
