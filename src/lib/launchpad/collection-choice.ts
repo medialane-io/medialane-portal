@@ -35,3 +35,12 @@ export function externalLinkProblem(link: string): string | null {
   } catch {}
   return "Use a link that starts with http:// or https://";
 }
+
+const sameFile = (a: File, b: File) =>
+  a.name === b.name && a.size === b.size && a.type === b.type && a.lastModified === b.lastModified;
+
+export function collectionImageProblem(image: File | null, others: File[]): string | null {
+  if (!image) return null;
+  const clash = others.some((other) => other.name === image.name && !sameFile(other, image));
+  return clash ? `Another file in this run is also named ${image.name}. Rename the collection image and choose it again.` : null;
+}

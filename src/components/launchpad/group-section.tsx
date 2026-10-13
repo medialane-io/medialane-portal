@@ -21,6 +21,7 @@ export function GroupSection({
   heading,
   words,
   group,
+  imageProblem,
   serviceId,
   owner,
   disabled,
@@ -46,6 +47,7 @@ export function GroupSection({
     | "pick"
     | "pickedAddress"
   >;
+  imageProblem?: string | null;
   serviceId: CollectionServiceId;
   owner: string;
   disabled: boolean;
@@ -92,7 +94,7 @@ export function GroupSection({
               </Field>
             </div>
           </div>
-          {group.cover.error ? <p className="text-sm text-destructive">{group.cover.error}</p> : null}
+          {group.cover.error || imageProblem ? <p className="text-sm text-destructive">{group.cover.error ?? imageProblem}</p> : null}
           <Field label="Description (optional)">
             <Textarea
               value={group.description}

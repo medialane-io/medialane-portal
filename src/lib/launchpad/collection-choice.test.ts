@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { collectionFiles, externalLinkProblem, newCollectionSpec } from "./collection-choice";
+import { collectionFiles, collectionImageProblem, externalLinkProblem, newCollectionSpec } from "./collection-choice";
 
 const image = new File(["x"], "cover.png", { type: "image/png" });
 
@@ -44,5 +44,21 @@ describe("externalLinkProblem", () => {
     expect(externalLinkProblem("me.example")).toBe("Use a link that starts with http:// or https://");
     expect(externalLinkProblem("ftp://me.example")).toBe("Use a link that starts with http:// or https://");
     expect(externalLinkProblem("https://")).toBe("Use a link that starts with http:// or https://");
+  });
+});
+
+describe("collectionImageProblem", () => {
+  const cover = new File(["cover"], "image.png", { type: "image/png", lastModified: 1 });
+
+  test("accepts no image, a uniquely named image, or the very same file chosen twice", () => {
+    expect(collectionImageProblem(null, [new File(["a"], "image.png")])).toBeNull();
+    expect(collectionImageProblem(cover, [new File(["a"], "art.png")])).toBeNull();
+    expect(collectionImageProblem(cover, [new File(["cover"], "image.png", { type: "image/png", lastModified: 1 })])).toBeNull();
+  });
+
+  test("rejects a different file that has the same name as another file in the run", () => {
+    expect(collectionImageProblem(cover, [new File(["other artwork"], "image.png", { type: "image/png", lastModified: 2 })])).toBe(
+      "Another file in this run is also named image.png. Rename the collection image and choose it again.",
+    );
   });
 });

@@ -18,7 +18,7 @@ import { useGroupChoice } from "@/hooks/use-group-choice";
 import { CheckoutPanel } from "@/components/launchpad/checkout-panel";
 import type { CollectionOption } from "./collection-picker";
 import { GroupSection } from "./group-section";
-import { collectionFiles } from "@/lib/launchpad/collection-choice";
+import { collectionFiles, collectionImageProblem } from "@/lib/launchpad/collection-choice";
 import { RecipientsSection } from "./recipients-section";
 import { ArtworkDrop } from "./artwork-drop";
 import { ClosedRunSection, PaidRunSection, recipientCount } from "./issued-run-sections";
@@ -76,9 +76,10 @@ export function CertificateEmissionTask() {
   const invalid = invalidRecipients(recipients);
 
   const group = groupState.choice;
+  const imageProblem = groupState.mode === "new" ? collectionImageProblem(groupState.cover.artwork, artwork ? [artwork] : []) : null;
   const runFiles = new Map<string, File>([
-    ...(artwork ? [[artwork.name, artwork] as [string, File]] : []),
     ...(group ? collectionFiles(group) : []),
+    ...(artwork ? [[artwork.name, artwork] as [string, File]] : []),
   ]);
 
   function chooseArtwork(file: File | undefined) {
@@ -88,6 +89,7 @@ export function CertificateEmissionTask() {
   const ready =
     Boolean(address) &&
     group !== null &&
+    !imageProblem &&
     name.trim().length > 0 &&
     recipients.length > 0 &&
     invalid.length === 0;
@@ -212,6 +214,7 @@ export function CertificateEmissionTask() {
                   symbolPlaceholder: "ONB26",
                 }}
                 group={groupState}
+                imageProblem={imageProblem}
                 serviceId={LAUNCHPAD.certificates.collections}
                 owner={address ?? ""}
                 disabled={busy}
