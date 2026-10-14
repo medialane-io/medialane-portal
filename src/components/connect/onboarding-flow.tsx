@@ -13,7 +13,6 @@ import { useWalletNativeSession } from "@/hooks/use-wallet-native-session";
 import { refreshSession, useSession } from "@/hooks/use-session";
 import { useEmailCode } from "@/hooks/use-email-code";
 import { fireConfetti } from "@/lib/confetti";
-import { MedialaneApiError } from "@medialane/sdk";
 import { mediaWallet } from "@/lib/wallet/client";
 import { CONSUMER_APP_URL } from "@/lib/site";
 import { afterCodeVerified } from "@/lib/onboarding/decisions";
@@ -21,7 +20,7 @@ import { flowReducer, initialFlow, type OnboardingStep } from "@/lib/onboarding/
 
 export type { OnboardingStep };
 
-const WALLET_STEPS: OnboardingStep[] = ["creating-passkey", "deploying", "signing-in"];
+const WALLET_STEPS: OnboardingStep[] = ["creating-passkey", "deploying"];
 
 export function isWalletStep(step: OnboardingStep): boolean {
   return WALLET_STEPS.includes(step);
@@ -29,7 +28,6 @@ export function isWalletStep(step: OnboardingStep): boolean {
 
 export function walletStepLabel(step: OnboardingStep): string {
   if (step === "deploying") return "Setting up your wallet…";
-  if (step === "signing-in") return "Signing in…";
   return "Creating passkey…";
 }
 
@@ -71,20 +69,10 @@ export function OnboardingFlow({ start = "email", redirectTo = null, onDone }: O
   const runWalletSetup = useCallback(async () => {
     dispatch({ type: "wallet-setup-started" });
     try {
-      const { siwsToken } = await mediaWallet.completeDeployment((s) =>
-        dispatch({ type: "wallet-progress", step: s as "creating-passkey" | "deploying" | "signing-in" }),
-      );
-      await getMedialaneClient().api.upsertMyWallet(siwsToken, {
-        walletType: "MEDIAWALLET",
-        chain: "STARKNET",
-      });
+      await mediaWallet.completeDeployment((step) => dispatch({ type: "wallet-progress", step }));
       await refreshSession();
       finish(true);
     } catch (err) {
-      if (err instanceof MedialaneApiError && err.message === "ACCOUNT_LINK_REQUIRED") {
-        dispatch({ type: "link-required" });
-        return;
-      }
       console.error("wallet setup failed", err);
       await failWallet(err);
     }

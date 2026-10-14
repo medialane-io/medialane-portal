@@ -10,7 +10,7 @@ const api = {
   upsertMyWallet: mock<(token: string, body: object) => Promise<object>>(async () => ({})),
   getSessionWallet: () => getSessionWallet(),
 };
-const completeDeployment = mock<(onStep: (s: string) => void) => Promise<{ siwsToken: string }>>(async () => ({ siwsToken: "siws" }));
+const completeDeployment = mock<(onStep: (s: string) => void) => Promise<{ sealed: object }>>(async () => ({ sealed: {} }));
 const getSessionWallet = mock<() => Promise<{ walletAddress: string; needsKeySetup: boolean } | null>>(async () => null);
 let localAddress: string | null = null;
 
@@ -45,7 +45,7 @@ beforeEach(() => {
   localStorage.clear();
   api.checkEmail.mockImplementation(async () => ({ exists: false }));
   api.verifyEmailCode.mockImplementation(async () => ({}));
-  completeDeployment.mockImplementation(async () => ({ siwsToken: "siws" }));
+  completeDeployment.mockImplementation(async () => ({ sealed: {} }));
   getSessionWallet.mockImplementation(async () => null);
 });
 afterEach(cleanup);
@@ -76,7 +76,7 @@ describe("someone signed in whose account has no wallet yet", () => {
 });
 
 describe("a new account", () => {
-  test("proves the email with a code first, then makes a wallet, links it and celebrates", async () => {
+  test("proves the email with a code first, then makes a wallet and celebrates without a separate link call", async () => {
     await enterEmail("new@example.com");
     await enterCode();
     await waitFor(() => expect(done).toEqual([{ celebrated: true }]));
@@ -85,7 +85,7 @@ describe("a new account", () => {
     expect(api.verifyEmailCode).toHaveBeenCalledWith("new@example.com", "123456");
     expect(getSessionWallet).not.toHaveBeenCalled();
     expect(completeDeployment).toHaveBeenCalledTimes(1);
-    expect(api.upsertMyWallet).toHaveBeenCalledTimes(1);
+    expect(api.upsertMyWallet).not.toHaveBeenCalled();
   });
 
   test("never makes a wallet before the code is verified", async () => {
@@ -186,6 +186,6 @@ describe("resuming wallet setup for an account that is already signed in", () =>
     expect(screen.queryByPlaceholderText("you@example.com")).toBeNull();
     await waitFor(() => expect(done).toEqual([{ celebrated: true }]));
     expect(completeDeployment).toHaveBeenCalledTimes(1);
-    expect(api.upsertMyWallet).toHaveBeenCalledTimes(1);
+    expect(api.upsertMyWallet).not.toHaveBeenCalled();
   });
 });
