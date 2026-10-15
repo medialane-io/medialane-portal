@@ -2,9 +2,8 @@ import { describe, expect, test } from "bun:test";
 import { emailRow, recoveryRow, walletRow } from "./rows";
 
 describe("settings rows", () => {
-  test("the email row waits for the status, then says set, confirmed or not confirmed", () => {
+  test("the email row waits for the status, then says confirmed or not confirmed", () => {
     expect(emailRow(null)).toBeNull();
-    expect(emailRow({ email: null, verified: false })).toEqual({ value: "Not set", tone: "warn" });
     expect(emailRow({ email: "a@b.co", verified: true })).toEqual({ value: "Confirmed", tone: "ok" });
     expect(emailRow({ email: "a@b.co", verified: false })).toEqual({ value: "Not confirmed", tone: "warn" });
   });

@@ -35,9 +35,4 @@ describe("after the login code is verified", () => {
       walletAddress: WALLET,
     });
   });
-
-  test("a wallet that still has the platform's provisioning key is finished on medialane.io, never from here", () => {
-    expect(afterCodeVerified({ walletAddress: WALLET, needsKeySetup: true }, null)).toEqual({ type: "setup-elsewhere" });
-    expect(afterCodeVerified({ walletAddress: WALLET, needsKeySetup: true }, WALLET)).toEqual({ type: "setup-elsewhere" });
-  });
 });

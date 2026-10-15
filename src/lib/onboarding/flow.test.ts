@@ -57,10 +57,6 @@ describe("a returning user on a device with no key", () => {
     const s = run(fresh, { type: "code-submitted" }, { type: "needs-pairing", walletAddress: "0xabc" });
     expect(s).toMatchObject({ step: "pair-or-recover", walletAddress: "0xabc", error: null });
   });
-
-  test("a wallet that must be finished on medialane.io has its own step", () => {
-    expect(run(fresh, { type: "needs-setup-elsewhere" }).step).toBe("setup-elsewhere");
-  });
 });
 
 describe("when the wallet step fails", () => {

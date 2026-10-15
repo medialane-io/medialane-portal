@@ -16,11 +16,7 @@ describe("the headline", () => {
     expect(accountStatus({ ...base, recovery: "unknown" }).headline).toBeNull();
   });
 
-  test("asks for an email first, then its confirmation", () => {
-    expect(accountStatus({ ...base, email: { email: null, verified: false } }).headline).toMatchObject({
-      tone: "warn",
-      href: "/settings/email",
-    });
+  test("asks to confirm the email", () => {
     expect(accountStatus({ ...base, email: { email: "team@example.com", verified: false } }).headline?.text).toContain("Confirm your email");
   });
 

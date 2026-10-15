@@ -6,13 +6,12 @@ export interface RowStatus {
 }
 
 export interface EmailStatus {
-  email: string | null;
+  email: string;
   verified: boolean;
 }
 
 export function emailRow(status: EmailStatus | null): RowStatus | null {
   if (!status) return null;
-  if (!status.email) return { value: "Not set", tone: "warn" };
   return status.verified ? { value: "Confirmed", tone: "ok" } : { value: "Not confirmed", tone: "warn" };
 }
 
