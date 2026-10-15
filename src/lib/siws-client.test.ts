@@ -1,7 +1,7 @@
 import { test, expect } from "bun:test";
 import { requestSiwsToken } from "./siws-client";
 
-test("wallet sign-in declares this app as the registration source", async () => {
+test("a fresh signature asks only for a token, without registering an account or starting a session", async () => {
   const bodies: Record<string, unknown>[] = [];
   const original = globalThis.fetch;
   globalThis.fetch = (async (url: string, init?: RequestInit) => {
@@ -14,5 +14,5 @@ test("wallet sign-in declares this app as the registration source", async () => 
   } finally {
     globalThis.fetch = original;
   }
-  expect(bodies[1]).toMatchObject({ appSource: "MEDIALANE_PORTAL" });
+  expect(bodies[1]).not.toHaveProperty("appSource");
 });

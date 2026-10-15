@@ -6,7 +6,6 @@ export type OnboardingStep =
   | "creating-passkey"
   | "deploying"
   | "pair-or-recover"
-  | "setup-elsewhere"
   | "done";
 
 export interface FlowState {
@@ -28,7 +27,6 @@ export type FlowEvent =
   | { type: "wallet-progress"; step: "creating-passkey" | "deploying" }
   | { type: "wallet-failed"; message: string; canRetry: boolean }
   | { type: "needs-pairing"; walletAddress: string }
-  | { type: "needs-setup-elsewhere" }
   | { type: "finished" };
 
 export const initialFlow = (start: "email" | "wallet"): FlowState => ({
@@ -61,8 +59,6 @@ export function flowReducer(state: FlowState, event: FlowEvent): FlowState {
       return { ...state, step: "creating-passkey", error: event.message, canRetry: event.canRetry };
     case "needs-pairing":
       return { ...state, step: "pair-or-recover", error: null, walletAddress: event.walletAddress };
-    case "needs-setup-elsewhere":
-      return { ...state, step: "setup-elsewhere", error: null };
     case "finished":
       return { ...state, step: "done" };
   }

@@ -7,10 +7,15 @@ const SESSION_KEY = "/api/session";
 
 let lastEmail: string | null = null;
 
-async function fetchSession(): Promise<ApiSession | null> {
+export async function fetchSession(): Promise<ApiSession | null> {
   const res = await fetch(SESSION_KEY, { cache: "no-store" });
   if (!res.ok) throw new Error("Session check failed");
   const session = (await res.json()) as ApiSession | null;
+  if (session && !session.email) {
+    await fetch(SESSION_KEY, { method: "DELETE" });
+    lastEmail = null;
+    return null;
+  }
   lastEmail = session?.email ?? null;
   return session;
 }

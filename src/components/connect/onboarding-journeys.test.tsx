@@ -127,14 +127,11 @@ describe("an address that already has an account", () => {
     expect(completeDeployment).toHaveBeenCalledTimes(1);
   });
 
-  test("a wallet still holding the platform's provisioning key is sent to medialane.io", async () => {
-    getSessionWallet.mockImplementation(async () => ({ walletAddress: WALLET, needsKeySetup: true }));
-    await enterEmail("consumer@example.com");
-    await enterCode();
-    const link = await screen.findByRole("link", { name: "Open medialane.io" });
-    expect(link.getAttribute("href")).toBe("https://medialane.io");
-    expect(done).toEqual([]);
-    expect(completeDeployment).not.toHaveBeenCalled();
+  test("an incomplete email address is refused before any code is sent", async () => {
+    await enterEmail("name@");
+    await screen.findByText(/full email address/);
+    expect(api.checkEmail).not.toHaveBeenCalled();
+    expect(api.requestEmailCode).not.toHaveBeenCalled();
   });
 
   test("a wrong code shows a message and lets them try again", async () => {

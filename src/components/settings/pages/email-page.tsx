@@ -85,24 +85,20 @@ export default function EmailSettingsPage() {
             </div>
           ) : (
             <div className="space-y-4">
-              {status.email ? (
-                <div className="flex flex-wrap items-center gap-2">
-                  <span className="min-w-0 truncate text-sm text-foreground">{status.email}</span>
-                  {status.verified ? (
-                    <Badge variant="outline" className="gap-1 border-emerald-500/40 bg-emerald-500/10 text-[10px] text-emerald-600 dark:text-emerald-400">
-                      <CheckCircle2 className="h-3 w-3" /> Verified
-                    </Badge>
-                  ) : (
-                    <Badge variant="outline" className="gap-1 border-yellow-500/40 bg-yellow-500/10 text-[10px] text-yellow-700 dark:text-yellow-400">
-                      <Clock className="h-3 w-3" /> Not verified
-                    </Badge>
-                  )}
-                </div>
-              ) : (
-                <p className="text-sm text-muted-foreground">No email on this account yet.</p>
-              )}
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="min-w-0 truncate text-sm text-foreground">{status.email}</span>
+                {status.verified ? (
+                  <Badge variant="outline" className="gap-1 border-emerald-500/40 bg-emerald-500/10 text-[10px] text-emerald-600 dark:text-emerald-400">
+                    <CheckCircle2 className="h-3 w-3" /> Verified
+                  </Badge>
+                ) : (
+                  <Badge variant="outline" className="gap-1 border-yellow-500/40 bg-yellow-500/10 text-[10px] text-yellow-700 dark:text-yellow-400">
+                    <Clock className="h-3 w-3" /> Not verified
+                  </Badge>
+                )}
+              </div>
               <div className="flex flex-wrap gap-2">
-                {status.email && !status.verified ? (
+                {!status.verified ? (
                   <Button
                     variant="outline"
                     onClick={() => {
@@ -117,17 +113,17 @@ export default function EmailSettingsPage() {
                   variant="ghost"
                   onClick={() => {
                     setEditOpen(true);
-                    setInput(status.email ?? "");
+                    setInput(status.email);
                   }}
                 >
-                  {status.email ? "Change email" : "Add email"}
+                  Change email
                 </Button>
               </div>
             </div>
           )}
         </AccountSection>
 
-        {status?.email ? (
+        {status ? (
           <EmailVerifyDialog
             open={dialogOpen}
             onOpenChange={setDialogOpen}

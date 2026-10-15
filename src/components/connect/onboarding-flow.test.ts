@@ -14,9 +14,7 @@ describe("which steps are wallet setup", () => {
       "checking-email",
       "code",
       "verifying-code",
-      "add-email",
       "pair-or-recover",
-      "setup-elsewhere",
       "done",
     ] as OnboardingStep[]) {
       expect(isWalletStep(step)).toBe(false);

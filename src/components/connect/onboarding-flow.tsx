@@ -14,8 +14,7 @@ import { refreshSession, useSession } from "@/hooks/use-session";
 import { useEmailCode } from "@/hooks/use-email-code";
 import { fireConfetti } from "@/lib/confetti";
 import { mediaWallet } from "@/lib/wallet/client";
-import { CONSUMER_APP_URL } from "@/lib/site";
-import { afterCodeVerified } from "@/lib/onboarding/decisions";
+import { afterCodeVerified, isEmailAddress } from "@/lib/onboarding/decisions";
 import { flowReducer, initialFlow, type OnboardingStep } from "@/lib/onboarding/flow";
 
 export type { OnboardingStep };
@@ -102,6 +101,10 @@ export function OnboardingFlow({ start = "email", redirectTo = null, onDone }: O
   };
 
   const continueWithEmail = async () => {
+    if (!isEmailAddress(email)) {
+      dispatch({ type: "email-step-failed", message: "Please enter your full email address, like name@example.com." });
+      return;
+    }
     dispatch({ type: "email-submitted" });
     try {
       const { exists } = await getMedialaneClient().api.checkEmail(email);
@@ -124,7 +127,6 @@ export function OnboardingFlow({ start = "email", redirectTo = null, onDone }: O
       const next = afterCodeVerified(wallet, loadWalletAddress());
       if (next.type === "finish") finish();
       else if (next.type === "pair-or-recover") dispatch({ type: "needs-pairing", walletAddress: next.walletAddress });
-      else if (next.type === "setup-elsewhere") dispatch({ type: "needs-setup-elsewhere" });
       else await runWalletSetup();
     } catch (err) {
       emailCode.fail(describeError(err, "Something went wrong. Please try again.").message);
@@ -198,20 +200,6 @@ export function OnboardingFlow({ start = "email", redirectTo = null, onDone }: O
     );
   }
 
-  if (step === "setup-elsewhere") {
-    return (
-      <div className="w-full space-y-3">
-        <p className="text-sm text-muted-foreground">
-          This account was created on Medialane. Finish setting it up there, then come back and sign in.
-        </p>
-        <Button asChild size="lg" className="w-full">
-          <a href={CONSUMER_APP_URL} target="_blank" rel="noopener noreferrer">
-            Open medialane.io
-          </a>
-        </Button>
-      </div>
-    );
-  }
 
 
   if (step === "code" || step === "verifying-code") {

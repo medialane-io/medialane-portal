@@ -7,7 +7,7 @@ import type { EmailStatus } from "@/lib/settings/rows";
 
 export function useAccountEmail() {
   const { session } = useSession();
-  const status: EmailStatus | null = session ? { email: session.email, verified: !session.emailDeadline } : null;
+  const status: EmailStatus | null = session?.email ? { email: session.email, verified: !session.emailDeadline } : null;
 
   const markVerified = useCallback(() => void refreshSession(), []);
 

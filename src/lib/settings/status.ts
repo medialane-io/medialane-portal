@@ -27,7 +27,6 @@ const shortAddress = (a: string): string => `${a.slice(0, 6)}…${a.slice(-4)}`;
 
 function headline({ email, walletDeployed, recovery }: StatusInput): StatusHeadline | null {
   if (email === null || walletDeployed === null || recovery === "unknown") return null;
-  if (!email.email) return { tone: "warn", text: "Add your email to keep your account", href: "/settings/email" };
   if (!email.verified) return { tone: "warn", text: "Confirm your email to keep your account", href: "/settings/email" };
   if (!walletDeployed) return { tone: "muted", text: "Your wallet is still setting up" };
   if (recovery === "missing") {
@@ -42,8 +41,8 @@ export function accountStatus(input: StatusInput): { headline: StatusHeadline | 
   const signin: StatusLine = {
     id: "signin",
     label: "Sign-in",
-    value: email === null ? null : (email.email ?? "No email yet"),
-    note: email?.email ? (email.verified ? { text: "Confirmed", tone: "ok" } : { text: "Not confirmed", tone: "warn" }) : undefined,
+    value: email?.email ?? null,
+    note: email ? (email.verified ? { text: "Confirmed", tone: "ok" } : { text: "Not confirmed", tone: "warn" }) : undefined,
   };
 
   const wallet: StatusLine = {
