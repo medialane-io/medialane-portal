@@ -8,6 +8,7 @@ let GET: (req: Request) => Promise<Response>;
 
 beforeAll(async () => {
   process.env.MEDIALANE_API_KEY = "test-key";
+  process.env.MEDIALANE_APP_SECRET = "test-secret";
   globalThis.fetch = (async (url: unknown, init?: RequestInit) => {
     calls.push({ url: String(url), headers: new Headers(init?.headers) });
     return backend();
@@ -44,6 +45,7 @@ test("a valid session returns the account, asked with the app's key and the sess
   expect(calls[0]!.url).toEndWith("/v1/users/me");
   expect(calls[0]!.headers.get("x-account-session")).toBe("acct-123");
   expect(calls[0]!.headers.get("x-api-key")).toBe("test-key");
+  expect(calls[0]!.headers.get("x-app-secret")).toBe("test-secret");
   expect(calls[0]!.headers.get("x-app-id")).toBe("MEDIALANE_PORTAL");
 });
 

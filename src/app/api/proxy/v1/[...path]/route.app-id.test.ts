@@ -11,6 +11,7 @@ let POST: Handler;
 
 beforeAll(async () => {
   process.env.MEDIALANE_API_KEY = "test-key";
+  process.env.MEDIALANE_APP_SECRET = "test-secret";
   globalThis.fetch = (async (url: unknown, init?: RequestInit) => {
     forwardedUrl = String(url);
     forwarded = new Headers(init?.headers);
@@ -33,6 +34,7 @@ test("the proxy names its app and ignores an app id sent by the browser", async 
   expect(res.status).toBe(200);
   expect(forwarded?.get("x-app-id")).toBe("MEDIALANE_PORTAL");
   expect(forwarded?.get("x-api-key")).toBe("test-key");
+  expect(forwarded?.get("x-app-secret")).toBe("test-secret");
 });
 
 test("the proxy forwards the account session cookie as x-account-session on every request", async () => {
