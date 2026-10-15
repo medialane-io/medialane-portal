@@ -6,10 +6,11 @@ type Key = { id: string; prefix: string; lastUsedAt: string | null };
 
 let keys: Key[] = [];
 const mutate = mock(async () => undefined);
-const signIn = mock<() => Promise<string | null>>(async () => "siws-token");
+const CONFIRMATION = { expiresAt: 1_700_000_300, signature: ["0x1", "0x2"] };
+const signIn = mock<(change: { action: string; key: string }) => Promise<typeof CONFIRMATION | null>>(async () => CONFIRMATION);
 const api = {
-  createApiKey: mock<(body: object, token: string) => Promise<{ data: { plaintext: string } }>>(async () => ({ data: { plaintext: "ml_live_secret" } })),
-  deleteApiKey: mock<(id: string, token: string) => Promise<object>>(async () => ({})),
+  createApiKey: mock<(body: object, confirmation: object) => Promise<{ data: { plaintext: string } }>>(async () => ({ data: { plaintext: "ml_live_secret" } })),
+  deleteApiKey: mock<(id: string, confirmation: object) => Promise<object>>(async () => ({})),
 };
 const confirmReplace = mock((message?: unknown) => typeof message === "string");
 
@@ -18,7 +19,7 @@ const real = {
 };
 
 mock.module("@/hooks/use-portal-account", () => ({ ...real.account, usePortalKeys: () => ({ data: keys, mutate }) }));
-mock.module("@/hooks/use-fresh-signature", () => ({ useFreshSignature: () => signIn }));
+mock.module("@/hooks/use-key-confirmation", () => ({ useKeyConfirmation: () => signIn }));
 mock.module("@/lib/medialane-client", () => ({ getMedialaneClient: () => ({ api }) }));
 
 const { ApiKeys } = await import("./api-keys");
@@ -29,7 +30,7 @@ beforeEach(() => {
   keys = [];
   mutate.mockClear();
   signIn.mockClear();
-  signIn.mockImplementation(async () => "siws-token");
+  signIn.mockImplementation(async () => CONFIRMATION);
   api.createApiKey.mockClear();
   api.deleteApiKey.mockClear();
   confirmReplace.mockClear();
@@ -44,8 +45,8 @@ describe("creating the key", () => {
     fireEvent.click(screen.getByRole("button", { name: "Create key" }));
     await waitFor(() => expect(screen.getByText("ml_live_secret")).toBeTruthy());
     expect(confirmReplace).not.toHaveBeenCalled();
-    expect(signIn).toHaveBeenCalledTimes(1);
-    expect(api.createApiKey.mock.calls[0]![1]).toBe("siws-token");
+    expect(signIn.mock.calls).toEqual([[{ action: "replace_api_key", key: "none" }]]);
+    expect(api.createApiKey.mock.calls[0]![1]).toEqual(CONFIRMATION);
     expect(screen.getByText(/It is not shown again/)).toBeTruthy();
     expect(mutate).toHaveBeenCalled();
   });
@@ -61,7 +62,7 @@ describe("creating the key", () => {
 
   test("a rejected confirmation is reported without leaking the secret", async () => {
     api.createApiKey.mockImplementationOnce(async () => {
-      throw new MedialaneApiError(401, "unauthorized");
+      throw new MedialaneApiError(403, "confirmation_required");
     });
     render(<ApiKeys />);
     fireEvent.click(screen.getByRole("button", { name: "Create key" }));
@@ -86,6 +87,7 @@ describe("replacing the key", () => {
     await waitFor(() => expect(api.createApiKey).toHaveBeenCalledTimes(1));
     expect(confirmReplace).toHaveBeenCalledTimes(1);
     expect(String(confirmReplace.mock.calls[0]![0])).toMatch(/stops the current key working/i);
+    expect(signIn.mock.calls).toEqual([[{ action: "replace_api_key", key: "id-1" }]]);
     expect(await screen.findByText("ml_live_secret")).toBeTruthy();
   });
 
@@ -106,7 +108,7 @@ describe("deleting the key", () => {
     render(<ApiKeys />);
     fireEvent.click(screen.getByRole("button", { name: "Delete key" }));
     await waitFor(() => expect(api.deleteApiKey).toHaveBeenCalledTimes(1));
-    expect(api.deleteApiKey.mock.calls[0]).toEqual(["id-2", "siws-token"]);
-    expect(signIn).toHaveBeenCalledTimes(1);
+    expect(api.deleteApiKey.mock.calls[0]).toEqual(["id-2", CONFIRMATION]);
+    expect(signIn.mock.calls).toEqual([[{ action: "delete_api_key", key: "id-2" }]]);
   });
 });

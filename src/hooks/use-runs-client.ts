@@ -9,7 +9,6 @@ export function useRunsClient() {
     () =>
       createLaunchpadRunsClient({
         baseUrl: MEDIALANE_BACKEND_URL,
-        getToken: async () => null,
       }),
     [],
   );

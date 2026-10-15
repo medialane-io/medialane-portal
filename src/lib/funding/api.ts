@@ -3,8 +3,8 @@ import { fundingApiFor, type FundingApi } from "@medialane/sdk/starknet";
 
 const PORTAL_PROXY = "/api/proxy";
 
-export function portalFundingApi(mediaWalletToken: string | null, asset?: string): FundingApi {
-  const api = fundingApiFor(new ApiClient(PORTAL_PROXY), mediaWalletToken ?? undefined);
+export function portalFundingApi(asset?: string): FundingApi {
+  const api = fundingApiFor(new ApiClient(PORTAL_PROXY));
   if (!asset || asset === "USDC") return api;
   return {
     ...api,

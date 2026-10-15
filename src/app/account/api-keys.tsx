@@ -6,7 +6,7 @@ import { Copy, KeyRound, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { usePortalKeys } from "@/hooks/use-portal-account";
-import { useFreshSignature } from "@/hooks/use-fresh-signature";
+import { useKeyConfirmation } from "@/hooks/use-key-confirmation";
 import { getMedialaneClient } from "@/lib/medialane-client";
 import { MedialaneApiError } from "@medialane/sdk";
 
@@ -15,29 +15,29 @@ const REPLACE_WARNING =
   "Replacing the key stops the current key working right away. Anything that uses it must be updated with the new key. Continue?";
 
 function unconfirmed(err: unknown): never {
-  if (err instanceof MedialaneApiError && err.status === 401) throw new Error(NOT_CONFIRMED);
+  if (err instanceof MedialaneApiError && err.status === 403) throw new Error(NOT_CONFIRMED);
   throw err;
 }
 
 export function ApiKeys() {
   const { data: keys, mutate } = usePortalKeys(true);
-  const signFresh = useFreshSignature();
+  const confirmChange = useKeyConfirmation();
   const [plaintext, setPlaintext] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const hasKey = (keys?.length ?? 0) > 0;
 
-  async function confirm(): Promise<string> {
-    const token = await signFresh().catch(() => null);
-    if (!token) throw new Error(NOT_CONFIRMED);
-    return token;
+  async function confirm(change: Parameters<typeof confirmChange>[0]) {
+    const confirmation = await confirmChange(change).catch(() => null);
+    if (!confirmation) throw new Error(NOT_CONFIRMED);
+    return confirmation;
   }
 
   async function create() {
     if (hasKey && !window.confirm(REPLACE_WARNING)) return;
     setBusy(true);
     try {
-      const token = await confirm();
-      const body = await getMedialaneClient().api.createApiKey({}, token).catch(unconfirmed);
+      const confirmation = await confirm({ action: "replace_api_key", key: keys?.[0]?.id ?? "none" });
+      const body = await getMedialaneClient().api.createApiKey({}, confirmation).catch(unconfirmed);
       setPlaintext(body.data.plaintext);
       await mutate();
     } catch (err) {
@@ -50,8 +50,8 @@ export function ApiKeys() {
   async function remove(id: string) {
     setBusy(true);
     try {
-      const token = await confirm();
-      await getMedialaneClient().api.deleteApiKey(id, token).catch(unconfirmed);
+      const confirmation = await confirm({ action: "delete_api_key", key: id });
+      await getMedialaneClient().api.deleteApiKey(id, confirmation).catch(unconfirmed);
       setPlaintext(null);
       await mutate();
     } catch (err) {
