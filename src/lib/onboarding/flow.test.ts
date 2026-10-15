@@ -23,8 +23,8 @@ describe("a new user's journey", () => {
     expect(s).toMatchObject({ step: "code", accountExisted: false });
     s = run(s, { type: "code-submitted" });
     expect(s.step).toBe("verifying-code");
-    s = run(s, { type: "wallet-setup-started" }, { type: "wallet-progress", step: "deploying" }, { type: "wallet-progress", step: "signing-in" });
-    expect(s.step).toBe("signing-in");
+    s = run(s, { type: "wallet-setup-started" }, { type: "wallet-progress", step: "deploying" });
+    expect(s.step).toBe("deploying");
     expect(run(s, { type: "finished" }).step).toBe("done");
   });
 });
@@ -73,10 +73,6 @@ describe("when the wallet step fails", () => {
   test("starting again clears the message and allows a retry", () => {
     const s = run(fresh, { type: "wallet-failed", message: "x", canRetry: false }, { type: "wallet-setup-started" });
     expect(s).toMatchObject({ error: null, canRetry: true, step: "creating-passkey" });
-  });
-
-  test("a wallet that needs linking to an email account goes back to the email step", () => {
-    expect(run(fresh, { type: "wallet-setup-started" }, { type: "link-required" }).step).toBe("email");
   });
 });
 
