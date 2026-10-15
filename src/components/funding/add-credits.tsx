@@ -123,7 +123,7 @@ export function AddCredits({ balance, onCredited }: { balance: number | undefine
     setShortAtPayment(null);
     setStep("creating");
     try {
-      const result = await fundWithChainTransfer(portalFundingApi(null, token), wallet, {
+      const result = await fundWithChainTransfer(portalFundingApi(token), wallet, {
         amount,
         onStep: setStep,
       });

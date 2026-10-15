@@ -11,9 +11,12 @@ test("an account reaches its own balance, keys, history and spend, and the legac
   expect(isPathAllowed("DELETE", "portal/keys/abc-123")).toBe(true);
 });
 
-test("signing in and verifying an email are reachable", () => {
-  for (const path of ["auth/siws/nonce", "auth/siws/verify", "auth/email/request-code", "auth/email/verify-code"]) {
+test("signing in is by email only; wallet sign-in is not reachable", () => {
+  for (const path of ["auth/email/request-code", "auth/email/verify-code"]) {
     expect(isPathAllowed("POST", path)).toBe(true);
+  }
+  for (const path of ["auth/siws/nonce", "auth/siws/verify"]) {
+    expect(isPathAllowed("POST", path)).toBe(false);
   }
 });
 

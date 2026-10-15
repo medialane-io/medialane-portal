@@ -21,7 +21,6 @@ export const ALLOW: Record<string, RegExp[]> = {
   POST: [
     /^rpc$/,
     /^paymaster\/(invoke|deploy)\/(build|execute)$/,
-    /^auth\/siws\/(nonce|verify)$/,
     /^intents\/(transfer-token|funding-transfer|wallet-manage)$/,
     /^auth\/email\/(request-code|verify-code)$/,
     /^users\/me$/,

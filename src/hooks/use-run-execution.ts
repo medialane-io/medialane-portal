@@ -25,7 +25,7 @@ export interface RunContext<E> {
 function sponsoredBy(signer: StarknetVenueSigner, client: LaunchpadRunsClient) {
   return async (base: string) => {
     const result = await executeSponsored(
-      { proxyUrl: base, fetchImpl: client.authorizedFetch },
+      { proxyUrl: base, fetchImpl: client.fetch },
       signer as unknown as TypedDataSigner,
       { userAddress: signer.address },
     );

@@ -57,7 +57,7 @@ export function CheckoutPanel({
     setBusy("wallet");
     setError(null);
     try {
-      const funded = await fundWithChainTransfer(portalFundingApi(null), mediaWalletFundingWallet(signer), {
+      const funded = await fundWithChainTransfer(portalFundingApi(), mediaWalletFundingWallet(signer), {
         amountUsdc: topUpUsdcFor(shortfall > 0 ? shortfall : quote.total),
       });
       if (funded.status !== "SETTLED") {
