@@ -6,6 +6,7 @@ const gateway = createAppGateway({
   appId: "MEDIALANE_PORTAL",
   backendUrl: MEDIALANE_BACKEND_URL,
   apiKey: process.env.MEDIALANE_API_KEY,
+  appSecret: process.env.MEDIALANE_APP_SECRET,
   allow: ALLOW,
   timeoutMs: 55_000,
 });
