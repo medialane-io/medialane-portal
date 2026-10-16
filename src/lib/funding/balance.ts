@@ -1,13 +1,10 @@
 import { SUPPORTED_TOKENS } from "@medialane/sdk";
-import { FundingTransferNotSentError, type FundingTransferCall } from "@medialane/sdk/starknet";
-import { starknetProvider } from "@/lib/starknet";
+import { erc20Balance, FundingTransferNotSentError, type FundingTransferCall } from "@medialane/sdk/starknet";
+import { getMedialaneClient } from "@/lib/medialane-client";
 
 export type BalanceReader = (token: string, owner: string) => Promise<bigint>;
 
-export const readTokenBalance: BalanceReader = async (token, owner) => {
-  const res = await starknetProvider.callContract({ contractAddress: token, entrypoint: "balanceOf", calldata: [owner] });
-  return BigInt(res[0]!) + (BigInt(res[1] ?? "0x0") << 128n);
-};
+export const readTokenBalance: BalanceReader = (token, owner) => erc20Balance(getMedialaneClient().provider, token, owner);
 
 export function formatUnits(value: bigint, decimals: number, round: "down" | "up"): string {
   const places = Math.min(6, decimals);

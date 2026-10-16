@@ -1,7 +1,7 @@
 "use client";
 
 import { createAppWallet } from "@medialane/ui";
-import { walletProvider } from "./provider";
+import { getMedialaneClient } from "@/lib/medialane-client";
 import { sessionEmail } from "@/hooks/use-session";
 
 const PRODUCTION_RP_ID = "portal.medialane.io";
@@ -17,6 +17,6 @@ export const { ownerStore, passkeyOwner, walletConsent, mediaWallet } = createAp
   changeEvent: "mlio-wallet",
   prfSalt: "medialane://portal/owner-key/v1",
   hkdfInfo: "medialane-portal-owner-key",
-  provider: walletProvider,
+  getClient: getMedialaneClient,
   loadAccountEmail: sessionEmail,
 });

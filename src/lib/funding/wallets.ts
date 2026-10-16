@@ -7,7 +7,6 @@ import {
   type FundingWallet,
   type StarknetVenueSigner,
 } from "@medialane/sdk/starknet";
-import { starknetProvider } from "@/lib/starknet";
 import { executeSponsored } from "@/lib/wallet/sponsored-executor";
 import { getMedialaneClient } from "@/lib/medialane-client";
 import type { CreateFundingTransferIntentParams } from "@medialane/sdk";
@@ -76,7 +75,7 @@ export async function connectExternalWallet(
   wallet: ExternalWallet,
   readBalance: BalanceReader = readTokenBalance,
 ): Promise<FundingWallet> {
-  const account = await WalletAccount.connect(starknetProvider, wallet.swo as never);
+  const account = await WalletAccount.connect(getMedialaneClient().provider, wallet.swo as never);
   if (!account.address) throw new Error("The wallet did not share an address.");
   return {
     address: account.address,

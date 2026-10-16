@@ -1,6 +1,6 @@
 import { getTokenBySymbol } from "@medialane/sdk";
 import { isDeployed as sdkIsDeployed, isValidStarknetAddress, normalizeWalletAddress } from "@medialane/sdk/starknet";
-import { walletProvider } from "./provider";
+import { getMedialaneClient } from "@/lib/medialane-client";
 
 export const norm = normalizeWalletAddress;
 export { isValidStarknetAddress };
@@ -11,4 +11,4 @@ export const STRK_TOKEN = tokenAddress("STRK");
 export const ETH_TOKEN = tokenAddress("ETH");
 export const USDC_TOKEN = tokenAddress("USDC");
 
-export const isDeployed = (address: string): Promise<boolean> => sdkIsDeployed(walletProvider(), address);
+export const isDeployed = (address: string): Promise<boolean> => sdkIsDeployed(getMedialaneClient().provider, address);
