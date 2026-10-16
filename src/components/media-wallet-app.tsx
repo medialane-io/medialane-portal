@@ -6,7 +6,6 @@ import { useWalletWriteAction } from "@/hooks/use-wallet-write-action";
 import { useEmailVerificationStatus } from "@/hooks/use-email-verification-required";
 import { useSession } from "@/hooks/use-session";
 import { getMedialaneClient } from "@/lib/medialane-client";
-import { starknetProvider } from "@/lib/starknet";
 import { mediaWallet } from "@/lib/wallet/client";
 import { resolveTokenImage } from "@/lib/utils";
 import { EXPLORER_URL } from "@/lib/constants";
@@ -22,7 +21,6 @@ export function MediaWalletApp() {
   return (
     <MediaWalletOverlay
       getClient={getMedialaneClient}
-      provider={starknetProvider}
       wallet={mediaWallet}
       resolveImage={resolveTokenImage}
       explorerUrl={EXPLORER_URL}

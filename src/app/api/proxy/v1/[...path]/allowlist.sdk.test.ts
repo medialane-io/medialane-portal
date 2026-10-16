@@ -18,7 +18,6 @@ const DUMMY = "0x0123";
 
 const client = new MedialaneClient({
   backendUrl: "https://portal.medialane.io/api/proxy",
-  rpcUrl: "https://rpc.invalid",
   marketplaceContract: STARKNET_MARKETPLACE_721_CONTRACT,
   marketplace1155Contract: STARKNET_MARKETPLACE_1155_CONTRACT,
   collectionContract: STARKNET_COLLECTION_721_CONTRACT,

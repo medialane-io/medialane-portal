@@ -10,7 +10,7 @@ import { CurrencyIcon } from "@medialane/ui";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { useErc20Balance } from "@/hooks/use-erc20-balance";
+import { useErc20Balance } from "@medialane/ui/utils/media-wallet/use-erc20-balance";
 import { useWalletNativeSession } from "@/hooks/use-wallet-native-session";
 import { usdPriceFor, useUsdPrices } from "@/hooks/use-usd-prices";
 import { cn } from "@/lib/utils";
@@ -23,6 +23,7 @@ import {
   mediaWalletFundingWallet,
   type ExternalWallet,
 } from "@/lib/funding/wallets";
+import { getMedialaneClient } from "@/lib/medialane-client";
 
 const STEP_COPY: Record<FundingStep, string> = {
   creating: "Starting your top-up",
@@ -43,7 +44,7 @@ function tokenMeta(symbol: Token) {
 
 function WalletBalance({ token, owner }: { token: Token; owner: string | null }) {
   const meta = tokenMeta(token);
-  const { rawBalance, isLoading } = useErc20Balance(meta.address, owner);
+  const { rawBalance, isLoading } = useErc20Balance(getMedialaneClient, meta.address, owner);
   if (!owner) return <span>Connect to see balance</span>;
   if (rawBalance === null) return <span>{isLoading ? "Checking balance…" : "Balance unavailable"}</span>;
   return (
@@ -86,7 +87,7 @@ export function AddCredits({ balance, onCredited }: { balance: number | undefine
   const valid = needed !== null;
   const credits = creditsEstimate(amount, token, usdPriceFor(usdPrices, token));
 
-  const { rawBalance: held } = useErc20Balance(meta.address, selectedOwner);
+  const { rawBalance: held } = useErc20Balance(getMedialaneClient, meta.address, selectedOwner);
   const shortNow =
     held !== null && needed !== null && held < needed
       ? new InsufficientFundsError(token, formatUnits(held, meta.decimals, "down"), formatUnits(needed, meta.decimals, "up"))
