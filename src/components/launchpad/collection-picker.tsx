@@ -4,7 +4,7 @@ import useSWR from "swr";
 import { Check, ImageIcon } from "lucide-react";
 import { Label, Skeleton } from "@medialane/ui";
 import type { CollectionServiceId } from "@medialane/sdk";
-import { Button } from "@/components/ui/button";
+import { Button } from "@medialane/ui/button";
 import { getMedialaneClient } from "@/lib/medialane-client";
 import { collectionCopy } from "@/lib/launchpad/collection-copy";
 

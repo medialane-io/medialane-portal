@@ -1,7 +1,7 @@
 "use client";
 
 import { Download, Upload } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Button } from "@medialane/ui/button";
 import type { Manifest } from "@/lib/launchpad/data-tokenization/manifest";
 
 const TEMPLATE = [

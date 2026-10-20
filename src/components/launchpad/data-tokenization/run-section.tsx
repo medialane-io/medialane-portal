@@ -1,7 +1,7 @@
 "use client";
 
 import { Loader2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Button } from "@medialane/ui/button";
 import type { LaunchpadRun } from "@medialane/sdk";
 import { CatalogDrop } from "./catalog-section";
 

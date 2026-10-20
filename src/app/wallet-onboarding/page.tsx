@@ -2,7 +2,7 @@
 
 import { Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@medialane/ui/card";
 import { ShieldCheck } from "lucide-react";
 import { OnboardingFlow } from "@/components/connect/onboarding-flow";
 import { safeRelativePath } from "@/lib/safe-redirect";

@@ -5,7 +5,7 @@ import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { ServiceFormShell, ClaimRail } from "@medialane/ui";
 import { ArrowLeft, Database, FileCheck2, Layers, Loader2, Scale, ShieldCheck } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Button } from "@medialane/ui/button";
 import { useWalletNativeSession } from "@/hooks/use-wallet-native-session";
 import { usePortalSession } from "@/hooks/use-portal-account";
 import { useRunsClient } from "@/hooks/use-runs-client";

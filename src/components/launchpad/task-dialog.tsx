@@ -1,14 +1,8 @@
 "use client";
 
 import { Check, Loader2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-} from "@/components/ui/dialog";
+import { Button } from "@medialane/ui/button";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@medialane/ui/dialog";
 import { type TaskPhase } from "@/lib/launchpad/task-progress";
 
 export function TaskDialog({

@@ -1,12 +1,11 @@
 "use client";
 
-import { describeError } from "@medialane/ui";
+import { describeError, AccountSection } from "@medialane/ui";
 import { useState } from "react";
 import { CheckCircle2, Clock, Loader2, Mail } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { AccountSection } from "@/components/settings/account-section";
+import { Badge } from "@medialane/ui/badge";
+import { Button } from "@medialane/ui/button";
+import { Input } from "@medialane/ui/input";
 import { SettingsGate, SettingsPage } from "@/components/settings/settings-shell";
 import { EmailVerifyDialog } from "@/components/settings/email-verify-dialog";
 import { useAccountEmail } from "@/hooks/use-account-email";

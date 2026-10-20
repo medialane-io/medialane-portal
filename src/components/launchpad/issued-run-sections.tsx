@@ -2,7 +2,7 @@
 
 import { Loader2 } from "lucide-react";
 import type { LaunchpadRun } from "@medialane/sdk";
-import { Button } from "@/components/ui/button";
+import { Button } from "@medialane/ui/button";
 import { issuedSummary } from "@/lib/launchpad/task-progress";
 
 export const recipientCount = (run: LaunchpadRun | null) => {

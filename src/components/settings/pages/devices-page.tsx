@@ -1,7 +1,7 @@
 "use client";
 
 import { Smartphone } from "lucide-react";
-import { AccountSection } from "@/components/settings/account-section";
+import { AccountSection } from "@medialane/ui";
 import { DevicesSection } from "@/components/settings/devices-section";
 import { SettingsGate, SettingsPage } from "@/components/settings/settings-shell";
 import { useWalletNativeSession } from "@/hooks/use-wallet-native-session";

@@ -4,7 +4,7 @@ import { describeError } from "@medialane/ui";
 import { useState } from "react";
 import { Copy, KeyRound, Trash2 } from "lucide-react";
 import { toast } from "sonner";
-import { Button } from "@/components/ui/button";
+import { Button } from "@medialane/ui/button";
 import { usePortalKeys } from "@/hooks/use-portal-account";
 import { useKeyConfirmation } from "@/hooks/use-key-confirmation";
 import { getMedialaneClient } from "@/lib/medialane-client";
