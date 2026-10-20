@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Loader2 } from "lucide-react";
 import type { StarknetVenueSigner } from "@medialane/sdk/starknet";
-import { Button } from "@/components/ui/button";
+import { Button } from "@medialane/ui/button";
 import { labelForAction } from "@/lib/spend-labels";
 import { fundWithChainTransfer } from "@medialane/sdk/starknet";
 import { topUpUsdcFor } from "@/lib/funding/amount";

@@ -7,7 +7,7 @@ import { labelForAction } from "@/lib/spend-labels";
 import { ApiKeys } from "./api-keys";
 import { HowItWorks } from "./how-it-works";
 import { AddCredits } from "@/components/funding/add-credits";
-import { Button } from "@/components/ui/button";
+import { Button } from "@medialane/ui/button";
 import { SecuritySummary } from "@/components/settings/security-summary";
 import { MissingKeyNotice, useMissingKey } from "@/components/wallet/missing-key-notice";
 

@@ -3,7 +3,7 @@
 import Link from "next/link";
 import type { ElementType, ReactNode } from "react";
 import { ArrowLeft, ChevronRight } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Button } from "@medialane/ui/button";
 import { MissingKeyNotice, useMissingKey } from "@/components/wallet/missing-key-notice";
 import { useWalletNativeSession } from "@/hooks/use-wallet-native-session";
 import { cn } from "@/lib/utils";

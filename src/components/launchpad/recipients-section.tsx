@@ -1,7 +1,7 @@
 "use client";
 
 import { Check } from "lucide-react";
-import { Textarea } from "@/components/ui/textarea";
+import { Textarea } from "@medialane/ui/textarea";
 import { guestRows, repeatsIn } from "@/lib/launchpad/ticketing/event";
 
 export function RecipientsSection({

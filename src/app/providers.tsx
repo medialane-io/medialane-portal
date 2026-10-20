@@ -3,15 +3,16 @@
 import { ThemeProvider } from "next-themes";
 import { Toaster, toast } from "sonner";
 import Link from "next/link";
-import { MedialaneLogo } from "@/components/brand/medialane-logo";
+import { MedialaneLogoFull as MedialaneLogo } from "@medialane/ui/brand-logo";
 import { SWRConfig } from "swr";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { usePathname } from "next/navigation";
 import { GoogleAnalytics } from "@next/third-parties/google";
-import { NavCommandMenu, NavBrandButton, ThemeAmbientBackground, SelfFundConsentDialog } from "@medialane/ui";
+import { NavCommandMenu, NavBrandButton, ThemeAmbientBackground, SelfFundConsentDialog, MedialaneAppProvider } from "@medialane/ui";
+import { useAppAdapter } from "@/lib/use-app-adapter";
 import { NAV_COMMANDS } from "@/lib/nav-commands";
 import { OnboardingGate } from "@/components/wallet/onboarding-gate";
-import { NavThemeToggle } from "@/components/nav-theme-toggle";
+import { NavThemeToggle } from "@medialane/ui/nav-theme-toggle";
 import { NavConnectButton } from "@/components/nav-connect-button";
 import { HeaderWalletTrigger } from "@/components/nav-wallet-trigger";
 import { MediaWalletApp } from "@/components/media-wallet-app";
@@ -86,6 +87,10 @@ function MainShell({ children }: { children: React.ReactNode }) {
   );
 }
 
+function AppAdapter({ children }: { children: React.ReactNode }) {
+  return <MedialaneAppProvider value={useAppAdapter()}>{children}</MedialaneAppProvider>;
+}
+
 function Shell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   if (
@@ -117,9 +122,11 @@ export function Providers({ children }: { children: React.ReactNode }) {
         }}
       >
         {GA_ID && <GoogleAnalytics gaId={GA_ID} />}
-        <OnboardingGate />
-        <Shell>{children}</Shell>
-        <SelfFundConsentDialog consent={walletConsent} />
+        <AppAdapter>
+          <OnboardingGate />
+          <Shell>{children}</Shell>
+          <SelfFundConsentDialog consent={walletConsent} />
+        </AppAdapter>
         <Toaster
           richColors
           position="bottom-center"

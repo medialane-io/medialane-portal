@@ -2,7 +2,7 @@
 
 import { Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@medialane/ui/card";
 import { ShieldCheck } from "lucide-react";
 import { ValuePropCarousel } from "@/components/connect/value-prop-carousel";
 import { OnboardingFlow } from "@/components/connect/onboarding-flow";

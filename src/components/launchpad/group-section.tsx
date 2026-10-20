@@ -1,9 +1,9 @@
 "use client";
 
 import type { CollectionServiceId } from "@medialane/sdk";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
+import { Button } from "@medialane/ui/button";
+import { Input } from "@medialane/ui/input";
+import { Textarea } from "@medialane/ui/textarea";
 import { Field } from "@/components/launchpad/form-fields";
 import { ArtworkDrop } from "./artwork-drop";
 import { CollectionPicker, type CollectionOption } from "./collection-picker";

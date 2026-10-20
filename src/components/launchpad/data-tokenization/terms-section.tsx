@@ -4,7 +4,7 @@ import { useState } from "react";
 import { CollapsibleSection } from "@medialane/ui";
 import { AI_POLICIES, GEOGRAPHIC_SCOPES, LICENSE_TYPES } from "@medialane/ui/data/ip";
 import { ShieldCheck } from "lucide-react";
-import { Input } from "@/components/ui/input";
+import { Input } from "@medialane/ui/input";
 import { Choice, Field } from "@/components/launchpad/form-fields";
 import { withPreset, type Terms } from "@/lib/launchpad/data-tokenization/spec";
 

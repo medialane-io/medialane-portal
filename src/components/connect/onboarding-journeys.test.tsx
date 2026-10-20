@@ -17,7 +17,7 @@ let localAddress: string | null = null;
 const real = {
   client: await import("@/lib/wallet/client"),
   store: await import("@/lib/wallet/store"),
-  confetti: await import("@/lib/confetti"),
+  confetti: await import("@medialane/ui/utils/media-wallet/confetti"),
   session: await import("@/hooks/use-wallet-native-session"),
   sessionHook: await import("@/hooks/use-session"),
 };
@@ -25,7 +25,7 @@ const real = {
 mock.module("@/lib/medialane-client", () => ({ getMedialaneClient: () => ({ api }) }));
 mock.module("@/lib/wallet/client", () => ({ ...real.client, mediaWallet: { ...real.client.mediaWallet, completeDeployment } }));
 mock.module("@/lib/wallet/store", () => ({ ...real.store, loadWalletAddress: () => localAddress }));
-mock.module("@/lib/confetti", () => ({ ...real.confetti, fireConfetti: () => {} }));
+mock.module("@medialane/ui/utils/media-wallet/confetti", () => ({ ...real.confetti, fireConfetti: () => {} }));
 mock.module("@/hooks/use-wallet-native-session", () => ({ ...real.session, useWalletNativeSession: () => ({ hasWallet: false }) }));
 let session: { email: string; walletAddress: string | null } | null = null;
 mock.module("@/hooks/use-session", () => ({ ...real.sessionHook, useSession: () => ({ session, isLoading: false }), refreshSession: async () => undefined }));

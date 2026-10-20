@@ -1,13 +1,11 @@
 "use client";
 
-import { AddressDisplay } from "@medialane/ui";
+import { AddressDisplay, AccountSection, useMediaWallet } from "@medialane/ui";
 import { ArrowUpRight, ShieldAlert, ShieldCheck, Wallet } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { Badge } from "@medialane/ui/badge";
+import { Button } from "@medialane/ui/button";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-import { AccountSection } from "@/components/settings/account-section";
 import { SettingsGate, SettingsPage } from "@/components/settings/settings-shell";
-import { useMediaWallet } from "@medialane/ui";
 import { useWalletNativeSession } from "@/hooks/use-wallet-native-session";
 import { EXPLORER_URL } from "@/lib/constants";
 
