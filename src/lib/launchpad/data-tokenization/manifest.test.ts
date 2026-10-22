@@ -1,5 +1,6 @@
 import { describe, expect, test } from "bun:test";
-import { parseCsv, placementFor, readManifest, MAX_FILE_BYTES } from "./manifest";
+import { MAX_UPLOAD_BYTES } from "@medialane/sdk";
+import { parseCsv, placementFor, readManifest } from "./manifest";
 
 const file = (name: string, type: string, size = 10) => new File([new Uint8Array(size)], name, { type });
 
@@ -83,10 +84,19 @@ describe("readManifest", () => {
   });
 
   test("two rows cannot share a file, and oversized files are refused", () => {
-    const big = file("big.jpg", "image/jpeg", MAX_FILE_BYTES + 1);
+    const big = file("big.jpg", "image/jpeg", MAX_UPLOAD_BYTES + 1);
     const csv = ["name,ip_type,file", "A,Photography,photo.jpg", "B,Photography,photo.jpg", "C,Photography,big.jpg"].join("\n");
     const { items, problems } = readManifest(csv, [...files, big]);
     expect(items).toHaveLength(1);
     expect(problems.map((p) => p.row)).toEqual([2, 3]);
+  });
+
+  test("a file of the upload size is accepted and a larger one names the size", () => {
+    const full = file("full.jpg", "image/jpeg", MAX_UPLOAD_BYTES);
+    const big = file("big.jpg", "image/jpeg", MAX_UPLOAD_BYTES + 1);
+    const csv = ["name,ip_type,file", "A,Photography,full.jpg", "B,Photography,big.jpg"].join("\n");
+    const { items, problems } = readManifest(csv, [full, big]);
+    expect(items).toHaveLength(1);
+    expect(problems.map((p) => p.message)).toEqual(["Row 2 big.jpg is larger than 90 MB"]);
   });
 });
