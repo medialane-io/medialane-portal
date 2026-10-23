@@ -33,7 +33,7 @@ interface PricingResponse {
 const livePricing = unstable_cache(
   async (): Promise<PricingResponse | null> => {
     try {
-      return await getMedialaneClient().api.getPricing();
+      return await getMedialaneClient().api.portal.pricing();
     } catch {
       return null;
     }

@@ -1,13 +1,13 @@
 import { ApiClient } from "@medialane/sdk";
-import { fundingApiFor, type FundingApi } from "@medialane/sdk/starknet";
+import { fundingApiFor, type FundingTransferApi } from "@medialane/sdk/starknet";
 
 const PORTAL_PROXY = "/api/proxy";
 
-export function portalFundingApi(asset?: string): FundingApi {
-  const api = fundingApiFor(new ApiClient(PORTAL_PROXY));
-  if (!asset || asset === "USDC") return api;
+export function portalFundingApi(asset?: string): FundingTransferApi {
+  const funding = fundingApiFor(new ApiClient({ baseUrl: PORTAL_PROXY }));
+  if (!asset || asset === "USDC") return funding;
   return {
-    ...api,
-    createFunding: (input) => api.createFunding({ ...input, params: { ...input.params, asset } }),
+    ...funding,
+    create: (input) => funding.create({ ...input, params: { ...input.params, asset } }),
   };
 }

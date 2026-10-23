@@ -13,9 +13,9 @@ function medialaneConfig() {
   return {
     backendUrl: MEDIALANE_BACKEND_URL,
     apiKey: MEDIALANE_API_KEY || undefined,
-    marketplaceContract: STARKNET_MARKETPLACE_721_CONTRACT,
+    marketplace721Contract: STARKNET_MARKETPLACE_721_CONTRACT,
     marketplace1155Contract: STARKNET_MARKETPLACE_1155_CONTRACT,
-    collectionContract: STARKNET_COLLECTION_721_CONTRACT,
+    collection721Contract: STARKNET_COLLECTION_721_CONTRACT,
     collection1155Contract: STARKNET_COLLECTION_1155_CONTRACT,
     chain: "STARKNET" as const,
   };

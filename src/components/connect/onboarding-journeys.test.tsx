@@ -3,13 +3,7 @@ import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/re
 
 const WALLET = "0x01575d29b83d7828cd1d833ef785083b809adeb187b6ac14aab21db568f2bf02";
 
-const api = {
-  checkEmail: mock<(email: string) => Promise<{ exists: boolean }>>(async () => ({ exists: false })),
-  requestEmailCode: mock<(email: string) => Promise<object>>(async () => ({})),
-  verifyEmailCode: mock<(email: string, code: string) => Promise<object>>(async () => ({})),
-  upsertMyWallet: mock<(token: string, body: object) => Promise<object>>(async () => ({})),
-  getSessionWallet: () => getSessionWallet(),
-};
+const api = { account: { emailExists: mock<(email: string) => Promise<boolean>>(async () => false), requestEmailCode: mock<(email: string) => Promise<object>>(async () => ({})), verifyEmailCode: mock<(email: string, code: string) => Promise<object>>(async () => ({})), upsertMyWallet: mock<(token: string, body: object) => Promise<object>>(async () => ({})), sessionWallet: () => getSessionWallet() } };
 const completeDeployment = mock<(onStep: (s: string) => void) => Promise<{ sealed: object }>>(async () => ({ sealed: {} }));
 const getSessionWallet = mock<() => Promise<{ walletAddress: string; needsKeySetup: boolean } | null>>(async () => null);
 let localAddress: string | null = null;
@@ -39,12 +33,12 @@ beforeEach(() => {
   done.length = 0;
   localAddress = null;
   session = null;
-  for (const m of [api.checkEmail, api.requestEmailCode, api.verifyEmailCode, api.upsertMyWallet]) m.mockClear();
+  for (const m of [api.account.emailExists, api.account.requestEmailCode, api.account.verifyEmailCode, api.account.upsertMyWallet]) m.mockClear();
   completeDeployment.mockClear();
   getSessionWallet.mockClear();
   localStorage.clear();
-  api.checkEmail.mockImplementation(async () => ({ exists: false }));
-  api.verifyEmailCode.mockImplementation(async () => ({}));
+  api.account.emailExists.mockImplementation(async () => false);
+  api.account.verifyEmailCode.mockImplementation(async () => ({}));
   completeDeployment.mockImplementation(async () => ({ sealed: {} }));
   getSessionWallet.mockImplementation(async () => null);
 });
@@ -71,7 +65,7 @@ describe("someone signed in whose account has no wallet yet", () => {
     render(<OnboardingFlow onDone={onDone} />);
     await waitFor(() => expect(done).toEqual([{ celebrated: true }]));
     expect(completeDeployment).toHaveBeenCalledTimes(1);
-    expect(api.requestEmailCode).not.toHaveBeenCalled();
+    expect(api.account.requestEmailCode).not.toHaveBeenCalled();
   });
 });
 
@@ -80,12 +74,12 @@ describe("a new account", () => {
     await enterEmail("new@example.com");
     await enterCode();
     await waitFor(() => expect(done).toEqual([{ celebrated: true }]));
-    expect(api.checkEmail).toHaveBeenCalledWith("new@example.com");
-    expect(api.requestEmailCode).toHaveBeenCalledWith("new@example.com");
-    expect(api.verifyEmailCode).toHaveBeenCalledWith("new@example.com", "123456");
+    expect(api.account.emailExists).toHaveBeenCalledWith("new@example.com");
+    expect(api.account.requestEmailCode).toHaveBeenCalledWith("new@example.com");
+    expect(api.account.verifyEmailCode).toHaveBeenCalledWith("new@example.com", "123456");
     expect(getSessionWallet).not.toHaveBeenCalled();
     expect(completeDeployment).toHaveBeenCalledTimes(1);
-    expect(api.upsertMyWallet).not.toHaveBeenCalled();
+    expect(api.account.upsertMyWallet).not.toHaveBeenCalled();
   });
 
   test("never makes a wallet before the code is verified", async () => {
@@ -97,7 +91,7 @@ describe("a new account", () => {
 
 describe("an address that already has an account", () => {
   beforeEach(() => {
-    api.checkEmail.mockImplementation(async () => ({ exists: true }));
+    api.account.emailExists.mockImplementation(async () => true);
   });
 
   test("on the device holding the key, signs in and finishes with no new wallet and no celebration", async () => {
@@ -130,12 +124,12 @@ describe("an address that already has an account", () => {
   test("an incomplete email address is refused before any code is sent", async () => {
     await enterEmail("name@");
     await screen.findByText(/full email address/);
-    expect(api.checkEmail).not.toHaveBeenCalled();
-    expect(api.requestEmailCode).not.toHaveBeenCalled();
+    expect(api.account.emailExists).not.toHaveBeenCalled();
+    expect(api.account.requestEmailCode).not.toHaveBeenCalled();
   });
 
   test("a wrong code shows a message and lets them try again", async () => {
-    api.verifyEmailCode.mockImplementationOnce(async () => {
+    api.account.verifyEmailCode.mockImplementationOnce(async () => {
       throw new Error("Incorrect code");
     });
     await enterEmail("typo@example.com");
@@ -172,7 +166,7 @@ describe("when the passkey step fails", () => {
     expect(done).toEqual([]);
     fireEvent.click(screen.getByRole("button", { name: "Try again" }));
     await waitFor(() => expect(done).toEqual([{ celebrated: true }]));
-    expect(api.verifyEmailCode).toHaveBeenCalledTimes(1);
+    expect(api.account.verifyEmailCode).toHaveBeenCalledTimes(1);
     expect(completeDeployment).toHaveBeenCalledTimes(2);
   });
 });
@@ -183,6 +177,6 @@ describe("resuming wallet setup for an account that is already signed in", () =>
     expect(screen.queryByPlaceholderText("you@example.com")).toBeNull();
     await waitFor(() => expect(done).toEqual([{ celebrated: true }]));
     expect(completeDeployment).toHaveBeenCalledTimes(1);
-    expect(api.upsertMyWallet).not.toHaveBeenCalled();
+    expect(api.account.upsertMyWallet).not.toHaveBeenCalled();
   });
 });

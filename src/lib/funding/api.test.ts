@@ -11,7 +11,7 @@ test("funding calls go through the portal proxy with no wallet token, so the ses
     return new Response(JSON.stringify({ data: { id: "fi1", method: "chain-transfer", status: "PENDING", expiresAt: "x" } }), { status: 201 });
   }) as unknown as typeof fetch;
 
-  await portalFundingApi().createFunding({ method: "chain-transfer", params: { amountUsdc: "5" } });
+  await portalFundingApi().create({ method: "chain-transfer", params: { amountUsdc: "5" } });
 
   expect(seen[0]!.url).toBe("/api/proxy/v1/portal/funding");
   expect(seen[0]!.auth).toBeUndefined();
@@ -24,9 +24,9 @@ test("a token other than USDC is passed to the top-up, and USDC sends nothing ex
     return new Response(JSON.stringify({ data: { id: "fi1", method: "chain-transfer", status: "PENDING", expiresAt: "x" } }), { status: 201 });
   }) as unknown as typeof fetch;
 
-  await portalFundingApi("ETH").createFunding({ method: "chain-transfer", params: { amountUsdc: "5" } });
-  await portalFundingApi("USDC").createFunding({ method: "chain-transfer", params: { amountUsdc: "5" } });
-  await portalFundingApi().createFunding({ method: "chain-transfer", params: { amountUsdc: "5" } });
+  await portalFundingApi("ETH").create({ method: "chain-transfer", params: { amountUsdc: "5" } });
+  await portalFundingApi("USDC").create({ method: "chain-transfer", params: { amountUsdc: "5" } });
+  await portalFundingApi().create({ method: "chain-transfer", params: { amountUsdc: "5" } });
 
   expect(bodies[0]).toEqual({ method: "chain-transfer", params: { amountUsdc: "5", asset: "ETH" } });
   expect(bodies[1]).toEqual({ method: "chain-transfer", params: { amountUsdc: "5" } });
