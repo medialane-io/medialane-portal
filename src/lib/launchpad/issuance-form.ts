@@ -1,3 +1,5 @@
+import { uploadSizeError } from "@medialane/sdk";
+
 export const LICENSE_PRESETS = [
   "All Rights Reserved",
   "CC BY-SA",
@@ -9,8 +11,6 @@ export const LICENSE_PRESETS = [
 export const AI_POLICIES = ["Allowed", "Training Only", "Not Allowed"] as const;
 
 export const TERRITORIES = ["Worldwide", "Americas", "Europe", "Asia Pacific"] as const;
-
-const MAX_IMAGE_BYTES = 10 * 1024 * 1024;
 
 const ACCEPTED_IMAGE_TYPES = [
   "image/jpeg",
@@ -24,10 +24,7 @@ export function imageRejectionReason(file: File): string | null {
   if (!ACCEPTED_IMAGE_TYPES.includes(file.type)) {
     return "Use a JPG, PNG, GIF, WebP or SVG file.";
   }
-  if (file.size > MAX_IMAGE_BYTES) {
-    return "That file is over 10 MB.";
-  }
-  return null;
+  return uploadSizeError(file, "image");
 }
 
 export function maxSupplyFor(recipients: number, entered: string): string | null {

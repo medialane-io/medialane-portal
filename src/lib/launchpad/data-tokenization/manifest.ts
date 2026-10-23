@@ -1,9 +1,8 @@
 import { IP_TYPES, type IPType } from "@medialane/ui/data/ip";
 import { IP_TEMPLATES, DOC_UPLOAD } from "@medialane/ui/data/ip-templates";
-import { RESERVED_TRAITS } from "@medialane/sdk";
+import { MAX_UPLOAD_BYTES, RESERVED_TRAITS, formatFileSize } from "@medialane/sdk";
 
 const MAX_ITEMS = 500;
-export const MAX_FILE_BYTES = 10 * 1024 * 1024;
 const MAX_TRAITS = 20;
 
 export type Placement = "image" | "animation" | "document";
@@ -89,7 +88,7 @@ const extensionOf = (name: string) => {
 };
 
 function fileProblem(file: File, placement: Placement): string | null {
-  if (file.size > MAX_FILE_BYTES) return `${file.name} is larger than 10 MB`;
+  if (file.size > MAX_UPLOAD_BYTES) return `${file.name} is larger than ${formatFileSize(MAX_UPLOAD_BYTES)}`;
   if (placement === "image" && !IMAGE_TYPES.has(file.type)) return `${file.name} needs to be a JPG, PNG, GIF, WebP, SVG or AVIF image`;
   if (placement === "animation" && !MEDIA_TYPES.test(file.type)) return `${file.name} needs to be an audio or video file`;
   if (placement === "document" && !DOCUMENT_EXTENSIONS.includes(extensionOf(file.name))) {
