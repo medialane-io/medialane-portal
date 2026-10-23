@@ -8,10 +8,11 @@ let keys: Key[] = [];
 const mutate = mock(async () => undefined);
 const CONFIRMATION = { expiresAt: 1_700_000_300, signature: ["0x1", "0x2"] };
 const signIn = mock<(change: { action: string; key: string }) => Promise<typeof CONFIRMATION | null>>(async () => CONFIRMATION);
-const api = {
-  createApiKey: mock<(body: object, confirmation: object) => Promise<{ data: { plaintext: string } }>>(async () => ({ data: { plaintext: "ml_live_secret" } })),
+const portal = {
+  createApiKey: mock<(body: object, confirmation: object) => Promise<{ plaintext: string }>>(async () => ({ plaintext: "ml_live_secret" })),
   deleteApiKey: mock<(id: string, confirmation: object) => Promise<object>>(async () => ({})),
 };
+const api = { portal };
 const confirmReplace = mock((message?: unknown) => typeof message === "string");
 
 const real = {
@@ -31,8 +32,8 @@ beforeEach(() => {
   mutate.mockClear();
   signIn.mockClear();
   signIn.mockImplementation(async () => CONFIRMATION);
-  api.createApiKey.mockClear();
-  api.deleteApiKey.mockClear();
+  portal.createApiKey.mockClear();
+  portal.deleteApiKey.mockClear();
   confirmReplace.mockClear();
   confirmReplace.mockImplementation((message?: unknown) => typeof message === "string");
   globalThis.confirm = confirmReplace as unknown as typeof globalThis.confirm;
@@ -46,7 +47,7 @@ describe("creating the key", () => {
     await waitFor(() => expect(screen.getByText("ml_live_secret")).toBeTruthy());
     expect(confirmReplace).not.toHaveBeenCalled();
     expect(signIn.mock.calls).toEqual([[{ action: "replace_api_key", key: "none" }]]);
-    expect(api.createApiKey.mock.calls[0]![1]).toEqual(CONFIRMATION);
+    expect(portal.createApiKey.mock.calls[0]![1]).toEqual(CONFIRMATION);
     expect(screen.getByText(/It is not shown again/)).toBeTruthy();
     expect(mutate).toHaveBeenCalled();
   });
@@ -56,17 +57,17 @@ describe("creating the key", () => {
     render(<ApiKeys />);
     fireEvent.click(screen.getByRole("button", { name: "Create key" }));
     await waitFor(() => expect(signIn).toHaveBeenCalled());
-    expect(api.createApiKey).not.toHaveBeenCalled();
+    expect(portal.createApiKey).not.toHaveBeenCalled();
     expect(screen.queryByText("ml_live_secret")).toBeNull();
   });
 
   test("a rejected confirmation is reported without leaking the secret", async () => {
-    api.createApiKey.mockImplementationOnce(async () => {
+    portal.createApiKey.mockImplementationOnce(async () => {
       throw new MedialaneApiError(403, "confirmation_required");
     });
     render(<ApiKeys />);
     fireEvent.click(screen.getByRole("button", { name: "Create key" }));
-    await waitFor(() => expect(api.createApiKey).toHaveBeenCalled());
+    await waitFor(() => expect(portal.createApiKey).toHaveBeenCalled());
     expect(screen.queryByText("ml_live_secret")).toBeNull();
   });
 });
@@ -84,7 +85,7 @@ describe("replacing the key", () => {
     keys = [key(1)];
     render(<ApiKeys />);
     fireEvent.click(screen.getByRole("button", { name: "Replace key" }));
-    await waitFor(() => expect(api.createApiKey).toHaveBeenCalledTimes(1));
+    await waitFor(() => expect(portal.createApiKey).toHaveBeenCalledTimes(1));
     expect(confirmReplace).toHaveBeenCalledTimes(1);
     expect(String(confirmReplace.mock.calls[0]![0])).toMatch(/stops the current key working/i);
     expect(signIn.mock.calls).toEqual([[{ action: "replace_api_key", key: "id-1" }]]);
@@ -98,7 +99,7 @@ describe("replacing the key", () => {
     fireEvent.click(screen.getByRole("button", { name: "Replace key" }));
     await waitFor(() => expect(confirmReplace).toHaveBeenCalled());
     expect(signIn).not.toHaveBeenCalled();
-    expect(api.createApiKey).not.toHaveBeenCalled();
+    expect(portal.createApiKey).not.toHaveBeenCalled();
   });
 });
 
@@ -107,8 +108,8 @@ describe("deleting the key", () => {
     keys = [key(2)];
     render(<ApiKeys />);
     fireEvent.click(screen.getByRole("button", { name: "Delete key" }));
-    await waitFor(() => expect(api.deleteApiKey).toHaveBeenCalledTimes(1));
-    expect(api.deleteApiKey.mock.calls[0]).toEqual(["id-2", CONFIRMATION]);
+    await waitFor(() => expect(portal.deleteApiKey).toHaveBeenCalledTimes(1));
+    expect(portal.deleteApiKey.mock.calls[0]).toEqual(["id-2", CONFIRMATION]);
     expect(signIn.mock.calls).toEqual([[{ action: "delete_api_key", key: "id-2" }]]);
   });
 });

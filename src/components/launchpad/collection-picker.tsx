@@ -39,7 +39,7 @@ export function CollectionPicker({
   const { data, isLoading, error: loadError, mutate } = useSWR(
     owner ? `launchpad:collections:${owner}:${serviceId}` : null,
     async () => {
-      const res = await getMedialaneClient().api.listCollections({ owner, page: 1, limit: 50 });
+      const res = await getMedialaneClient().api.collections.list({ owner, page: 1, limit: 50 });
       return (res.data ?? []).filter((c) => c.service === serviceId && c.contractAddress);
     },
     { shouldRetryOnError: false, revalidateOnFocus: false },

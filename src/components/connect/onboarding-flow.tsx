@@ -107,7 +107,7 @@ export function OnboardingFlow({ start = "email", redirectTo = null, onDone }: O
     }
     dispatch({ type: "email-submitted" });
     try {
-      const { exists } = await getMedialaneClient().api.checkEmail(email);
+      const { exists } = await getMedialaneClient().api.account.emailExists(email).then((exists) => ({ exists }));
       dispatch({ type: "account-found", exists });
       await requestLoginCode();
     } catch {
@@ -123,7 +123,7 @@ export function OnboardingFlow({ start = "email", redirectTo = null, onDone }: O
     }
     try {
       await refreshSession();
-      const wallet = flow.accountExisted ? await getMedialaneClient().api.getSessionWallet() : null;
+      const wallet = flow.accountExisted ? await getMedialaneClient().api.account.sessionWallet() : null;
       const next = afterCodeVerified(wallet, loadWalletAddress());
       if (next.type === "finish") finish();
       else if (next.type === "pair-or-recover") dispatch({ type: "needs-pairing", walletAddress: next.walletAddress });

@@ -6,9 +6,9 @@ import { getMedialaneClient } from "@/lib/medialane-client";
 import { useWalletNativeSession } from "./use-wallet-native-session";
 import { useSession } from "./use-session";
 
-async function orNull<T>(request: Promise<{ data: T }>): Promise<T | null> {
+async function orNull<T>(request: Promise<T>): Promise<T | null> {
   try {
-    return (await request).data;
+    return await request;
   } catch (err) {
     if (err instanceof MedialaneApiError && [401, 403, 404].includes(err.status)) return null;
     throw err;
@@ -25,7 +25,7 @@ export function usePortalSession() {
 
   const { data, error, isLoading, mutate } = useSWR(
     session ? "portal:me" : null,
-    () => orNull<ApiPortalMe>(api().getMe()),
+    () => orNull<ApiPortalMe>(api().portal.me()),
     quiet,
   );
 
@@ -35,7 +35,7 @@ export function usePortalSession() {
 export function usePortalKeys(signedIn: boolean) {
   return useSWR(
     signedIn ? "portal:keys" : null,
-    () => orNull<ApiPortalKey[]>(api().getApiKeys()),
+    () => orNull<ApiPortalKey[]>(api().portal.apiKeys()),
     quiet,
   );
 }
@@ -43,7 +43,7 @@ export function usePortalKeys(signedIn: boolean) {
 export function usePortalSpend(signedIn: boolean) {
   return useSWR(
     signedIn ? "portal:spend" : null,
-    () => orNull<ApiPortalSpend>(api().getSpend()),
+    () => orNull<ApiPortalSpend>(api().portal.spend()),
     quiet,
   );
 }
@@ -51,7 +51,7 @@ export function usePortalSpend(signedIn: boolean) {
 export function usePortalCredits(signedIn: boolean) {
   return useSWR(
     signedIn ? "portal:credits" : null,
-    () => orNull<ApiCreditPayment[]>(api().getCreditHistory()),
+    () => orNull<ApiCreditPayment[]>(api().portal.creditHistory()),
     quiet,
   );
 }

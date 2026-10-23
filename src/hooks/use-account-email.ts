@@ -12,7 +12,7 @@ export function useAccountEmail() {
   const markVerified = useCallback(() => void refreshSession(), []);
 
   const changeEmail = useCallback(async (email: string) => {
-    await getMedialaneClient().api.changeMyEmail(email);
+    await getMedialaneClient().api.account.changeMyEmail(email);
     await refreshSession();
   }, []);
 

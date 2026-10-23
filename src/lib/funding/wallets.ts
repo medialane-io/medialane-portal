@@ -22,7 +22,7 @@ export function isUserRejection(err: unknown): boolean {
 export type FundingIntentCreator = (params: CreateFundingTransferIntentParams) => Promise<{ id: string }>;
 
 const createFundingIntent: FundingIntentCreator = async (params) =>
-  (await getMedialaneClient().api.createFundingTransferIntent(params)).data as { id: string };
+  await getMedialaneClient().api.intents.create("funding-transfer", params) as { id: string };
 
 export function mediaWalletFundingWallet(
   signer: StarknetVenueSigner,

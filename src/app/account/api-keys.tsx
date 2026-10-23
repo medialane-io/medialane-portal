@@ -37,8 +37,8 @@ export function ApiKeys() {
     setBusy(true);
     try {
       const confirmation = await confirm({ action: "replace_api_key", key: keys?.[0]?.id ?? "none" });
-      const body = await getMedialaneClient().api.createApiKey({}, confirmation).catch(unconfirmed);
-      setPlaintext(body.data.plaintext);
+      const body = await getMedialaneClient().api.portal.createApiKey({}, confirmation).catch(unconfirmed);
+      setPlaintext(body.plaintext);
       await mutate();
     } catch (err) {
       toast.error(describeError(err, "Could not create the key").message);
@@ -51,7 +51,7 @@ export function ApiKeys() {
     setBusy(true);
     try {
       const confirmation = await confirm({ action: "delete_api_key", key: id });
-      await getMedialaneClient().api.deleteApiKey(id, confirmation).catch(unconfirmed);
+      await getMedialaneClient().api.portal.deleteApiKey(id, confirmation).catch(unconfirmed);
       setPlaintext(null);
       await mutate();
     } catch (err) {
