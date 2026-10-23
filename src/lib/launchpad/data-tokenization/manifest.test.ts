@@ -78,7 +78,7 @@ describe("readManifest", () => {
     const messages = readManifest(csv, files).problems.map((p) => p.message);
     expect(messages[0]).toContain("Row 1 needs a name");
     expect(messages[1]).toContain("needs a cover image");
-    expect(messages[2]).toContain("needs to be a JPG");
+    expect(messages[2]).toContain("Choose an image in JPG");
     expect(messages[3]).toContain("is missing missing.pdf");
     expect(messages[4]).toContain('unknown type "Hologram"');
   });
@@ -98,5 +98,30 @@ describe("readManifest", () => {
     const { items, problems } = readManifest(csv, [full, big]);
     expect(items).toHaveLength(1);
     expect(problems.map((p) => p.message)).toEqual(["Row 2 big.jpg is larger than 90 MB"]);
+  });
+
+  test("file types come from the SDK lists for each placement", () => {
+    const own = [
+      file("photo.heic", "image/heic"),
+      file("photo.avif", "image/avif"),
+      file("song.png", "image/png"),
+      file("song.mp3", "audio/mpeg"),
+      file("notes.md", ""),
+      file("cover.png", "image/png"),
+    ];
+    const csv = [
+      "name,ip_type,file,image",
+      "A,Photography,photo.heic,",
+      "B,Photography,photo.avif,",
+      "C,Audio,song.png,cover.png",
+      "D,Audio,song.mp3,cover.png",
+      "E,Documents,notes.md,cover.png",
+    ].join("\n");
+    const { items, problems } = readManifest(csv, own);
+    expect(items.map((i) => i.name)).toEqual(["B", "D", "E"]);
+    expect(problems.map((p) => p.message)).toEqual([
+      "Row 1 photo.heic: Choose an image in JPG, JPEG, PNG, GIF, SVG, WEBP or AVIF.",
+      "Row 3 song.png needs to be an audio or video file",
+    ]);
   });
 });

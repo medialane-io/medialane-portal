@@ -1,4 +1,4 @@
-import { uploadSizeError } from "@medialane/sdk";
+import { uploadError } from "@medialane/sdk";
 
 export const LICENSE_PRESETS = [
   "All Rights Reserved",
@@ -12,19 +12,8 @@ export const AI_POLICIES = ["Allowed", "Training Only", "Not Allowed"] as const;
 
 export const TERRITORIES = ["Worldwide", "Americas", "Europe", "Asia Pacific"] as const;
 
-const ACCEPTED_IMAGE_TYPES = [
-  "image/jpeg",
-  "image/png",
-  "image/gif",
-  "image/webp",
-  "image/svg+xml",
-];
-
 export function imageRejectionReason(file: File): string | null {
-  if (!ACCEPTED_IMAGE_TYPES.includes(file.type)) {
-    return "Use a JPG, PNG, GIF, WebP or SVG file.";
-  }
-  return uploadSizeError(file, "image");
+  return uploadError(file, "image");
 }
 
 export function maxSupplyFor(recipients: number, entered: string): string | null {

@@ -43,3 +43,13 @@ describe("imageRejectionReason", () => {
     expect(imageRejectionReason(image(95 * 1024 * 1024))).toBe("That image is 95 MB. Please choose one under 90 MB.");
   });
 });
+
+describe("imageRejectionReason types", () => {
+  test("an AVIF image is accepted", () => {
+    expect(imageRejectionReason({ type: "image/avif", size: 1000 } as File)).toBeNull();
+  });
+
+  test("other image types get the SDK message", () => {
+    expect(imageRejectionReason({ type: "image/heic", size: 1000, name: "a.heic" } as File)).toBe("Choose an image in JPG, JPEG, PNG, GIF, SVG, WEBP or AVIF.");
+  });
+});
