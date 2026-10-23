@@ -1,6 +1,6 @@
 import { IP_TYPES, type IPType } from "@medialane/ui/data/ip";
-import { IP_TEMPLATES, DOC_UPLOAD } from "@medialane/ui/data/ip-templates";
-import { MAX_UPLOAD_BYTES, RESERVED_TRAITS, formatFileSize } from "@medialane/sdk";
+import { IP_TEMPLATES } from "@medialane/ui/data/ip-templates";
+import { MAX_UPLOAD_BYTES, RESERVED_TRAITS, UPLOAD_LIMITS, formatFileSize, uploadError } from "@medialane/sdk";
 
 const MAX_ITEMS = 500;
 const MAX_TRAITS = 20;
@@ -29,9 +29,7 @@ export interface Manifest {
 }
 
 const KNOWN_COLUMNS = new Set(["name", "description", "ip_type", "file", "image"]);
-const IMAGE_TYPES = new Set(["image/jpeg", "image/png", "image/gif", "image/webp", "image/svg+xml", "image/avif"]);
-const MEDIA_TYPES = /^(audio|video)\//;
-const DOCUMENT_EXTENSIONS = DOC_UPLOAD.accept.split(",").map((ext) => ext.trim().toLowerCase());
+const ANIMATION_TYPES = UPLOAD_LIMITS.media.mimeTypes.filter((type) => type.startsWith("audio/") || type.startsWith("video/"));
 const RESERVED = new Set([...RESERVED_TRAITS].map((t) => t.toLowerCase()));
 
 export function placementFor(ipType: IPType): Placement {
@@ -82,19 +80,11 @@ export function parseCsv(text: string): string[][] {
   return rows.filter((r) => r.some((cell) => cell.trim() !== ""));
 }
 
-const extensionOf = (name: string) => {
-  const dot = name.lastIndexOf(".");
-  return dot === -1 ? "" : name.slice(dot).toLowerCase();
-};
-
 function fileProblem(file: File, placement: Placement): string | null {
   if (file.size > MAX_UPLOAD_BYTES) return `${file.name} is larger than ${formatFileSize(MAX_UPLOAD_BYTES)}`;
-  if (placement === "image" && !IMAGE_TYPES.has(file.type)) return `${file.name} needs to be a JPG, PNG, GIF, WebP, SVG or AVIF image`;
-  if (placement === "animation" && !MEDIA_TYPES.test(file.type)) return `${file.name} needs to be an audio or video file`;
-  if (placement === "document" && !DOCUMENT_EXTENSIONS.includes(extensionOf(file.name))) {
-    return `${file.name} needs to be one of ${DOCUMENT_EXTENSIONS.join(", ")}`;
-  }
-  return null;
+  if (placement === "animation") return ANIMATION_TYPES.includes(file.type) ? null : `${file.name} needs to be an audio or video file`;
+  const problem = uploadError(file, placement);
+  return problem ? `${file.name}: ${problem}` : null;
 }
 
 export function readManifest(csvText: string, files: File[]): Manifest {

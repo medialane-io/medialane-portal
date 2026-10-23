@@ -1,5 +1,6 @@
 "use client";
 
+import { acceptFor } from "@medialane/sdk";
 import { Upload } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -27,7 +28,7 @@ export function ArtworkDrop({
         onChoose(e.dataTransfer.files?.[0]);
       }}
     >
-      <input type="file" accept="image/*" className="hidden" disabled={disabled} onChange={(e) => onChoose(e.target.files?.[0])} />
+      <input type="file" accept={acceptFor("image")} className="hidden" disabled={disabled} onChange={(e) => onChoose(e.target.files?.[0])} />
       {preview ? (
         <img src={preview} alt="" className={cn("h-full w-full object-cover", imageClassName)} />
       ) : (
