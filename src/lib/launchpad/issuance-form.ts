@@ -1,4 +1,4 @@
-import { uploadError } from "@medialane/sdk";
+import { uploadError } from "@medialane/ui/utils/upload-limits";
 
 export const LICENSE_PRESETS = [
   "All Rights Reserved",

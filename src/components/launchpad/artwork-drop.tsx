@@ -1,6 +1,6 @@
 "use client";
 
-import { acceptFor } from "@medialane/sdk";
+import { acceptFor } from "@medialane/ui/utils/upload-limits";
 import { Upload } from "lucide-react";
 import { cn } from "@/lib/utils";
 

@@ -1,6 +1,7 @@
 import { IP_TYPES, type IPType } from "@medialane/ui/data/ip";
 import { IP_TEMPLATES } from "@medialane/ui/data/ip-templates";
-import { MAX_UPLOAD_BYTES, RESERVED_TRAITS, UPLOAD_LIMITS, formatFileSize, uploadError } from "@medialane/sdk";
+import { MAX_UPLOAD_BYTES, RESERVED_TRAITS, formatFileSize } from "@medialane/sdk";
+import { UPLOAD_LIMITS, uploadError } from "@medialane/ui/utils/upload-limits";
 
 const MAX_ITEMS = 500;
 const MAX_TRAITS = 20;
