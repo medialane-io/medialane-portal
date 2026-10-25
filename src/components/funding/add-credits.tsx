@@ -210,7 +210,7 @@ export function AddCredits({ balance, onCredited }: { balance: number | undefine
         <span className="text-sm text-muted-foreground">From</span>
         {options.length === 0 ? (
           <p className="text-sm text-muted-foreground">
-            No wallet found. Sign in with Media Wallet, or install Ready or Braavos.
+            No wallet found. Sign in, or install a Starknet wallet.
           </p>
         ) : (
           <div className="space-y-2" role="radiogroup" aria-label="Pay from">

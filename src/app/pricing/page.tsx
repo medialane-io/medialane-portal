@@ -60,8 +60,7 @@ function PriceTable({ rows }: { rows: { actionKey: string; label: string; credit
 
 export default async function PricingPage() {
   const pricing = await livePricing();
-  const creditsPerUsdc = pricing?.creditsPerUsdc ?? 100;
-  const mdln = tierRows(pricing?.mdln?.tiers, creditsPerUsdc);
+  const mdln = pricing ? tierRows(pricing.mdln?.tiers, pricing.creditsPerUsdc) : [];
   const { runs, api } = groupPricing(pricing?.pricing.rules);
 
   return (
@@ -93,22 +92,24 @@ export default async function PricingPage() {
           <Section title="Prices are unavailable right now" description="The live price list could not be loaded. Please try again in a moment." />
         ) : null}
 
-        <Section title="Hold MDLN, pay less" description="Your discount applies the moment you deposit. Nothing to lock up or stake.">
-          <div className="max-w-4xl mx-auto divide-y divide-border/40">
-            <div className="grid grid-cols-3 px-2 py-4 text-sm font-semibold">
-              <div className="text-muted-foreground">MDLN holdings</div>
-              <div className="text-center text-foreground">Multiplier</div>
-              <div className="text-center text-primary">Rate</div>
-            </div>
-            {mdln.map((tier) => (
-              <div key={tier.range} className="grid grid-cols-3 px-2 py-4 items-center text-sm">
-                <div className="text-muted-foreground">{tier.range}</div>
-                <div className="text-center font-medium text-foreground">{tier.multiplier}</div>
-                <div className="text-center font-medium text-primary">{tier.rate}</div>
+        {pricing ? (
+          <Section title="Hold MDLN, pay less" description="Your discount applies the moment you deposit. Nothing to lock up or stake.">
+            <div className="max-w-4xl mx-auto divide-y divide-border/40">
+              <div className="grid grid-cols-3 px-2 py-4 text-sm font-semibold">
+                <div className="text-muted-foreground">MDLN holdings</div>
+                <div className="text-center text-foreground">Multiplier</div>
+                <div className="text-center text-primary">Rate</div>
               </div>
-            ))}
-          </div>
-        </Section>
+              {mdln.map((tier) => (
+                <div key={tier.range} className="grid grid-cols-3 px-2 py-4 items-center text-sm">
+                  <div className="text-muted-foreground">{tier.range}</div>
+                  <div className="text-center font-medium text-foreground">{tier.multiplier}</div>
+                  <div className="text-center font-medium text-primary">{tier.rate}</div>
+                </div>
+              ))}
+            </div>
+          </Section>
+        ) : null}
 
         <LaunchpadCtaBanner
           eyebrow="Credits"

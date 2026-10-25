@@ -17,7 +17,7 @@ const content: ServiceDetailContent = {
   eyebrow: "Launchpad",
   title: "Tickets your guests can hold and you can verify",
   description:
-    "Create a ticket with its own supply and validity window and send it to a guest list. Guests need no app and no account to receive one.",
+    "Create a ticket with its own supply and validity window and send it to a guest list. Guests do not need to set anything up to receive one.",
   cta: { label: "Start a run", href: "/launchpad/ip-ticketing" },
   blocks: [
     { eyebrow: "Supply and validity", title: "Set how many, and when", description: "Each ticket type has its own supply and a start and end time." },

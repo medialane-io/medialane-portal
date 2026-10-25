@@ -3,7 +3,7 @@ import Link from "next/link";
 const STEPS = [
   {
     title: "Create a key",
-    body: "A key lets your app use Medialane on your behalf.",
+    body: "An API key identifies you when you use Medialane.",
   },
   {
     title: "Add credits",
@@ -11,7 +11,7 @@ const STEPS = [
   },
   {
     title: "Use the key",
-    body: "Paste it into your app. Every request it makes is paid from your credits.",
+    body: "Send it with every request. Each request is paid from your credits.",
   },
 ] as const;
 

@@ -17,7 +17,7 @@ Every asset records its authorship and date permanently, and carries its license
 
 ## For developers
 
-Sign in with your email and a passkey, create your API key, and build on the same open API and [`@medialane/sdk`](https://github.com/medialane-io/medialane-sdk) that the Medialane apps use. Every feature in our apps is available to your app too.
+Sign in with your email, create your API key, and build on the open API and [`@medialane/sdk`](https://github.com/medialane-io/medialane-sdk). Every feature of Medialane is available through the API.
 
 ## For AI agents
 

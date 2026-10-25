@@ -117,7 +117,7 @@ export function HomePage() {
           </CardGrid>
         </Section>
 
-        <Section title="Creating or collecting?" description="The consumer app is for creators and collectors who want to publish, collect and trade without a business account.">
+        <Section title="Creating or collecting?" description="medialane.io is where creators and collectors publish, collect and trade.">
           <div className="text-center">
             <a href={CONSUMER_APP_URL} target="_blank" rel="noopener noreferrer" className="text-sm font-medium text-primary hover:underline">
               Open medialane.io
