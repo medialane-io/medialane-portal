@@ -67,7 +67,7 @@ export function ApiKeys() {
         <div>
           <h2 className="text-lg font-semibold">API key</h2>
           <p className="text-sm text-muted-foreground">
-            Your key connects your app to Medialane. Every request it makes is paid from this account&apos;s credits.
+            Your key identifies you to Medialane. Every request made with it is paid from this account&apos;s credits.
             An account has one key.
           </p>
         </div>
@@ -127,7 +127,7 @@ export function ApiKeys() {
         <div className="rounded-xl border border-dashed border-border/60 p-8 text-center">
           <KeyRound className="mx-auto h-5 w-5 text-muted-foreground" />
           <p className="mt-2 text-sm font-medium">No key yet</p>
-          <p className="mt-1 text-sm text-muted-foreground">Create it to connect an app.</p>
+          <p className="mt-1 text-sm text-muted-foreground">Create one to start making requests.</p>
         </div>
       )}
     </section>

@@ -67,7 +67,7 @@ export default function ServicesPage() {
 
         <Section
           title="Also on the protocol"
-          description="Available through the API and on the consumer app, medialane.io."
+          description="Available through the API and on medialane.io."
         >
           <CardGrid columns={3}>
             {PROTOCOL.map((item) => (

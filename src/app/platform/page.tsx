@@ -5,7 +5,7 @@ import { CardGrid, InfoCard, PageBody, PageHero, Section } from "@/components/si
 
 const title = "How Medialane works";
 const description =
-  "Immutable records, permissionless contracts and one shared catalog behind every Medialane product and partner app.";
+  "Immutable records, permissionless contracts and one shared catalog behind everything built on Medialane.";
 
 export const metadata: Metadata = {
   title,
@@ -37,7 +37,7 @@ const PRINCIPLES = [
     eyebrow: "The catalog",
     title: "One record, many apps",
     description:
-      "Medialane's apps and partner apps read and write the same catalog through the SDK. Different views of one record, none of which can change what it says.",
+      "Every app reads and writes the same catalog through the SDK. Different views of one record, none of which can change what it says.",
   },
 ];
 
@@ -62,7 +62,7 @@ export default function PlatformPage() {
         description="Tokenization turns something you own into a digital record you can license, trade and verify on Starknet, secured by zero-knowledge validity proofs. It is the idea behind tokenizing real estate or bonds, applied to intellectual property."
       />
       <PageBody>
-        <Section title="Four ideas" description="What every Medialane product and partner app is built on.">
+        <Section title="Four ideas" description="What everything built on Medialane rests on.">
           <CardGrid columns={4}>
             {PRINCIPLES.map((item) => (
               <InfoCard key={item.title} {...item} />

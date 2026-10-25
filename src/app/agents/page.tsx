@@ -18,7 +18,7 @@ export const metadata: Metadata = {
 const BLOCKS = [
   { eyebrow: "Headless authentication", title: "An agent signs in on its own", description: "Any agent with a Starknet keypair authenticates, provisions credits and calls the API without a person in the loop." },
   { eyebrow: "x402, pay per call", title: "Pay for what you use, when you use it", description: "Machine-payable access over the x402 protocol. It is the rail rights holders use to be paid for AI access to their catalogs, from the other side of the same transaction." },
-  { eyebrow: "Machine-readable", title: "The same registry the apps read", description: "Services and their actions are described as structured data an agent can call directly." },
+  { eyebrow: "Machine-readable", title: "A registry an agent can read", description: "Services and their actions are described as structured data an agent can call directly." },
 ];
 
 export default function AgentsPage() {

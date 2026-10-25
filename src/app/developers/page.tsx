@@ -16,10 +16,10 @@ export const metadata: Metadata = {
 };
 
 const STEPS = [
-  { title: "Sign in and get a key", description: "Sign in with your email and a passkey, then create your API key from your account. An account has one key." },
+  { title: "Sign in and get a key", description: "Sign in with your email, then create your API key from your account. An account has one key." },
   { title: "Add credits", description: "Buy credits with USDC. Every call your key makes is paid from them." },
   { title: "Read the service registry", description: "Every service is described as structured data, so there is no per-route behavior to guess at." },
-  { title: "Call the API or sign an intent", description: "Reads return indexed data. Writes return calldata for you to sign, so your key never leaves your device." },
+  { title: "Call the API or sign an intent", description: "Reads return indexed data. Writes return calldata for you to sign, so your wallet key never leaves your device." },
 ];
 
 const ENDPOINTS = [
