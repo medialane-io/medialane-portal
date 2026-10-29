@@ -2,7 +2,7 @@ export const ALLOW: Record<string, RegExp[]> = {
   GET: [
     /^portal\/me$/,
     /^portal\/keys$/,
-    /^portal\/credits\/(history|spend)$/,
+    /^portal\/credits\/history$/,
     /^portal\/funding\/methods$/,
     /^portal\/funding\/[^/]+$/,
     /^prices$/,

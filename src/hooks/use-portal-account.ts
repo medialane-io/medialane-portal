@@ -1,7 +1,7 @@
 "use client";
 
 import useSWR from "swr";
-import { MedialaneApiError, type ApiPortalMe, type ApiPortalKey, type ApiPortalSpend, type ApiCreditPayment } from "@medialane/sdk";
+import { MedialaneApiError, type ApiPortalMe, type ApiPortalKey, type ApiCreditPayment } from "@medialane/sdk";
 import { getMedialaneClient } from "@/lib/medialane-client";
 import { useWalletNativeSession } from "./use-wallet-native-session";
 import { useSession } from "./use-session";
@@ -36,14 +36,6 @@ export function usePortalKeys(signedIn: boolean) {
   return useSWR(
     signedIn ? "portal:keys" : null,
     () => orNull<ApiPortalKey[]>(api().portal.apiKeys()),
-    quiet,
-  );
-}
-
-export function usePortalSpend(signedIn: boolean) {
-  return useSWR(
-    signedIn ? "portal:spend" : null,
-    () => orNull<ApiPortalSpend>(api().portal.spend()),
     quiet,
   );
 }
