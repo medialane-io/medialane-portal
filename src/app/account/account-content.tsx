@@ -2,8 +2,7 @@
 
 import Link from "next/link";
 import { useEffect } from "react";
-import { usePortalSession, usePortalSpend } from "@/hooks/use-portal-account";
-import { labelForAction } from "@/lib/spend-labels";
+import { usePortalSession } from "@/hooks/use-portal-account";
 import { ApiKeys } from "./api-keys";
 import { HowItWorks } from "./how-it-works";
 import { AddCredits } from "@/components/funding/add-credits";
@@ -22,7 +21,6 @@ function usd(credits: number): string {
 
 export function AccountContent() {
   const { signedIn, account, ready, hasWallet, error, refresh: refreshAccount } = usePortalSession();
-  const { data: spend } = usePortalSpend(signedIn);
   const missingKey = useMissingKey();
 
   useEffect(() => {
@@ -86,20 +84,6 @@ export function AccountContent() {
           Credits pay for every request your key makes.
         </p>
       </section>
-
-      {spend && spend.byAction.length > 0 ? (
-        <section className="space-y-3">
-          <h2 className="text-lg font-semibold">What you have spent on</h2>
-          <ul className="divide-y divide-border/40">
-            {spend.byAction.map((row) => (
-              <li key={row.actionKey} className="flex items-center justify-between py-3 text-sm">
-                <span className="text-muted-foreground">{labelForAction(row.actionKey)}</span>
-                <span className="tabular-nums">{row.credits.toLocaleString()}</span>
-              </li>
-            ))}
-          </ul>
-        </section>
-      ) : null}
 
       <SecuritySummary />
 

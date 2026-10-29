@@ -1,11 +1,11 @@
 import { test, expect } from "bun:test";
 import { isPathAllowed } from "./allowlist";
 
-test("an account reaches its own balance, keys, history and spend, and the legacy deposit nudge is gone", () => {
+test("an account reaches its own balance, keys and history, and the legacy deposit nudge is gone", () => {
   expect(isPathAllowed("GET", "portal/me")).toBe(true);
   expect(isPathAllowed("GET", "portal/keys")).toBe(true);
   expect(isPathAllowed("GET", "portal/credits/history")).toBe(true);
-  expect(isPathAllowed("GET", "portal/credits/spend")).toBe(true);
+  expect(isPathAllowed("GET", "portal/credits/spend")).toBe(false);
   expect(isPathAllowed("POST", "portal/keys")).toBe(true);
   expect(isPathAllowed("POST", "portal/credits/check")).toBe(false);
   expect(isPathAllowed("DELETE", "portal/keys/abc-123")).toBe(true);
