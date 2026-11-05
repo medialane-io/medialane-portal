@@ -7,7 +7,7 @@ import {
   type FundingWallet,
   type StarknetVenueSigner,
 } from "@medialane/sdk/starknet";
-import { executeSponsored } from "@/lib/wallet/sponsored-executor";
+import { executeSponsored, type SponsoredIntent } from "@/lib/wallet/sponsored-executor";
 import { getMedialaneClient } from "@/lib/medialane-client";
 import type { CreateFundingTransferIntentParams } from "@medialane/sdk";
 import { assertWalletCanCover, readTokenBalance, type BalanceReader } from "./balance";
@@ -19,10 +19,10 @@ export function isUserRejection(err: unknown): boolean {
   return typeof message === "string" && /reject|declin|denied|cancel/i.test(message);
 }
 
-export type FundingIntentCreator = (params: CreateFundingTransferIntentParams) => Promise<{ id: string }>;
+export type FundingIntentCreator = (params: CreateFundingTransferIntentParams) => Promise<SponsoredIntent>;
 
 const createFundingIntent: FundingIntentCreator = async (params) =>
-  await getMedialaneClient().api.intents.create("funding-transfer", params) as { id: string };
+  await getMedialaneClient().api.intents.create("funding-transfer", params) as SponsoredIntent;
 
 export function mediaWalletFundingWallet(
   signer: StarknetVenueSigner,
@@ -39,7 +39,7 @@ export function mediaWalletFundingWallet(
       const intent = await createIntent({ owner: signer.address, asset: call.contractAddress, amountAtomic: amount.toString() });
       let result;
       try {
-        result = await sponsored(signer, [intent.id]);
+        result = await sponsored(signer, [intent]);
       } catch (err) {
         if (err instanceof PasskeyCancelledError) {
           throw new FundingTransferNotSentError("You cancelled the transfer.");
