@@ -129,7 +129,7 @@ export function OnboardingFlow({ start = "email", redirectTo = null, onDone }: O
       else if (next.type === "pair-or-recover") dispatch({ type: "needs-pairing", walletAddress: next.walletAddress });
       else await runWalletSetup();
     } catch (err) {
-      emailCode.fail(describeError(err, "Something went wrong. Please try again.").message);
+      emailCode.fail(describeError(err).message);
       dispatch({ type: "code-failed", message: null });
     }
   };

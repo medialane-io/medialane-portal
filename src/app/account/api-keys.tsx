@@ -41,7 +41,7 @@ export function ApiKeys() {
       setPlaintext(body.plaintext);
       await mutate();
     } catch (err) {
-      toast.error(describeError(err, "Could not create the key").message);
+      toast.error(describeError(err).message);
     } finally {
       setBusy(false);
     }
@@ -55,7 +55,7 @@ export function ApiKeys() {
       setPlaintext(null);
       await mutate();
     } catch (err) {
-      toast.error(describeError(err, "Could not delete the key").message);
+      toast.error(describeError(err).message);
     } finally {
       setBusy(false);
     }

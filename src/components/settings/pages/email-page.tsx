@@ -32,7 +32,7 @@ export default function EmailSettingsPage() {
       setCodeAlreadySent(true);
       setDialogOpen(true);
     } catch (err) {
-      setError(describeError(err, "We couldn't update your email. Please try again.").message);
+      setError(describeError(err).message);
     } finally {
       setBusy("idle");
     }
