@@ -3,7 +3,7 @@ import { FundingTransferNotSentError, PasskeyCancelledError } from "@medialane/s
 import { isUserRejection, mediaWalletFundingWallet } from "./wallets";
 
 const call = { contractAddress: "0xusdc", entrypoint: "transfer" as const, calldata: ["0xt", "5", "0"] };
-const intentStub = async () => ({ id: "fund" });
+const intentStub = async () => ({ id: "fund", calls: [call] });
 const signer = (over: Record<string, unknown> = {}) =>
   ({ address: "0xabc", signTypedData: async () => ["0x1", "0x2"], execute: async () => ({ txHash: "0xself" }), ...over }) as never;
 
@@ -25,18 +25,18 @@ describe("Media Wallet as a funding wallet", () => {
     await expect(wallet.sendTransfer(call)).rejects.toBeInstanceOf(FundingTransferNotSentError);
   });
 
-  test("the transfer runs as the backend's funding intent with its id", async () => {
+  test("the transfer runs as the backend's funding intent, with its id and calls", async () => {
     const created: unknown[] = [];
     const sent: unknown[] = [];
     const wallet = mediaWalletFundingWallet(
       signer(),
-      async (_s, ids) => { sent.push(ids); return { status: "sponsored", transactionHash: "0xsp" }; },
+      async (_s, intents) => { sent.push(intents); return { status: "sponsored", transactionHash: "0xsp" }; },
       async () => 10n ** 30n,
-      async (params) => { created.push(params); return { id: "fund1" }; },
+      async (params) => { created.push(params); return { id: "fund1", calls: [call] }; },
     );
     expect(await wallet.sendTransfer(call)).toEqual({ txHash: "0xsp" });
     expect(created).toEqual([{ owner: "0xabc", asset: "0xusdc", amountAtomic: "5" }]);
-    expect(sent).toEqual([["fund1"]]);
+    expect(sent).toEqual([[{ id: "fund1", calls: [call] }]]);
   });
 
   test("any other failure is left as it is, because a transfer may have gone out", async () => {
