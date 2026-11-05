@@ -49,7 +49,7 @@ export function LinkDeviceContent() {
       setError(
         e instanceof PasskeyCancelledError
           ? "Confirmation cancelled."
-          : describeError(e, "Could not set up this device.").message,
+          : describeError(e).message,
       );
       setStep("start");
     }
@@ -71,7 +71,7 @@ export function LinkDeviceContent() {
       notifyWalletChange();
       router.replace(redirectTo);
     } catch (e) {
-      setError(describeError(e, "Could not confirm this device.").message);
+      setError(describeError(e).message);
       setStep("share");
     }
   };

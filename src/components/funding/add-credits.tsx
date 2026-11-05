@@ -106,7 +106,7 @@ export function AddCredits({ balance, onCredited }: { balance: number | undefine
       const funding = await connectExternalWallet(wallet);
       setConnected((prev) => ({ ...prev, [id]: funding }));
     } catch (err) {
-      setError(describeError(err, `Could not connect to ${wallet.name}.`).message);
+      setError(describeError(err).message);
     } finally {
       setConnecting(null);
     }
@@ -134,7 +134,7 @@ export function AddCredits({ balance, onCredited }: { balance: number | undefine
       }
     } catch (err) {
       if (err instanceof InsufficientFundsError) setShortAtPayment(err);
-      else setError(describeError(err, "Could not complete the top-up.").message);
+      else setError(describeError(err).message);
     } finally {
       setStep(null);
     }

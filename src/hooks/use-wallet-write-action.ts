@@ -46,7 +46,7 @@ export function useWalletWriteAction(
         if (result?.txHash) await verify(result.txHash);
         setStatus("success");
       } catch (err) {
-        setError(describeError(err, "We couldn't complete that transaction. Please try again.").message);
+        setError(describeError(err).message);
         setStatus("error");
       } finally {
         lockVenueSigner(signer.address);

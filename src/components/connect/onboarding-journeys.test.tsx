@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, describe, expect, mock, test } from "bun:test";
 import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { MedialaneApiError } from "@medialane/sdk";
 
 const WALLET = "0x01575d29b83d7828cd1d833ef785083b809adeb187b6ac14aab21db568f2bf02";
 
@@ -130,11 +131,11 @@ describe("an address that already has an account", () => {
 
   test("a wrong code shows a message and lets them try again", async () => {
     api.account.verifyEmailCode.mockImplementationOnce(async () => {
-      throw new Error("Incorrect code");
+      throw new MedialaneApiError(400, "Incorrect code", undefined, { error: "Incorrect code" });
     });
     await enterEmail("typo@example.com");
     await enterCode("000000");
-    await waitFor(() => expect(screen.getByText(/Incorrect code|Something went wrong/)).toBeTruthy());
+    await waitFor(() => expect(screen.getByText("Incorrect code")).toBeTruthy());
     expect(done).toEqual([]);
     expect(getSessionWallet).not.toHaveBeenCalled();
   });
