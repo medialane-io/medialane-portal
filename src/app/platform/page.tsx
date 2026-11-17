@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { LaunchpadCtaBanner } from "@medialane/ui";
 import { canonical, buildSocialMetadata } from "@/lib/seo";
 import { CardGrid, InfoCard, PageBody, PageHero, Section, VideoFrame } from "@/components/site/page-shell";
 
@@ -17,15 +16,15 @@ export const metadata: Metadata = {
 const PRINCIPLES = [
   {
     eyebrow: "The record",
-    title: "Kept where it cannot be rewritten",
+    title: "Permanent by design",
     description:
       "Authorship, date and license terms are stored in content-addressed, immutable metadata. The history of every asset, sale and license can be replayed from onchain events.",
   },
   {
     eyebrow: "The contracts",
-    title: "Set once, in public",
+    title: "Open and permissionless",
     description:
-      "Contracts are immutable and permissionless. Once deployed they stay as they were set, including for Medialane itself.",
+      "Contracts are immutable and open to everyone. Once deployed they work the same way for every participant.",
   },
   {
     eyebrow: "The terms",
@@ -37,7 +36,7 @@ const PRINCIPLES = [
     eyebrow: "The catalog",
     title: "One record, many apps",
     description:
-      "Every app reads and writes the same catalog through the SDK. Different views of one record, none of which can change what it says.",
+      "Every app reads and writes the same catalog through the SDK, so every view shows the same record.",
   },
 ];
 
@@ -50,7 +49,7 @@ const HUBS = [
   {
     title: "Marketplace",
     description:
-      "Buy, sell and license what has been issued. A sale pays out the moment it completes, directly between buyer and seller, with no escrow holding funds in between.",
+      "Buy, sell and license what has been issued. A sale pays out the moment it completes, directly between buyer and seller.",
   },
 ];
 
@@ -64,7 +63,7 @@ export default function PlatformPage() {
       <PageBody>
         <VideoFrame id="uH3jem2_Ix8" title="Medialane trailer: the story of media" />
 
-        <Section title="Four ideas" description="What everything built on Medialane rests on.">
+        <Section title="The foundations" description="What everything built here rests on.">
           <CardGrid columns={4}>
             {PRINCIPLES.map((item) => (
               <InfoCard key={item.title} {...item} />
@@ -72,7 +71,7 @@ export default function PlatformPage() {
           </CardGrid>
         </Section>
 
-        <Section title="Two hubs" description="Everything Medialane does is issuing an asset or trading one.">
+        <Section title="Issue and trade" description="Everything here is issuing an asset or trading one.">
           <CardGrid columns={2}>
             {HUBS.map((hub) => (
               <InfoCard key={hub.title} title={hub.title} description={hub.description} />
@@ -80,13 +79,10 @@ export default function PlatformPage() {
           </CardGrid>
         </Section>
 
-        <Section
-          title="You are in control"
-          description="Medialane is not an intermediary. It sponsors transactions and runs the services, but it never holds your keys or your funds, and contracts settle payments directly."
-        >
+        <Section title="Your wallet, your approval">
           <CardGrid columns={2}>
-            <InfoCard title="Your wallet" description="Assets are minted to a wallet only you control, secured with a passkey, Face ID or Touch ID. There is no seed phrase to lose." />
-            <InfoCard title="Your approval" description="You approve every batch of a run from your wallet before anything is issued." />
+            <InfoCard title="Your wallet" description="Assets are created in a wallet secured with a passkey, Face ID or Touch ID." />
+            <InfoCard title="Your approval" description="Every action is approved from your wallet before anything is issued." />
           </CardGrid>
         </Section>
 
@@ -95,14 +91,6 @@ export default function PlatformPage() {
           description="Starknet's proof system will let Medialane attest to real-world facts onchain, such as how many times a song streamed or an article was cited. As those proofs accumulate, the value of a licensed asset becomes something anyone can verify for themselves."
         />
 
-        <LaunchpadCtaBanner
-          eyebrow="Launchpad"
-          title="See what you can issue today"
-          description="Data Tokenization, IP Ticketing and Certificate Emission, run on your credits."
-          href="/services"
-          ctaLabel="View services"
-          tone="manage"
-        />
       </PageBody>
     </div>
   );

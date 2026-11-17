@@ -5,7 +5,7 @@ import { IpTicketingTask } from "@/components/launchpad/ip-ticketing-task";
 
 export const metadata: Metadata = {
   title: "IP Ticketing",
-  description: "Create verifiable on-chain tickets and distribute them to a list of recipients in one run.",
+  description: "Create verifiable on-chain tickets and distribute them to a list of recipients at once.",
   alternates: canonical("/launchpad/ip-ticketing"),
 };
 

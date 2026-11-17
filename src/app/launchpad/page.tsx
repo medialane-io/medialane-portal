@@ -2,12 +2,11 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Award, Database, Ticket } from "lucide-react";
 import { canonical, buildSocialMetadata } from "@/lib/seo";
-import { LaunchpadCtaBanner } from "@medialane/ui";
 import { RunsList } from "@/components/launchpad/runs-list";
 
 const title = "Launchpad";
 const description =
-  "Register a catalog, issue tickets or issue certificates. Save a run, pay for it once, and pick it back up any time.";
+  "Register a catalog, issue tickets or issue certificates. Your progress is saved, so you can pick it back up any time.";
 
 export const metadata: Metadata = {
   title,
@@ -24,8 +23,7 @@ export default function LaunchpadPage() {
           Issue your work
         </h1>
         <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-          Register a catalog, issue tickets or issue certificates. Save a run, pay for it once, and
-          pick it back up any time. Everything is issued to your own wallet.
+          Register a catalog, issue tickets or issue certificates. Your progress is saved, so you can pick it back up any time. Everything is issued to your own wallet.
         </p>
       </section>
 
@@ -42,7 +40,7 @@ export default function LaunchpadPage() {
             <div className="space-y-1.5">
               <h2 className="font-semibold">Data Tokenization</h2>
               <p className="text-sm text-muted-foreground">
-                Register a whole catalog in one run, with license terms attached to each item.
+                Register a whole catalog at once, with license terms attached to each item.
               </p>
             </div>
           </Link>
@@ -76,14 +74,6 @@ export default function LaunchpadPage() {
           </Link>
         </div>
 
-        <LaunchpadCtaBanner
-          eyebrow="Pricing"
-          title="See what it costs"
-          description="Every service is priced from the same table, read live."
-          href="/pricing"
-          ctaLabel="See pricing"
-          tone="manage"
-        />
       </div>
     </div>
   );

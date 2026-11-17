@@ -5,7 +5,7 @@ import { CertificateEmissionTask } from "@/components/launchpad/certificate-emis
 
 export const metadata: Metadata = {
   title: "Certificate Emission",
-  description: "Create verifiable on-chain certificates and distribute them to a list of recipients in one run.",
+  description: "Create verifiable on-chain certificates and distribute them to a list of recipients at once.",
   alternates: canonical("/launchpad/certificate-emission"),
 };
 

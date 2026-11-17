@@ -292,3 +292,38 @@ input[type="number"] {
   padding: 2px;
   border-radius: calc(var(--radius) * 1.25 + 2px);
 }
+
+.ft { position: relative; isolation: isolate; overflow: hidden; margin-top: auto; padding: 7rem 0 0; color: #fff; background: radial-gradient(55% 90% at 12% 0%, hsl(var(--brand-purple) / 0.24), transparent 70%), radial-gradient(55% 90% at 90% 100%, hsl(var(--brand-blue) / 0.26), transparent 70%), radial-gradient(35% 60% at 55% 110%, hsl(var(--brand-rose) / 0.14), transparent 70%), hsl(var(--brand-navy)); }
+.ft-scene { position: absolute; inset: 0; z-index: -1; width: 100%; height: 100%; pointer-events: none; }
+.ft-content { position: relative; z-index: 1; margin: 0 auto; width: 100%; max-width: 80rem; padding: 0 1rem; }
+@media (min-width: 640px) { .ft-content { padding: 0 1.5rem; } }
+.ft-carousel { position: relative; }
+.ft-track { display: flex; gap: 1.5rem; margin: 0; padding: 0; list-style: none; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; }
+.ft-track::-webkit-scrollbar { display: none; }
+.ft-card { --h: 327 64% 67%; flex: 0 0 16rem; min-height: 10.5rem; display: flex; flex-direction: column; justify-content: space-between; gap: 1.25rem; padding: 1.25rem; scroll-snap-align: start; border-radius: 20px; background: rgba(255, 255, 255, 0.67); color: #000; transition: background 0.3s, box-shadow 0.3s; }
+.ft-card:nth-child(5n+2) { --h: var(--brand-orange); }
+.ft-card:nth-child(5n+3) { --h: var(--brand-rose); }
+.ft-card:nth-child(5n+4) { --h: var(--brand-purple); }
+.ft-card:nth-child(5n+5) { --h: 225 100% 80%; }
+.ft-card.is-lit { background: #fff; box-shadow: 0 22px 54px -16px hsl(var(--h) / 0.85); }
+.ft-icon { display: grid; place-items: center; width: 2.9rem; height: 2.9rem; border-radius: 12px; background: hsl(var(--h) / 0.18); color: color-mix(in srgb, hsl(var(--h)) 65%, #000); }
+.ft-icon svg { width: 1.5rem; height: 1.5rem; }
+.ft-card h3 { margin: 0; font-size: 1.2rem; font-weight: 600; letter-spacing: -0.02em; line-height: 1.2; }
+.ft-controls { position: absolute; inset: 0 0.5rem; display: flex; align-items: center; justify-content: space-between; pointer-events: none; }
+@media (min-width: 1180px) { .ft-controls { inset: 0 -1.5rem; } }
+.ft-btn { display: grid; place-items: center; width: 2.75rem; height: 2.75rem; border: 0; border-radius: 999px; background: #fff; box-shadow: 0 8px 24px -8px rgba(6, 6, 90, 0.5); color: hsl(240 100% 52%); cursor: pointer; pointer-events: auto; transition: background 0.2s, opacity 0.2s; }
+.ft-btn svg { width: 1.25rem; height: 1.25rem; }
+.ft-btn:hover:not(:disabled) { background: hsl(240 100% 96%); }
+.ft-btn:disabled { opacity: 0; pointer-events: none; }
+.ft-body { position: relative; display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr) minmax(0, 1fr); gap: 4rem 3rem; align-items: start; margin-top: 5.5rem; }
+@media (max-width: 980px) { .ft-body { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); } .ft-brand { grid-column: 1 / -1; } }
+@media (max-width: 640px) { .ft { padding-top: 4.7rem; } .ft-body { grid-template-columns: 1fr; } .ft-card { flex-basis: 14rem; } .ft-controls { inset: 0 0.25rem; } }
+.ft-brand p { max-width: 30ch; margin: 1.5rem 0 2.5rem; font-size: 1.05rem; line-height: 1.45; color: rgba(255, 255, 255, 0.85); }
+.ft-contact { display: inline-flex; align-items: center; padding: 0.85rem 1.7rem; border-radius: 999px; background: #fff; color: hsl(240 100% 52%); font-size: 0.95rem; font-weight: 600; transition: background 0.2s; }
+.ft-contact:hover { background: hsl(240 100% 96%); }
+.ft-links { display: grid; gap: 0.9rem; margin: 0; padding: 0; list-style: none; }
+.ft-link { display: block; padding: 0.1rem 0; color: rgba(255, 255, 255, 0.85); font-size: 1rem; font-weight: 500; transition: color 0.2s, transform 0.2s; }
+.ft-link:hover { color: #fff; transform: translateX(4px); }
+.ft-legal { position: relative; z-index: 1; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 1rem; margin-top: 5.5rem; padding: 2rem 0 3rem; color: rgba(255, 255, 255, 0.75); font-size: 0.85rem; }
+.ft-legal a:hover { color: #fff; }
+@media (prefers-reduced-motion: reduce) { .ft-link { transition: color 0.2s; } .ft-link:hover { transform: none; } }

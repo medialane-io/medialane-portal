@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { LaunchpadCtaBanner } from "@medialane/ui";
 import { CardGrid, InfoCard, PageBody, PageHero, Section, StepList } from "@/components/site/page-shell";
 
 export interface ServiceDetailBlock {
@@ -15,13 +14,6 @@ export interface ServiceDetailContent {
   blocks: ServiceDetailBlock[];
   steps?: { title: string; description: string }[];
   cta?: { label: string; href: string };
-  secondaryCta?: {
-    eyebrow: string;
-    title: string;
-    description: string;
-    href: string;
-    ctaLabel: string;
-  };
 }
 
 export function ServiceDetailPage({ content }: { content: ServiceDetailContent }) {
@@ -49,16 +41,6 @@ export function ServiceDetailPage({ content }: { content: ServiceDetailContent }
           <Section title="How it works">
             <StepList steps={content.steps} />
           </Section>
-        ) : null}
-        {content.secondaryCta ? (
-          <LaunchpadCtaBanner
-            eyebrow={content.secondaryCta.eyebrow}
-            title={content.secondaryCta.title}
-            description={content.secondaryCta.description}
-            href={content.secondaryCta.href}
-            ctaLabel={content.secondaryCta.ctaLabel}
-            tone="manage"
-          />
         ) : null}
         <div className="text-center">
           <Link href="/services" className="text-sm font-medium text-primary hover:underline">

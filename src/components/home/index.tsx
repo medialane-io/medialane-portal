@@ -1,7 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { LaunchpadCtaBanner } from "@medialane/ui";
-import { CardGrid, Eyebrow, InfoCard, PageBody, PageHero, Panel, Section, StepList } from "@/components/site/page-shell";
+import { CardGrid, InfoCard, PageBody, PageHero, Section } from "@/components/site/page-shell";
 import { BERNE_COUNTRIES, CONSUMER_APP_URL } from "@/lib/site";
 
 const RECORD_POINTS = [
@@ -15,7 +14,7 @@ const SERVICES = [
     href: "/services/data-tokenization",
     eyebrow: "Protect and license",
     title: "Data Tokenization",
-    description: "A whole catalog registered in one run, with license terms that travel with every item.",
+    description: "A whole catalog registered at once, with license terms that travel with every item.",
     image: "/img/registration.jpg",
   },
   {
@@ -29,23 +28,16 @@ const SERVICES = [
     href: "/services/certificates",
     eyebrow: "Credential and certify",
     title: "Certificate Emission",
-    description: "Non-transferable certificates for a list of recipients, each receiving a wallet if they have none.",
+    description: "Non-transferable certificates for a list of recipients, each added to their own wallet.",
     image: "/img/business.jpg",
   },
 ];
 
-const STEPS = [
-  { title: "Choose a service", description: "Data Tokenization, IP Ticketing or Certificate Emission, with the files or recipient list to issue." },
-  { title: "Set the terms", description: "License, commercial use, territory and AI policy for what is issued." },
-  { title: "Pay once", description: "Credits, or USDC from the wallet. A saved run can be reopened at any time." },
-  { title: "Approve each batch", description: "Everything is issued to the owner's wallet, and each batch is approved with a passkey." },
-];
-
 const BUILD = [
-  { href: "/developers", title: "Developers", description: "One metered API for registration, licensing, minting and activity. A key, paid per call." },
-  { href: "/agents", title: "AI agents", description: "Agents authenticate with a keypair and pay per call on the same terms as people." },
+  { href: "/developers", title: "Developers", description: "One API for registration, licensing, creation and activity." },
+  { href: "/agents", title: "AI agents", description: "Agents sign in with a keypair and use the same services as people." },
   { href: "/infrastructure", title: "Infrastructure", description: "Tokenization inside a product, with its own screens on top." },
-  { href: "/pricing", title: "Pricing", description: "No subscription. Every action has a price in credits, read live." },
+  { href: "/pricing", title: "Pricing", description: "Clear prices for every action, shown live." },
 ];
 
 export function HomePage() {
@@ -54,7 +46,7 @@ export function HomePage() {
       <PageHero
         eyebrow="Medialane Portal"
         title="Protect, tokenize and monetize intellectual property"
-        description="Medialane records who made a work, when, and what anyone, including AI systems, may do with it. Catalogs, tickets and certificates are launched from the Launchpad, or built into a product with one API."
+        description="Every work gets a record of who made it, when, and what anyone, including AI systems, may do with it. Catalogs, tickets and certificates are launched from the Launchpad, or built into a product with one API."
       >
         <div className="flex flex-wrap items-center justify-center gap-3">
           <Link
@@ -76,7 +68,7 @@ export function HomePage() {
         <Section
           id="launchpad"
           title="Launch from the Launchpad"
-          description="Three services, each paid with credits and approved from the owner's own wallet."
+          description="Protect catalogs, issue tickets and certificates, and verify them onchain."
         >
           <CardGrid columns={3}>
             {SERVICES.map((service) => (
@@ -88,7 +80,7 @@ export function HomePage() {
         <Section
           id="ai"
           title="A record that travels with the work"
-          description={`AI systems are trained on creative work at scale, usually with no record of authorship or terms. A Medialane record lives in immutable metadata that anyone can verify, built for the Berne Convention, which covers ${BERNE_COUNTRIES} countries.`}
+          description={`Every work carries a verifiable record of who made it and the terms that apply, kept in immutable metadata that anyone can check. Built for the Berne Convention, which covers ${BERNE_COUNTRIES} countries.`}
         >
           <div className="grid gap-10 sm:grid-cols-3">
             {RECORD_POINTS.map((point) => (
@@ -105,28 +97,13 @@ export function HomePage() {
           </div>
         </Section>
 
-        <Section title="How a run works" description="Every Launchpad service follows the same four steps.">
-          <StepList steps={STEPS} />
-        </Section>
-
-        <Panel>
-          <Eyebrow>Ownership</Eyebrow>
-          <h2 className="font-display text-3xl font-bold leading-tight sm:text-4xl">Assets stay with their owner</h2>
-          <p className="text-base text-[#a3a8ba] sm:text-lg">
-            Assets are minted to the owner&apos;s wallet and payments settle directly through the smart contracts, with no escrow. Medialane never holds keys or funds.
-          </p>
-          <Link href="/platform" className="inline-block text-sm font-medium text-[hsl(240_100%_80%)] hover:underline">
-            How Medialane works
-          </Link>
-        </Panel>
-
         <section className="grid items-center gap-12 lg:grid-cols-2">
           <div className="relative aspect-[3/2] overflow-hidden rounded-3xl">
             <Image src="/img/developers.jpg" alt="" fill sizes="(min-width: 1024px) 50vw, 100vw" className="object-cover" />
           </div>
           <div className="space-y-8">
             <div className="space-y-3">
-              <h2 className="font-display text-3xl font-bold leading-tight text-foreground sm:text-4xl">Build with Medialane</h2>
+              <h2 className="font-display text-3xl font-bold leading-tight text-foreground sm:text-4xl">Build on the API</h2>
               <p className="text-base text-muted-foreground sm:text-lg">The same services are available to developers, AI agents and organizations through one API.</p>
             </div>
             <ul className="divide-y divide-border/60">
@@ -148,14 +125,6 @@ export function HomePage() {
         </section>
 
         <div className="space-y-6">
-          <LaunchpadCtaBanner
-            eyebrow="Talk to us"
-            title="Protecting a catalog or building a product on top of it?"
-            description="Tell us what is being built and we will help choose the right service."
-            href="/contact"
-            ctaLabel="Contact us"
-            tone="manage"
-          />
           <p className="text-center text-sm text-muted-foreground">
             Creating or collecting?{" "}
             <a href={CONSUMER_APP_URL} target="_blank" rel="noopener noreferrer" className="font-medium text-primary hover:underline">

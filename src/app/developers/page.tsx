@@ -1,12 +1,11 @@
 import type { Metadata } from "next";
-import { LaunchpadCtaBanner } from "@medialane/ui";
 import { canonical, buildSocialMetadata } from "@/lib/seo";
 import { CardGrid, InfoCard, PageBody, PageHero, Section, StepList } from "@/components/site/page-shell";
 import { DOCS_URL } from "@/lib/site";
 
 const title = "Developers";
 const description =
-  "A typed SDK, a service registry and one metered API for every live service: registration, licensing, minting, marketplace orders, metadata and onchain activity.";
+  "A typed SDK, a service registry and one API for every live service: registration, licensing, minting, marketplace orders, metadata and onchain activity.";
 
 export const metadata: Metadata = {
   title,
@@ -17,9 +16,9 @@ export const metadata: Metadata = {
 
 const STEPS = [
   { title: "Sign in and get a key", description: "Sign in with your email, then create your API key from your account. An account has one key." },
-  { title: "Add credits", description: "Buy credits with USDC. Every call your key makes is paid from them." },
-  { title: "Read the service registry", description: "Every service is described as structured data, so there is no per-route behavior to guess at." },
-  { title: "Call the API or sign an intent", description: "Reads return indexed data. Writes return calldata for you to sign, so your wallet key never leaves your device." },
+  { title: "Top up", description: "Add USDC to cover every call your key makes." },
+  { title: "Read the service registry", description: "Every service is described as structured data, so behavior is clear before the first call." },
+  { title: "Call the API or sign an intent", description: "Reads return indexed data. Writes return ready-to-sign calldata, so your wallet key stays on your device." },
 ];
 
 const ENDPOINTS = [
@@ -29,12 +28,12 @@ const ENDPOINTS = [
   { title: "Onchain activity", description: "Mints, transfers, sales, offers and cancellations, indexed as they happen." },
   { title: "Marketplace orders", description: "Query listings, bids and completed sales, and sign trade intents with your own wallet." },
   { title: "Tickets and clubs", description: "Issue and query tickets and membership cards, with full holder history." },
-  { title: "Sponsorship", description: "Bids and licenses settled directly when a deal is accepted, with no escrow." },
+  { title: "Sponsorship", description: "Bids and licenses settled directly when a deal is accepted." },
   { title: "Creator coins", description: "Deploy and track fixed-supply creator coins." },
 ];
 
 const CALLERS = [
-  { title: "Businesses", description: "Run Launchpad services on your credits, or call the same capabilities from your own systems." },
+  { title: "Businesses", description: "Use the Launchpad services, or call the same capabilities from your own systems." },
   { title: "AI agents", description: "Authenticate headlessly with a keypair and pay per call over x402, at the same prices as a person." },
 ];
 
@@ -43,7 +42,7 @@ export default function DevelopersPage() {
     <div className="pb-20">
       <PageHero
         title="One API for the whole protocol"
-        description="One API covers every live service. Sign in, get a key and start building. Paid per call, on the same rail businesses and AI agents both use."
+        description="One API covers every live service, for businesses and AI agents alike. Sign in, get a key and start building."
       >
         <div className="flex flex-wrap items-center justify-center gap-3">
           <a
@@ -58,7 +57,7 @@ export default function DevelopersPage() {
       </PageHero>
 
       <PageBody>
-        <Section title="Get building in four steps">
+        <Section title="Get building">
           <StepList steps={STEPS} />
         </Section>
 
@@ -70,7 +69,7 @@ export default function DevelopersPage() {
           </CardGrid>
         </Section>
 
-        <Section title="Built for every caller" description="The same registry and the same API, two ways in.">
+        <Section title="Built for every caller" description="The same registry and the same API for everyone.">
           <CardGrid columns={2}>
             {CALLERS.map((item) => (
               <InfoCard key={item.title} {...item} />
@@ -78,14 +77,6 @@ export default function DevelopersPage() {
           </CardGrid>
         </Section>
 
-        <LaunchpadCtaBanner
-          eyebrow="Get started"
-          title="Sign in and get a key"
-          description="Create an API key and add credits from your account."
-          href="/account"
-          ctaLabel="Go to your account"
-          tone="manage"
-        />
       </PageBody>
     </div>
   );

@@ -3,7 +3,6 @@ import { unstable_cache } from "next/cache";
 import { getMedialaneClient } from "@/lib/medialane-client";
 import { canonical, buildSocialMetadata } from "@/lib/seo";
 import { tierRows, type MdlnTier } from "@/lib/mdln-tiers";
-import { LaunchpadCtaBanner } from "@medialane/ui";
 import { groupPricing, type PricingRule } from "@/lib/pricing-groups";
 import { CardGrid, InfoCard, PageBody, PageHero, Section } from "@/components/site/page-shell";
 
@@ -72,7 +71,7 @@ export default async function PricingPage() {
 
       <PageBody>
         {runs.length > 0 ? (
-          <Section title="Launchpad runs" description="A run is the sum of the actions it performs, each priced below.">
+          <Section title="Launchpad" description="Each action is priced below, in credits.">
             <PriceTable rows={runs} />
             <CardGrid columns={3}>
               {SERVICE_COSTS.map((item) => (
@@ -111,14 +110,6 @@ export default async function PricingPage() {
           </Section>
         ) : null}
 
-        <LaunchpadCtaBanner
-          eyebrow="Credits"
-          title="Buy credits with USDC"
-          description="One credit is one cent. Top up from your account and spend it across every service."
-          href="/account"
-          ctaLabel="Go to your account"
-          tone="manage"
-        />
       </PageBody>
     </div>
   );
