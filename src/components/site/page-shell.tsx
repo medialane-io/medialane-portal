@@ -144,3 +144,19 @@ export function Panel({ children }: { children: ReactNode }) {
     </div>
   );
 }
+
+export function VideoFrame({ id, title }: { id: string; title: string }) {
+  return (
+    <div className="relative mx-auto aspect-video w-full max-w-4xl overflow-hidden rounded-3xl bg-[hsl(var(--brand-navy))]">
+      <iframe
+        src={`https://www.youtube-nocookie.com/embed/${id}`}
+        title={title}
+        loading="lazy"
+        referrerPolicy="strict-origin-when-cross-origin"
+        allow="accelerometer; encrypted-media; gyroscope; picture-in-picture; fullscreen"
+        allowFullScreen
+        className="absolute inset-0 h-full w-full border-0"
+      />
+    </div>
+  );
+}

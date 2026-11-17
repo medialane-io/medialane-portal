@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { LaunchpadCtaBanner } from "@medialane/ui";
 import { canonical, buildSocialMetadata } from "@/lib/seo";
-import { CardGrid, InfoCard, PageBody, PageHero, Section } from "@/components/site/page-shell";
+import { CardGrid, InfoCard, PageBody, PageHero, Section, VideoFrame } from "@/components/site/page-shell";
 
 const title = "How Medialane works";
 const description =
@@ -62,6 +62,8 @@ export default function PlatformPage() {
         description="Tokenization turns something you own into a digital record you can license, trade and verify on Starknet, secured by zero-knowledge validity proofs. It is the idea behind tokenizing real estate or bonds, applied to intellectual property."
       />
       <PageBody>
+        <VideoFrame id="uH3jem2_Ix8" title="Medialane trailer: the story of media" />
+
         <Section title="Four ideas" description="What everything built on Medialane rests on.">
           <CardGrid columns={4}>
             {PRINCIPLES.map((item) => (

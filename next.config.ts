@@ -19,7 +19,7 @@ const reportOnlyCsp = [
   "font-src 'self' data:",
   `connect-src 'self' ${BACKEND_ORIGIN} https://www.google-analytics.com https://region1.google-analytics.com`,
   "worker-src 'self' blob:",
-  "frame-src 'self'",
+  "frame-src 'self' https://www.youtube-nocookie.com",
   "base-uri 'self'",
   "object-src 'none'",
   "frame-ancestors 'self'",
