@@ -2,8 +2,6 @@
 
 import { ThemeProvider } from "next-themes";
 import { Toaster, toast } from "sonner";
-import Link from "next/link";
-import { MedialaneLogoFull as MedialaneLogo } from "@medialane/ui/brand-logo";
 import { SWRConfig } from "swr";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { usePathname } from "next/navigation";
@@ -17,7 +15,7 @@ import { NavConnectButton } from "@/components/nav-connect-button";
 import { HeaderWalletTrigger } from "@/components/nav-wallet-trigger";
 import { MediaWalletApp } from "@/components/media-wallet-app";
 import { walletConsent } from "@/lib/wallet/client";
-import { DOCS_URL, PRIVACY_URL, TERMS_URL } from "@/lib/site";
+import { SiteFooter } from "@/components/site/site-footer";
 
 const GA_ID = process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS_ID;
 
@@ -59,29 +57,7 @@ function MainShell({ children }: { children: React.ReactNode }) {
           <HeaderWalletTrigger />
         </div>
         <main className="min-w-0 flex-1 overflow-x-hidden">{children}</main>
-        <footer className="px-4 sm:px-6 lg:px-8 py-8 mt-auto">
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-muted-foreground">
-            <p className="text-xs">© {new Date().getFullYear()} Medialane DAO</p>
-            <nav className="flex items-center gap-4 flex-wrap justify-center">
-              <Link href="/platform" className="hover:text-foreground transition-colors">How it works</Link>
-              <Link href="/services" className="hover:text-foreground transition-colors">Services</Link>
-              <Link href="/developers" className="hover:text-foreground transition-colors">Developers</Link>
-              <Link href="/agents" className="hover:text-foreground transition-colors">AI agents</Link>
-              <Link href="/infrastructure" className="hover:text-foreground transition-colors">Infrastructure</Link>
-              <Link href="/launchpad" className="hover:text-foreground transition-colors">Launchpad</Link>
-              <Link href="/account" className="hover:text-foreground transition-colors">Account</Link>
-              <Link href="/pricing" className="hover:text-foreground transition-colors">Pricing</Link>
-              <Link href="/contact" className="hover:text-foreground transition-colors">Contact</Link>
-              <a href={DOCS_URL} target="_blank" rel="noopener noreferrer" className="hover:text-foreground transition-colors">Docs</a>
-              <a href={TERMS_URL} target="_blank" rel="noopener noreferrer" className="hover:text-foreground transition-colors">Terms</a>
-              <a href={PRIVACY_URL} target="_blank" rel="noopener noreferrer" className="hover:text-foreground transition-colors">Privacy</a>
-              <a href="https://x.com/medialane_io" target="_blank" rel="noopener noreferrer" className="hover:text-foreground transition-colors">X</a>
-            </nav>
-            <div className="flex items-center gap-2">
-              <MedialaneLogo />
-            </div>
-          </div>
-        </footer>
+        <SiteFooter />
       </div>
     </>
   );
