@@ -16,7 +16,7 @@ export const metadata: Metadata = {
 const content: ServiceDetailContent = {
   eyebrow: "On the protocol",
   title: "Scarcity you control",
-  description: "Available through the API and on medialane.io. Two services cover it: numbered editions of an existing work, and timed drops of a new one.",
+  description: "Available through the API and on medialane.io. Numbered editions of an existing work, and timed drops of a new one.",
   cta: { label: "See the API", href: "/developers" },
   blocks: [
     { title: "Numbered copies, set by you", description: "Release a work in as many numbered copies as you choose. Every copy carries the same provenance back to your original." },

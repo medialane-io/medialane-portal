@@ -19,9 +19,9 @@ const content: ServiceDetailContent = {
   description: "Available through the API and on medialane.io. A song, an artwork or a patent can take a sponsorship offer in exchange for a license.",
   cta: { label: "See the API", href: "/developers" },
   blocks: [
-    { eyebrow: "Direct settlement", title: "Sponsor an asset, receive a license", description: "A sponsor bids on an asset you own and you accept. They receive a license and payment settles directly between the two of you, with no escrow." },
-    { eyebrow: "Open or invited", title: "Open bidding, or one sponsor", description: "Run an open offer anyone can bid on, or start a deal with one sponsor. Either side can propose the terms." },
-    { eyebrow: "Owner-verified", title: "Only the owner can accept", description: "The license is issued the moment the asset's owner accepts a bid." },
+    { eyebrow: "Direct settlement", title: "Sponsor an asset, receive a license", description: "A sponsor bids on an asset you own and you accept. They receive a license and payment settles directly between the two of you." },
+    { eyebrow: "Open or invited", title: "Open bidding, or one sponsor", description: "Start an open offer anyone can bid on, or start a deal with one sponsor. Either side can propose the terms." },
+    { eyebrow: "Owner-verified", title: "Accepted by the owner", description: "The license is issued the moment the asset's owner accepts a bid." },
   ],
 };
 

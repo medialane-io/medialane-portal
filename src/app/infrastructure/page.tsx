@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { LaunchpadCtaBanner } from "@medialane/ui";
 import { canonical, buildSocialMetadata } from "@/lib/seo";
 import { CardGrid, InfoCard, PageBody, PageHero } from "@/components/site/page-shell";
 
@@ -16,8 +15,8 @@ export const metadata: Metadata = {
 
 const BLOCKS = [
   { title: "Pick what to add", description: "Tickets, memberships, collections, licensing or a coin. Each is a ready-made capability." },
-  { title: "Connect through one API", description: "Call Medialane's API to issue and manage assets for your product. There are no contracts for you to write, audit or deploy." },
-  { title: "Build your own screens", description: "You design the interface your customers see. Medialane runs the tokenization underneath it." },
+  { title: "Connect through one API", description: "Issue and manage assets for your product through the API, with ready-to-use contracts already in place." },
+  { title: "Build your own screens", description: "You design the interface your customers see, and the tokenization works underneath it." },
   { title: "Works beyond your product", description: "Every asset follows the same open format, so it is recognized by other marketplaces and apps." },
 ];
 
@@ -25,8 +24,8 @@ export default function InfrastructurePage() {
   return (
     <div className="pb-20">
       <PageHero
-        title="Power your product with Medialane"
-        description="Plug in ready-made tokenization capabilities, on infrastructure Medialane's own products already run on."
+        title="Power your product with tokenization"
+        description="Plug in ready-made tokenization capabilities, on the infrastructure that powers our own products."
       />
       <PageBody>
         <CardGrid columns={4}>
@@ -34,14 +33,6 @@ export default function InfrastructurePage() {
             <InfoCard key={item.title} {...item} />
           ))}
         </CardGrid>
-        <LaunchpadCtaBanner
-          eyebrow="Working at scale?"
-          title="Talk to us about your integration"
-          description="Tell us what you are building and what volume you expect."
-          href="/contact"
-          ctaLabel="Contact us"
-          tone="manage"
-        />
       </PageBody>
     </div>
   );
