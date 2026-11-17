@@ -2,12 +2,12 @@ import type { Metadata } from "next";
 import { canonical, buildSocialMetadata } from "@/lib/seo";
 import { HomePage } from "@/components/home";
 
-const title = "Protect, license and monetize your IP onchain";
+const title = "Protect, tokenize and monetize intellectual property";
 const description =
-  "Proof of authorship and license terms, including an AI policy, for the work you own. Issue to a list of people from the Launchpad, or build it into your product with one API.";
+  "Medialane records who made a work, when, and what anyone, including AI systems, may do with it. Launch catalogs, tickets and certificates from the Launchpad, or build on one API.";
 
 export const metadata: Metadata = {
-  title: { absolute: "Medialane | Protect, license and monetize your IP onchain" },
+  title: { absolute: "Medialane | Protect, tokenize and monetize intellectual property" },
   description,
   alternates: canonical("/"),
   ...buildSocialMetadata({ title, description, imageAlt: "Medialane" }),

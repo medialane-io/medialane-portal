@@ -109,7 +109,7 @@ export function readManifest(csvText: string, files: File[]): Manifest {
 
   const dataRows = rows.slice(1);
   if (dataRows.length > MAX_ITEMS) {
-    return { items, problems: [{ row: null, message: `A run holds up to ${MAX_ITEMS} items` }] };
+    return { items, problems: [{ row: null, message: "This run has too many items" }] };
   }
 
   const byName = new Map(files.map((f) => [f.name, f]));
