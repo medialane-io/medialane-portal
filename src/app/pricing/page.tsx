@@ -8,7 +8,7 @@ import { CardGrid, InfoCard, PageBody, PageHero, Section } from "@/components/si
 
 const title = "Pricing";
 const description =
-  "No subscription. Every action on Medialane has a price in credits, read live, and the same price applies to people and AI agents.";
+  "Clear prices for every action, read live, and the same for people and AI agents.";
 
 export const metadata: Metadata = {
   title,
@@ -66,7 +66,7 @@ export default async function PricingPage() {
     <div className="pb-20">
       <PageHero
         title="Pay for what you use"
-        description="No subscription. Buy credits with USDC and spend them as you go. One credit is one cent, and holding MDLN lowers the rate."
+        description="Buy credits with USDC and use them as you go. One credit is one cent, and holding MDLN lowers the rate."
       />
 
       <PageBody>

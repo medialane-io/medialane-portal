@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import { canonical, buildSocialMetadata } from "@/lib/seo";
 import { CardGrid, InfoCard, PageBody, PageHero, Section, VideoFrame } from "@/components/site/page-shell";
 
-const title = "How Medialane works";
+const title = "How it works";
 const description =
-  "Immutable records, permissionless contracts and one shared catalog behind everything built on Medialane.";
+  "Immutable records, permissionless contracts and one shared catalog behind everything built on the platform.";
 
 export const metadata: Metadata = {
   title,
@@ -57,11 +57,11 @@ export default function PlatformPage() {
   return (
     <div className="pb-20">
       <PageHero
-        title="How Medialane works"
+        title="How it works"
         description="Tokenization turns something you own into a digital record you can license, trade and verify on Starknet, secured by zero-knowledge validity proofs. It is the idea behind tokenizing real estate or bonds, applied to intellectual property."
       />
       <PageBody>
-        <VideoFrame id="uH3jem2_Ix8" title="Medialane trailer: the story of media" />
+        <VideoFrame id="uH3jem2_Ix8" title="Trailer: the story of media" />
 
         <Section title="The foundations" description="What everything built here rests on.">
           <CardGrid columns={4}>

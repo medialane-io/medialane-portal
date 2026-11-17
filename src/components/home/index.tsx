@@ -44,7 +44,7 @@ export function HomePage() {
   return (
     <div className="pb-24">
       <PageHero
-        eyebrow="Medialane Portal"
+        eyebrow="Portal"
         title="Protect, tokenize and monetize intellectual property"
         description="Every work gets a record of who made it, when, and what anyone, including AI systems, may do with it. Catalogs, tickets and certificates are launched from the Launchpad, or built into a product with one API."
       >
