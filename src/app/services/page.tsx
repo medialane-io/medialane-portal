@@ -16,7 +16,7 @@ export const metadata: Metadata = {
 };
 
 const LAUNCHPAD = [
-  { href: "/services/data-tokenization", eyebrow: "Launchpad", title: "Data Tokenization", description: "Register up to 500 items in one run, with authorship, date and license terms recorded for each." },
+  { href: "/services/data-tokenization", eyebrow: "Launchpad", title: "Data Tokenization", description: "Register a whole catalog in one run, with authorship, date and license terms recorded for each item." },
   { href: "/services/tickets", eyebrow: "Launchpad", title: "IP Ticketing", description: "Tickets with their own supply and validity window, sent to a guest list and checkable against the chain." },
   { href: "/services/certificates", eyebrow: "Launchpad", title: "Certificate Emission", description: "Non-transferable certificates sent to a list of recipients, who keep them in their own wallet." },
 ];

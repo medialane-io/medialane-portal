@@ -17,7 +17,7 @@ const content: ServiceDetailContent = {
   eyebrow: "Launchpad",
   title: "Register a whole catalog in one run",
   description:
-    "Add up to 500 items, set the terms once, and every item is minted to your own collection with authorship, date and license terms recorded permanently.",
+    "Add the items, set the terms once, and every item is minted to your own collection with authorship, date and license terms recorded permanently.",
   cta: { label: "Start a run", href: "/launchpad/data-tokenization" },
   blocks: [
     { eyebrow: "Proof", title: "Authorship and date, kept", description: "Each item carries a permanent record of who made it and when, in content-addressed metadata anyone can verify." },

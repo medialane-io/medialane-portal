@@ -42,7 +42,7 @@ export default function LaunchpadPage() {
             <div className="space-y-1.5">
               <h2 className="font-semibold">Data Tokenization</h2>
               <p className="text-sm text-muted-foreground">
-                Register up to 500 items in one run, with license terms attached to each.
+                Register a whole catalog in one run, with license terms attached to each item.
               </p>
             </div>
           </Link>

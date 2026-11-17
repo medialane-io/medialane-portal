@@ -170,7 +170,7 @@ export function DataTokenizationTask() {
             included={[
               { icon: FileCheck2, title: "Proof of ownership", desc: "Authorship and date are recorded permanently for every item." },
               { icon: Scale, title: "Terms that travel", desc: "Licensing is carried by each item wherever it goes." },
-              { icon: Layers, title: "Your whole catalog", desc: "Up to 500 items in one run, picked up anytime." },
+              { icon: Layers, title: "Your whole catalog", desc: "Your catalog in one run, picked up anytime." },
             ]}
             steps={["Choose a collection", "Add your catalog and its files", "Pay once and run it"]}
             trustIcon={ShieldCheck}
